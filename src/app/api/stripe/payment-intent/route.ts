@@ -25,6 +25,22 @@ export async function POST(request: Request) {
 
   const { listing_id, type } = parsed.data
 
+  // Prevent double payment
+  const { data: existingTx } = await supabase
+    .from('transactions')
+    .select('id')
+    .eq('listing_id', listing_id)
+    .eq('payer_id', user.id)
+    .in('status', ['succeeded', 'pending'])
+    .maybeSingle()
+
+  if (existingTx) {
+    return NextResponse.json(
+      { error: 'You have already paid for this listing.' },
+      { status: 409 }
+    )
+  }
+
   const { data: listing } = await supabase
     .from('listings')
     .select('*, users:supplier_id(stripe_account_id)')

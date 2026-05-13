@@ -37,6 +37,18 @@ export async function POST(request: Request) {
         : session.payment_intent?.id
 
       if (listingId && payerId && payeeId && paymentIntentId) {
+        // Verify metadata matches actual database state
+        const { data: listing } = await supabase
+          .from('listings')
+          .select('id, supplier_id')
+          .eq('id', listingId)
+          .single()
+
+        if (!listing || listing.supplier_id !== payeeId) {
+          console.error('Webhook metadata mismatch: listing/payee mismatch', { listingId, payeeId })
+          break
+        }
+
         // Record transaction (idempotent)
         const { data: existing } = await supabase
           .from('transactions')

@@ -28,7 +28,8 @@ const TRUST_ITEMS = [
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') ?? '/dashboard'
+  const rawNext = searchParams.get('next') ?? '/dashboard'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
   const [error, setError] = useState<string | null>(null)
 
   const {

@@ -95,8 +95,21 @@ export function ListingWizard({ userId }: { userId: string }) {
 
   function handlePhotoAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp']
+    const maxSize = 10 * 1024 * 1024 // 10 MB per file
+
+    const valid = files.filter(f => {
+      if (!validTypes.includes(f.type)) return false
+      if (f.size > maxSize) return false
+      return true
+    })
+
+    if (valid.length < files.length) {
+      toast.error('Some files were skipped (only JPG, PNG, WebP under 10 MB)')
+    }
+
     const remaining = MAX_LISTING_IMAGES - photos.length
-    const toAdd = files.slice(0, remaining)
+    const toAdd = valid.slice(0, remaining)
     setPhotos(prev => [...prev, ...toAdd])
     setPhotoURLs(prev => [...prev, ...toAdd.map(f => URL.createObjectURL(f))])
   }
