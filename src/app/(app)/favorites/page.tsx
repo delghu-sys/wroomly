@@ -1,0 +1,72 @@
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
+import { ListingCard } from '@/components/listings/ListingCard'
+import type { ListingWithDetails } from '@/types/database'
+import { Button } from '@/components/ui/button'
+import { Heart } from 'lucide-react'
+
+export const metadata: Metadata = { title: 'Saved Listings' }
+
+export default async function FavoritesPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/sign-in')
+
+  const { data: favorites } = await supabase
+    .from('favorites')
+    .select(`
+      listing_id,
+      listings(
+        *,
+        listing_images(*),
+        listing_amenities(*),
+        swap_preferences(*),
+        users:supplier_id(id, full_name, avatar_url, university)
+      )
+    `)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const listings = ((favorites ?? []) as any[])
+    .map(f => f.listings)
+    .filter(Boolean) as ListingWithDetails[]
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="animate-fade-up mb-8">
+        <p className="text-xs uppercase tracking-[0.18em] text-ink-muted font-medium mb-2">
+          {listings.length} {listings.length === 1 ? 'place' : 'places'} saved
+        </p>
+        <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink text-balance">
+          Saved <span className="italic font-light text-navy">listings.</span>
+        </h1>
+      </div>
+
+      {listings.length === 0 ? (
+        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
+          <div className="inline-flex w-14 h-14 rounded-2xl bg-maize/30 text-navy items-center justify-center mb-4">
+            <Heart className="w-6 h-6" />
+          </div>
+          <p className="font-display text-2xl text-ink">Nothing saved yet</p>
+          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
+            Tap the heart on any listing you like — it&apos;ll show up here so you can come back later.
+          </p>
+          <Link href="/listings">
+            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
+              Browse listings
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="stagger-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {listings.map(listing => (
+            <ListingCard key={listing.id} listing={listing} isFavorited />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

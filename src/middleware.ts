@@ -1,0 +1,71 @@
+import { NextResponse, type NextRequest } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
+import { createServerClient } from '@supabase/ssr'
+
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy']
+const AUTH_ROUTES = ['/sign-in', '/sign-up', '/verify-email']
+const ADMIN_ROUTES = ['/admin']
+const SUPPLIER_ROUTES = ['/my-listings', '/listings/new', '/inquiries', '/payouts']
+
+export async function middleware(request: NextRequest) {
+  const { supabaseResponse, user } = await updateSession(request)
+  const pathname = request.nextUrl.pathname
+
+  // Allow public and auth routes
+  if (
+    AUTH_ROUTES.some(r => pathname.startsWith(r)) ||
+    PUBLIC_ROUTES.some(r => pathname === r) ||
+    (pathname.startsWith('/listings/') && !pathname.endsWith('/edit') && !pathname.endsWith('/new')) ||
+    pathname.startsWith('/users/')
+  ) {
+    return supabaseResponse
+  }
+
+  // Require auth for all other routes
+  if (!user) {
+    const redirectUrl = new URL('/sign-in', request.url)
+    redirectUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Fetch user role from DB
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll() },
+        setAll() {},
+      },
+    }
+  )
+  const { data: profile } = await supabase
+    .from('users')
+    .select('user_type, is_suspended')
+    .eq('id', user.id)
+    .single()
+
+  if ((profile as { is_suspended?: boolean } | null)?.is_suspended) {
+    return NextResponse.redirect(new URL('/suspended', request.url))
+  }
+
+  const userType = (profile as { user_type?: string } | null)?.user_type
+
+  // Admin-only routes
+  if (ADMIN_ROUTES.some(r => pathname.startsWith(r)) && userType !== 'admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // Supplier-only routes (admins also allowed)
+  if (SUPPLIER_ROUTES.some(r => pathname.startsWith(r)) && userType !== 'supplier' && userType !== 'admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  return supabaseResponse
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
