@@ -7,6 +7,7 @@ import { ListingsFilters } from '@/components/listings/ListingsFilters'
 import { ListingsViewToggle } from '@/components/listings/ListingsViewToggle'
 import { ListingsMap, type MapListing } from '@/components/listings/ListingsMap'
 import { Button } from '@/components/ui/button'
+import { ListingsSearch } from '@/components/listings/ListingsSearch'
 import { BedDouble, Bell, DollarSign, CalendarRange, MapPin } from 'lucide-react'
 import {
   ANN_ARBOR_NEIGHBORHOODS,
@@ -45,6 +46,9 @@ export default async function ListingsPage({
     `)
     .eq('status', 'active')
 
+  if (filters.q) {
+    query = query.or(`title.ilike.%${filters.q}%,description.ilike.%${filters.q}%,neighborhood.ilike.%${filters.q}%,residence_name.ilike.%${filters.q}%`)
+  }
   if (filters.type === 'sublet' || filters.type === 'swap') {
     query = query.eq('type', filters.type)
   }
@@ -173,7 +177,10 @@ export default async function ListingsPage({
                 </p>
               )}
             </div>
-            <ListingsViewToggle view={view} />
+            <div className="flex items-center gap-3">
+              <ListingsSearch currentQuery={filters.q} />
+              <ListingsViewToggle view={view} />
+            </div>
           </div>
         </div>
       </section>

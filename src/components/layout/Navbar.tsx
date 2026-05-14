@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquare, Menu, X } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
 
 interface NavbarProps {
@@ -24,6 +25,7 @@ interface NavbarProps {
 
 export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
   const router = useRouter()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   async function signOut() {
     const supabase = createClient()
@@ -33,7 +35,7 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
   }
 
   function nav(href: string) {
-    return () => router.push(href)
+    return () => { setMobileOpen(false); router.push(href) }
   }
 
   const initials = user?.full_name
@@ -57,7 +59,7 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
           </span>
         </Link>
 
-        {/* Center links */}
+        {/* Center links — desktop */}
         <div className="hidden md:flex items-center gap-7">
           <Link
             href="/listings"
@@ -107,47 +109,58 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
                 </div>
               )}
 
-              {/* Avatar dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 focus:ring-offset-background ease-smooth transition-transform hover:scale-[1.03]">
-                  <Avatar className="h-9 w-9 ring-1 ring-line">
-                    <AvatarImage src={user.avatar_url ?? undefined} />
-                    <AvatarFallback className="bg-navy-soft text-navy text-sm font-medium">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5 border-line shadow-soft">
-                  <div className="px-3 py-2.5">
-                    <p className="text-sm font-medium text-ink truncate">{user.full_name}</p>
-                    <p className="text-xs text-ink-muted truncate">{user.email}</p>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={nav('/dashboard')} className="rounded-lg">Dashboard</DropdownMenuItem>
-                  {(user.user_type === 'supplier' || user.user_type === 'admin') && (
-                    <>
-                      <DropdownMenuItem onClick={nav('/my-listings')} className="rounded-lg">My listings</DropdownMenuItem>
-                      <DropdownMenuItem onClick={nav('/inquiries')} className="rounded-lg">Inquiries</DropdownMenuItem>
-                      <DropdownMenuItem onClick={nav('/payouts')} className="rounded-lg">Payouts</DropdownMenuItem>
-                    </>
-                  )}
-                  {user.user_type === 'consumer' && (
-                    <>
-                      <DropdownMenuItem onClick={nav('/favorites')} className="rounded-lg">Saved listings</DropdownMenuItem>
-                      <DropdownMenuItem onClick={nav('/applications')} className="rounded-lg">Applications</DropdownMenuItem>
-                    </>
-                  )}
-                  {user.user_type === 'admin' && (
-                    <DropdownMenuItem onClick={nav('/admin')} className="rounded-lg">Admin dashboard</DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={nav('/profile')} className="rounded-lg">Profile settings</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut} className="rounded-lg text-destructive focus:text-destructive">
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Avatar dropdown — desktop */}
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 focus:ring-offset-background ease-smooth transition-transform hover:scale-[1.03]">
+                    <Avatar className="h-9 w-9 ring-1 ring-line">
+                      <AvatarImage src={user.avatar_url ?? undefined} />
+                      <AvatarFallback className="bg-navy-soft text-navy text-sm font-medium">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5 border-line shadow-soft">
+                    <div className="px-3 py-2.5">
+                      <p className="text-sm font-medium text-ink truncate">{user.full_name}</p>
+                      <p className="text-xs text-ink-muted truncate">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={nav('/dashboard')} className="rounded-lg">Dashboard</DropdownMenuItem>
+                    {(user.user_type === 'supplier' || user.user_type === 'admin') && (
+                      <>
+                        <DropdownMenuItem onClick={nav('/my-listings')} className="rounded-lg">My listings</DropdownMenuItem>
+                        <DropdownMenuItem onClick={nav('/inquiries')} className="rounded-lg">Inquiries</DropdownMenuItem>
+                        <DropdownMenuItem onClick={nav('/payouts')} className="rounded-lg">Payouts</DropdownMenuItem>
+                      </>
+                    )}
+                    {user.user_type === 'consumer' && (
+                      <>
+                        <DropdownMenuItem onClick={nav('/favorites')} className="rounded-lg">Saved listings</DropdownMenuItem>
+                        <DropdownMenuItem onClick={nav('/applications')} className="rounded-lg">Applications</DropdownMenuItem>
+                      </>
+                    )}
+                    {user.user_type === 'admin' && (
+                      <DropdownMenuItem onClick={nav('/admin')} className="rounded-lg">Admin dashboard</DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={nav('/profile')} className="rounded-lg">Profile settings</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => { setMobileOpen(false); signOut() }} className="rounded-lg text-destructive focus:text-destructive">
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              {/* Hamburger — mobile */}
+              <button
+                onClick={() => setMobileOpen(o => !o)}
+                className="md:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-navy-soft transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </>
           ) : (
             <>
@@ -162,14 +175,88 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
               <Button
                 size="sm"
                 onClick={nav('/sign-up')}
-                className="rounded-full bg-navy hover:bg-navy/90 text-white px-4 ease-smooth transition-all hover:-translate-y-px"
+                className="hidden sm:inline-flex rounded-full bg-navy hover:bg-navy/90 text-white px-4 ease-smooth transition-all hover:-translate-y-px"
               >
                 Get started
               </Button>
+              {/* Hamburger — mobile logged out */}
+              <button
+                onClick={() => setMobileOpen(o => !o)}
+                className="md:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-navy-soft transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </>
           )}
         </div>
       </nav>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-line bg-background/95 backdrop-blur-xl animate-fade-up">
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+            <MobileLink href="/listings" onClick={() => setMobileOpen(false)}>Browse</MobileLink>
+            <MobileLink href="/about" onClick={() => setMobileOpen(false)}>How it works</MobileLink>
+
+            {user && (
+              <>
+                <div className="h-px bg-line my-2" />
+                <MobileLink href="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</MobileLink>
+                <MobileLink href="/messages" onClick={() => setMobileOpen(false)}>
+                  Messages {unreadCount > 0 && <span className="ml-1.5 text-xs bg-maize text-navy px-1.5 py-0.5 rounded-full font-semibold">{unreadCount}</span>}
+                </MobileLink>
+
+                {(user.user_type === 'supplier' || user.user_type === 'admin') && (
+                  <>
+                    <MobileLink href="/my-listings" onClick={() => setMobileOpen(false)}>My listings</MobileLink>
+                    <MobileLink href="/inquiries" onClick={() => setMobileOpen(false)}>Inquiries</MobileLink>
+                    <MobileLink href="/listings/new" onClick={() => setMobileOpen(false)}>+ List a place</MobileLink>
+                  </>
+                )}
+                {user.user_type === 'consumer' && (
+                  <>
+                    <MobileLink href="/favorites" onClick={() => setMobileOpen(false)}>Saved listings</MobileLink>
+                    <MobileLink href="/applications" onClick={() => setMobileOpen(false)}>Applications</MobileLink>
+                  </>
+                )}
+                {user.user_type === 'admin' && (
+                  <MobileLink href="/admin" onClick={() => setMobileOpen(false)}>Admin</MobileLink>
+                )}
+
+                <div className="h-px bg-line my-2" />
+                <MobileLink href="/profile" onClick={() => setMobileOpen(false)}>Profile settings</MobileLink>
+                <button
+                  onClick={() => { setMobileOpen(false); signOut() }}
+                  className="w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            )}
+
+            {!user && (
+              <>
+                <div className="h-px bg-line my-2" />
+                <MobileLink href="/sign-in" onClick={() => setMobileOpen(false)}>Sign in</MobileLink>
+                <MobileLink href="/sign-up" onClick={() => setMobileOpen(false)}>Create account</MobileLink>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
+  )
+}
+
+function MobileLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className="block px-3 py-2.5 text-sm font-medium text-ink rounded-xl hover:bg-navy-soft transition-colors"
+    >
+      {children}
+    </Link>
   )
 }

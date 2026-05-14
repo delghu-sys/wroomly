@@ -211,6 +211,19 @@ export default async function DashboardPage() {
   ])
 
   const inquiries = (inquiriesRes.data ?? []) as Pick<Inquiry, 'id' | 'status' | 'created_at' | 'listing_id'>[]
+
+  // Fetch listing titles for inquiries
+  const inquiryListingIds = [...new Set(inquiries.map(i => i.listing_id))]
+  const inquiryListingTitles: Record<string, string> = {}
+  if (inquiryListingIds.length > 0) {
+    const { data: iListings } = await supabase
+      .from('listings')
+      .select('id, title')
+      .in('id', inquiryListingIds)
+    for (const il of (iListings ?? []) as { id: string; title: string }[]) {
+      inquiryListingTitles[il.id] = il.title
+    }
+  }
   const favorites = (favoritesRes.data ?? []) as { id: string; listing_id: string }[]
   const unreadMessages = 'count' in unreadRes ? (unreadRes.count ?? 0) : 0
 
@@ -307,14 +320,14 @@ export default async function DashboardPage() {
           </div>
           <div className="divide-y divide-line">
             {inquiries.map(inq => (
-              <div key={inq.id} className="flex items-center justify-between px-6 py-4 ease-smooth transition-colors hover:bg-navy-soft/40">
+              <Link key={inq.id} href={`/listings/${inq.listing_id}`} className="flex items-center justify-between px-6 py-4 ease-smooth transition-colors hover:bg-navy-soft/40">
                 <p className="text-sm font-medium text-ink truncate">
-                  Application #{inq.id.slice(0, 8)}
+                  {inquiryListingTitles[inq.listing_id] ?? 'Listing'}
                 </p>
                 <Badge variant="outline" className={`rounded-full ${STATUS_COLORS[inq.status]}`}>
                   {inq.status.charAt(0).toUpperCase() + inq.status.slice(1)}
                 </Badge>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
