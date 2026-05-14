@@ -62,7 +62,7 @@ export function ListingsFilters({
         <Label>Sort by</Label>
         <Select
           value={currentFilters.sort ?? 'newest'}
-          onValueChange={(v: string) => updateFilter('sort', v === 'newest' ? undefined : v)}
+          onValueChange={v => updateFilter('sort', !v || v === 'newest' ? undefined : v)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Newest first" />
