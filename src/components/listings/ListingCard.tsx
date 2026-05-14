@@ -4,14 +4,16 @@ import type { ListingWithDetails } from '@/types/database'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MapPin, BedDouble, Bath, ArrowLeftRight, Calendar, Star } from 'lucide-react'
 import { formatCents, formatDateRange, getListingImageUrl } from '@/lib/utils/listing'
+import { FavoriteButton } from './FavoriteButton'
 
 interface ListingCardProps {
   listing: ListingWithDetails
   isFavorited?: boolean
+  userId?: string | null
   supplierRating?: { avg: number; count: number }
 }
 
-export function ListingCard({ listing, supplierRating }: ListingCardProps) {
+export function ListingCard({ listing, isFavorited = false, userId = null, supplierRating }: ListingCardProps) {
   const coverImage = listing.listing_images
     .sort((a, b) => a.display_order - b.display_order)
     .at(0)
@@ -55,6 +57,8 @@ export function ListingCard({ listing, supplierRating }: ListingCardProps) {
               <BedDouble className="w-10 h-10 text-ink-muted/40" />
             </div>
           )}
+          {/* Favorite button */}
+          <FavoriteButton listingId={listing.id} userId={userId} isFavorited={isFavorited} />
           {/* Type chip — refined */}
           <div className="absolute top-3 left-3">
             <span

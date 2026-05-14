@@ -1,11 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import type { ListingWithDetails } from '@/types/database'
+import Link from 'next/link'
 import { ListingCard } from '@/components/listings/ListingCard'
 import { ListingsFilters } from '@/components/listings/ListingsFilters'
 import { ListingsViewToggle } from '@/components/listings/ListingsViewToggle'
 import { ListingsMap, type MapListing } from '@/components/listings/ListingsMap'
-import { BedDouble } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { BedDouble, Bell, DollarSign, CalendarRange, MapPin } from 'lucide-react'
 import {
   ANN_ARBOR_NEIGHBORHOODS,
   ANN_ARBOR_RESIDENCES,
@@ -29,6 +31,7 @@ export default async function ListingsPage({
   }
 
   const supabase = await createClient()
+  const { data: { user: authUser } } = await supabase.auth.getUser()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
@@ -89,6 +92,16 @@ export default async function ListingsPage({
   }
 
   const { data: listings } = await query.limit(48)
+
+  // Get user's favorites
+  const favoriteIds = new Set<string>()
+  if (authUser) {
+    const { data: favs } = await supabase
+      .from('favorites')
+      .select('listing_id')
+      .eq('user_id', authUser.id)
+    for (const f of favs ?? []) favoriteIds.add(f.listing_id)
+  }
 
   // Aggregate supplier ratings in one batch query
   const supplierIds = Array.from(
@@ -178,14 +191,37 @@ export default async function ListingsPage({
 
           <div className="flex-1 min-w-0">
             {typedListings.length === 0 ? (
-              <div className="text-center py-24 rounded-3xl border border-dashed border-line bg-surface/50">
+              <div className="text-center py-16 rounded-3xl border border-dashed border-line bg-surface/50">
                 <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
                   <BedDouble className="w-6 h-6" />
                 </div>
-                <p className="font-display text-2xl text-ink">No listings match your filters</p>
-                <p className="mt-2 text-sm text-ink-muted max-w-sm mx-auto">
-                  Try widening your price range, swapping neighborhoods, or clearing a few filters to see more places.
+                <p className="font-display text-2xl text-ink">No exact matches yet</p>
+                <p className="mt-2 text-sm text-ink-muted max-w-md mx-auto">
+                  We don&apos;t have a listing that matches all your filters right now, but new places are added every day.
                 </p>
+
+                <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/listings">
+                    <Button variant="outline" className="rounded-full h-10 px-5 text-sm">
+                      Clear all filters
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-line max-w-md mx-auto">
+                  <p className="text-sm font-medium text-ink mb-1">Try adjusting your search</p>
+                  <div className="flex flex-wrap gap-2 justify-center mt-3">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft bg-surface border border-line rounded-full px-3 py-1.5">
+                      <DollarSign className="w-3 h-3" /> Increase your budget
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft bg-surface border border-line rounded-full px-3 py-1.5">
+                      <CalendarRange className="w-3 h-3" /> Broaden your dates
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-ink-soft bg-surface border border-line rounded-full px-3 py-1.5">
+                      <MapPin className="w-3 h-3" /> Browse nearby areas
+                    </span>
+                  </div>
+                </div>
               </div>
             ) : view === 'map' ? (
               <div className="animate-fade-in">
@@ -197,6 +233,8 @@ export default async function ListingsPage({
                   <ListingCard
                     key={listing.id}
                     listing={listing}
+                    userId={authUser?.id ?? null}
+                    isFavorited={favoriteIds.has(listing.id)}
                     supplierRating={ratingBySupplier[listing.supplier_id]}
                   />
                 ))}

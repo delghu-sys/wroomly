@@ -8,7 +8,7 @@ import type { Message } from '@/types/database'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Send, CreditCard, CheckCircle2, Sparkles } from 'lucide-react'
+import { ArrowLeft, Send, CreditCard, CheckCircle2, Sparkles, Check, CheckCheck } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 
@@ -317,8 +317,13 @@ export function ChatWindow({ conversation, initialMessages, currentUserId, hasPa
                   }`}
                 >
                   {msg.content}
-                  <p className={`text-xs mt-1 ${isMe ? 'text-white/50' : 'text-ink-muted'}`}>
+                  <p className={`text-xs mt-1 flex items-center gap-1 ${isMe ? 'text-white/50 justify-end' : 'text-ink-muted'}`}>
                     {format(parseISO(msg.created_at), 'h:mm a')}
+                    {isMe && (
+                      msg.is_read
+                        ? <CheckCheck className="w-3.5 h-3.5 text-sky-300" />
+                        : <Check className="w-3.5 h-3.5" />
+                    )}
                   </p>
                 </div>
               </div>
@@ -344,14 +349,37 @@ export function ChatWindow({ conversation, initialMessages, currentUserId, hasPa
         <div ref={bottomRef} />
       </div>
 
+      {/* Quick prompts */}
+      {messages.length < 4 && (
+        <div className="flex gap-2 flex-wrap pt-2 shrink-0">
+          {[
+            'Is the rent negotiable?',
+            'Are utilities included?',
+            'Can I tour the apartment?',
+            'Is the room furnished?',
+            'How many roommates are there?',
+            'Can I take over the lease?',
+          ].map(prompt => (
+            <button
+              key={prompt}
+              type="button"
+              onClick={() => setInput(prompt)}
+              className="text-xs px-3 py-1.5 rounded-full border border-line bg-surface text-ink-soft hover:bg-navy-soft hover:text-navy hover:border-navy/20 transition-colors"
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Input */}
-      <form onSubmit={sendMessage} className="pt-4 border-t border-line shrink-0">
+      <form onSubmit={sendMessage} className="pt-3 border-t border-line shrink-0">
         <div className="flex items-end gap-2">
           <Textarea
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message… (Enter to send, Shift+Enter for new line)"
+            placeholder="Type a message…"
             rows={2}
             className="resize-none"
             disabled={sending}
