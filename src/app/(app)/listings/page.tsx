@@ -41,7 +41,6 @@ export default async function ListingsPage({
       users:supplier_id(id, full_name, avatar_url, university)
     `)
     .eq('status', 'active')
-    .order('created_at', { ascending: false })
 
   if (filters.type === 'sublet' || filters.type === 'swap') {
     query = query.eq('type', filters.type)
@@ -72,6 +71,21 @@ export default async function ListingsPage({
   }
   if (filters.pets === 'true') {
     query = query.eq('pets_allowed', true)
+  }
+
+  // Sorting
+  switch (filters.sort) {
+    case 'price_asc':
+      query = query.order('price_per_month', { ascending: true, nullsFirst: false })
+      break
+    case 'price_desc':
+      query = query.order('price_per_month', { ascending: false, nullsFirst: false })
+      break
+    case 'date_asc':
+      query = query.order('available_from', { ascending: true })
+      break
+    default:
+      query = query.order('created_at', { ascending: false })
   }
 
   const { data: listings } = await query.limit(48)

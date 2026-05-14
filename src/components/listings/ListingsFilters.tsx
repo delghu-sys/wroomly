@@ -57,6 +57,27 @@ export function ListingsFilters({
         )}
       </div>
 
+      {/* Sort */}
+      <div className="space-y-2">
+        <Label>Sort by</Label>
+        <Select
+          value={currentFilters.sort ?? 'newest'}
+          onValueChange={v => updateFilter('sort', v === 'newest' ? undefined : v)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Newest first" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Newest first</SelectItem>
+            <SelectItem value="price_asc">Price: low to high</SelectItem>
+            <SelectItem value="price_desc">Price: high to low</SelectItem>
+            <SelectItem value="date_asc">Available soonest</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Separator />
+
       {/* Type */}
       <div className="space-y-2">
         <Label>Listing type</Label>
