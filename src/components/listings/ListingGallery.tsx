@@ -35,8 +35,8 @@ export function ListingGallery({ images, title }: ListingGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-[16/9] bg-gray-100 rounded-2xl flex items-center justify-center">
-        <BedDouble className="w-16 h-16 text-gray-300" />
+      <div className="aspect-[16/9] bg-navy-soft/30 rounded-3xl flex items-center justify-center">
+        <BedDouble className="w-16 h-16 text-ink-muted/40" />
       </div>
     )
   }
@@ -46,7 +46,7 @@ export function ListingGallery({ images, title }: ListingGalleryProps) {
       <div className="space-y-2">
         {/* Main image */}
         <div
-          className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-gray-100 cursor-zoom-in"
+          className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-navy-soft/30 cursor-zoom-in"
           onClick={() => setLightboxOpen(true)}
         >
           <Image
@@ -89,7 +89,7 @@ export function ListingGallery({ images, title }: ListingGalleryProps) {
                 key={img.id}
                 onClick={() => setCurrent(i)}
                 className={`relative w-16 h-16 rounded-lg overflow-hidden shrink-0 ring-2 transition-all ${
-                  i === current ? 'ring-blue-600' : 'ring-transparent hover:ring-gray-300'
+                  i === current ? 'ring-navy' : 'ring-transparent hover:ring-line'
                 }`}
               >
                 <Image

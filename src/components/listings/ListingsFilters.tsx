@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
+import { SlidersHorizontal } from 'lucide-react'
 
 interface ListingsFiltersProps {
   neighborhoods: string[]
@@ -47,11 +48,16 @@ export function ListingsFilters({
   const hasFilters = Object.values(currentFilters).some(Boolean)
 
   return (
-    <div className="bg-white rounded-2xl border p-5 space-y-5 sticky top-20">
+    <div className="bg-surface rounded-3xl border border-line p-5 space-y-5 sticky top-20 shadow-soft">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">Filters</h3>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-navy-soft flex items-center justify-center">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-navy" />
+          </div>
+          <h3 className="font-display text-base text-ink">Filters</h3>
+        </div>
         {hasFilters && (
-          <button onClick={clearAll} className="text-sm text-blue-600 hover:underline">
+          <button onClick={clearAll} className="text-xs text-navy font-medium hover:text-ink ease-smooth transition-colors">
             Clear all
           </button>
         )}
@@ -59,7 +65,7 @@ export function ListingsFilters({
 
       {/* Sort */}
       <div className="space-y-2">
-        <Label>Sort by</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Sort by</Label>
         <Select
           value={currentFilters.sort ?? 'newest'}
           onValueChange={v => updateFilter('sort', !v || v === 'newest' ? undefined : v)}
@@ -76,11 +82,11 @@ export function ListingsFilters({
         </Select>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Type */}
       <div className="space-y-2">
-        <Label>Listing type</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Listing type</Label>
         <div className="grid grid-cols-3 gap-2">
           {[
             { value: '', label: 'Any' },
@@ -90,10 +96,10 @@ export function ListingsFilters({
             <button
               key={opt.value}
               onClick={() => updateFilter('type', opt.value || undefined)}
-              className={`text-sm py-1.5 px-2 rounded-lg border transition-colors ${
+              className={`text-sm py-1.5 px-2 rounded-xl border ease-smooth transition-all ${
                 (currentFilters.type ?? '') === opt.value
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'text-gray-600 border-gray-200 hover:border-blue-300'
+                  ? 'bg-navy text-white border-navy shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
+                  : 'text-ink-soft border-line hover:border-navy/30 hover:text-ink'
               }`}
             >
               {opt.label}
@@ -102,17 +108,16 @@ export function ListingsFilters({
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Property type */}
       <div className="space-y-2">
-        <Label>Property type</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Property type</Label>
         <Select
           value={currentFilters.property_type ?? ''}
           onValueChange={v =>
             updateFilters({
               property_type: v || undefined,
-              // residence sub-filter only makes sense for apartments
               residence_name: v === 'apartment' ? currentFilters.residence_name : undefined,
             })
           }
@@ -132,7 +137,7 @@ export function ListingsFilters({
       {/* Residence sub-filter (apartments / complexes) */}
       {currentFilters.property_type === 'apartment' && (
         <div className="space-y-2">
-          <Label>Residence / complex</Label>
+          <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Residence / complex</Label>
           <Select
             value={currentFilters.residence_name ?? ''}
             onValueChange={v => updateFilter('residence_name', v || undefined)}
@@ -150,11 +155,11 @@ export function ListingsFilters({
         </div>
       )}
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Neighborhood */}
       <div className="space-y-2">
-        <Label>Neighborhood</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Neighborhood</Label>
         <Select
           value={currentFilters.neighborhood ?? ''}
           onValueChange={v => updateFilter('neighborhood', v || undefined)}
@@ -171,17 +176,17 @@ export function ListingsFilters({
         </Select>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Available from (single month/year picker) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label>Available from</Label>
+          <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Available from</Label>
           {currentFilters.available_from && (
             <button
               type="button"
               onClick={() => updateFilter('available_from', undefined)}
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-navy font-medium hover:text-ink ease-smooth transition-colors"
             >
               Clear
             </button>
@@ -190,14 +195,12 @@ export function ListingsFilters({
         {(() => {
           const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
           const now = new Date()
-          // 18 months starting from this month
           const options = Array.from({ length: 18 }, (_, i) => {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
             const y = d.getFullYear()
             const m = String(d.getMonth() + 1).padStart(2, '0')
             return { value: `${y}-${m}-01`, label: `${monthNames[d.getMonth()]} ${y}` }
           })
-          // Make sure currently-selected value is in the list even if past
           const current = currentFilters.available_from ?? ''
           if (current && !options.some(o => o.value === current)) {
             const [y, m] = current.split('-').map(Number)
@@ -225,11 +228,11 @@ export function ListingsFilters({
         </p>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Price range */}
       <div className="space-y-2">
-        <Label>Monthly price ($)</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Monthly price ($)</Label>
         <div className="grid grid-cols-2 gap-2">
           <Input
             type="number"
@@ -246,11 +249,11 @@ export function ListingsFilters({
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Bedrooms */}
       <div className="space-y-2">
-        <Label>Bedrooms</Label>
+        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Bedrooms</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {[
             { value: '', label: 'Any' },
@@ -263,10 +266,10 @@ export function ListingsFilters({
             <button
               key={opt.value}
               onClick={() => updateFilter('bedrooms', opt.value || undefined)}
-              className={`text-sm py-1.5 rounded-lg border transition-colors ${
+              className={`text-sm py-1.5 rounded-xl border ease-smooth transition-all ${
                 (currentFilters.bedrooms ?? '') === opt.value
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'text-gray-600 border-gray-200 hover:border-blue-300'
+                  ? 'bg-navy text-white border-navy shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
+                  : 'text-ink-soft border-line hover:border-navy/30 hover:text-ink'
               }`}
             >
               {opt.label}
@@ -275,7 +278,7 @@ export function ListingsFilters({
         </div>
       </div>
 
-      <Separator />
+      <Separator className="bg-line" />
 
       {/* Checkboxes */}
       <div className="space-y-3">
@@ -285,7 +288,7 @@ export function ListingsFilters({
             checked={currentFilters.furnished === 'true'}
             onCheckedChange={v => updateFilter('furnished', v ? 'true' : undefined)}
           />
-          <Label htmlFor="furnished" className="cursor-pointer">Furnished</Label>
+          <Label htmlFor="furnished" className="cursor-pointer text-sm text-ink-soft">Furnished</Label>
         </div>
         <div className="flex items-center gap-2">
           <Checkbox
@@ -293,7 +296,7 @@ export function ListingsFilters({
             checked={currentFilters.pets === 'true'}
             onCheckedChange={v => updateFilter('pets', v ? 'true' : undefined)}
           />
-          <Label htmlFor="pets" className="cursor-pointer">Pets allowed</Label>
+          <Label htmlFor="pets" className="cursor-pointer text-sm text-ink-soft">Pets allowed</Label>
         </div>
       </div>
     </div>

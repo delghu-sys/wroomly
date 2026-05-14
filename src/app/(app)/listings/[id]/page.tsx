@@ -128,8 +128,8 @@ export default async function ListingDetailPage({
               <Badge
                 className={
                   l.type === 'sublet'
-                    ? 'bg-blue-600 text-white border-0'
-                    : 'bg-emerald-600 text-white border-0'
+                    ? 'bg-navy text-white border-0'
+                    : 'bg-maize text-navy border-0'
                 }
               >
                 {l.type === 'sublet' ? 'Sublet' : (
@@ -142,9 +142,9 @@ export default async function ListingDetailPage({
               {l.utilities_included && <Badge variant="outline">Utilities included</Badge>}
               {l.pets_allowed && <Badge variant="outline">Pets OK</Badge>}
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">{l.title}</h1>
+            <h1 className="font-display text-3xl tracking-tight text-ink">{l.title}</h1>
             {l.neighborhood && (
-              <p className="text-gray-500 mt-1">{l.neighborhood}, {l.city}, {l.state}</p>
+              <p className="text-ink-muted mt-1">{l.neighborhood}, {l.city}, {l.state}</p>
             )}
           </div>
 
@@ -156,10 +156,12 @@ export default async function ListingDetailPage({
               { icon: Maximize2, label: 'Size', value: l.sq_ft ? `${l.sq_ft} sq ft` : '—' },
               { icon: Calendar, label: 'Available', value: formatDateRange(l.available_from, l.available_to) },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="bg-gray-50 rounded-xl p-4">
-                <Icon className="w-5 h-5 text-blue-600 mb-2" />
-                <p className="text-xs text-gray-500">{label}</p>
-                <p className="font-medium text-gray-900 text-sm mt-0.5">{value}</p>
+              <div key={label} className="bg-navy-soft/40 rounded-2xl p-4 border border-navy/5">
+                <div className="w-8 h-8 rounded-xl bg-navy/8 flex items-center justify-center mb-2.5">
+                  <Icon className="w-4 h-4 text-navy" />
+                </div>
+                <p className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">{label}</p>
+                <p className="font-display text-sm text-ink mt-0.5">{value}</p>
               </div>
             ))}
           </div>
@@ -169,19 +171,19 @@ export default async function ListingDetailPage({
           {/* Description */}
           {l.description && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">About this place</h2>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">{l.description}</p>
+              <h2 className="font-display text-xl tracking-tight text-ink mb-3">About this place</h2>
+              <p className="text-ink-soft leading-relaxed whitespace-pre-line">{l.description}</p>
             </div>
           )}
 
           {/* Amenities */}
           {amenities.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">Amenities</h2>
+              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Amenities</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {amenities.map(amenity => (
-                  <div key={amenity} className="flex items-center gap-2 text-sm text-gray-700">
-                    <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div key={amenity} className="flex items-center gap-2 text-sm text-ink-soft">
+                    <ShieldCheck className="w-4 h-4 text-navy shrink-0" />
                     {amenity}
                   </div>
                 ))}
@@ -192,23 +194,23 @@ export default async function ListingDetailPage({
           {/* Swap preferences */}
           {l.type === 'swap' && l.swap_preferences && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">Swap preferences</h2>
-              <div className="bg-emerald-50 rounded-xl p-4 space-y-2">
+              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Swap preferences</h2>
+              <div className="bg-maize-soft rounded-2xl p-4 border border-maize/30 space-y-2">
                 {l.swap_preferences.preferred_cities?.length > 0 && (
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-ink-soft">
                     <span className="font-medium">Looking to swap with:</span>{' '}
                     {l.swap_preferences.preferred_cities.join(', ')}
                   </p>
                 )}
                 {l.swap_preferences.preferred_from && l.swap_preferences.preferred_to && (
-                  <p className="text-sm text-gray-700">
+                  <p className="text-sm text-ink-soft">
                     <span className="font-medium">Preferred dates:</span>{' '}
                     {format(parseISO(l.swap_preferences.preferred_from), 'MMM d')} –{' '}
                     {format(parseISO(l.swap_preferences.preferred_to), 'MMM d, yyyy')}
                   </p>
                 )}
                 {l.swap_preferences.notes && (
-                  <p className="text-sm text-gray-700">{l.swap_preferences.notes}</p>
+                  <p className="text-sm text-ink-soft">{l.swap_preferences.notes}</p>
                 )}
               </div>
             </div>
@@ -217,28 +219,28 @@ export default async function ListingDetailPage({
           {/* Map */}
           {l.lat && l.lng && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-3">Location</h2>
+              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Location</h2>
               <ListingMap lat={l.lat} lng={l.lng} neighborhood={l.neighborhood} />
             </div>
           )}
 
           {/* Supplier profile */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Listed by</h2>
+            <h2 className="font-display text-xl tracking-tight text-ink mb-3">Listed by</h2>
             <Link
               href={`/users/${l.users.id}`}
               className="group flex items-start gap-4 -mx-2 px-2 py-2 rounded-xl hover:bg-ink-soft/5 transition"
             >
               <Avatar className="h-12 w-12">
                 <AvatarImage src={l.users?.avatar_url ?? undefined} />
-                <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                <AvatarFallback className="bg-navy-soft text-navy font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 group-hover:underline">{l.users?.full_name}</p>
+                <p className="font-semibold text-ink group-hover:underline">{l.users?.full_name}</p>
                 <div className="flex items-center gap-3 text-sm mt-0.5">
-                  <span className="inline-flex items-center gap-1 text-blue-600">
+                  <span className="inline-flex items-center gap-1 text-navy">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     U of M verified
                   </span>
@@ -262,7 +264,7 @@ export default async function ListingDetailPage({
         {/* Right: booking sidebar */}
         <div className="lg:col-span-1">
           <div className="sticky top-20">
-            <div className="bg-white border rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="bg-surface border border-line rounded-3xl p-6 shadow-soft space-y-4">
               {(l.status === 'rented' || l.status === 'swapped') ? (
                 <>
                   <div className="bg-[oklch(0.97_0.04_25)] border border-[oklch(0.85_0.1_25)] rounded-xl p-4 text-center">
@@ -285,7 +287,7 @@ export default async function ListingDetailPage({
                 <>
                   {l.type === 'sublet' && l.price_per_month && (
                     <div>
-                      <p className="text-3xl font-bold text-ink">
+                      <p className="font-display text-4xl tracking-tight text-ink">
                         {formatCents(l.price_per_month)}
                         <span className="text-base font-normal text-ink-muted">/mo</span>
                       </p>
@@ -298,12 +300,12 @@ export default async function ListingDetailPage({
                   )}
 
                   {l.type === 'swap' && (
-                    <div className="bg-emerald-50 rounded-xl p-3">
-                      <p className="font-semibold text-emerald-800 flex items-center gap-2">
+                    <div className="bg-maize-soft rounded-2xl p-4 border border-maize/30">
+                      <p className="font-display font-semibold text-navy flex items-center gap-2">
                         <ArrowLeftRight className="w-4 h-4" />
                         Housing swap
                       </p>
-                      <p className="text-sm text-emerald-700 mt-1">
+                      <p className="text-sm text-ink-soft mt-1">
                         No money changes hands — you swap your place for theirs.
                       </p>
                     </div>
