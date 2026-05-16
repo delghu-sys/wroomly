@@ -16,7 +16,7 @@
   --color-maize-soft: var(--maize-soft);
   --color-navy: var(--navy);
   --color-navy-soft: var(--navy-soft);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
   --font-heading: var(--font-display);
@@ -143,12 +143,10 @@
   }
   html {
     scroll-behavior: smooth;
-    font-feature-settings: 'ss01', 'cv11';
     text-rendering: optimizeLegibility;
   }
   body {
     @apply bg-background text-foreground font-sans;
-    font-feature-settings: 'ss01', 'cv11';
   }
   ::selection {
     background-color: var(--maize);
@@ -168,8 +166,7 @@
 @layer utilities {
   .font-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    font-feature-settings: 'ss01';
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
   }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
@@ -232,6 +229,14 @@
   }
   .animate-marquee {
     animation: marquee 38s linear infinite;
+  }
+
+  @keyframes marquee-reverse {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
+  }
+  .animate-marquee-reverse {
+    animation: marquee-reverse 45s linear infinite;
   }
 
   /* Gentle float (decorative blobs) */
@@ -413,6 +418,7 @@
     .animate-scale-in,
     .animate-ken-burns,
     .animate-marquee,
+    .animate-marquee-reverse,
     .animate-float,
     .animate-float-slow,
     .animate-gradient,
