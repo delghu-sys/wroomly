@@ -16,17 +16,16 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }
 
-  const base =
-    'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition'
-  const active = 'bg-white text-ink shadow-sm'
-  const inactive = 'text-ink-muted hover:text-ink'
-
   return (
-    <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-ink-soft/10 border border-line">
+    <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-surface border border-line shadow-soft shrink-0">
       <button
         type="button"
         onClick={() => setView('grid')}
-        className={`${base} ${view === 'grid' ? active : inactive}`}
+        className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg ease-smooth transition-all ${
+          view === 'grid'
+            ? 'bg-navy text-white shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
+            : 'text-ink-muted hover:text-ink'
+        }`}
         aria-pressed={view === 'grid'}
       >
         <LayoutGrid className="w-4 h-4" />
@@ -35,7 +34,11 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
       <button
         type="button"
         onClick={() => setView('map')}
-        className={`${base} ${view === 'map' ? active : inactive}`}
+        className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg ease-smooth transition-all ${
+          view === 'map'
+            ? 'bg-navy text-white shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
+            : 'text-ink-muted hover:text-ink'
+        }`}
         aria-pressed={view === 'map'}
       >
         <Map className="w-4 h-4" />
