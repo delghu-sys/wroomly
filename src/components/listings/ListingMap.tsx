@@ -41,12 +41,13 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
           },
         },
         paint: {
+          // Maize-tinted privacy circle in brand color
           'circle-radius': 60,
-          'circle-color': '#1d4ed8',
-          'circle-opacity': 0.2,
+          'circle-color': '#e8b73f',
+          'circle-opacity': 0.22,
           'circle-stroke-width': 2,
-          'circle-stroke-color': '#1d4ed8',
-          'circle-stroke-opacity': 0.4,
+          'circle-stroke-color': '#e8b73f',
+          'circle-stroke-opacity': 0.55,
         },
       })
     })
@@ -59,10 +60,14 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
 
   return (
     <div className="space-y-2">
-      <div ref={mapContainer} className="h-56 rounded-xl overflow-hidden" />
+      <div
+        ref={mapContainer}
+        className="h-64 rounded-3xl overflow-hidden border border-line shadow-[0_4px_18px_oklch(0_0_0/0.05)]"
+      />
       {neighborhood && (
-        <p className="text-sm text-gray-500">
-          Approximate location in <span className="font-medium text-gray-700">{neighborhood}</span>.
+        <p className="text-sm text-ink-muted leading-relaxed">
+          Approximate location in{' '}
+          <span className="font-medium text-ink">{neighborhood}</span>.
           Exact address shared after booking.
         </p>
       )}

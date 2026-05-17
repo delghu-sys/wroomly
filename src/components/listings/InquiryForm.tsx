@@ -1,29 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { createClient } from '@/lib/supabase/client'
-import type { Listing } from '@/types/database'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { toast } from 'sonner'
 import Link from 'next/link'
-import { CheckCircle2, CreditCard, MessageSquare } from 'lucide-react'
-
-const schema = z.object({
-  message: z.string().min(20, 'Please write at least 20 characters'),
-  move_in_date: z.string().optional(),
-  move_out_date: z.string().optional(),
-})
-type FormValues = z.infer<typeof schema>
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { ListingWithDetails } from '@/types/database'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { CheckCircle2, CreditCard, MessageSquare, Send, Loader2 } from 'lucide-react'
+import { PaperPlaneTilt, UserPlus } from '@phosphor-icons/react/dist/ssr'
+import { InquiryModal } from './InquiryModal'
+import { getListingImageUrl } from '@/lib/utils/listing'
+import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
 
 interface InquiryFormProps {
-  listing: Listing
+  listing: ListingWithDetails
   authUser: { id: string } | null
   isOwner: boolean
   existingInquiry: { id: string; status: string } | null
@@ -31,37 +22,72 @@ interface InquiryFormProps {
   hasPaid?: boolean
 }
 
-export function InquiryForm({ listing, authUser, isOwner, existingInquiry, conversationId, hasPaid }: InquiryFormProps) {
+/**
+ * Conversational inquiry CTA panel for the listing detail sidebar.
+ *
+ * - Unauthenticated → directional-fill magnetic Sign-in CTA
+ * - Owner → edit-listing button
+ * - Existing inquiry → state-specific status panel
+ * - No inquiry yet → magnetic "Send inquiry" button that opens the
+ *   InquiryModal (morphing spring expand from button).
+ */
+export function InquiryForm({
+  listing,
+  authUser,
+  isOwner,
+  existingInquiry,
+  conversationId,
+  hasPaid,
+}: InquiryFormProps) {
   const router = useRouter()
   const [paying, setPaying] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+  const coverImage = listing.listing_images
+    ?.slice()
+    .sort((a, b) => a.display_order - b.display_order)
+    .at(0)
+  const thumbnailUrl = coverImage ? getListingImageUrl(coverImage.storage_path) : null
 
+  // ── Owner state ──
   if (isOwner) {
     return (
       <div className="text-center py-2">
         <p className="text-sm text-ink-muted mb-3">This is your listing</p>
-        <Link href={`/listings/${listing.id}/edit`}>
-          <Button variant="outline" className="w-full">Edit listing</Button>
+        <Link href={`/listings/${listing.id}/edit`} className="block">
+          <Button
+            variant="outline"
+            className="w-full h-12 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]"
+          >
+            Edit listing
+          </Button>
         </Link>
       </div>
     )
   }
 
+  // ── Unauthenticated ──
   if (!authUser) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-ink-muted text-center">Sign in to send an inquiry</p>
-        <Link href={`/sign-in?next=/listings/${listing.id}`}>
-          <Button className="w-full">Sign in to inquire</Button>
-        </Link>
-        <Link href="/sign-up">
-          <Button variant="outline" className="w-full">Create account</Button>
-        </Link>
+        <MagneticLinkCta
+          href={`/sign-in?next=/listings/${listing.id}`}
+          variant="primary"
+          icon={<PaperPlaneTilt size={16} weight="fill" className="-rotate-12" />}
+        >
+          Sign in to inquire
+        </MagneticLinkCta>
+        <MagneticLinkCta
+          href="/sign-up"
+          variant="ghost"
+          size="sm"
+          icon={<UserPlus size={15} weight="duotone" />}
+        >
+          Create account
+        </MagneticLinkCta>
+        <p className="pt-1 text-[11.5px] text-ink-muted text-center leading-relaxed">
+          Inquiries open a private chat — no commitment until both sides agree.
+        </p>
       </div>
     )
   }
@@ -88,109 +114,143 @@ export function InquiryForm({ listing, authUser, isOwner, existingInquiry, conve
     }
   }
 
-  if (existingInquiry) {
-    const status = existingInquiry.status
-
-    if (status === 'accepted' && listing.type === 'sublet') {
-      if (hasPaid) {
-        return (
-          <div className="bg-[oklch(0.97_0.04_142)] border border-[oklch(0.85_0.1_142)] rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-center gap-2 text-[oklch(0.45_0.15_142)] font-medium">
-              <CheckCircle2 className="w-5 h-5" />
-              <p className="font-display text-lg">Booking confirmed</p>
-            </div>
-            <p className="text-sm text-ink-soft text-center">
-              You&apos;ve paid for this place. You&apos;re all set!
-            </p>
-            {conversationId && (
-              <Link href={`/messages/${conversationId}`} className="block">
-                <Button className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Message your host
-                </Button>
-              </Link>
-            )}
-          </div>
-        )
-      }
+  // ── Existing inquiry: accepted (sublet) ──
+  if (existingInquiry?.status === 'accepted' && listing.type === 'sublet') {
+    if (hasPaid) {
       return (
-        <div className="bg-[oklch(0.97_0.04_142)] border border-[oklch(0.85_0.1_142)] rounded-2xl p-4 space-y-3">
-          <div>
-            <p className="font-display text-lg text-ink">Inquiry accepted</p>
-            <p className="text-sm text-ink-soft mt-0.5">
-              Confirm your booking to lock in this place.
-            </p>
+        <div
+          className="rounded-2xl p-4 space-y-3 border"
+          style={{
+            background: 'oklch(0.55 0.15 142 / 0.12)',
+            borderColor: 'oklch(0.55 0.15 142 / 0.35)',
+          }}
+        >
+          <div className="flex items-center justify-center gap-2 font-medium" style={{ color: 'oklch(0.40 0.13 142)' }}>
+            <CheckCircle2 className="w-5 h-5" />
+            <p className="font-display text-lg">Booking confirmed</p>
           </div>
-          <Button
-            onClick={startCheckout}
-            disabled={paying}
-            className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11"
-          >
-            <CreditCard className="w-4 h-4 mr-2" />
-            {paying ? 'Redirecting…' : 'Pay now'}
-          </Button>
+          <p className="text-sm text-ink-soft text-center">
+            You&rsquo;ve paid for this place. You&rsquo;re all set.
+          </p>
           {conversationId && (
             <Link href={`/messages/${conversationId}`} className="block">
-              <Button variant="outline" className="w-full rounded-full">
+              <Button className="w-full h-11 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 transition-all duration-300 active:scale-[0.98]">
                 <MessageSquare className="w-4 h-4 mr-2" />
-                Open chat
+                Message your host
               </Button>
             </Link>
           )}
         </div>
       )
     }
-
-    if (status === 'accepted') {
-      // swap — no payment, just go to chat
-      return (
-        <div className="bg-[oklch(0.97_0.04_142)] border border-[oklch(0.85_0.1_142)] rounded-2xl p-4 space-y-3">
-          <div>
-            <p className="font-display text-lg text-ink">Swap accepted</p>
-            <p className="text-sm text-ink-soft mt-0.5">
-              Coordinate the swap details in chat.
-            </p>
-          </div>
-          {conversationId && (
-            <Link href={`/messages/${conversationId}`} className="block">
-              <Button className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Open chat
-              </Button>
-            </Link>
-          )}
-        </div>
-      )
-    }
-
-    if (status === 'pending') {
-      return (
-        <div className="bg-navy-soft border border-line rounded-2xl p-4 space-y-3">
-          <div>
-            <p className="font-display text-lg text-ink">Inquiry sent</p>
-            <p className="text-sm text-ink-soft mt-0.5">
-              The supplier will review and respond in chat.
-            </p>
-          </div>
-          {conversationId && (
-            <Link href={`/messages/${conversationId}`} className="block">
-              <Button className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Open chat
-              </Button>
-            </Link>
-          )}
-        </div>
-      )
-    }
-
     return (
-      <div className="bg-surface border border-line rounded-2xl p-4 text-center">
+      <div
+        className="rounded-2xl p-4 space-y-3 border"
+        style={{
+          background: 'oklch(0.55 0.15 142 / 0.10)',
+          borderColor: 'oklch(0.55 0.15 142 / 0.35)',
+        }}
+      >
+        <div>
+          <p className="font-display text-lg text-ink">Inquiry accepted</p>
+          <p className="text-sm text-ink-soft mt-0.5">
+            Confirm your booking to lock in this place.
+          </p>
+        </div>
+        <Button
+          onClick={startCheckout}
+          disabled={paying}
+          className="
+            group relative w-full h-11 rounded-full overflow-hidden
+            bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+            font-semibold
+            shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
+            hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+            transition-shadow duration-500 active:scale-[0.98]
+          "
+        >
+          <span className="absolute inset-0 bg-[oklch(0.10_0.02_260)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+          <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+            {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+            {paying ? 'Redirecting…' : 'Pay now'}
+          </span>
+        </Button>
+        {conversationId && (
+          <Link href={`/messages/${conversationId}`} className="block">
+            <Button
+              variant="outline"
+              className="w-full h-11 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Open chat
+            </Button>
+          </Link>
+        )}
+      </div>
+    )
+  }
+
+  // ── Existing inquiry: accepted (swap) ──
+  if (existingInquiry?.status === 'accepted') {
+    return (
+      <div
+        className="rounded-2xl p-4 space-y-3 border"
+        style={{
+          background: 'oklch(0.55 0.15 142 / 0.10)',
+          borderColor: 'oklch(0.55 0.15 142 / 0.35)',
+        }}
+      >
+        <div>
+          <p className="font-display text-lg text-ink">Swap accepted</p>
+          <p className="text-sm text-ink-soft mt-0.5">
+            Coordinate the swap details in chat.
+          </p>
+        </div>
+        {conversationId && (
+          <Link href={`/messages/${conversationId}`} className="block">
+            <Button className="w-full h-11 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 transition-all duration-300 active:scale-[0.98]">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Open chat
+            </Button>
+          </Link>
+        )}
+      </div>
+    )
+  }
+
+  // ── Existing inquiry: pending ──
+  if (existingInquiry?.status === 'pending') {
+    return (
+      <div className="rounded-2xl p-4 space-y-3 border border-line bg-[oklch(0.97_0.008_75)]">
+        <div>
+          <p className="font-display text-lg text-ink">Inquiry sent</p>
+          <p className="text-sm text-ink-soft mt-0.5">
+            The supplier will review and respond in chat.
+          </p>
+        </div>
+        {conversationId && (
+          <Link href={`/messages/${conversationId}`} className="block">
+            <Button className="w-full h-11 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 transition-all duration-300 active:scale-[0.98]">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Open chat
+            </Button>
+          </Link>
+        )}
+      </div>
+    )
+  }
+
+  // ── Existing inquiry: rejected / withdrawn ──
+  if (existingInquiry) {
+    return (
+      <div className="rounded-2xl p-4 text-center border border-line bg-[oklch(0.97_0.008_75)]">
         <p className="font-display text-lg text-ink">
-          {status === 'rejected' ? 'Inquiry not accepted' : 'Inquiry withdrawn'}
+          {existingInquiry.status === 'rejected'
+            ? 'Inquiry not accepted'
+            : 'Inquiry withdrawn'}
         </p>
         <p className="text-sm text-ink-muted mt-1">
-          {status === 'rejected'
+          {existingInquiry.status === 'rejected'
             ? 'The supplier did not accept this inquiry.'
             : 'You withdrew this inquiry.'}
         </p>
@@ -198,98 +258,50 @@ export function InquiryForm({ listing, authUser, isOwner, existingInquiry, conve
     )
   }
 
-  async function onSubmit(data: FormValues) {
-    if (!authUser) return
-    const supabase = createClient()
-
-    const { data: inquiry, error: inquiryError } = await supabase
-      .from('inquiries')
-      .insert({
-        listing_id: listing.id,
-        consumer_id: authUser.id,
-        message: data.message,
-        move_in_date: data.move_in_date || null,
-        move_out_date: data.move_out_date || null,
-      })
-      .select('id')
-      .single()
-
-    if (inquiryError || !inquiry) {
-      toast.error('Failed to send inquiry. Please try again.')
-      return
-    }
-
-    const { data: convo, error: convoError } = await supabase
-      .from('conversations')
-      .insert({
-        listing_id: listing.id,
-        supplier_id: listing.supplier_id,
-        consumer_id: authUser.id,
-        inquiry_id: inquiry.id,
-      })
-      .select('id')
-      .single()
-
-    if (convoError || !convo) {
-      toast.error('Inquiry sent, but could not open chat.')
-      router.refresh()
-      return
-    }
-
-    await supabase.from('messages').insert({
-      conversation_id: convo.id,
-      sender_id: authUser.id,
-      content: data.message,
-    })
-
-    toast.success('Inquiry sent!')
-    router.push(`/messages/${convo.id}`)
-  }
+  // ── No inquiry yet → magnetic CTA opens InquiryModal ──
+  router // keep linter happy — we may navigate elsewhere from child modal
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {listing.type === 'sublet' && (
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <Label className="text-xs">Move-in date</Label>
-            <Input
-              type="date"
-              min={listing.available_from}
-              max={listing.available_to}
-              {...register('move_in_date')}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Move-out date</Label>
-            <Input
-              type="date"
-              min={listing.available_from}
-              max={listing.available_to}
-              {...register('move_out_date')}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-1">
-        <Label>Your message</Label>
-        <Textarea
-          placeholder="Introduce yourself — tell them about your situation, why you're interested, and any questions you have."
-          rows={4}
-          {...register('message')}
-        />
-        {errors.message && (
-          <p className="text-sm text-destructive">{errors.message.message}</p>
-        )}
+    <>
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="
+            group relative w-full h-12 rounded-full overflow-hidden
+            bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+            font-semibold text-sm tracking-tight
+            shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
+            hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+            transition-all duration-300 active:scale-[0.98]
+          "
+        >
+          <span className="absolute inset-0 bg-[oklch(0.10_0.02_260)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+          <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+            <Send className="w-4 h-4 -rotate-12" strokeWidth={2.25} />
+            Send inquiry
+          </span>
+        </button>
+        <p className="text-xs text-ink-muted text-center leading-relaxed">
+          Opens a chat with the supplier — no commitment.
+        </p>
       </div>
 
-      <Button type="submit" className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11" disabled={isSubmitting}>
-        {isSubmitting ? 'Sending…' : 'Send inquiry'}
-      </Button>
-
-      <p className="text-xs text-ink-muted text-center">
-        Opens a chat with the supplier — no commitment.
-      </p>
-    </form>
+      <InquiryModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        listing={{
+          id: listing.id,
+          title: listing.title,
+          type: listing.type,
+          price_per_month: listing.price_per_month,
+          available_from: listing.available_from,
+          available_to: listing.available_to,
+          supplier_id: listing.supplier_id,
+          thumbnailUrl,
+        }}
+        authUserId={authUser.id}
+      />
+    </>
   )
 }

@@ -29,7 +29,12 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  const isHome = pathname === '/'
+  // Pages whose top sections use the dark atmospheric hero. The navbar starts
+  // transparent over them and fades to a solid glassy bar on scroll.
+  const hasDarkHero =
+    pathname === '/' ||
+    pathname === '/listings' ||
+    pathname === '/about'
 
   useEffect(() => {
     function onScroll() {
@@ -40,7 +45,7 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const transparent = isHome && !scrolled
+  const transparent = hasDarkHero && !scrolled
 
   async function signOut() {
     const supabase = createClient()

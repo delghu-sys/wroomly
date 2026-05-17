@@ -2,7 +2,6 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
-import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -47,30 +46,43 @@ export function ListingsFilters({
 
   const hasFilters = Object.values(currentFilters).some(Boolean)
 
+  const tinyLabel =
+    'text-[10px] uppercase tracking-[0.15em] text-ink-muted font-semibold'
+
   return (
-    <div className="bg-surface rounded-3xl border border-line p-5 space-y-5 sticky top-20 shadow-soft">
-      <div className="flex items-center justify-between">
+    <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl border border-white/60 p-5 space-y-5 sticky top-20 shadow-[0_2px_16px_oklch(0_0_0/0.04)]">
+      {/* Soft inner highlight for glass refraction */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-3xl"
+        style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.7)' }}
+        aria-hidden
+      />
+
+      <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-navy-soft flex items-center justify-center">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-navy" />
+          <div className="w-7 h-7 rounded-lg bg-[oklch(0.84_0.17_85/0.12)] flex items-center justify-center">
+            <SlidersHorizontal className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
           </div>
-          <h3 className="font-display text-base text-ink">Filters</h3>
+          <h3 className="font-display text-base text-ink tracking-tight">Filters</h3>
         </div>
         {hasFilters && (
-          <button onClick={clearAll} className="text-xs text-navy font-medium hover:text-ink ease-smooth transition-colors">
+          <button
+            onClick={clearAll}
+            className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
+          >
             Clear all
           </button>
         )}
       </div>
 
       {/* Sort */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Sort by</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Sort by</Label>
         <Select
           value={currentFilters.sort ?? 'newest'}
           onValueChange={v => updateFilter('sort', !v || v === 'newest' ? undefined : v)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Newest first" />
           </SelectTrigger>
           <SelectContent>
@@ -82,37 +94,40 @@ export function ListingsFilters({
         </Select>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Type */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Listing type</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Listing type</Label>
         <div className="grid grid-cols-3 gap-2">
           {[
             { value: '', label: 'Any' },
             { value: 'sublet', label: 'Sublet' },
             { value: 'swap', label: 'Swap' },
-          ].map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => updateFilter('type', opt.value || undefined)}
-              className={`text-sm py-1.5 px-2 rounded-xl border ease-smooth transition-all ${
-                (currentFilters.type ?? '') === opt.value
-                  ? 'bg-navy text-white border-navy shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
-                  : 'text-ink-soft border-line hover:border-navy/30 hover:text-ink'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+          ].map(opt => {
+            const active = (currentFilters.type ?? '') === opt.value
+            return (
+              <button
+                key={opt.value}
+                onClick={() => updateFilter('type', opt.value || undefined)}
+                className={`text-sm py-2 px-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
+                  active
+                    ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] border-[oklch(0.10_0.02_260)] shadow-[0_4px_16px_oklch(0.10_0.02_260/0.30)]'
+                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
+                }`}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Property type */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Property type</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Property type</Label>
         <Select
           value={currentFilters.property_type ?? ''}
           onValueChange={v =>
@@ -122,7 +137,7 @@ export function ListingsFilters({
             })
           }
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
@@ -134,15 +149,15 @@ export function ListingsFilters({
         </Select>
       </div>
 
-      {/* Residence sub-filter (apartments / complexes) */}
+      {/* Residence sub-filter */}
       {currentFilters.property_type === 'apartment' && (
-        <div className="space-y-2">
-          <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Residence / complex</Label>
+        <div className="relative space-y-2">
+          <Label className={tinyLabel}>Residence / complex</Label>
           <Select
             value={currentFilters.residence_name ?? ''}
             onValueChange={v => updateFilter('residence_name', v || undefined)}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
               <SelectValue placeholder="Any residence" />
             </SelectTrigger>
             <SelectContent>
@@ -155,16 +170,16 @@ export function ListingsFilters({
         </div>
       )}
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Neighborhood */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Neighborhood</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Neighborhood</Label>
         <Select
           value={currentFilters.neighborhood ?? ''}
           onValueChange={v => updateFilter('neighborhood', v || undefined)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Any neighborhood" />
           </SelectTrigger>
           <SelectContent>
@@ -176,17 +191,17 @@ export function ListingsFilters({
         </Select>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
-      {/* Available from (single month/year picker) */}
-      <div className="space-y-2">
+      {/* Available from */}
+      <div className="relative space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Available from</Label>
+          <Label className={tinyLabel}>Available from</Label>
           {currentFilters.available_from && (
             <button
               type="button"
               onClick={() => updateFilter('available_from', undefined)}
-              className="text-xs text-navy font-medium hover:text-ink ease-smooth transition-colors"
+              className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
             >
               Clear
             </button>
@@ -214,7 +229,9 @@ export function ListingsFilters({
               value={current}
               onValueChange={v => updateFilter('available_from', v || undefined)}
             >
-              <SelectTrigger><SelectValue placeholder="Any month" /></SelectTrigger>
+              <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+                <SelectValue placeholder="Any month" />
+              </SelectTrigger>
               <SelectContent>
                 {options.map(o => (
                   <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -223,37 +240,39 @@ export function ListingsFilters({
             </Select>
           )
         })()}
-        <p className="text-xs text-ink-muted">
+        <p className="text-xs text-ink-muted leading-relaxed">
           Shows places available by this month.
         </p>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Price range */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Monthly price ($)</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Monthly price ($)</Label>
         <div className="grid grid-cols-2 gap-2">
           <Input
             type="number"
             placeholder="Min"
             defaultValue={currentFilters.min_price}
             onBlur={e => updateFilter('min_price', e.target.value || undefined)}
+            className="h-10 rounded-xl border-line bg-white/80"
           />
           <Input
             type="number"
             placeholder="Max"
             defaultValue={currentFilters.max_price}
             onBlur={e => updateFilter('max_price', e.target.value || undefined)}
+            className="h-10 rounded-xl border-line bg-white/80"
           />
         </div>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Bedrooms */}
-      <div className="space-y-2">
-        <Label className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">Bedrooms</Label>
+      <div className="relative space-y-2">
+        <Label className={tinyLabel}>Bedrooms</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {[
             { value: '', label: 'Any' },
@@ -262,31 +281,35 @@ export function ListingsFilters({
             { value: '2', label: '2' },
             { value: '3', label: '3' },
             { value: '4', label: '4' },
-          ].map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => updateFilter('bedrooms', opt.value || undefined)}
-              className={`text-sm py-1.5 rounded-xl border ease-smooth transition-all ${
-                (currentFilters.bedrooms ?? '') === opt.value
-                  ? 'bg-navy text-white border-navy shadow-[0_2px_8px_oklch(0.27_0.07_257_/_0.2)]'
-                  : 'text-ink-soft border-line hover:border-navy/30 hover:text-ink'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+          ].map(opt => {
+            const active = (currentFilters.bedrooms ?? '') === opt.value
+            return (
+              <button
+                key={opt.value}
+                onClick={() => updateFilter('bedrooms', opt.value || undefined)}
+                className={`text-sm py-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
+                  active
+                    ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] border-[oklch(0.10_0.02_260)] shadow-[0_4px_16px_oklch(0.10_0.02_260/0.30)]'
+                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
+                }`}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <Separator className="bg-line" />
+      <Separator className="bg-line/70" />
 
       {/* Checkboxes */}
-      <div className="space-y-3">
+      <div className="relative space-y-3">
         <div className="flex items-center gap-2">
           <Checkbox
             id="furnished"
             checked={currentFilters.furnished === 'true'}
             onCheckedChange={v => updateFilter('furnished', v ? 'true' : undefined)}
+            className="data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
           />
           <Label htmlFor="furnished" className="cursor-pointer text-sm text-ink-soft">Furnished</Label>
         </div>
@@ -295,6 +318,7 @@ export function ListingsFilters({
             id="pets"
             checked={currentFilters.pets === 'true'}
             onCheckedChange={v => updateFilter('pets', v ? 'true' : undefined)}
+            className="data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
           />
           <Label htmlFor="pets" className="cursor-pointer text-sm text-ink-soft">Pets allowed</Label>
         </div>

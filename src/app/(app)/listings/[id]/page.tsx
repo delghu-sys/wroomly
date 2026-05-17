@@ -1,17 +1,16 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingWithDetails } from '@/types/database'
-import { ListingGallery } from '@/components/listings/ListingGallery'
+import { BrandedGallery } from '@/components/listings/BrandedGallery'
 import { ListingMap } from '@/components/listings/ListingMap'
-import { InquiryForm } from '@/components/listings/InquiryForm'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import { ShieldCheck, BedDouble, Bath, Maximize2, Calendar, Wifi, Car, PawPrint, Zap, ArrowLeftRight, Star } from 'lucide-react'
-import { formatCents, formatDateRange } from '@/lib/utils/listing'
+import { AmenityGrid } from '@/components/listings/AmenityGrid'
+import { SupplierCard } from '@/components/listings/SupplierCard'
+import { BookingSidebar } from '@/components/listings/BookingSidebar'
+import { BrandChip } from '@/components/brand/BrandChip'
+import { ScrollReveal } from '@/components/home/ScrollReveal'
+import { BedDouble, Bath, Maximize2, Calendar, ArrowLeftRight, MapPin } from 'lucide-react'
+import { formatDateRange } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
 
 export async function generateMetadata({
@@ -21,8 +20,59 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params
   const supabase = await createClient()
-  const { data } = await supabase.from('listings').select('title').eq('id', id).single()
-  return { title: data?.title ?? 'Listing' }
+  const { data } = await supabase
+    .from('listings')
+    .select('title, bedrooms, neighborhood, available_from, available_to')
+    .eq('id', id)
+    .single()
+
+  if (!data) {
+    return {
+      title: 'Listing not found',
+      description: 'This listing may have been removed or never existed.',
+    }
+  }
+
+  const bedroomLabel =
+    data.bedrooms === 0
+      ? 'Studio'
+      : data.bedrooms === 1
+        ? '1 bedroom'
+        : data.bedrooms
+          ? `${data.bedrooms}-bedroom`
+          : 'Room'
+
+  const dateRange =
+    data.available_from && data.available_to
+      ? `${new Date(data.available_from).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        })} – ${new Date(data.available_to).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })}`
+      : 'flexible dates'
+
+  const description = `${bedroomLabel}${
+    data.neighborhood ? ` in ${data.neighborhood}` : ''
+  } — available ${dateRange}. Listed by a verified U of M student.`
+
+  return {
+    title: data.title,
+    description,
+    openGraph: {
+      title: `${data.title} | Wroomly`,
+      description,
+      images: ['/og-default.png'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${data.title} | Wroomly`,
+      description,
+      images: ['/og-default.png'],
+    },
+  }
 }
 
 export default async function ListingDetailPage({
@@ -49,7 +99,14 @@ export default async function ListingDetailPage({
   if (!listing) notFound()
 
   const l = listing as ListingWithDetails & {
-    users: { id: string; full_name: string | null; avatar_url: string | null; university: string | null; created_at: string; bio: string | null }
+    users: {
+      id: string
+      full_name: string | null
+      avatar_url: string | null
+      university: string | null
+      created_at: string
+      bio: string | null
+    }
   }
 
   // Aggregate supplier rating
@@ -61,7 +118,8 @@ export default async function ListingDetailPage({
   const supplierReviewCount = supplierReviews?.length ?? 0
   const supplierRatingAvg =
     supplierReviewCount > 0
-      ? (supplierReviews as { rating: number }[]).reduce((a, r) => a + r.rating, 0) / supplierReviewCount
+      ? (supplierReviews as { rating: number }[]).reduce((a, r) => a + r.rating, 0) /
+        supplierReviewCount
       : null
 
   const {
@@ -70,7 +128,7 @@ export default async function ListingDetailPage({
 
   const isOwner = authUser?.id === l.supplier_id
 
-  // Check if consumer already has an inquiry on this listing, and its conversation
+  // Existing inquiry & conversation
   let existingInquiry: { id: string; status: string } | null = null
   let conversationId: string | null = null
   if (authUser && !isOwner) {
@@ -91,7 +149,7 @@ export default async function ListingDetailPage({
     }
   }
 
-  // Check if consumer already paid for this listing
+  // Has paid?
   let hasPaid = false
   if (authUser && !isOwner) {
     const { data: paidTx } = await supabase
@@ -107,227 +165,190 @@ export default async function ListingDetailPage({
   const sortedImages = l.listing_images.sort((a, b) => a.display_order - b.display_order)
   const amenities = l.listing_amenities.map(a => a.amenity)
 
-  const initials = l.users?.full_name
-    ?.split(' ')
-    .map(n => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: main content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Gallery */}
-          <ListingGallery images={sortedImages} title={l.title} />
+    <div className="bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+          {/* Left: main content */}
+          <div className="lg:col-span-2 space-y-10">
+            {/* Hero gallery */}
+            <ScrollReveal>
+              <BrandedGallery images={sortedImages} title={l.title} />
+            </ScrollReveal>
 
-          {/* Header */}
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <Badge
-                className={
-                  l.type === 'sublet'
-                    ? 'bg-navy text-white border-0'
-                    : 'bg-maize text-navy border-0'
-                }
-              >
-                {l.type === 'sublet' ? 'Sublet' : (
-                  <span className="flex items-center gap-1">
-                    <ArrowLeftRight className="w-3 h-3" /> Housing Swap
-                  </span>
-                )}
-              </Badge>
-              {l.furnished && <Badge variant="outline">Furnished</Badge>}
-              {l.utilities_included && <Badge variant="outline">Utilities included</Badge>}
-              {l.pets_allowed && <Badge variant="outline">Pets OK</Badge>}
-            </div>
-            <h1 className="font-display text-3xl tracking-tight text-ink">{l.title}</h1>
-            {l.neighborhood && (
-              <p className="text-ink-muted mt-1">{l.neighborhood}, {l.city}, {l.state}</p>
-            )}
-          </div>
-
-          {/* Key details */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { icon: BedDouble, label: 'Bedrooms', value: l.bedrooms === 0 ? 'Studio' : l.bedrooms ? `${l.bedrooms} bed` : '—' },
-              { icon: Bath, label: 'Bathrooms', value: l.bathrooms ? `${l.bathrooms} bath` : '—' },
-              { icon: Maximize2, label: 'Size', value: l.sq_ft ? `${l.sq_ft} sq ft` : '—' },
-              { icon: Calendar, label: 'Available', value: formatDateRange(l.available_from, l.available_to) },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="bg-navy-soft/40 rounded-2xl p-4 border border-navy/5">
-                <div className="w-8 h-8 rounded-xl bg-navy/8 flex items-center justify-center mb-2.5">
-                  <Icon className="w-4 h-4 text-navy" />
+            {/* Title + badges */}
+            <ScrollReveal delay={0.1}>
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {l.type === 'sublet' ? (
+                    <BrandChip variant="navy">Sublet</BrandChip>
+                  ) : (
+                    <BrandChip variant="primary" icon={ArrowLeftRight}>
+                      Housing Swap
+                    </BrandChip>
+                  )}
+                  {l.furnished && <BrandChip variant="ghost">Furnished</BrandChip>}
+                  {l.utilities_included && (
+                    <BrandChip variant="ghost">Utilities included</BrandChip>
+                  )}
+                  {l.pets_allowed && <BrandChip variant="ghost">Pets OK</BrandChip>}
                 </div>
-                <p className="text-xs uppercase tracking-[0.1em] text-ink-muted font-medium">{label}</p>
-                <p className="font-display text-sm text-ink mt-0.5">{value}</p>
+
+                <h1 className="font-display text-[clamp(2rem,4vw,3.25rem)] tracking-tight text-ink leading-[1.05]">
+                  {l.title}
+                </h1>
+                {l.neighborhood && (
+                  <p className="mt-3 text-ink-muted flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-[oklch(0.45_0.13_85)]" strokeWidth={1.75} />
+                    {l.neighborhood}, {l.city}, {l.state}
+                  </p>
+                )}
               </div>
-            ))}
-          </div>
+            </ScrollReveal>
 
-          <Separator />
-
-          {/* Description */}
-          {l.description && (
-            <div>
-              <h2 className="font-display text-xl tracking-tight text-ink mb-3">About this place</h2>
-              <p className="text-ink-soft leading-relaxed whitespace-pre-line">{l.description}</p>
-            </div>
-          )}
-
-          {/* Amenities */}
-          {amenities.length > 0 && (
-            <div>
-              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Amenities</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {amenities.map(amenity => (
-                  <div key={amenity} className="flex items-center gap-2 text-sm text-ink-soft">
-                    <ShieldCheck className="w-4 h-4 text-navy shrink-0" />
-                    {amenity}
+            {/* Key details — 4 stat tiles */}
+            <ScrollReveal delay={0.15}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    icon: BedDouble,
+                    label: 'Bedrooms',
+                    value:
+                      l.bedrooms === 0
+                        ? 'Studio'
+                        : l.bedrooms
+                          ? `${l.bedrooms} bed`
+                          : '—',
+                  },
+                  {
+                    icon: Bath,
+                    label: 'Bathrooms',
+                    value: l.bathrooms ? `${l.bathrooms} bath` : '—',
+                  },
+                  {
+                    icon: Maximize2,
+                    label: 'Size',
+                    value: l.sq_ft ? `${l.sq_ft} sq ft` : '—',
+                  },
+                  {
+                    icon: Calendar,
+                    label: 'Available',
+                    value: formatDateRange(l.available_from, l.available_to),
+                  },
+                ].map(({ icon: Icon, label, value }) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl p-4 border border-line bg-white"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-[oklch(0.84_0.17_85/0.12)] text-[oklch(0.45_0.13_85)] flex items-center justify-center mb-3">
+                      <Icon className="w-4 h-4" strokeWidth={1.75} />
+                    </div>
+                    <p className="text-[10px] uppercase tracking-[0.15em] text-ink-muted font-semibold">
+                      {label}
+                    </p>
+                    <p className="font-display text-base text-ink mt-0.5 tracking-tight">
+                      {value}
+                    </p>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            </ScrollReveal>
 
-          {/* Swap preferences */}
-          {l.type === 'swap' && l.swap_preferences && (
-            <div>
-              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Swap preferences</h2>
-              <div className="bg-maize-soft rounded-2xl p-4 border border-maize/30 space-y-2">
-                {l.swap_preferences.preferred_cities?.length > 0 && (
-                  <p className="text-sm text-ink-soft">
-                    <span className="font-medium">Looking to swap with:</span>{' '}
-                    {l.swap_preferences.preferred_cities.join(', ')}
+            {/* Description */}
+            {l.description && (
+              <ScrollReveal>
+                <div>
+                  <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
+                    About this place
+                  </h2>
+                  <p className="text-ink-soft leading-relaxed whitespace-pre-line max-w-[65ch]">
+                    {l.description}
                   </p>
-                )}
-                {l.swap_preferences.preferred_from && l.swap_preferences.preferred_to && (
-                  <p className="text-sm text-ink-soft">
-                    <span className="font-medium">Preferred dates:</span>{' '}
-                    {format(parseISO(l.swap_preferences.preferred_from), 'MMM d')} –{' '}
-                    {format(parseISO(l.swap_preferences.preferred_to), 'MMM d, yyyy')}
-                  </p>
-                )}
-                {l.swap_preferences.notes && (
-                  <p className="text-sm text-ink-soft">{l.swap_preferences.notes}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Map */}
-          {l.lat && l.lng && (
-            <div>
-              <h2 className="font-display text-xl tracking-tight text-ink mb-3">Location</h2>
-              <ListingMap lat={l.lat} lng={l.lng} neighborhood={l.neighborhood} />
-            </div>
-          )}
-
-          {/* Supplier profile */}
-          <div>
-            <h2 className="font-display text-xl tracking-tight text-ink mb-3">Listed by</h2>
-            <Link
-              href={`/users/${l.users.id}`}
-              className="group flex items-start gap-4 -mx-2 px-2 py-2 rounded-xl hover:bg-ink-soft/5 transition"
-            >
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={l.users?.avatar_url ?? undefined} />
-                <AvatarFallback className="bg-navy-soft text-navy font-semibold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-ink group-hover:underline">{l.users?.full_name}</p>
-                <div className="flex items-center gap-3 text-sm mt-0.5">
-                  <span className="inline-flex items-center gap-1 text-navy">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    U of M verified
-                  </span>
-                  {supplierRatingAvg !== null && (
-                    <span className="inline-flex items-center gap-1 text-ink">
-                      <Star className="w-3.5 h-3.5 fill-maize stroke-maize" />
-                      <span className="font-medium">{supplierRatingAvg.toFixed(1)}</span>
-                      <span className="text-ink-muted">({supplierReviewCount})</span>
-                    </span>
-                  )}
                 </div>
-                {l.users.bio && (
-                  <p className="text-sm text-ink-soft mt-2 line-clamp-2">{l.users.bio}</p>
-                )}
-                <p className="text-xs text-primary mt-1">View full profile →</p>
-              </div>
-            </Link>
-          </div>
-        </div>
+              </ScrollReveal>
+            )}
 
-        {/* Right: booking sidebar */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-20">
-            <div className="bg-surface border border-line rounded-3xl p-6 shadow-soft space-y-4">
-              {(l.status === 'rented' || l.status === 'swapped') ? (
-                <>
-                  <div className="bg-[oklch(0.97_0.04_25)] border border-[oklch(0.85_0.1_25)] rounded-xl p-4 text-center">
-                    <p className="font-display text-lg text-ink">
-                      {l.status === 'rented' ? 'This place has been rented' : 'This swap is complete'}
-                    </p>
-                    <p className="text-sm text-ink-muted mt-1">
-                      This listing is no longer available.
-                    </p>
-                  </div>
-                  {existingInquiry?.status === 'accepted' && conversationId && (
-                    <Link href={`/messages/${conversationId}`} className="block">
-                      <Button className="press w-full rounded-full bg-navy text-white hover:bg-navy/90 h-11">
-                        Open chat
-                      </Button>
-                    </Link>
-                  )}
-                </>
-              ) : (
-                <>
-                  {l.type === 'sublet' && l.price_per_month && (
-                    <div>
-                      <p className="font-display text-4xl tracking-tight text-ink">
-                        {formatCents(l.price_per_month)}
-                        <span className="text-base font-normal text-ink-muted">/mo</span>
+            {/* Amenities */}
+            {amenities.length > 0 && (
+              <ScrollReveal>
+                <div>
+                  <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-5 leading-tight">
+                    Amenities
+                  </h2>
+                  <AmenityGrid amenities={amenities} />
+                </div>
+              </ScrollReveal>
+            )}
+
+            {/* Swap preferences */}
+            {l.type === 'swap' && l.swap_preferences && (
+              <ScrollReveal>
+                <div>
+                  <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
+                    Swap preferences
+                  </h2>
+                  <div className="rounded-3xl p-5 border border-[oklch(0.84_0.17_85/0.30)] bg-[oklch(0.84_0.17_85/0.06)] space-y-2">
+                    {l.swap_preferences.preferred_cities?.length > 0 && (
+                      <p className="text-sm text-ink-soft">
+                        <span className="font-medium text-ink">Looking to swap with:</span>{' '}
+                        {l.swap_preferences.preferred_cities.join(', ')}
                       </p>
-                      {l.deposit_amount && (
-                        <p className="text-sm text-ink-muted mt-1">
-                          + {formatCents(l.deposit_amount)} deposit
+                    )}
+                    {l.swap_preferences.preferred_from &&
+                      l.swap_preferences.preferred_to && (
+                        <p className="text-sm text-ink-soft">
+                          <span className="font-medium text-ink">Preferred dates:</span>{' '}
+                          {format(parseISO(l.swap_preferences.preferred_from), 'MMM d')} –{' '}
+                          {format(parseISO(l.swap_preferences.preferred_to), 'MMM d, yyyy')}
                         </p>
                       )}
-                    </div>
-                  )}
-
-                  {l.type === 'swap' && (
-                    <div className="bg-maize-soft rounded-2xl p-4 border border-maize/30">
-                      <p className="font-display font-semibold text-navy flex items-center gap-2">
-                        <ArrowLeftRight className="w-4 h-4" />
-                        Housing swap
+                    {l.swap_preferences.notes && (
+                      <p className="text-sm text-ink-soft leading-relaxed">
+                        {l.swap_preferences.notes}
                       </p>
-                      <p className="text-sm text-ink-soft mt-1">
-                        No money changes hands — you swap your place for theirs.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="text-sm text-ink-soft bg-navy-soft/40 rounded-xl p-3">
-                    <Calendar className="w-4 h-4 inline mr-1.5 text-navy" />
-                    {format(parseISO(l.available_from), 'MMM d')} –{' '}
-                    {format(parseISO(l.available_to), 'MMM d, yyyy')}
+                    )}
                   </div>
+                </div>
+              </ScrollReveal>
+            )}
 
-                  <InquiryForm
-                    listing={l}
-                    authUser={authUser ? { id: authUser.id } : null}
-                    isOwner={isOwner}
-                    existingInquiry={existingInquiry}
-                    conversationId={conversationId}
-                    hasPaid={hasPaid}
-                  />
-                </>
-              )}
-            </div>
+            {/* Map */}
+            {l.lat && l.lng && (
+              <ScrollReveal>
+                <div>
+                  <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
+                    Location
+                  </h2>
+                  <ListingMap lat={l.lat} lng={l.lng} neighborhood={l.neighborhood} />
+                </div>
+              </ScrollReveal>
+            )}
+
+            {/* Supplier card */}
+            <ScrollReveal>
+              <div>
+                <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
+                  Listed by
+                </h2>
+                <SupplierCard
+                  user={l.users}
+                  ratingAvg={supplierRatingAvg}
+                  reviewCount={supplierReviewCount}
+                />
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* Right: booking sidebar */}
+          <div className="lg:col-span-1">
+            <BookingSidebar
+              listing={l}
+              authUser={authUser ? { id: authUser.id } : null}
+              isOwner={isOwner}
+              existingInquiry={existingInquiry}
+              conversationId={conversationId}
+              hasPaid={hasPaid}
+            />
           </div>
         </div>
       </div>

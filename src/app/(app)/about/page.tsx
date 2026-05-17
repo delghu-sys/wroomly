@@ -1,201 +1,212 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Button } from '@/components/ui/button'
-import {
-  Sparkles,
-  Search,
-  MessageSquare,
-  ShieldCheck,
-  CreditCard,
-  KeyRound,
-  ArrowRight,
-  Lock,
-  BadgeCheck,
-  Eye,
-  AlertTriangle,
-} from 'lucide-react'
+import { ShieldCheck, CreditCard, MessageSquare } from 'lucide-react'
+import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
+import { WordReveal } from '@/components/brand/WordReveal'
+import { LiveBadge } from '@/components/brand/LiveBadge'
+import { MagneticButton } from '@/components/home/MagneticButton'
+import { ScrollReveal } from '@/components/home/ScrollReveal'
+import { StackedSteps } from '@/components/about/StackedSteps'
+import { TrustBento } from '@/components/about/TrustBento'
 
 export const metadata: Metadata = {
-  title: 'How it works — Wroomly',
+  title: 'How It Works',
   description:
-    'How Wroomly works: verified U-M students, secure payments, in-app messaging, and a trust & safety review for every listing.',
+    'See how Wroomly handles verification, secure payments, and in-app messaging for U of M student housing.',
+  openGraph: {
+    title: 'How It Works | Wroomly',
+    description:
+      'See how Wroomly handles verification, secure payments, and in-app messaging for U of M student housing.',
+    images: ['/og-default.png'],
+  },
 }
 
 export default function AboutPage() {
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-grain" aria-hidden />
-        <div
-          className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full -z-10 blur-3xl opacity-60"
-          style={{ background: 'radial-gradient(closest-side, var(--maize-soft), transparent)' }}
-          aria-hidden
-        />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 backdrop-blur px-3 py-1 text-xs font-medium text-ink-soft">
-            <Sparkles className="w-3.5 h-3.5 text-[oklch(0.7_0.14_92)]" />
-            How it works
-          </div>
-          <h1 className="font-display text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.02] tracking-tight text-ink mt-6 text-balance">
-            Make room for
-            <span className="italic font-light text-navy"> connection.</span>
-          </h1>
-          <p className="mt-6 text-lg text-ink-soft leading-relaxed max-w-2xl">
-            Wroomly is a verified marketplace for sublets and apartment swaps between
-            University of Michigan students. Every listing is reviewed, every payment is
-            secured, and every conversation stays on-platform.
-          </p>
-        </div>
-      </section>
+      {/* ── Atmospheric Hero ── */}
+      <section className="relative isolate overflow-hidden -mt-16 pt-16 min-h-[80vh] flex items-center">
+        <AtmosphericBackground variant="hero" />
 
-      {/* Steps */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 className="font-display text-3xl tracking-tight text-ink mb-10">The flow</h2>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <Step
-            icon={<Search className="w-5 h-5" />}
-            n="01"
-            title="Browse or list"
-            body="Suppliers post a sublet or a swap in a few minutes. Consumers filter by neighborhood, dates, price, and amenities to find a place that fits."
-          />
-          <Step
-            icon={<MessageSquare className="w-5 h-5" />}
-            n="02"
-            title="Message securely"
-            body="Talk to the other side inside the app. No phone numbers traded, no email back-and-forth, no Craigslist surprises."
-          />
-          <Step
-            icon={<ShieldCheck className="w-5 h-5" />}
-            n="03"
-            title="Apply with proof"
-            body="Submit a quick application with your U-M info. Suppliers review and accept the candidate they want."
-          />
-          <Step
-            icon={<CreditCard className="w-5 h-5" />}
-            n="04"
-            title="Pay & hold"
-            body="Rent and deposit run through secure payments. Funds aren't released until both sides confirm move-in is good."
-          />
-          <Step
-            icon={<KeyRound className="w-5 h-5" />}
-            n="05"
-            title="Move in"
-            body="Coordinate keys and check-in inside the platform. Disputes (rare) get a human review from our team."
-          />
-          <Step
-            icon={<BadgeCheck className="w-5 h-5" />}
-            n="06"
-            title="Review"
-            body="After move-in, both sides leave a public review. Reputation makes the next booking easier for everyone."
-          />
-        </div>
-      </section>
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-medium mb-5">
+                How Wroomly works
+              </p>
 
-      {/* Trust & safety */}
-      <section id="trust" className="bg-surface border-y border-line scroll-mt-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="inline-flex items-center gap-2 rounded-full border border-line bg-background px-3 py-1 text-xs font-medium text-ink-soft mb-4">
-            <ShieldCheck className="w-3.5 h-3.5 text-navy" />
-            Trust & safety
-          </div>
-          <h2 className="font-display text-3xl tracking-tight text-ink mb-3">
-            Built for students, not strangers.
-          </h2>
-          <p className="text-ink-soft max-w-2xl leading-relaxed">
-            We&apos;re a small platform on purpose — verified accounts, reviewed listings, and
-            payments that never go off-platform.
-          </p>
+              <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] tracking-tight text-white">
+                <WordReveal text="Make room for" delay={0.1} />
+                <br />
+                <WordReveal text="connection." delay={0.4} accentWords={['connection.']} />
+              </h1>
 
-          <div className="grid sm:grid-cols-2 gap-6 mt-10">
-            <TrustCard
-              icon={<BadgeCheck className="w-5 h-5" />}
-              title="Verified U-M accounts"
-              body="Suppliers and consumers verify their identity and university affiliation before posting or applying."
-            />
-            <TrustCard
-              icon={<Eye className="w-5 h-5" />}
-              title="Every listing reviewed"
-              body="An AI moderator scans each new listing for scams, off-platform contact, and discriminatory language. Borderline cases go to a human admin before they go live."
-            />
-            <TrustCard
-              icon={<Lock className="w-5 h-5" />}
-              title="Payments held in escrow"
-              body="Rent and deposit are charged through Stripe and only released after both parties confirm move-in. No wire transfers, no Venmo strangers."
-            />
-            <TrustCard
-              icon={<AlertTriangle className="w-5 h-5" />}
-              title="Report anything"
-              body="Suspicious DM, off-platform offer, or a listing that feels off? Hit Report and we look at it fast. Repeat offenders get banned."
-            />
+              <p className="mt-7 text-lg text-white/55 leading-relaxed max-w-xl">
+                Wroomly is a verified marketplace for sublets and apartment swaps between
+                University of Michigan students. Every listing is reviewed, every payment is
+                secured, and every conversation stays on-platform.
+              </p>
+
+              <div className="mt-9 flex flex-wrap gap-3">
+                <LiveBadge
+                  icon={<ShieldCheck className="w-3.5 h-3.5" strokeWidth={1.75} />}
+                  delay={0.7}
+                >
+                  @umich.edu verified
+                </LiveBadge>
+                <LiveBadge
+                  icon={<CreditCard className="w-3.5 h-3.5" strokeWidth={1.75} />}
+                  delay={0.82}
+                >
+                  Escrowed payments
+                </LiveBadge>
+                <LiveBadge
+                  icon={<MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />}
+                  delay={0.94}
+                >
+                  Private messaging
+                </LiveBadge>
+              </div>
+            </div>
+
+            {/* Right — abstract glass composition */}
+            <div className="hidden lg:block relative h-[440px]" aria-hidden>
+              <div
+                className="absolute top-8 right-12 w-56 h-72 rounded-3xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_oklch(0_0_0/0.40)] rotate-[5deg]"
+              >
+                <div className="animate-float p-5 flex flex-col gap-4 h-full">
+                  <div className="h-2.5 w-3/4 rounded-full bg-white/[0.10]" />
+                  <div className="h-2 w-1/2 rounded-full bg-white/[0.06]" />
+                  <div className="mt-auto space-y-2">
+                    <div className="h-10 rounded-xl bg-[oklch(0.84_0.17_85/0.15)] border border-[oklch(0.84_0.17_85/0.20)]" />
+                    <div className="h-10 rounded-xl bg-white/[0.05] border border-white/[0.06]" />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="absolute top-24 right-48 w-60 h-80 rounded-3xl bg-white/[0.07] backdrop-blur-xl border border-white/[0.10] shadow-[0_18px_50px_oklch(0_0_0/0.50)] -rotate-[4deg]"
+              >
+                <div className="animate-float-slow p-5 flex flex-col gap-3 h-full">
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-full bg-[oklch(0.84_0.17_85/0.25)] flex items-center justify-center">
+                      <ShieldCheck
+                        className="w-3.5 h-3.5 text-[oklch(0.84_0.17_85)]"
+                        strokeWidth={2}
+                      />
+                    </span>
+                    <div className="h-2 w-20 rounded-full bg-white/[0.10]" />
+                  </div>
+                  <div className="h-2.5 w-full rounded-full bg-white/[0.08]" />
+                  <div className="h-2 w-2/3 rounded-full bg-white/[0.05]" />
+                  <div className="mt-auto h-px bg-white/[0.06]" />
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
+                      <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                    </span>
+                    <span className="text-[10px] text-white/50 tracking-wide">
+                      Verified · Live
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="absolute top-4 right-2 w-1.5 h-1.5 rounded-full bg-[oklch(0.84_0.17_85)]"
+              />
+              <div
+                className="absolute bottom-6 right-[300px] w-1 h-1 rounded-full bg-white/30 animate-float"
+                style={{ animationDelay: '4s' }}
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-        <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-ink">
-          Ready to find your next place?
-        </h2>
-        <p className="mt-4 text-ink-soft max-w-xl mx-auto">
-          Browse current sublets and swaps, or list your own in a few minutes.
-        </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/listings">
-            <Button size="lg">
-              Browse listings <ArrowRight className="w-4 h-4 ml-1.5" />
-            </Button>
-          </Link>
-          <Link href="/listings/new">
-            <Button size="lg" variant="outline">List your place</Button>
-          </Link>
+      {/* ── The flow — stacked steps ── */}
+      <section className="relative py-24 sm:py-32" style={{ background: 'oklch(0.97 0.008 75)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <p className="text-xs uppercase tracking-[0.22em] text-ink-muted font-semibold mb-4">
+              The flow
+            </p>
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-ink max-w-3xl leading-[0.95]">
+              Six steps from{' '}
+              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                hello to keys in hand.
+              </span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="mt-20">
+            <StackedSteps />
+          </div>
         </div>
       </section>
-    </div>
-  )
-}
 
-function Step({
-  icon,
-  n,
-  title,
-  body,
-}: {
-  icon: React.ReactNode
-  n: string
-  title: string
-  body: string
-}) {
-  return (
-    <div className="rounded-2xl border border-line bg-background p-6 hover:shadow-sm transition-shadow">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-9 h-9 rounded-lg bg-navy/5 text-navy flex items-center justify-center">
-          {icon}
+      {/* ── Trust & safety bento ── */}
+      <section id="trust" className="relative py-24 sm:py-28 bg-background scroll-mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="max-w-2xl">
+              <p className="text-xs uppercase tracking-[0.22em] text-ink-muted font-semibold mb-4">
+                Trust &amp; safety
+              </p>
+              <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[0.95]">
+                Built for students,{' '}
+                <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                  not strangers.
+                </span>
+              </h2>
+              <p className="mt-5 text-ink-soft leading-relaxed max-w-[55ch]">
+                We&rsquo;re a small platform on purpose — verified accounts, reviewed
+                listings, and payments that never go off-platform.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="mt-14">
+            <TrustBento />
+          </div>
         </div>
-        <span className="text-xs font-medium tracking-[0.15em] text-ink-muted">{n}</span>
-      </div>
-      <h3 className="font-display text-xl text-ink mb-2">{title}</h3>
-      <p className="text-sm text-ink-soft leading-relaxed">{body}</p>
-    </div>
-  )
-}
+      </section>
 
-function TrustCard({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode
-  title: string
-  body: string
-}) {
-  return (
-    <div className="rounded-2xl border border-line bg-background p-6">
-      <div className="w-9 h-9 rounded-lg bg-navy/5 text-navy flex items-center justify-center mb-3">
-        {icon}
-      </div>
-      <h3 className="font-medium text-ink mb-1.5">{title}</h3>
-      <p className="text-sm text-ink-soft leading-relaxed">{body}</p>
+      {/* ── CTA — atmospheric, dual button ── */}
+      <section className="relative isolate overflow-hidden py-32 sm:py-40">
+        <AtmosphericBackground variant="panel" />
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <ScrollReveal>
+            <p className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-medium mb-6">
+              <span className="w-8 h-px bg-[oklch(0.84_0.17_85_/_0.40)]" aria-hidden />
+              Ready when you are
+              <span className="w-8 h-px bg-[oklch(0.84_0.17_85_/_0.40)]" aria-hidden />
+            </p>
+            <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[0.95]">
+              Find your next place.
+              <br />
+              <span className="italic font-light text-[oklch(0.84_0.17_85)]">
+                Or list your own.
+              </span>
+            </h2>
+            <p className="mt-7 text-lg text-white/50 max-w-xl mx-auto leading-relaxed">
+              A few clicks to browse what&rsquo;s open, or a few minutes to put yours up.
+            </p>
+
+            <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/listings">
+                <MagneticButton variant="primary" showArrow>
+                  Browse listings
+                </MagneticButton>
+              </Link>
+              <Link href="/sign-up">
+                <MagneticButton variant="secondary">List your place</MagneticButton>
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
     </div>
   )
 }

@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.95.2",
     "@base-ui/react": "^1.4.1",
     "@hookform/resolvers": "^5.2.2",
+    "@phosphor-icons/react": "^2.1.10",
     "@stripe/stripe-js": "^9.4.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",

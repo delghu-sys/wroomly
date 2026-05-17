@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
+import { FooterGate } from '@/components/layout/FooterGate'
 import type { User } from '@/types/database'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -72,7 +72,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex flex-col min-h-screen">
       <Navbar user={profile} unreadCount={unreadCount} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <FooterGate />
     </div>
   )
 }

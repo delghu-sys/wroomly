@@ -1,10 +1,48 @@
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { ChatWindow } from '@/components/messages/ChatWindow'
-import type { Message } from '@/types/database'
+import type { Message, InquiryStatus } from '@/types/database'
+import { MessagesShell } from '@/components/messages/MessagesShell'
+import { ThreadView } from '@/components/messages/ThreadView'
+import { loadConversations } from '@/components/messages/loadConversations'
+
+const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 export const metadata: Metadata = { title: 'Chat' }
+
+function imageUrl(path: string | null | undefined): string | null {
+  if (!path || !SUPA_URL) return null
+  return `${SUPA_URL}/storage/v1/object/public/listing-images/${path}`
+}
+
+interface ConvoRow {
+  id: string
+  supplier_id: string
+  consumer_id: string
+  listing_id: string
+  inquiry_id: string | null
+  listings: {
+    id: string
+    title: string
+    type: string
+    price_per_month: number | null
+    available_from: string | null
+    available_to: string | null
+    neighborhood: string | null
+    listing_images: { storage_path: string; display_order: number }[] | null
+  } | null
+  supplier: { id: string; full_name: string | null; avatar_url: string | null } | null
+  consumer: { id: string; full_name: string | null; avatar_url: string | null } | null
+}
+
+interface InquiryRow {
+  id: string
+  message: string
+  move_in_date: string | null
+  move_out_date: string | null
+  status: InquiryStatus
+  consumer_id: string
+}
 
 export default async function ConversationPage({
   params,
@@ -14,37 +52,48 @@ export default async function ConversationPage({
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/sign-in')
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect(`/sign-in?next=/messages/${id}`)
 
-  const { data: conversationData } = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      listings(id, title, type, price_per_month, available_from, available_to),
-      supplier:supplier_id(id, full_name, avatar_url),
-      consumer:consumer_id(id, full_name, avatar_url)
-    `)
-    .eq('id', id)
-    .single()
+  // Fetch list + thread data in parallel
+  const [conversationsPromise, threadDataPromise] = [
+    loadConversations(user.id),
+    supabase
+      .from('conversations')
+      .select(`
+        *,
+        listings(id, title, type, price_per_month, available_from, available_to, neighborhood, listing_images(storage_path, display_order)),
+        supplier:supplier_id(id, full_name, avatar_url),
+        consumer:consumer_id(id, full_name, avatar_url)
+      `)
+      .eq('id', id)
+      .single(),
+  ]
 
-  if (!conversationData) notFound()
+  const conversations = await conversationsPromise
+  const { data: convoRaw } = await threadDataPromise
+  if (!convoRaw) notFound()
+  const conv = convoRaw as ConvoRow
 
-  // Verify user is a participant
-  const conv = conversationData as {
-    id: string
-    supplier_id: string
-    consumer_id: string
-    listing_id: string
-    listings: { id: string; title: string; type: string; price_per_month: number | null } | null
-    supplier: { id: string; full_name: string | null; avatar_url: string | null } | null
-    consumer: { id: string; full_name: string | null; avatar_url: string | null } | null
-  }
-
+  // Verify membership
   if (conv.supplier_id !== user.id && conv.consumer_id !== user.id) {
     notFound()
   }
 
+  // Inquiry
+  let inquiry: InquiryRow | null = null
+  if (conv.inquiry_id) {
+    const { data: inq } = await supabase
+      .from('inquiries')
+      .select('id, message, move_in_date, move_out_date, status, consumer_id')
+      .eq('id', conv.inquiry_id)
+      .maybeSingle()
+    inquiry = (inq as InquiryRow) ?? null
+  }
+
+  // Messages
   const { data: messagesData } = await supabase
     .from('messages')
     .select('*')
@@ -53,7 +102,7 @@ export default async function ConversationPage({
 
   const messages = (messagesData ?? []) as Message[]
 
-  // Mark messages as read
+  // Mark as read server-side
   await supabase
     .from('messages')
     .update({ is_read: true })
@@ -61,7 +110,7 @@ export default async function ConversationPage({
     .neq('sender_id', user.id)
     .eq('is_read', false)
 
-  // Check whether consumer has successfully paid for this listing
+  // Paid check
   const { data: paidTx } = await supabase
     .from('transactions')
     .select('id')
@@ -70,17 +119,58 @@ export default async function ConversationPage({
     .eq('status', 'succeeded')
     .limit(1)
     .maybeSingle()
-
   const hasPaid = !!paidTx
 
+  // Shape listing for ThreadView
+  const firstImage = conv.listings?.listing_images
+    ?.slice()
+    .sort((a, b) => a.display_order - b.display_order)
+    .at(0)
+
+  const conversationForThread = {
+    id: conv.id,
+    listing_id: conv.listing_id,
+    supplier_id: conv.supplier_id,
+    consumer_id: conv.consumer_id,
+    listings: conv.listings
+      ? {
+          id: conv.listings.id,
+          title: conv.listings.title,
+          type: conv.listings.type,
+          price_per_month: conv.listings.price_per_month,
+          available_from: conv.listings.available_from,
+          available_to: conv.listings.available_to,
+          neighborhood: conv.listings.neighborhood,
+          thumbnailUrl: imageUrl(firstImage?.storage_path),
+        }
+      : null,
+    supplier: conv.supplier,
+    consumer: conv.consumer,
+    inquiry: inquiry
+      ? {
+          id: inquiry.id,
+          message: inquiry.message,
+          move_in_date: inquiry.move_in_date,
+          move_out_date: inquiry.move_out_date,
+          status: inquiry.status,
+          consumer_id: inquiry.consumer_id,
+        }
+      : null,
+  }
+
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
-      <ChatWindow
-        conversation={conv}
-        initialMessages={messages}
-        currentUserId={user.id}
-        hasPaid={hasPaid}
-      />
-    </div>
+    <MessagesShell
+      conversations={conversations}
+      activeId={id}
+      mobileListHidden
+      right={
+        <ThreadView
+          conversation={conversationForThread}
+          initialMessages={messages}
+          currentUserId={user.id}
+          hasPaid={hasPaid}
+        />
+      }
+    />
   )
 }
