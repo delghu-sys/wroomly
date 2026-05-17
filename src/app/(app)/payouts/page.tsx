@@ -64,9 +64,12 @@ export default async function PayoutsPage() {
       {/* How it works */}
       <div className="animate-fade-up delay-75 bg-navy-soft border border-line rounded-2xl p-5 mb-8">
         <p className="text-sm text-ink-soft leading-relaxed">
-          <strong className="text-ink">How payouts work:</strong> When a student books your listing, Wroomly holds the payment securely.
-          Your payout becomes available 24 hours after the move-in date. We&apos;ll notify you when funds are ready.
-          Wroomly takes a 5% service fee.
+          <strong className="text-ink">How payouts work:</strong> When a
+          student books your place, Stripe routes the rent straight to your
+          connected account at checkout. Stripe pays out to your bank on its
+          standard schedule (usually 2 business days). The 5% Wroomly service
+          fee is paid by the consumer on top of the rent — you receive the
+          full amount you listed.
         </p>
       </div>
 

@@ -60,16 +60,19 @@ export async function POST(request: Request) {
     )
   }
 
-  const amountCents =
+  // The supplier-facing amount (rent or deposit). The platform fee is
+  // added on top — `totalChargeCents` is what we actually bill the
+  // consumer.
+  const rentCents =
     type === 'deposit'
       ? (listing.deposit_amount ?? listing.price_per_month ?? 0)
       : (listing.price_per_month ?? 0)
 
-  if (amountCents <= 0) {
+  if (rentCents <= 0) {
     return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
   }
 
-  const { platformFee } = calculateFees(amountCents)
+  const { platformFee, totalChargeCents } = calculateFees(rentCents)
 
   // Get or create Stripe customer for consumer
   let { data: profile } = await supabase
@@ -89,7 +92,7 @@ export async function POST(request: Request) {
   }
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: amountCents,
+    amount: totalChargeCents, // rent + 5% fee
     currency: 'usd',
     customer: customerId,
     application_fee_amount: platformFee,
@@ -101,16 +104,20 @@ export async function POST(request: Request) {
       payer_id: user.id,
       payee_id: listing.supplier_id,
       type,
+      rent_cents: String(rentCents),
+      platform_fee_cents: String(platformFee),
     },
   })
 
-  // Create pending transaction record
+  // Create pending transaction record. `amount_cents` stores the total
+  // charged (rent + fee); `platform_fee_cents` stores the fee. The
+  // payouts page computes the supplier net as `amount - fee = rent`.
   await supabase.from('transactions').insert({
     listing_id,
     payer_id: user.id,
     payee_id: listing.supplier_id,
     type,
-    amount_cents: amountCents,
+    amount_cents: totalChargeCents,
     platform_fee_cents: platformFee,
     stripe_payment_intent_id: paymentIntent.id,
     status: 'pending',

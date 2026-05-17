@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { CreditCard, CheckCircle2, Loader2 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
+import { FeeNote } from '@/components/brand/FeeNote'
 
 interface AcceptedSystemCardProps {
   rawContent: string
@@ -102,10 +103,17 @@ export function AcceptedSystemCard({
             <p className="text-sm text-ink-soft mt-1.5 leading-relaxed">{title}</p>
           )}
           {isSublet && data.price && data.price > 0 && (
-            <p className="font-display text-2xl tracking-tight text-ink mt-3">
-              ${(data.price / 100).toLocaleString()}
-              <span className="text-sm text-ink-muted font-normal"> /mo</span>
-            </p>
+            <>
+              <p className="font-display text-2xl tracking-tight text-ink mt-3">
+                ${(data.price / 100).toLocaleString()}
+                <span className="text-sm text-ink-muted font-normal"> /mo</span>
+              </p>
+              {isConsumer && !hasPaid && (
+                <div className="mt-1.5">
+                  <FeeNote variant="pill" />
+                </div>
+              )}
+            </>
           )}
 
           {isConsumer && isSublet && !hasPaid && (

@@ -11,6 +11,7 @@ import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
 import { InquiryForm } from './InquiryForm'
 import { Button } from '@/components/ui/button'
+import { FeeNote } from '@/components/brand/FeeNote'
 import type { ListingWithDetails } from '@/types/database'
 
 interface BookingSidebarProps {
@@ -104,6 +105,9 @@ export function BookingSidebar({
                       + {formatCents(listing.deposit_amount)} deposit
                     </p>
                   )}
+                  <p className="mt-2">
+                    <FeeNote variant="inline" />
+                  </p>
                 </div>
               )}
 

@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCents } from '@/lib/utils/listing'
+import { FeeNote } from '@/components/brand/FeeNote'
 
 const schema = z.object({
   message: z.string().min(20, 'Please write at least 20 characters'),
@@ -294,16 +295,24 @@ export function InquiryModal({
 
                     {/* Confirm strip */}
                     {listing.type === 'sublet' && listing.price_per_month && (
-                      <div className="flex items-center justify-between px-4 py-3 rounded-2xl border border-line bg-[oklch(0.97_0.008_75)]">
-                        <div className="flex items-center gap-2 text-[12px] text-ink-soft">
-                          <Calendar className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
-                          {format(parseISO(listing.available_from), 'MMM d')} —{' '}
-                          {format(parseISO(listing.available_to), 'MMM d, yyyy')}
+                      <div className="rounded-2xl border border-line bg-[oklch(0.97_0.008_75)]">
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div className="flex items-center gap-2 text-[12px] text-ink-soft">
+                            <Calendar className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
+                            {format(parseISO(listing.available_from), 'MMM d')} —{' '}
+                            {format(parseISO(listing.available_to), 'MMM d, yyyy')}
+                          </div>
+                          <p className="font-display text-base text-ink tracking-tight">
+                            {formatCents(listing.price_per_month)}
+                            <span className="text-ink-muted font-normal text-sm">
+                              {' '}
+                              /mo
+                            </span>
+                          </p>
                         </div>
-                        <p className="font-display text-base text-ink tracking-tight">
-                          {formatCents(listing.price_per_month)}
-                          <span className="text-ink-muted font-normal text-sm"> /mo</span>
-                        </p>
+                        <div className="px-4 pb-3 -mt-0.5 text-right">
+                          <FeeNote variant="inline" />
+                        </div>
                       </div>
                     )}
 
