@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
@@ -308,29 +308,38 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
  * velocities. Hardware-accelerated via transform only.
  */
 function ConfettiBurst() {
-  const particles = Array.from({ length: 14 }, (_, i) => ({
-    id: i,
-    angle: (i / 14) * Math.PI * 2,
-    distance: 80 + Math.random() * 80,
-    rotate: (Math.random() - 0.5) * 720,
-    color:
-      i % 3 === 0
-        ? 'oklch(0.10 0.02 260)'
-        : i % 3 === 1
-          ? 'oklch(0.84 0.17 85)'
-          : 'oklch(0.55 0.15 142)',
-  }))
+  // Compute particle layout once per mount — Math.random in render would
+  // reshuffle on every re-render and cause hydration mismatches if it ever ran
+  // server-side.
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, i) => {
+        const angle = (i / 14) * Math.PI * 2
+        const distance = 80 + Math.random() * 80
+        return {
+          id: i,
+          x: Math.cos(angle) * distance,
+          y: Math.sin(angle) * distance,
+          rotate: (Math.random() - 0.5) * 720,
+          color:
+            i % 3 === 0
+              ? 'oklch(0.10 0.02 260)'
+              : i % 3 === 1
+                ? 'oklch(0.84 0.17 85)'
+                : 'oklch(0.55 0.15 142)',
+        }
+      }),
+    []
+  )
 
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       {particles.map(p => {
-        const x = Math.cos(p.angle) * p.distance
-        const y = Math.sin(p.angle) * p.distance
         return (
           <motion.span
             key={p.id}
             initial={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 0.8 }}
-            animate={{ x, y, opacity: 0, rotate: p.rotate, scale: 1.1 }}
+            animate={{ x: p.x, y: p.y, opacity: 0, rotate: p.rotate, scale: 1.1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
             className="absolute w-2 h-2 rounded-[2px]"

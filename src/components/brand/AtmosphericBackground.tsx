@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * Server-safe atmospheric background — dark navy mesh + noise overlay.
  * Matches the homepage hero / CTA section treatment.

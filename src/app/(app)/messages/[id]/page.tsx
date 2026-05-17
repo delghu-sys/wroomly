@@ -82,44 +82,41 @@ export default async function ConversationPage({
     notFound()
   }
 
-  // Inquiry
-  let inquiry: InquiryRow | null = null
-  if (conv.inquiry_id) {
-    const { data: inq } = await supabase
-      .from('inquiries')
-      .select('id, message, move_in_date, move_out_date, status, consumer_id')
-      .eq('id', conv.inquiry_id)
-      .maybeSingle()
-    inquiry = (inq as InquiryRow) ?? null
-  }
+  // Inquiry, messages, and paid status are independent — fan them out.
+  const [inquiryRes, messagesRes, paidRes] = await Promise.all([
+    conv.inquiry_id
+      ? supabase
+          .from('inquiries')
+          .select('id, message, move_in_date, move_out_date, status, consumer_id')
+          .eq('id', conv.inquiry_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', id)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('transactions')
+      .select('id')
+      .eq('listing_id', conv.listing_id)
+      .eq('payer_id', conv.consumer_id)
+      .eq('status', 'succeeded')
+      .limit(1)
+      .maybeSingle(),
+  ])
 
-  // Messages
-  const { data: messagesData } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', id)
-    .order('created_at', { ascending: true })
+  const inquiry = (inquiryRes.data as InquiryRow | null) ?? null
+  const messages = (messagesRes.data ?? []) as Message[]
+  const hasPaid = !!paidRes.data
 
-  const messages = (messagesData ?? []) as Message[]
-
-  // Mark as read server-side
-  await supabase
+  // Mark-as-read is a side effect; don't block the render on it.
+  void supabase
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', id)
     .neq('sender_id', user.id)
     .eq('is_read', false)
-
-  // Paid check
-  const { data: paidTx } = await supabase
-    .from('transactions')
-    .select('id')
-    .eq('listing_id', conv.listing_id)
-    .eq('payer_id', conv.consumer_id)
-    .eq('status', 'succeeded')
-    .limit(1)
-    .maybeSingle()
-  const hasPaid = !!paidTx
 
   // Shape listing for ThreadView
   const firstImage = conv.listings?.listing_images

@@ -58,14 +58,14 @@ export default function TermsPage() {
             </span>
           </h1>
           <div className="mt-7 inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.05] backdrop-blur-sm border border-white/[0.07]">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-white/55 font-semibold">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-white/70 font-semibold">
               Effective
             </span>
             <span className="text-[12.5px] font-medium text-white/85">
               {EFFECTIVE_DATE}
             </span>
           </div>
-          <p className="mt-7 text-base sm:text-lg text-white/50 leading-relaxed max-w-2xl">
+          <p className="mt-7 text-base sm:text-lg text-white/70 leading-relaxed max-w-2xl">
             The plain-English layout of the legal agreement between you and
             Wroomly. The text below is the binding version — we&rsquo;ve given
             it visual hierarchy, not new wording.

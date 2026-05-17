@@ -1,7 +1,3 @@
-'use client'
-
-import { memo } from 'react'
-
 interface StatusDotProps {
   /** When true → emerald breathing pulse. When false → static muted dot. */
   active?: boolean
@@ -10,13 +6,11 @@ interface StatusDotProps {
 }
 
 /**
- * Live presence indicator. Memoized so the perpetual pulse never
- * re-renders the parent header.
+ * Live presence indicator. Pure CSS — server-renderable. The `animate-ping`
+ * loop is automatically halted when the user prefers reduced motion via
+ * the global stylesheet.
  */
-export const StatusDot = memo(function StatusDot({
-  active = true,
-  label,
-}: StatusDotProps) {
+export function StatusDot({ active = true, label }: StatusDotProps) {
   return (
     <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-muted font-medium">
       <span className="relative flex h-1.5 w-1.5">
@@ -32,4 +26,4 @@ export const StatusDot = memo(function StatusDot({
       {label}
     </span>
   )
-})
+}

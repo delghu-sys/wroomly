@@ -31,7 +31,7 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
             type="button"
             onClick={() => setView(opt)}
             aria-pressed={active}
-            className="relative inline-flex items-center gap-1.5 h-9 px-4 text-sm font-medium transition-colors duration-300 active:scale-[0.97]"
+            className="relative inline-flex items-center gap-1.5 h-9 px-4 text-sm font-medium transition-colors duration-300 active:scale-[0.97] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
           >
             {active && (
               <motion.span

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
@@ -51,6 +51,23 @@ export function InquiryModal({
 }: InquiryModalProps) {
   const router = useRouter()
   const [phase, setPhase] = useState<'form' | 'success'>('form')
+
+  // Pre-compute particle layout once per mount so re-renders don't reshuffle.
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => {
+        const angle = (i / 12) * Math.PI * 2
+        const dist = 90 + Math.random() * 60
+        return {
+          i,
+          x: Math.cos(angle) * dist,
+          y: Math.sin(angle) * dist,
+          color:
+            i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.10 0.02 260)',
+        }
+      }),
+    []
+  )
 
   const {
     register,
@@ -338,32 +355,25 @@ export function InquiryModal({
                 >
                   {/* Particle burst */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const angle = (i / 12) * Math.PI * 2
-                      const dist = 90 + Math.random() * 60
-                      return (
-                        <motion.span
-                          key={i}
-                          initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }}
-                          animate={{
-                            x: Math.cos(angle) * dist,
-                            y: Math.sin(angle) * dist,
-                            opacity: 0,
-                            scale: 1,
-                          }}
-                          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute w-2 h-2 rounded-[2px]"
-                          style={{
-                            background:
-                              i % 2 === 0
-                                ? 'oklch(0.84 0.17 85)'
-                                : 'oklch(0.10 0.02 260)',
-                            willChange: 'transform, opacity',
-                          }}
-                          aria-hidden
-                        />
-                      )
-                    })}
+                    {particles.map(p => (
+                      <motion.span
+                        key={p.i}
+                        initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }}
+                        animate={{
+                          x: p.x,
+                          y: p.y,
+                          opacity: 0,
+                          scale: 1,
+                        }}
+                        transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute w-2 h-2 rounded-[2px]"
+                        style={{
+                          background: p.color,
+                          willChange: 'transform, opacity',
+                        }}
+                        aria-hidden
+                      />
+                    ))}
                   </div>
                   <motion.div
                     initial={{ scale: 0.4, rotate: -20 }}

@@ -56,7 +56,7 @@ export function LiveBadge({
       )}
       <span
         className={`text-sm font-medium ${
-          dark ? 'text-white/55' : 'text-ink-soft'
+          dark ? 'text-white/75' : 'text-ink-soft'
         }`}
       >
         {children}

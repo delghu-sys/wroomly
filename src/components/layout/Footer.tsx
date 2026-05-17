@@ -62,7 +62,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-white/60">
             &copy; {new Date().getFullYear()} Wroomly. Not affiliated with the University of Michigan.
           </p>
           <p className="text-xs text-maize/60 font-display italic">
@@ -88,11 +88,11 @@ function FooterCol({
         {links.map(l => (
           <li key={l.href + l.label}>
             {l.external ? (
-              <a href={l.href} className="text-sm text-white/55 hover:text-white ease-smooth transition-colors">
+              <a href={l.href} className="text-sm text-white/70 hover:text-white ease-smooth transition-colors">
                 {l.label}
               </a>
             ) : (
-              <Link href={l.href} className="text-sm text-white/55 hover:text-white ease-smooth transition-colors">
+              <Link href={l.href} className="text-sm text-white/70 hover:text-white ease-smooth transition-colors">
                 {l.label}
               </Link>
             )}

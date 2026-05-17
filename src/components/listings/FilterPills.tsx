@@ -75,7 +75,7 @@ export function FilterPills({ filters }: FilterPillsProps) {
             key={pill.label}
             type="button"
             onClick={() => apply(pill.patch(filters))}
-            className="relative inline-flex items-center h-9 px-4 text-sm font-medium transition-colors duration-300"
+            className="relative inline-flex items-center h-9 px-4 text-sm font-medium transition-colors duration-300 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
             aria-pressed={active}
           >
             {active && (

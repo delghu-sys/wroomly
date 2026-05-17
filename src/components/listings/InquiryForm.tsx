@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { ListingWithDetails } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -39,7 +37,6 @@ export function InquiryForm({
   conversationId,
   hasPaid,
 }: InquiryFormProps) {
-  const router = useRouter()
   const [paying, setPaying] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -259,8 +256,6 @@ export function InquiryForm({
   }
 
   // ── No inquiry yet → magnetic CTA opens InquiryModal ──
-  router // keep linter happy — we may navigate elsewhere from child modal
-
   return (
     <>
       <div className="space-y-2">

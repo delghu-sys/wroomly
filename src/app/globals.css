@@ -413,6 +413,7 @@
 
   /* Respect reduced motion preferences */
   @media (prefers-reduced-motion: reduce) {
+    /* Bespoke keyframes */
     .animate-fade-up,
     .animate-fade-in,
     .animate-scale-in,
@@ -423,11 +424,21 @@
     .animate-float-slow,
     .animate-gradient,
     .animate-orbit,
+    .animate-ping-soft,
     .shimmer,
     .stagger-reveal > * {
       animation: none !important;
     }
+    /* Tailwind defaults — keep `animate-spin` for spinners (functional) but
+       neutralize decorative ping / pulse loops site-wide. */
+    .animate-ping,
+    .animate-pulse {
+      animation: none !important;
+    }
     .lift:hover,
     .tilt:hover { transform: none !important; }
+    /* Disable arbitrary transition durations on hover-fill chrome so
+       directional-fill chrome reads as a single state instead of motion. */
+    [data-motion-safe='false'] { transition: none !important; }
   }
 }

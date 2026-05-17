@@ -41,7 +41,7 @@ export default function AboutPage() {
                 <WordReveal text="connection." delay={0.4} accentWords={['connection.']} />
               </h1>
 
-              <p className="mt-7 text-lg text-white/55 leading-relaxed max-w-xl">
+              <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-xl">
                 Wroomly is a verified marketplace for sublets and apartment swaps between
                 University of Michigan students. Every listing is reviewed, every payment is
                 secured, and every conversation stays on-platform.
@@ -105,7 +105,7 @@ export default function AboutPage() {
                       <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
                       <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
                     </span>
-                    <span className="text-[10px] text-white/50 tracking-wide">
+                    <span className="text-[10px] text-white/70 tracking-wide">
                       Verified · Live
                     </span>
                   </div>
@@ -190,7 +190,7 @@ export default function AboutPage() {
                 Or list your own.
               </span>
             </h2>
-            <p className="mt-7 text-lg text-white/50 max-w-xl mx-auto leading-relaxed">
+            <p className="mt-7 text-lg text-white/70 max-w-xl mx-auto leading-relaxed">
               A few clicks to browse what&rsquo;s open, or a few minutes to put yours up.
             </p>
 

@@ -69,7 +69,7 @@ export function HomeHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ ...spring, delay: 0.6 }}
-              className="mt-7 text-lg sm:text-xl text-white/50 max-w-lg leading-relaxed"
+              className="mt-7 text-lg sm:text-xl text-white/70 max-w-lg leading-relaxed"
             >
               Sublet or swap your Ann&nbsp;Arbor apartment with verified
               U&nbsp;of&nbsp;M students. Secure payments, in-app messaging,
@@ -109,7 +109,7 @@ export function HomeHero() {
                     <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
                   </span>
                   <Icon className="w-3.5 h-3.5 text-[oklch(0.84_0.17_85)]" />
-                  <span className="text-sm text-white/55 font-medium">{label}</span>
+                  <span className="text-sm text-white/70 font-medium">{label}</span>
                 </motion.div>
               ))}
             </div>

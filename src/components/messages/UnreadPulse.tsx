@@ -1,17 +1,10 @@
-'use client'
-
-import { memo } from 'react'
-
 /**
  * Maize unread indicator with an infinite breathe-pulse.
- * Isolated + memoized so the perpetual animation never triggers
- * re-renders of the conversation row.
+ * Pure CSS via Tailwind's `animate-ping` — no JS, server-renderable.
+ * Pulse is muted automatically via globals.css when the user has
+ * `prefers-reduced-motion: reduce`.
  */
-export const UnreadPulse = memo(function UnreadPulse({
-  count,
-}: {
-  count?: number
-}) {
+export function UnreadPulse({ count }: { count?: number }) {
   return (
     <span className="relative inline-flex shrink-0">
       <span
@@ -30,4 +23,4 @@ export const UnreadPulse = memo(function UnreadPulse({
       </span>
     </span>
   )
-})
+}

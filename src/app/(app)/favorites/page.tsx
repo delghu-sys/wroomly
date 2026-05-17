@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { ListingCard } from '@/components/listings/ListingCard'
+import { BrandListingCard } from '@/components/listings/BrandListingCard'
 import type { ListingWithDetails } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
@@ -46,24 +46,41 @@ export default async function FavoritesPage() {
       </div>
 
       {listings.length === 0 ? (
-        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-maize/30 text-navy items-center justify-center mb-4">
-            <Heart className="w-6 h-6" />
+        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-white/55 backdrop-blur-sm">
+          <div
+            className="inline-flex w-14 h-14 rounded-2xl items-center justify-center mb-4"
+            style={{
+              background: 'oklch(0.10 0.02 260)',
+              color: 'oklch(0.84 0.17 85)',
+            }}
+          >
+            <Heart className="w-6 h-6" strokeWidth={1.75} />
           </div>
-          <p className="font-display text-2xl text-ink">Nothing saved yet</p>
-          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-            Tap the heart on any listing you like — it&apos;ll show up here so you can come back later.
+          <p className="font-display text-2xl text-ink">
+            Nothing saved{' '}
+            <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              yet.
+            </span>
+          </p>
+          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto leading-relaxed">
+            Tap the heart on any listing you like — it&apos;ll show up here so
+            you can come back later.
           </p>
           <Link href="/listings">
-            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
+            <Button className="press rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)] hover:shadow-[0_8px_24px_oklch(0.84_0.17_85/0.35)] h-11 px-6 font-semibold transition-shadow duration-500">
               Browse listings
             </Button>
           </Link>
         </div>
       ) : (
-        <div className="stagger-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {listings.map(listing => (
-            <ListingCard key={listing.id} listing={listing} isFavorited />
+            <BrandListingCard
+              key={listing.id}
+              listing={listing}
+              userId={user.id}
+              isFavorited
+            />
           ))}
         </div>
       )}

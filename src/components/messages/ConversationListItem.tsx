@@ -92,6 +92,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
         className={`
           relative flex items-center gap-3 px-3 py-3 rounded-2xl group
           transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+          focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.25)]
           ${active ? '' : 'hover:bg-white/60'}
         `}
       >

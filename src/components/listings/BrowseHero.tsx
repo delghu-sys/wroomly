@@ -52,7 +52,7 @@ export function BrowseHero({ totalCount, currentQuery, filters, view }: BrowseHe
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...spring, delay: 0.7 }}
-          className="mt-6 text-base sm:text-lg text-white/50 leading-relaxed max-w-xl"
+          className="mt-6 text-base sm:text-lg text-white/70 leading-relaxed max-w-xl"
         >
           Sublets and swaps from verified U&nbsp;of&nbsp;M students. Filter by
           neighborhood, dates, price — the right listing is a couple of clicks away.

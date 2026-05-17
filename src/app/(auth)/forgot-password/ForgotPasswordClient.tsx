@@ -1,0 +1,175 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { motion } from 'motion/react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { createClient } from '@/lib/supabase/client'
+import { AlertCircle } from 'lucide-react'
+import { EnvelopeSimple, CheckCircle } from '@phosphor-icons/react/dist/ssr'
+import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
+import { BrandFormInput } from '@/components/auth/BrandFormInput'
+import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
+
+const schema = z.object({
+  email: z.string().email('Enter a valid email'),
+})
+type FormValues = z.infer<typeof schema>
+
+const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
+
+export default function ForgotPasswordClient() {
+  const [sent, setSent] = useState(false)
+  const [serverError, setServerError] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+
+  async function onSubmit({ email }: FormValues) {
+    setServerError(null)
+    const supabase = createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/callback`,
+    })
+    if (error) {
+      setServerError(error.message)
+      return
+    }
+    setSent(true)
+  }
+
+  return (
+    <div className="min-h-[100dvh] flex flex-col lg:flex-row">
+      <AtmosphericAuthPanel
+        headline1="Forgot your"
+        headline2="password?"
+        accentWords={['password?']}
+        subhead="We’ll send a one-time reset link to your verified email. The link expires in an hour."
+      />
+
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={spring}
+            className="mb-9"
+          >
+            <p className="text-xs uppercase tracking-[0.22em] text-ink-muted font-semibold mb-3">
+              Reset
+            </p>
+            <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
+              Send the{' '}
+              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                reset link.
+              </span>
+            </h2>
+            <p className="text-ink-soft mt-3 leading-relaxed">
+              Enter the email you signed up with — we’ll mail you a link to
+              choose a new password.
+            </p>
+          </motion.div>
+
+          {sent ? (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...spring, delay: 0.1 }}
+              className="rounded-3xl border border-line bg-white/85 backdrop-blur-xl p-6"
+              style={{
+                boxShadow:
+                  'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 4px 18px oklch(0 0 0 / 0.04)',
+              }}
+            >
+              <div
+                className="inline-flex w-11 h-11 rounded-2xl items-center justify-center shadow-[0_6px_20px_oklch(0.55_0.15_142/0.30)]"
+                style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
+              >
+                <CheckCircle size={20} weight="duotone" />
+              </div>
+              <p className="font-display text-xl tracking-tight text-ink mt-4 leading-tight">
+                Check your inbox.
+              </p>
+              <p className="text-ink-soft mt-2 leading-relaxed">
+                If an account exists for{' '}
+                <strong className="font-semibold text-ink">
+                  {watch('email')}
+                </strong>
+                , a reset link is on its way. Didn’t get it within a few
+                minutes? Check spam, then try again.
+              </p>
+              <div className="mt-5 flex items-center gap-3">
+                <Link
+                  href="/sign-in"
+                  className="text-[13px] font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline transition-colors"
+                >
+                  Back to sign in
+                </Link>
+                <span aria-hidden className="text-ink-muted">
+                  ·
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSent(false)}
+                  className="text-[13px] font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline transition-colors"
+                >
+                  Send again
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.form
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...spring, delay: 0.1 }}
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-5"
+            >
+              <BrandFormInput
+                label="Email"
+                type="email"
+                placeholder="you@university.edu"
+                {...register('email')}
+                error={errors.email?.message}
+              />
+
+              {serverError && (
+                <div className="flex items-start gap-2 text-sm text-[oklch(0.55_0.20_25)] bg-[oklch(0.97_0.04_25)] border border-[oklch(0.85_0.10_25)] rounded-2xl px-4 py-3">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  {serverError}
+                </div>
+              )}
+
+              <div className="pt-2">
+                <AuthSubmitButton loading={isSubmitting}>
+                  <EnvelopeSimple
+                    size={16}
+                    weight="duotone"
+                    className="mr-1"
+                  />
+                  Send reset link
+                </AuthSubmitButton>
+              </div>
+
+              <p className="text-center text-[13px] text-ink-muted pt-2">
+                Remembered it?{' '}
+                <Link
+                  href="/sign-in"
+                  className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </motion.form>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

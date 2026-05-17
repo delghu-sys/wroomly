@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Quotes } from '@phosphor-icons/react/dist/ssr'
 import { StarRating } from '@/components/users/StarRating'
 
@@ -32,14 +32,17 @@ export function RotatingTestimonial({
 }: RotatingTestimonialProps) {
   const [i, setI] = useState(0)
   const [paused, setPaused] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
-    if (paused || testimonials.length < 2) return
+    // Halt auto-advance entirely if the user prefers reduced motion or has
+    // focused into the panel; respects WCAG 2.2.2 (auto-updating content).
+    if (paused || prefersReducedMotion || testimonials.length < 2) return
     const t = window.setTimeout(() => {
       setI(n => (n + 1) % testimonials.length)
     }, intervalMs)
     return () => window.clearTimeout(t)
-  }, [i, paused, intervalMs, testimonials.length])
+  }, [i, paused, intervalMs, prefersReducedMotion, testimonials.length])
 
   const t = testimonials[i]
   if (!t) return null
@@ -51,6 +54,10 @@ export function RotatingTestimonial({
       transition={{ ...spring, delay: 1.15 }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      aria-live="polite"
+      aria-roledescription="carousel"
       className="
         relative max-w-md rounded-3xl overflow-hidden
         border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl

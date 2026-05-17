@@ -55,7 +55,20 @@ export default async function ListingsPage({
     .eq('status', 'active')
 
   if (filters.q) {
-    query = query.or(`title.ilike.%${filters.q}%,description.ilike.%${filters.q}%,neighborhood.ilike.%${filters.q}%,residence_name.ilike.%${filters.q}%`)
+    // PostgREST .or() takes a comma-delimited filter expression. Any comma,
+    // paren, or backslash in user input would break out of the value slot —
+    // strip those characters and clamp length before interpolating. Percent
+    // and underscore are LIKE wildcards which are safe (user-facing fuzzy
+    // search) but we still cap input to a sane upper bound.
+    const safeQ = filters.q
+      .replace(/[,()\\]/g, ' ')
+      .trim()
+      .slice(0, 80)
+    if (safeQ.length > 0) {
+      query = query.or(
+        `title.ilike.%${safeQ}%,description.ilike.%${safeQ}%,neighborhood.ilike.%${safeQ}%,residence_name.ilike.%${safeQ}%`
+      )
+    }
   }
   if (filters.type === 'sublet' || filters.type === 'swap') {
     query = query.eq('type', filters.type)

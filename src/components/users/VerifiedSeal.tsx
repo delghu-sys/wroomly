@@ -1,6 +1,3 @@
-'use client'
-
-import { memo } from 'react'
 import { SealCheck } from '@phosphor-icons/react/dist/ssr'
 
 interface VerifiedSealProps {
@@ -12,9 +9,10 @@ interface VerifiedSealProps {
 
 /**
  * Animated maize verified seal (Phosphor SealCheck).
- * Isolated + memoized — the perpetual ping never re-renders the parent.
+ * Pure CSS animation — server-renderable; muted automatically by the
+ * `prefers-reduced-motion` rules in globals.css.
  */
-export const VerifiedSeal = memo(function VerifiedSeal({
+export function VerifiedSeal({
   size = 22,
   pulse = true,
   className = '',
@@ -36,4 +34,4 @@ export const VerifiedSeal = memo(function VerifiedSeal({
       />
     </span>
   )
-})
+}

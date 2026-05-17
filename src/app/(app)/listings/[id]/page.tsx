@@ -109,11 +109,13 @@ export default async function ListingDetailPage({
     }
   }
 
-  // Aggregate supplier rating
-  const { data: supplierReviews } = await supabase
-    .from('reviews')
-    .select('rating')
-    .eq('reviewee_id', l.supplier_id)
+  // Fan-out the independent queries: supplier rating + auth lookup don't
+  // depend on each other, so run them in parallel. Saves one round-trip.
+  const [{ data: supplierReviews }, { data: { user: authUser } }] =
+    await Promise.all([
+      supabase.from('reviews').select('rating').eq('reviewee_id', l.supplier_id),
+      supabase.auth.getUser(),
+    ])
 
   const supplierReviewCount = supplierReviews?.length ?? 0
   const supplierRatingAvg =
@@ -122,23 +124,34 @@ export default async function ListingDetailPage({
         supplierReviewCount
       : null
 
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
-
   const isOwner = authUser?.id === l.supplier_id
 
-  // Existing inquiry & conversation
+  // Existing inquiry & conversation + paid status can fan out together for
+  // authenticated non-owners.
   let existingInquiry: { id: string; status: string } | null = null
   let conversationId: string | null = null
+  let hasPaid = false
   if (authUser && !isOwner) {
-    const { data } = await supabase
-      .from('inquiries')
-      .select('id, status')
-      .eq('listing_id', id)
-      .eq('consumer_id', authUser.id)
-      .single()
-    existingInquiry = data
+    const [inquiryRes, paidRes] = await Promise.all([
+      supabase
+        .from('inquiries')
+        .select('id, status')
+        .eq('listing_id', id)
+        .eq('consumer_id', authUser.id)
+        .single(),
+      supabase
+        .from('transactions')
+        .select('id')
+        .eq('listing_id', id)
+        .eq('payer_id', authUser.id)
+        .eq('status', 'succeeded')
+        .maybeSingle(),
+    ])
+
+    existingInquiry = inquiryRes.data
+    hasPaid = !!paidRes.data
+
+    // Only fetch the conversation id if an inquiry actually exists.
     if (existingInquiry) {
       const { data: convo } = await supabase
         .from('conversations')
@@ -147,19 +160,6 @@ export default async function ListingDetailPage({
         .maybeSingle()
       conversationId = convo?.id ?? null
     }
-  }
-
-  // Has paid?
-  let hasPaid = false
-  if (authUser && !isOwner) {
-    const { data: paidTx } = await supabase
-      .from('transactions')
-      .select('id')
-      .eq('listing_id', id)
-      .eq('payer_id', authUser.id)
-      .eq('status', 'succeeded')
-      .maybeSingle()
-    hasPaid = !!paidTx
   }
 
   const sortedImages = l.listing_images.sort((a, b) => a.display_order - b.display_order)

@@ -74,7 +74,7 @@ export function AtmosphericAuthPanel({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.6 }}
-            className="mt-6 text-white/55 text-lg leading-relaxed max-w-md"
+            className="mt-6 text-white/70 text-lg leading-relaxed max-w-md"
           >
             {subhead}
           </motion.p>
