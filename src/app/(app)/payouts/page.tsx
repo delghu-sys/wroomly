@@ -6,6 +6,8 @@ import { DollarSign, Clock, CheckCircle2, Wallet } from 'lucide-react'
 import { formatCents } from '@/lib/utils/listing'
 import { format, parseISO, isPast, addDays } from 'date-fns'
 import type { Transaction, User } from '@/types/database'
+import { fetchConnectStatus } from '@/lib/stripe'
+import { PayoutAccountCard } from '@/components/payments/PayoutAccountCard'
 
 export const metadata: Metadata = { title: 'Payouts' }
 
@@ -15,7 +17,11 @@ export default async function PayoutsPage() {
   if (!user) redirect('/sign-in')
 
   const [profileRes, transactionsRes] = await Promise.all([
-    supabase.from('users').select('user_type').eq('id', user.id).single(),
+    supabase
+      .from('users')
+      .select('user_type, stripe_account_id')
+      .eq('id', user.id)
+      .single(),
     supabase
       .from('transactions')
       .select('*')
@@ -23,8 +29,15 @@ export default async function PayoutsPage() {
       .order('created_at', { ascending: false }),
   ])
 
-  const profile = profileRes.data as Pick<User, 'user_type'> | null
-  if (profile?.user_type !== 'supplier' && profile?.user_type !== 'admin') redirect('/dashboard')
+  const profile = profileRes.data as Pick<
+    User,
+    'user_type' | 'stripe_account_id'
+  > | null
+  if (profile?.user_type !== 'supplier' && profile?.user_type !== 'admin')
+    redirect('/dashboard')
+
+  // Lookup payout-account state for the gating card.
+  const connect = await fetchConnectStatus(profile?.stripe_account_id)
 
   const transactions = (transactionsRes.data ?? []) as Transaction[]
 
@@ -59,6 +72,14 @@ export default async function PayoutsPage() {
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink text-balance">
           Your <span className="italic font-light text-navy">payouts.</span>
         </h1>
+      </div>
+
+      {/* Payout account state — drives the rest of the supplier flow */}
+      <div className="animate-fade-up delay-50 mb-6">
+        <PayoutAccountCard
+          status={connect.status}
+          detailsSubmitted={connect.detailsSubmitted}
+        />
       </div>
 
       {/* How it works */}

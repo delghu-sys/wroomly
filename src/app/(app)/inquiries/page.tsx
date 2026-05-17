@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { format, parseISO } from 'date-fns'
 import type { Inquiry, User, Listing } from '@/types/database'
+import { fetchConnectStatus } from '@/lib/stripe'
 
 export const metadata: Metadata = { title: 'Inquiries' }
 
@@ -21,14 +22,20 @@ export default async function InquiriesPage() {
 
   const { data: profileData } = await supabase
     .from('users')
-    .select('user_type')
+    .select('user_type, stripe_account_id')
     .eq('id', user.id)
     .single()
 
-  const userType = (profileData as { user_type?: string } | null)?.user_type
-  if (userType !== 'supplier' && userType !== 'admin') {
+  const profile = profileData as
+    | { user_type?: string; stripe_account_id?: string | null }
+    | null
+  if (profile?.user_type !== 'supplier' && profile?.user_type !== 'admin') {
     redirect('/dashboard')
   }
+
+  // Single supplier viewing the page — single Connect lookup is fine.
+  const connect = await fetchConnectStatus(profile?.stripe_account_id ?? null)
+  const supplierPayoutReady = connect.status === 'active'
 
   // Get supplier's listing IDs first
   const listingsRes = await supabase
@@ -122,6 +129,8 @@ export default async function InquiriesPage() {
                     inquiryId={inq.id}
                     consumerId={consumer.id}
                     listingId={listing.id}
+                    listingType={listing.type}
+                    supplierPayoutReady={supplierPayoutReady}
                   />
                 )}
               </div>

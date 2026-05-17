@@ -5,6 +5,7 @@ import type { Message, InquiryStatus } from '@/types/database'
 import { MessagesShell } from '@/components/messages/MessagesShell'
 import { ThreadView } from '@/components/messages/ThreadView'
 import { loadConversations } from '@/components/messages/loadConversations'
+import { fetchConnectStatus } from '@/lib/stripe'
 
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
@@ -118,6 +119,17 @@ export default async function ConversationPage({
     .neq('sender_id', user.id)
     .eq('is_read', false)
 
+  // Lookup supplier's Stripe Connect status so the inquiry accept gate
+  // can decide whether the supplier can take the booking right now.
+  const { data: supplierProfile } = await supabase
+    .from('users')
+    .select('stripe_account_id')
+    .eq('id', conv.supplier_id)
+    .single()
+  const supplierConnect = await fetchConnectStatus(
+    supplierProfile?.stripe_account_id ?? null
+  )
+
   // Shape listing for ThreadView
   const firstImage = conv.listings?.listing_images
     ?.slice()
@@ -166,6 +178,7 @@ export default async function ConversationPage({
           initialMessages={messages}
           currentUserId={user.id}
           hasPaid={hasPaid}
+          supplierPayoutReady={supplierConnect.status === 'active'}
         />
       }
     />

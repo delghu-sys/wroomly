@@ -58,6 +58,12 @@ interface ThreadViewProps {
   initialMessages: Message[]
   currentUserId: string
   hasPaid: boolean
+  /**
+   * Whether the supplier's Stripe Connect account is fully active.
+   * Drives the accept-gate inside `InquiryPinnedCard` so sublet
+   * inquiries can't be accepted before the host can receive money.
+   */
+  supplierPayoutReady: boolean
 }
 
 const QUICK_PROMPTS = [
@@ -76,6 +82,7 @@ export function ThreadView({
   initialMessages,
   currentUserId,
   hasPaid,
+  supplierPayoutReady,
 }: ThreadViewProps) {
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -197,6 +204,7 @@ export function ThreadView({
                 thumbnailUrl: listing.thumbnailUrl,
               }}
               isSupplier={isSupplier}
+              supplierPayoutReady={supplierPayoutReady}
             />
           </div>
         )}

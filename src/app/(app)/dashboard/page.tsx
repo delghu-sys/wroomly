@@ -8,6 +8,8 @@ import { Home, MessageSquare, Search, Star, Plus, ArrowRight, CheckCircle2 } fro
 import { formatCents } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
 import type { User, Listing, Inquiry, Transaction } from '@/types/database'
+import { fetchConnectStatus } from '@/lib/stripe'
+import { PayoutSetupBanner } from '@/components/payments/PayoutSetupBanner'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -64,6 +66,9 @@ export default async function DashboardPage() {
     const unreadMessages = 'count' in unreadRes ? (unreadRes.count ?? 0) : 0
     const activeListings = listings.filter(l => l.status === 'active').length
 
+    // Stripe Connect readiness — banner only renders when not active.
+    const connect = await fetchConnectStatus(profile.stripe_account_id)
+
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="animate-fade-up mb-10 flex items-end justify-between flex-wrap gap-4">
@@ -82,6 +87,9 @@ export default async function DashboardPage() {
             </Button>
           </Link>
         </div>
+
+        {/* Payout setup nudge — auto-hides once Stripe is fully active. */}
+        <PayoutSetupBanner status={connect.status} />
 
         <div className="stagger-reveal grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {[

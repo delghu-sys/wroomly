@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
 import { createClient } from '@/lib/supabase/client'
 import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import type { InquiryStatus } from '@/types/database'
@@ -31,6 +32,13 @@ interface InquiryPinnedCardProps {
     thumbnailUrl: string | null
   }
   isSupplier: boolean
+  /**
+   * Server-evaluated readiness of the supplier's Stripe Connect account.
+   * Sublet inquiries can't be accepted while this is false — there's
+   * nowhere for the rent to land. Defaults to `true` so swap inquiries
+   * (no money flow) and legacy callers aren't broken.
+   */
+  supplierPayoutReady?: boolean
 }
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
@@ -40,8 +48,13 @@ export function InquiryPinnedCard({
   inquiry,
   listing,
   isSupplier,
+  supplierPayoutReady = true,
 }: InquiryPinnedCardProps) {
   const router = useRouter()
+  // Sublet bookings move real money; require an active Stripe Connect
+  // account before letting the supplier accept. Swaps are exempt — no
+  // funds flow through Wroomly.
+  const needsPayoutSetup = listing.type === 'sublet' && !supplierPayoutReady
   const [status, setStatus] = useState<InquiryStatus>(inquiry.status)
   const [loading, setLoading] = useState<'accept' | 'reject' | null>(null)
   const [showBurst, setShowBurst] = useState(false)
@@ -194,8 +207,50 @@ export function InquiryPinnedCard({
           </p>
         )}
 
+        {/* Supplier payout-not-ready gate. Sublet inquiries can't be
+            accepted until the host has finished Stripe onboarding —
+            otherwise there's nowhere for the rent to land. */}
+        {isSupplier && status === 'pending' && needsPayoutSetup && (
+          <div
+            className="mt-5 rounded-2xl border p-4 flex items-start gap-3"
+            style={{
+              borderColor: 'oklch(0.84 0.17 85 / 0.40)',
+              background: 'oklch(0.84 0.17 85 / 0.08)',
+            }}
+          >
+            <div
+              className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{
+                background: 'oklch(0.10 0.02 260)',
+                color: 'oklch(0.84 0.17 85)',
+              }}
+            >
+              <Warning size={16} weight="duotone" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10.5px] uppercase tracking-[0.18em] font-semibold text-[oklch(0.32_0.10_85)]">
+                Payout setup needed
+              </p>
+              <p className="text-[13.5px] text-ink-soft mt-0.5 leading-relaxed">
+                Connect Stripe before accepting — that&rsquo;s where the rent
+                lands. Takes about 5 minutes.
+              </p>
+              <Link
+                href="/payouts"
+                className="
+                  inline-flex items-center gap-1.5 mt-3
+                  text-[13px] font-semibold text-[oklch(0.32_0.10_85)]
+                  underline-offset-4 hover:underline transition-colors
+                "
+              >
+                Set up payouts <ArrowRight size={13} weight="bold" />
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Supplier actions */}
-        {isSupplier && status === 'pending' && (
+        {isSupplier && status === 'pending' && !needsPayoutSetup && (
           <div className="mt-5 flex items-center gap-2">
             <button
               type="button"
