@@ -32,7 +32,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-medium mb-5">
-                How Wroomly works
+                How it works
               </p>
 
               <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] tracking-tight text-white">

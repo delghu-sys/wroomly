@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
-import { SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from '@phosphor-icons/react/dist/ssr'
 
 interface ListingsFiltersProps {
   neighborhoods: string[]
@@ -61,7 +61,11 @@ export function ListingsFilters({
       <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-[oklch(0.84_0.17_85/0.12)] flex items-center justify-center">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
+            <SlidersHorizontal
+              size={14}
+              weight="bold"
+              className="text-[oklch(0.45_0.13_85)]"
+            />
           </div>
           <h3 className="font-display text-base text-ink tracking-tight">Filters</h3>
         </div>

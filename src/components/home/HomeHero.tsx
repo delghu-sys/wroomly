@@ -2,9 +2,11 @@
 
 import { motion } from 'motion/react'
 import { ShieldCheck, CreditCard, MessageSquare } from 'lucide-react'
+import { Robot, Info } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 import { TextScramble } from './TextScramble'
 import { MagneticButton } from './MagneticButton'
+import { BrandTooltip } from '@/components/brand/BrandTooltip'
 
 const NOISE_SVG =
   "data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
@@ -112,6 +114,55 @@ export function HomeHero() {
                   <span className="text-sm text-white/70 font-medium">{label}</span>
                 </motion.div>
               ))}
+
+              {/* AI-moderated — tooltip-explained. Same chrome as the
+                  pulsing badges, but the Info glyph + cursor signal that
+                  hovering/focusing it reveals the explanation. */}
+              <BrandTooltip
+                side="top"
+                content={
+                  <>
+                    Every listing is reviewed by AI before going live.
+                    Borderline cases go to a human admin.
+                  </>
+                }
+              >
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ ...spring, delay: 1.0 + 3 * 0.12 }}
+                  whileHover={{ y: -1 }}
+                  className="
+                    inline-flex items-center gap-2.5 px-4 py-2 rounded-full
+                    bg-white/[0.04] backdrop-blur-sm border border-white/[0.06]
+                    cursor-default
+                    transition-[border-color,background-color] duration-300
+                    hover:bg-white/[0.07] hover:border-[oklch(0.84_0.17_85/0.30)]
+                    focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]
+                  "
+                  aria-label="What does AI-moderated mean?"
+                >
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
+                    <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                  </span>
+                  <Robot
+                    size={14}
+                    weight="duotone"
+                    className="text-[oklch(0.84_0.17_85)]"
+                  />
+                  <span className="text-sm text-white/70 font-medium">
+                    AI-moderated
+                  </span>
+                  <Info
+                    size={12}
+                    weight="regular"
+                    className="text-white/45 -ml-0.5"
+                    aria-hidden
+                  />
+                </motion.button>
+              </BrandTooltip>
             </div>
           </div>
 

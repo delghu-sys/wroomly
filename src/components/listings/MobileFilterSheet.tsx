@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { X, SlidersHorizontal } from 'lucide-react'
+import { X } from 'lucide-react'
+import { SlidersHorizontal } from '@phosphor-icons/react/dist/ssr'
 import { ListingsFilters } from './ListingsFilters'
 
 interface MobileFilterSheetProps {
@@ -60,7 +61,7 @@ export function MobileFilterSheet({
         aria-controls="mobile-filter-sheet"
         className="lg:hidden inline-flex items-center gap-2 h-9 px-4 rounded-full border border-line bg-white/70 backdrop-blur text-sm font-medium text-ink hover:border-[oklch(0.84_0.17_85/0.40)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_1px_2px_oklch(0_0_0/0.04)] active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
       >
-        <SlidersHorizontal className="w-3.5 h-3.5" />
+        <SlidersHorizontal size={14} weight="bold" />
         Filters
         {activeFilterCount > 0 && (
           <span className="w-5 h-5 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] text-[10px] font-bold flex items-center justify-center">

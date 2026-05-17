@@ -546,7 +546,7 @@ export default function TermsPage() {
             {/* Contact card + university disclaimer */}
             <div className="space-y-6 pt-6">
               <TermsContactCard />
-              <p className="text-[12.5px] text-ink-muted leading-relaxed max-w-[65ch]">
+              <p className="text-[12.5px] text-ink-muted leading-relaxed max-w-[68ch]">
                 Wroomly is an independent platform and is not affiliated with,
                 endorsed by, or sponsored by the University of Michigan or its
                 Board of Regents.

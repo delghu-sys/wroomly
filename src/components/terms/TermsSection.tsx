@@ -26,10 +26,10 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
         [&_strong]:text-[oklch(0.32_0.10_85)]
         [&_p]:text-ink-soft
         [&_p]:leading-relaxed
-        [&_p]:max-w-[65ch]
+        [&_p]:max-w-[68ch]
         [&_p]:mt-4
-        [&_ul]:mt-4 [&_ul]:space-y-2 [&_ul]:max-w-[65ch]
-        [&_ol]:mt-4 [&_ol]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:max-w-[65ch]
+        [&_ul]:mt-4 [&_ul]:space-y-2 [&_ul]:max-w-[68ch]
+        [&_ol]:mt-4 [&_ol]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:max-w-[68ch]
         [&_ul>li]:text-ink-soft [&_ul>li]:leading-relaxed [&_ul>li]:pl-5 [&_ul>li]:relative
         [&_ul>li]:before:content-[''] [&_ul>li]:before:absolute [&_ul>li]:before:left-0 [&_ul>li]:before:top-[0.7em]
         [&_ul>li]:before:w-2 [&_ul>li]:before:h-px
@@ -39,14 +39,15 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
         [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:hover:underline
       "
     >
-      {/* Watermark section number */}
+      {/* Watermark section number — kept under 10% so it reads as
+          atmospheric backdrop, not content. */}
       <span
         className="
           pointer-events-none absolute -top-4 sm:-top-6 -left-2 sm:-left-3
           font-display tracking-tighter leading-none italic font-light
           text-[clamp(5rem,12vw,9rem)] select-none
         "
-        style={{ color: 'oklch(0.84 0.17 85 / 0.10)' }}
+        style={{ color: 'oklch(0.84 0.17 85 / 0.08)' }}
         aria-hidden
       >
         {n.padStart(2, '0')}

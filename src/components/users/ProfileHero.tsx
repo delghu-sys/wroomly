@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { GraduationCap, CalendarBlank, Crown } from '@phosphor-icons/react/dist/ssr'
+import { MapPin, CalendarBlank, Crown } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
 import { VerifiedSeal } from './VerifiedSeal'
 import { StarRating } from './StarRating'
@@ -67,7 +67,7 @@ export function ProfileHero({
         >
           <Avatar
             className="ring-2 ring-white shadow-[0_8px_28px_oklch(0.84_0.17_85/0.30)]"
-            style={{ width: 96, height: 96 }}
+            style={{ width: 80, height: 80 }}
           >
             <AvatarImage src={avatarUrl ?? undefined} />
             <AvatarFallback
@@ -75,7 +75,7 @@ export function ProfileHero({
               style={{
                 background: 'oklch(0.84 0.17 85)',
                 color: 'oklch(0.10 0.02 260)',
-                fontSize: 36,
+                fontSize: 30,
                 lineHeight: 1,
               }}
             >
@@ -143,7 +143,7 @@ export function ProfileHero({
         >
           {university && (
             <p className="inline-flex items-center gap-1.5">
-              <GraduationCap size={14} weight="duotone" />
+              <MapPin size={14} weight="duotone" />
               {university}
             </p>
           )}

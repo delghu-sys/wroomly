@@ -90,7 +90,7 @@ export default async function ListingDetailPage({
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
-      users(id, full_name, avatar_url, university, created_at, bio)
+      users(id, full_name, avatar_url, university, created_at, bio, instagram_handle)
     `)
     .eq('id', id)
     .in('status', ['active', 'rented', 'swapped'])
@@ -106,6 +106,7 @@ export default async function ListingDetailPage({
       university: string | null
       created_at: string
       bio: string | null
+      instagram_handle: string | null
     }
   }
 
@@ -228,6 +229,12 @@ export default async function ListingDetailPage({
                   {
                     icon: Maximize2,
                     label: 'Size',
+                    // TODO(data): The `sq_ft` field is rendering values that
+                    // look off for some listings (e.g. a Verve studio reports
+                    // ~121 sq ft when Ann Arbor studios are typically
+                    // 400–600 sq ft). Either the supplier entered the wrong
+                    // figure or the unit drifted somewhere upstream. Audit
+                    // the schema + wizard input before changing display.
                     value: l.sq_ft ? `${l.sq_ft} sq ft` : '—',
                   },
                   {

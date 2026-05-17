@@ -2,16 +2,22 @@
 
 import { useRef, useState, useCallback } from 'react'
 import { motion, useInView } from 'motion/react'
-import { BadgeCheck, Eye, Lock, AlertTriangle, type LucideIcon } from 'lucide-react'
+import {
+  ShieldCheck,
+  Robot,
+  Lock,
+  Flag,
+} from '@phosphor-icons/react/dist/ssr'
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
 
-const ITEMS: { icon: LucideIcon; title: string; body: string }[] = [
+const ITEMS: { icon: PhosphorIcon; title: string; body: string }[] = [
   {
-    icon: BadgeCheck,
+    icon: ShieldCheck,
     title: 'Verified U-M accounts',
     body: 'Suppliers and consumers verify their identity and university affiliation before posting or applying.',
   },
   {
-    icon: Eye,
+    icon: Robot,
     title: 'Every listing reviewed',
     body: 'An AI moderator scans each new listing for scams, off-platform contact, and discriminatory language. Borderline cases go to a human admin before they go live.',
   },
@@ -21,7 +27,7 @@ const ITEMS: { icon: LucideIcon; title: string; body: string }[] = [
     body: 'Rent and deposit are charged through Stripe and only released after both parties confirm move-in. No wire transfers, no Venmo strangers.',
   },
   {
-    icon: AlertTriangle,
+    icon: Flag,
     title: 'Report anything',
     body: 'Suspicious DM, off-platform offer, or a listing that feels off? Hit Report and we look at it fast. Repeat offenders get banned.',
   },
@@ -34,7 +40,7 @@ function Tile({
   index,
   inView,
 }: {
-  icon: LucideIcon
+  icon: PhosphorIcon
   title: string
   body: string
   index: number
@@ -67,7 +73,7 @@ function Tile({
         delay: index * 0.08,
       }}
       whileHover={{ y: -4 }}
-      className="relative rounded-3xl overflow-hidden border border-line bg-white/70 backdrop-blur-xl p-7 sm:p-8 transition-shadow duration-500 hover:shadow-[0_24px_60px_oklch(0_0_0/0.08)]"
+      className="group relative rounded-3xl overflow-hidden border border-line bg-white/70 backdrop-blur-xl p-7 sm:p-8 transition-shadow duration-500 hover:shadow-[0_24px_60px_oklch(0_0_0/0.08)]"
     >
       {/* Glass refraction highlight */}
       <div
@@ -86,8 +92,16 @@ function Tile({
       />
 
       <div className="relative">
-        <div className="w-12 h-12 rounded-2xl bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] flex items-center justify-center mb-5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110">
-          <Icon className="w-5 h-5" strokeWidth={1.75} />
+        <div
+          className="
+            w-12 h-12 rounded-2xl
+            bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]
+            flex items-center justify-center mb-5
+            transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+            group-hover:scale-110
+          "
+        >
+          <Icon size={22} weight="duotone" />
         </div>
         <h3 className="font-display text-xl sm:text-2xl tracking-tight text-ink mb-3 leading-tight">
           {title}

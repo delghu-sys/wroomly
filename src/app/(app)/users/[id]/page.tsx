@@ -170,7 +170,7 @@ export default async function UserProfilePage({
                   About
                 </p>
                 {u.bio ? (
-                  <p className="text-[14.5px] text-ink-soft leading-relaxed whitespace-pre-line max-w-[55ch]">
+                  <p className="text-[14.5px] text-ink-soft leading-relaxed whitespace-pre-line max-w-prose">
                     {u.bio}
                   </p>
                 ) : (
