@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { Camera, AtSign, Plus, X } from 'lucide-react'
+import { getListingImageUrl as publicUrl } from '@/lib/utils/listing'
 
 const schema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,10 +27,6 @@ const schema = z.object({
     .optional(),
 })
 type FormValues = z.infer<typeof schema>
-
-const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const publicUrl = (path: string) =>
-  `${SUPA_URL}/storage/v1/object/public/listing-images/${path}`
 
 export function ProfileForm({
   profile,

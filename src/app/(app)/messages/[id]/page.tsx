@@ -6,14 +6,13 @@ import { MessagesShell } from '@/components/messages/MessagesShell'
 import { ThreadView } from '@/components/messages/ThreadView'
 import { loadConversations } from '@/components/messages/loadConversations'
 import { fetchConnectStatus } from '@/lib/stripe'
-
-const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+import { getListingImageUrl } from '@/lib/utils/listing'
 
 export const metadata: Metadata = { title: 'Chat' }
 
 function imageUrl(path: string | null | undefined): string | null {
-  if (!path || !SUPA_URL) return null
-  return `${SUPA_URL}/storage/v1/object/public/listing-images/${path}`
+  if (!path) return null
+  return getListingImageUrl(path)
 }
 
 interface ConvoRow {

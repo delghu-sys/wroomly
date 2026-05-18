@@ -13,8 +13,7 @@ import {
   ANN_ARBOR_RESIDENCES,
   PROPERTY_TYPES,
 } from '@/lib/constants'
-
-const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+import { getListingImageUrl } from '@/lib/utils/listing'
 
 export const metadata: Metadata = {
   title: 'Browse Listings',
@@ -117,26 +116,34 @@ export default async function ListingsPage({
 
   const { data: listings } = await query.limit(48)
 
-  const favoriteIds = new Set<string>()
-  if (authUser) {
-    const { data: favs } = await supabase
-      .from('favorites')
-      .select('listing_id')
-      .eq('user_id', authUser.id)
-    for (const f of favs ?? []) favoriteIds.add(f.listing_id)
-  }
-
+  // Favorites (auth-gated) + supplier ratings are independent — fan out
+  // so we save a round trip per browse page load.
   const supplierIds = Array.from(
     new Set(((listings ?? []) as ListingWithDetails[]).map(l => l.supplier_id))
   )
+
+  const [favsRes, ratingsRes] = await Promise.all([
+    authUser
+      ? supabase
+          .from('favorites')
+          .select('listing_id')
+          .eq('user_id', authUser.id)
+      : Promise.resolve({ data: [] as { listing_id: string }[] }),
+    supplierIds.length > 0
+      ? supabase
+          .from('reviews')
+          .select('reviewee_id, rating')
+          .in('reviewee_id', supplierIds)
+      : Promise.resolve({ data: [] as { reviewee_id: string; rating: number }[] }),
+  ])
+
+  const favoriteIds = new Set<string>()
+  for (const f of favsRes.data ?? []) favoriteIds.add(f.listing_id)
+
   const ratingBySupplier: Record<string, { avg: number; count: number }> = {}
   if (supplierIds.length > 0) {
-    const { data: ratingRows } = await supabase
-      .from('reviews')
-      .select('reviewee_id, rating')
-      .in('reviewee_id', supplierIds)
     const buckets: Record<string, number[]> = {}
-    for (const r of (ratingRows ?? []) as { reviewee_id: string; rating: number }[]) {
+    for (const r of (ratingsRes.data ?? []) as { reviewee_id: string; rating: number }[]) {
       ;(buckets[r.reviewee_id] ??= []).push(r.rating)
     }
     for (const [id, ratings] of Object.entries(buckets)) {
@@ -152,9 +159,7 @@ export default async function ListingsPage({
 
   const mapListings: MapListing[] = typedListings.map(l => {
     const firstImage = l.listing_images?.[0]
-    const image_url = firstImage
-      ? `${SUPA_URL}/storage/v1/object/public/listing-images/${firstImage.storage_path}`
-      : null
+    const image_url = firstImage ? getListingImageUrl(firstImage.storage_path) : null
     return {
       id: l.id,
       title: l.title,

@@ -15,11 +15,10 @@ import { UserListingsStrip } from '@/components/users/UserListingsStrip'
 import { ReviewList } from '@/components/users/ReviewList'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
 
-const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const photoUrl = (path: string) =>
-  SUPA_URL
-    ? `${SUPA_URL}/storage/v1/object/public/listing-images/${path}`
-    : ''
+// User profile photos live in the same listing-images bucket under a
+// `profile-photos/<user_id>/…` prefix, so the URL helper is shared with
+// listings. See ProfileForm for the upload path convention.
+import { getListingImageUrl as photoUrl } from '@/lib/utils/listing'
 
 export async function generateMetadata({
   params,

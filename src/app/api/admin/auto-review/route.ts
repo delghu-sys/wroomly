@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { reviewListing, type ListingForReview } from '@/lib/reviewers/listing-reviewer'
 import type { Listing, ListingImage, ListingAmenity, SwapPreference } from '@/types/database'
+import { getListingImageUrl as imageUrl } from '@/lib/utils/listing'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -9,10 +10,6 @@ export const maxDuration = 60
 interface BodyShape {
   listingId?: string
   sweep?: boolean
-}
-
-function imageUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/listing-images/${path}`
 }
 
 async function reviewOne(

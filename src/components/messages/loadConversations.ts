@@ -1,8 +1,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
+import { getListingImageUrl } from '@/lib/utils/listing'
 import type { ConversationListItemData } from './ConversationListItem'
-
-const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 interface RpcRow {
   id: string
@@ -21,8 +20,8 @@ interface RpcRow {
 }
 
 function imageUrl(path: string | null | undefined): string | null {
-  if (!path || !SUPA_URL) return null
-  return `${SUPA_URL}/storage/v1/object/public/listing-images/${path}`
+  if (!path) return null
+  return getListingImageUrl(path)
 }
 
 function initialsOf(name: string | null | undefined): string {

@@ -49,23 +49,21 @@ export default async function PaymentSuccessPage({
     const listingId = session.metadata?.listing_id
     const inquiryId = session.metadata?.inquiry_id
 
-    if (listingId) {
-      const { data: listing } = await supabase
-        .from('listings')
-        .select('title')
-        .eq('id', listingId)
-        .single()
-      listingTitle = listing?.title ?? null
-    }
-
-    if (inquiryId) {
-      const { data: convo } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('inquiry_id', inquiryId)
-        .maybeSingle()
-      conversationId = convo?.id ?? null
-    }
+    // Listing title + conversation id are independent — fan out.
+    const [listingRes, convoRes] = await Promise.all([
+      listingId
+        ? supabase.from('listings').select('title').eq('id', listingId).single()
+        : Promise.resolve({ data: null as { title: string } | null }),
+      inquiryId
+        ? supabase
+            .from('conversations')
+            .select('id')
+            .eq('inquiry_id', inquiryId)
+            .maybeSingle()
+        : Promise.resolve({ data: null as { id: string } | null }),
+    ])
+    listingTitle = listingRes.data?.title ?? null
+    conversationId = convoRes.data?.id ?? null
   } catch {
     // Stripe session retrieve failed — show generic success state.
   }
