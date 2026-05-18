@@ -1,4 +1,4 @@
-import { PLATFORM_FEE_PERCENT } from '@/lib/stripe'
+import { PLATFORM_FEE_PERCENT } from '@/lib/fees'
 
 interface FeeNoteProps {
   /**

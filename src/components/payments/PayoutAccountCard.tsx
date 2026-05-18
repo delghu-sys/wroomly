@@ -4,7 +4,7 @@ import {
   Bank,
   ArrowSquareOut,
 } from '@phosphor-icons/react/dist/ssr'
-import type { ConnectStatus } from '@/lib/stripe'
+import type { ConnectStatus } from '@/lib/fees'
 import { ConnectStripeButton } from './ConnectStripeButton'
 
 interface PayoutAccountCardProps {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { ConnectStatus } from '@/lib/stripe'
+import type { ConnectStatus } from '@/lib/fees'
 
 interface ConnectStripeButtonProps {
   status: ConnectStatus

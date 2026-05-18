@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
-import type { ConnectStatus } from '@/lib/stripe'
+import type { ConnectStatus } from '@/lib/fees'
 
 interface PayoutSetupBannerProps {
   status: ConnectStatus

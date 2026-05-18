@@ -33,41 +33,12 @@ export const stripe = new Proxy({} as Stripe, {
   },
 })
 
-export const PLATFORM_FEE_PERCENT = 5 // 5% platform fee, added on top of rent
-
-/**
- * Fee model — the platform fee is **added on top** of the listed rent.
- * The supplier keeps the full rent they listed; the consumer pays the
- * surcharge.
- *
- *   rentCents        — what the supplier listed and receives.
- *   platformFee      — Wroomly's slice. Added on top of rent.
- *   totalChargeCents — what we actually charge the consumer.
- *
- * Example: rent $1,000 → consumer pays $1,050 → supplier nets $1,000,
- * Wroomly nets $50.
- *
- * The numeric relationships (used by the payouts page math today):
- *   totalChargeCents === amount_cents stored on the transaction
- *   platformFee      === platform_fee_cents stored on the transaction
- *   amount - fee     === supplier amount === rent (unchanged invariant)
- */
-export function calculateFees(rentCents: number) {
-  const platformFee = Math.round(rentCents * (PLATFORM_FEE_PERCENT / 100))
-  const totalChargeCents = rentCents + platformFee
-  const supplierAmount = rentCents
-  return { platformFee, totalChargeCents, supplierAmount }
-}
-
-/**
- * Coarse-grained payout-readiness state used across the UI to gate
- * supplier actions and render the right CTA.
- *
- *   none       — no Connect account exists yet (user never started).
- *   incomplete — account exists, Stripe still wants more info.
- *   active     — charges + payouts both enabled. Ready to receive money.
- */
-export type ConnectStatus = 'none' | 'incomplete' | 'active'
+// Fee constants + ConnectStatus type live in @/lib/fees so client
+// components can import them without dragging the Stripe SDK into the
+// browser bundle. Re-export from here for backward compat — existing
+// server-side callers can keep importing from '@/lib/stripe'.
+import type { ConnectStatus } from './fees'
+export { PLATFORM_FEE_PERCENT, calculateFees, type ConnectStatus } from './fees'
 
 /**
  * Look up a supplier's Connect account state. Pass null/undefined to
