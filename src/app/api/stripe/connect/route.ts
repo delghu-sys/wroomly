@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 
 /**
@@ -60,16 +60,47 @@ export async function POST(request: Request) {
     // ── Onboarding — create account if missing, then a fresh account link ──
     let accountId = profile.stripe_account_id
     if (!accountId) {
+      // Pre-fill the Express account's business profile so the supplier
+      // doesn't get asked for a website / product description during
+      // onboarding (most students don't have a website). Stripe still
+      // collects identity (SSN, DOB, bank) but skips the business URL
+      // step when we provide one upfront. We also tag the account as a
+      // peer-to-peer rental marketplace so MCC and risk model are right.
       const account = await stripe.accounts.create({
         type: 'express',
         metadata: { user_id: user.id },
+        business_type: 'individual',
+        business_profile: {
+          mcc: '6513', // "Real estate agents and managers — rentals"
+          url: process.env.NEXT_PUBLIC_APP_URL!,
+          product_description:
+            'Subletting an apartment or dorm room to a verified U-of-M student via the Wroomly platform.',
+        },
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
       })
       accountId = account.id
 
-      await supabase
+      // Migration 008 locks `stripe_account_id` from the user role via RLS
+      // (so a malicious client can't claim someone else's Stripe account by
+      // PATCHing their own row). The service-role client bypasses RLS,
+      // which is the correct path for trust-sensitive writes done by an
+      // authenticated server route after our own auth check above.
+      const service = await createServiceClient()
+      const { error: updateErr } = await service
         .from('users')
         .update({ stripe_account_id: accountId })
         .eq('id', user.id)
+
+      if (updateErr) {
+        console.error('Failed to persist stripe_account_id', updateErr)
+        return NextResponse.json(
+          { error: 'Failed to save Stripe account. Please try again.' },
+          { status: 500 }
+        )
+      }
     }
 
     const accountLink = await stripe.accountLinks.create({
