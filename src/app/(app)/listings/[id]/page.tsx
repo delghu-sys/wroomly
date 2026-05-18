@@ -139,7 +139,7 @@ export default async function ListingDetailPage({
         .select('id, status')
         .eq('listing_id', id)
         .eq('consumer_id', authUser.id)
-        .single(),
+        .maybeSingle(),
       supabase
         .from('transactions')
         .select('id')
