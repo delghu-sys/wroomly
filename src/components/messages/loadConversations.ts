@@ -1,24 +1,23 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
-import type { Message } from '@/types/database'
 import type { ConversationListItemData } from './ConversationListItem'
 
 const SUPA_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-interface ConvoRow {
+interface RpcRow {
   id: string
   supplier_id: string
   consumer_id: string
-  created_at: string
-  listings: {
-    id: string
-    title: string
-    type: string
-    listing_images: { storage_path: string; display_order: number }[] | null
-  } | null
-  supplier: { id: string; full_name: string | null; avatar_url: string | null } | null
-  consumer: { id: string; full_name: string | null; avatar_url: string | null } | null
-  messages: Message[]
+  other_id: string | null
+  other_full_name: string | null
+  other_avatar_url: string | null
+  listing_id: string | null
+  listing_title: string | null
+  listing_thumbnail_path: string | null
+  last_message_content: string | null
+  last_message_sender_id: string | null
+  last_message_created_at: string | null
+  unread_count: number | string // bigint can come back as a string
 }
 
 function imageUrl(path: string | null | undefined): string | null {
@@ -38,66 +37,44 @@ function initialsOf(name: string | null | undefined): string {
 
 /**
  * Fetch the current user's conversations shaped for ConversationList.
- * Returns null if the user isn't authenticated.
+ *
+ * Backed by the `get_my_conversations()` Postgres function (migration 010),
+ * which returns one row per conversation with last-message + unread-count
+ * precomputed via lateral joins. The previous PostgREST embed had to pull
+ * every message in every conversation just to derive those two values.
  */
 export async function loadConversations(
   userId: string
 ): Promise<ConversationListItemData[]> {
   const supabase = await createClient()
 
-  const { data } = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      listings(id, title, type, listing_images(storage_path, display_order)),
-      supplier:supplier_id(id, full_name, avatar_url),
-      consumer:consumer_id(id, full_name, avatar_url),
-      messages(id, content, created_at, sender_id, is_read)
-    `)
-    .or(`supplier_id.eq.${userId},consumer_id.eq.${userId}`)
-    .order('created_at', { ascending: false })
+  const { data, error } = await supabase.rpc('get_my_conversations')
+  if (error) {
+    console.error('[loadConversations] rpc failed', error)
+    return []
+  }
 
-  const rows = (data ?? []) as ConvoRow[]
+  const rows = (data ?? []) as RpcRow[]
 
-  return rows
-    .map(c => {
-      const msgs = c.messages ?? []
-      const lastMsg = msgs.length
-        ? [...msgs].sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
-        : null
-      const unread = msgs.filter(m => !m.is_read && m.sender_id !== userId).length
-
-      const isSupplier = c.supplier_id === userId
-      const other = isSupplier ? c.consumer : c.supplier
-      const listing = c.listings
-      const firstImage = listing?.listing_images
-        ?.slice()
-        .sort((a, b) => a.display_order - b.display_order)
-        .at(0)
-
-      const data: ConversationListItemData = {
-        id: c.id,
-        otherName: other?.full_name ?? null,
-        otherAvatarUrl: other?.avatar_url ?? null,
-        otherInitials: initialsOf(other?.full_name),
-        listingId: listing?.id ?? null,
-        listingTitle: listing?.title ?? null,
-        listingThumbnail: imageUrl(firstImage?.storage_path),
-        lastMessage: lastMsg
-          ? {
-              content: lastMsg.content,
-              senderId: lastMsg.sender_id,
-              createdAt: lastMsg.created_at,
-            }
-          : null,
-        unread,
-        currentUserId: userId,
-      }
-      return data
-    })
-    .sort((a, b) => {
-      const at = a.lastMessage?.createdAt ?? ''
-      const bt = b.lastMessage?.createdAt ?? ''
-      return bt.localeCompare(at)
-    })
+  return rows.map(r => {
+    const data: ConversationListItemData = {
+      id: r.id,
+      otherName: r.other_full_name,
+      otherAvatarUrl: r.other_avatar_url,
+      otherInitials: initialsOf(r.other_full_name),
+      listingId: r.listing_id,
+      listingTitle: r.listing_title,
+      listingThumbnail: imageUrl(r.listing_thumbnail_path),
+      lastMessage: r.last_message_content
+        ? {
+            content: r.last_message_content,
+            senderId: r.last_message_sender_id ?? '',
+            createdAt: r.last_message_created_at ?? '',
+          }
+        : null,
+      unread: Number(r.unread_count) || 0,
+      currentUserId: userId,
+    }
+    return data
+  })
 }
