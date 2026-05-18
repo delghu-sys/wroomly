@@ -30,22 +30,15 @@ export default async function DashboardPage() {
   const isSupplier = profile.user_type === 'supplier' || profile.user_type === 'admin'
 
   if (isSupplier) {
-    const listingsRes = await supabase
-      .from('listings')
-      .select('id, status, title')
-      .eq('supplier_id', user.id)
-
-    const listings = (listingsRes.data ?? []) as Pick<Listing, 'id' | 'status' | 'title'>[]
-    const listingIds = listings.map(l => l.id)
-
-    const [inquiriesRes, unreadRes] = await Promise.all([
-      listingIds.length > 0
-        ? supabase
-          .from('inquiries')
-          .select('id, status, listing_id')
-          .in('listing_id', listingIds)
-          .eq('status', 'pending')
-        : { data: [] },
+    // Three independent fetches kicked off together: listings, unread count
+    // (only needs supplier_id, not listing ids), and the Stripe Connect
+    // status RTT. Pending-inquiries needs listingIds, so it runs in the
+    // second wave.
+    const [listingsRes, unreadRes, connect] = await Promise.all([
+      supabase
+        .from('listings')
+        .select('id, status, title')
+        .eq('supplier_id', user.id),
       (async () => {
         const convoRes = await supabase
           .from('conversations')
@@ -60,14 +53,23 @@ export default async function DashboardPage() {
           .neq('sender_id', user.id)
           .in('conversation_id', convoIds)
       })(),
+      fetchConnectStatus(profile.stripe_account_id),
     ])
+
+    const listings = (listingsRes.data ?? []) as Pick<Listing, 'id' | 'status' | 'title'>[]
+    const listingIds = listings.map(l => l.id)
+
+    const inquiriesRes = listingIds.length > 0
+      ? await supabase
+          .from('inquiries')
+          .select('id, status, listing_id')
+          .in('listing_id', listingIds)
+          .eq('status', 'pending')
+      : { data: [] as { id: string; status: string; listing_id: string }[] }
 
     const pendingInquiries = (inquiriesRes.data ?? []) as { id: string; status: string; listing_id: string }[]
     const unreadMessages = 'count' in unreadRes ? (unreadRes.count ?? 0) : 0
     const activeListings = listings.filter(l => l.status === 'active').length
-
-    // Stripe Connect readiness — banner only renders when not active.
-    const connect = await fetchConnectStatus(profile.stripe_account_id)
 
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -166,30 +168,16 @@ export default async function DashboardPage() {
     )
   }
 
-  // Consumer dashboard — fetch bookings (paid transactions)
-  const { data: bookingsData } = await supabase
-    .from('transactions')
-    .select('id, listing_id, amount_cents, platform_fee_cents, status, created_at, release_date')
-    .eq('payer_id', user.id)
-    .eq('status', 'succeeded')
-    .order('created_at', { ascending: false })
-
-  const bookings = (bookingsData ?? []) as Transaction[]
-
-  // Fetch listing titles for bookings
-  const bookingListingIds = [...new Set(bookings.map(b => b.listing_id))]
-  let bookingListings: Record<string, { title: string; id: string }> = {}
-  if (bookingListingIds.length > 0) {
-    const { data: bListings } = await supabase
-      .from('listings')
-      .select('id, title')
-      .in('id', bookingListingIds)
-    for (const bl of (bListings ?? []) as { id: string; title: string }[]) {
-      bookingListings[bl.id] = bl
-    }
-  }
-
-  const [inquiriesRes, favoritesRes, unreadRes] = await Promise.all([
+  // Consumer dashboard — all four top-level fetches are independent, so
+  // run them in parallel. Listing-title lookups depend on the rows we
+  // get back, so they fan out in a second wave.
+  const [bookingsRes, inquiriesRes, favoritesRes, unreadRes] = await Promise.all([
+    supabase
+      .from('transactions')
+      .select('id, listing_id, amount_cents, platform_fee_cents, status, created_at, release_date')
+      .eq('payer_id', user.id)
+      .eq('status', 'succeeded')
+      .order('created_at', { ascending: false }),
     supabase
       .from('inquiries')
       .select('id, status, created_at, listing_id')
@@ -217,19 +205,31 @@ export default async function DashboardPage() {
     })(),
   ])
 
+  const bookings = (bookingsRes.data ?? []) as Transaction[]
   const inquiries = (inquiriesRes.data ?? []) as Pick<Inquiry, 'id' | 'status' | 'created_at' | 'listing_id'>[]
 
-  // Fetch listing titles for inquiries
+  // Second wave: fan out the two listing-title lookups in parallel so the
+  // dashboard doesn't pay 2 sequential RTTs.
+  const bookingListingIds = [...new Set(bookings.map(b => b.listing_id))]
   const inquiryListingIds = [...new Set(inquiries.map(i => i.listing_id))]
+
+  const [bListingsRes, iListingsRes] = await Promise.all([
+    bookingListingIds.length > 0
+      ? supabase.from('listings').select('id, title').in('id', bookingListingIds)
+      : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+    inquiryListingIds.length > 0
+      ? supabase.from('listings').select('id, title').in('id', inquiryListingIds)
+      : Promise.resolve({ data: [] as { id: string; title: string }[] }),
+  ])
+
+  const bookingListings: Record<string, { title: string; id: string }> = {}
+  for (const bl of (bListingsRes.data ?? []) as { id: string; title: string }[]) {
+    bookingListings[bl.id] = bl
+  }
+
   const inquiryListingTitles: Record<string, string> = {}
-  if (inquiryListingIds.length > 0) {
-    const { data: iListings } = await supabase
-      .from('listings')
-      .select('id, title')
-      .in('id', inquiryListingIds)
-    for (const il of (iListings ?? []) as { id: string; title: string }[]) {
-      inquiryListingTitles[il.id] = il.title
-    }
+  for (const il of (iListingsRes.data ?? []) as { id: string; title: string }[]) {
+    inquiryListingTitles[il.id] = il.title
   }
   const favorites = (favoritesRes.data ?? []) as { id: string; listing_id: string }[]
   const unreadMessages = 'count' in unreadRes ? (unreadRes.count ?? 0) : 0

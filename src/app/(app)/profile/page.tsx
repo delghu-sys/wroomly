@@ -11,19 +11,19 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  // Profile + photos are independent — fan out so we save a round trip.
+  const [profileRes, photosRes] = await Promise.all([
+    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase
+      .from('user_photos')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('display_order', { ascending: true }),
+  ])
 
+  const profile = profileRes.data
   if (!profile) redirect('/sign-in')
-
-  const { data: photos } = await supabase
-    .from('user_photos')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('display_order', { ascending: true })
+  const photos = photosRes.data
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

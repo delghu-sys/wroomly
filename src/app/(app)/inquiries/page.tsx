@@ -20,13 +20,18 @@ export default async function InquiriesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
-  const { data: profileData } = await supabase
-    .from('users')
-    .select('user_type, stripe_account_id')
-    .eq('id', user.id)
-    .single()
+  // Profile + listing-ids in parallel; we can't kick off Connect yet
+  // because it depends on stripe_account_id from the profile row.
+  const [profileRes, listingsRes] = await Promise.all([
+    supabase
+      .from('users')
+      .select('user_type, stripe_account_id')
+      .eq('id', user.id)
+      .single(),
+    supabase.from('listings').select('id').eq('supplier_id', user.id),
+  ])
 
-  const profile = profileData as
+  const profile = profileRes.data as
     | { user_type?: string; stripe_account_id?: string | null }
     | null
   if (profile?.user_type !== 'supplier' && profile?.user_type !== 'admin') {
@@ -36,12 +41,6 @@ export default async function InquiriesPage() {
   // Single supplier viewing the page — single Connect lookup is fine.
   const connect = await fetchConnectStatus(profile?.stripe_account_id ?? null)
   const supplierPayoutReady = connect.status === 'active'
-
-  // Get supplier's listing IDs first
-  const listingsRes = await supabase
-    .from('listings')
-    .select('id')
-    .eq('supplier_id', user.id)
 
   const listingIds = ((listingsRes.data ?? []) as { id: string }[]).map(l => l.id)
 
