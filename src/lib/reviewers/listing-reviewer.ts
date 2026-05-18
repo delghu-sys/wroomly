@@ -1,7 +1,22 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { Listing, ListingAmenity, SwapPreference } from '@/types/database'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// Lazy-init: the SDK constructor throws "Neither apiKey nor authenticator
+// provided" when ANTHROPIC_API_KEY is missing. Instantiating at module
+// scope means *any* code path that transitively loads this file (including
+// client bundles via tree-shaking misses) would crash at module evaluation
+// when the env var is absent. Construct on first use, scoped to the
+// `reviewListing` server function below.
+let _anthropic: Anthropic | null = null
+function getAnthropic(): Anthropic {
+  if (_anthropic) return _anthropic
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY is not set — listing auto-review unavailable')
+  }
+  _anthropic = new Anthropic({ apiKey })
+  return _anthropic
+}
 
 export type ReviewDecision = 'approve' | 'reject' | 'manual'
 
@@ -115,7 +130,7 @@ export async function reviewListing(listing: ListingForReview): Promise<ReviewRe
     source: { type: 'url' as const, url },
   }))
 
-  const response = await anthropic.messages.create({
+  const response = await getAnthropic().messages.create({
     model: 'claude-haiku-4-5',
     max_tokens: 512,
     system: SYSTEM_PROMPT,
