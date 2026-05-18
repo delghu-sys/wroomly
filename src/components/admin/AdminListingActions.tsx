@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
@@ -11,51 +10,39 @@ interface AdminListingActionsProps {
   listingId: string
 }
 
+/**
+ * Admin approve/reject controls for a pending listing. Mutations go
+ * through `/api/admin/actions` which gates on `user_type === 'admin'`
+ * server-side and writes via the service role.
+ */
 export function AdminListingActions({ listingId }: AdminListingActionsProps) {
   const router = useRouter()
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null)
   const [showRejectNote, setShowRejectNote] = useState(false)
   const [rejectNote, setRejectNote] = useState('')
 
-  async function handleApprove() {
-    setLoading('approve')
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    await supabase.from('listings').update({ status: 'active' }).eq('id', listingId)
-    await supabase.from('admin_actions').insert({
-      admin_id: user!.id,
-      target_type: 'listing',
-      target_id: listingId,
-      action: 'approve_listing',
-    })
-
-    toast.success('Listing approved and live!')
-    router.refresh()
-    setLoading(null)
-  }
-
-  async function handleReject() {
-    if (!rejectNote.trim()) {
-      toast.error('Please provide a reason for rejection.')
-      return
+  async function dispatch(action: 'approve' | 'reject', notes?: string) {
+    setLoading(action)
+    try {
+      const res = await fetch('/api/admin/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'listing', listingId, action, notes }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(data.error ?? 'Action failed.')
+        return
+      }
+      toast.success(
+        action === 'approve' ? 'Listing approved and live!' : 'Listing rejected.'
+      )
+      router.refresh()
+    } catch {
+      toast.error('Network error — please try again.')
+    } finally {
+      setLoading(null)
     }
-    setLoading('reject')
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    await supabase.from('listings').update({ status: 'archived' }).eq('id', listingId)
-    await supabase.from('admin_actions').insert({
-      admin_id: user!.id,
-      target_type: 'listing',
-      target_id: listingId,
-      action: 'reject_listing',
-      notes: rejectNote,
-    })
-
-    toast.success('Listing rejected.')
-    router.refresh()
-    setLoading(null)
   }
 
   if (showRejectNote) {
@@ -71,12 +58,22 @@ export function AdminListingActions({ listingId }: AdminListingActionsProps) {
           <Button
             size="sm"
             variant="destructive"
-            onClick={handleReject}
+            onClick={() => {
+              if (!rejectNote.trim()) {
+                toast.error('Please provide a reason for rejection.')
+                return
+              }
+              dispatch('reject', rejectNote.trim())
+            }}
             disabled={!!loading}
           >
             {loading === 'reject' ? 'Rejecting…' : 'Confirm reject'}
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setShowRejectNote(false)}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowRejectNote(false)}
+          >
             Cancel
           </Button>
         </div>
@@ -86,7 +83,11 @@ export function AdminListingActions({ listingId }: AdminListingActionsProps) {
 
   return (
     <div className="flex gap-2">
-      <Button size="sm" onClick={handleApprove} disabled={!!loading}>
+      <Button
+        size="sm"
+        onClick={() => dispatch('approve')}
+        disabled={!!loading}
+      >
         {loading === 'approve' ? 'Approving…' : 'Approve'}
       </Button>
       <Button

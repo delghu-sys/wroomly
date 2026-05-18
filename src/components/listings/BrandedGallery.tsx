@@ -54,10 +54,22 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
   return (
     <>
       <div className="space-y-3">
-        {/* Main image with crossfade */}
+        {/* Main image with crossfade. Wrapped as a `role="button"` so
+            keyboard users can open the lightbox with Enter/Space — the
+            nested prev/next chevrons are still real <button>s, so we
+            avoid the invalid-HTML nested-button pattern. */}
         <div
-          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.10_0.02_260)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)]"
+          role="button"
+          tabIndex={0}
+          aria-label="Open photo lightbox"
+          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.10_0.02_260)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.50)]"
           onClick={() => setLightboxOpen(true)}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              setLightboxOpen(true)
+            }
+          }}
         >
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.div

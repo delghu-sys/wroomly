@@ -5,8 +5,9 @@ import Image from 'next/image'
 import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CreditCard, CheckCircle2, BedDouble } from 'lucide-react'
-import { formatDistanceToNowStrict, parseISO } from 'date-fns'
+import { formatDistanceToNowStrict, format, parseISO } from 'date-fns'
 import { UnreadPulse } from './UnreadPulse'
+import { useNow } from '@/lib/hooks/useNow'
 
 export interface ConversationListItemData {
   id: string
@@ -21,10 +22,15 @@ export interface ConversationListItemData {
   currentUserId: string
 }
 
-function relativeTime(iso: string): string {
+// Mount-time-aware timestamp. When `now` is null (server / first client
+// render) we fall back to an absolute label so SSR and the first hydrate
+// produce identical HTML. Once mounted, swap to the relative form.
+function timestampFor(iso: string, now: Date | null): string {
   try {
     const d = parseISO(iso)
-    const diffMs = Date.now() - d.getTime()
+    if (!now) return format(d, 'MMM d')
+
+    const diffMs = now.getTime() - d.getTime()
     const diffMin = diffMs / 60000
     if (diffMin < 1) return 'now'
     if (diffMin < 60) return `${Math.floor(diffMin)}m`
@@ -81,7 +87,8 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
 
   const preview = lastMessage ? previewLabel(lastMessage.content) : null
   const isSender = lastMessage?.senderId === currentUserId
-  const time = lastMessage ? relativeTime(lastMessage.createdAt) : ''
+  const now = useNow()
+  const time = lastMessage ? timestampFor(lastMessage.createdAt, now) : ''
   const hasUnread = unread > 0
 
   return (

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { stripe, calculateFees } from '@/lib/stripe'
+import { stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2, MessageSquare, Home } from 'lucide-react'
@@ -9,6 +9,13 @@ import { formatCents } from '@/lib/utils/listing'
 
 export const metadata: Metadata = { title: 'Payment successful' }
 
+/**
+ * Read-only confirmation screen. All write-side state changes
+ * (transaction insert, listing→rented, `::paid::` system message) live
+ * in the Stripe webhook so they survive a closed tab and aren't subject
+ * to the user's auth context. This page just reads what the webhook
+ * already wrote.
+ */
 export default async function PaymentSuccessPage({
   searchParams,
 }: {
@@ -18,7 +25,9 @@ export default async function PaymentSuccessPage({
   if (!session_id) redirect('/dashboard')
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
   let listingTitle: string | null = null
@@ -27,17 +36,18 @@ export default async function PaymentSuccessPage({
 
   try {
     const session = await stripe.checkout.sessions.retrieve(session_id)
-    const listingId = session.metadata?.listing_id
-    const inquiryId = session.metadata?.inquiry_id
-    const payerId = session.metadata?.payer_id
-    const payeeId = session.metadata?.payee_id
-    const platformFeeCents = parseInt(session.metadata?.platform_fee_cents ?? '0', 10)
-    const releaseDate = session.metadata?.release_date || null
+
+    // Only show the confirmation to the person who actually paid — guards
+    // against someone passing around a `?session_id=` to peek at a booking
+    // that isn't theirs.
+    if (session.metadata?.payer_id !== user.id) {
+      redirect('/dashboard')
+    }
+
     amountPaid = session.amount_total ?? 0
 
-    const paymentIntentId = typeof session.payment_intent === 'string'
-      ? session.payment_intent
-      : (session.payment_intent as { id: string } | null)?.id ?? null
+    const listingId = session.metadata?.listing_id
+    const inquiryId = session.metadata?.inquiry_id
 
     if (listingId) {
       const { data: listing } = await supabase
@@ -56,53 +66,8 @@ export default async function PaymentSuccessPage({
         .maybeSingle()
       conversationId = convo?.id ?? null
     }
-
-    // Record transaction if not already recorded (idempotent — webhook may have done it already)
-    if (listingId && payerId && payeeId && paymentIntentId && session.payment_status === 'paid') {
-      const { data: existingTx } = await supabase
-        .from('transactions')
-        .select('id')
-        .eq('stripe_payment_intent_id', paymentIntentId)
-        .maybeSingle()
-
-      if (!existingTx) {
-        const fees = platformFeeCents || calculateFees(amountPaid).platformFee
-        await supabase.from('transactions').insert({
-          listing_id: listingId,
-          payer_id: payerId,
-          payee_id: payeeId,
-          type: 'first_month',
-          amount_cents: amountPaid,
-          platform_fee_cents: fees,
-          stripe_payment_intent_id: paymentIntentId,
-          status: 'succeeded',
-          release_date: releaseDate,
-        })
-      }
-
-      // Mark listing as rented
-      await supabase.from('listings').update({ status: 'rented' }).eq('id', listingId)
-
-      // Post ::paid:: system message in conversation (idempotent check)
-      if (conversationId) {
-        const { data: existingPaidMsg } = await supabase
-          .from('messages')
-          .select('id')
-          .eq('conversation_id', conversationId)
-          .like('content', '::paid::%')
-          .maybeSingle()
-
-        if (!existingPaidMsg) {
-          await supabase.from('messages').insert({
-            conversation_id: conversationId,
-            sender_id: payerId,
-            content: '::paid::{}',
-          })
-        }
-      }
-    }
   } catch {
-    // Stripe session retrieval failed — show generic success
+    // Stripe session retrieve failed — show generic success state.
   }
 
   return (
@@ -115,15 +80,19 @@ export default async function PaymentSuccessPage({
           Payment confirmed
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink text-balance">
-          You&apos;re <span className="italic font-light text-navy">all set.</span>
+          You&apos;re{' '}
+          <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+            all set.
+          </span>
         </h1>
         {listingTitle && (
           <p className="text-ink-muted mt-3 text-lg">
-            Your booking for <strong className="text-ink">{listingTitle}</strong> is confirmed.
+            Your booking for{' '}
+            <strong className="text-ink">{listingTitle}</strong> is confirmed.
           </p>
         )}
         {amountPaid > 0 && (
-          <p className="font-display text-2xl font-bold text-navy mt-2">
+          <p className="font-display text-2xl font-bold text-ink mt-2">
             {formatCents(amountPaid)} paid
           </p>
         )}
@@ -134,7 +103,7 @@ export default async function PaymentSuccessPage({
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           {conversationId && (
             <Link href={`/messages/${conversationId}`}>
-              <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
+              <Button className="press rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 h-11 px-6 font-semibold">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Message your host
               </Button>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import type { UserType } from '@/types/database'
@@ -14,28 +13,55 @@ interface Props {
   isVerified: boolean
 }
 
-export function AdminUserActions({ userId, currentRole, isSuspended, isVerified }: Props) {
-  const router = useRouter()
-  const [busy, setBusy] = useState<string | null>(null)
+type Action =
+  | 'verify'
+  | 'suspend'
+  | 'unsuspend'
+  | 'promote_admin'
+  | 'demote_admin'
 
-  async function update(patch: Record<string, unknown>, label: string, action: string) {
+const SUCCESS_LABELS: Record<Action, string> = {
+  verify: 'User verified.',
+  suspend: 'User suspended.',
+  unsuspend: 'User reinstated.',
+  promote_admin: 'Made admin.',
+  demote_admin: 'Removed admin.',
+}
+
+/**
+ * Admin row controls. All mutations route through `/api/admin/actions`
+ * which re-verifies the requester is an admin server-side and writes via
+ * the service-role client. The browser never carries the trust.
+ */
+export function AdminUserActions({
+  userId,
+  currentRole,
+  isSuspended,
+  isVerified,
+}: Props) {
+  const router = useRouter()
+  const [busy, setBusy] = useState<Action | null>(null)
+
+  async function dispatch(action: Action) {
     setBusy(action)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    const { error } = await supabase.from('users').update(patch).eq('id', userId)
-    if (error) {
-      toast.error(`Failed to ${label}.`)
-    } else {
-      await supabase.from('admin_actions').insert({
-        admin_id: user!.id,
-        target_type: 'user',
-        target_id: userId,
-        action,
+    try {
+      const res = await fetch('/api/admin/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kind: 'user', userId, action }),
       })
-      toast.success(label)
-      router.refresh()
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(data.error ?? 'Action failed.')
+      } else {
+        toast.success(SUCCESS_LABELS[action])
+        router.refresh()
+      }
+    } catch {
+      toast.error('Network error — please try again.')
+    } finally {
+      setBusy(null)
     }
-    setBusy(null)
   }
 
   return (
@@ -45,9 +71,9 @@ export function AdminUserActions({ userId, currentRole, isSuspended, isVerified 
           size="sm"
           variant="outline"
           disabled={!!busy}
-          onClick={() => update({ is_verified: true }, 'User verified.', 'verify_user')}
+          onClick={() => dispatch('verify')}
         >
-          {busy === 'verify_user' ? '…' : 'Verify'}
+          {busy === 'verify' ? '…' : 'Verify'}
         </Button>
       )}
       {isSuspended ? (
@@ -55,9 +81,9 @@ export function AdminUserActions({ userId, currentRole, isSuspended, isVerified 
           size="sm"
           variant="outline"
           disabled={!!busy}
-          onClick={() => update({ is_suspended: false }, 'User reinstated.', 'unsuspend_user')}
+          onClick={() => dispatch('unsuspend')}
         >
-          {busy === 'unsuspend_user' ? '…' : 'Reinstate'}
+          {busy === 'unsuspend' ? '…' : 'Reinstate'}
         </Button>
       ) : (
         <Button
@@ -65,9 +91,9 @@ export function AdminUserActions({ userId, currentRole, isSuspended, isVerified 
           variant="outline"
           className="text-red-600 border-red-200 hover:bg-red-50"
           disabled={!!busy}
-          onClick={() => update({ is_suspended: true }, 'User suspended.', 'suspend_user')}
+          onClick={() => dispatch('suspend')}
         >
-          {busy === 'suspend_user' ? '…' : 'Suspend'}
+          {busy === 'suspend' ? '…' : 'Suspend'}
         </Button>
       )}
       {currentRole !== 'admin' ? (
@@ -75,7 +101,7 @@ export function AdminUserActions({ userId, currentRole, isSuspended, isVerified 
           size="sm"
           variant="outline"
           disabled={!!busy}
-          onClick={() => update({ user_type: 'admin' }, 'Made admin.', 'promote_admin')}
+          onClick={() => dispatch('promote_admin')}
         >
           {busy === 'promote_admin' ? '…' : 'Make admin'}
         </Button>
@@ -84,7 +110,7 @@ export function AdminUserActions({ userId, currentRole, isSuspended, isVerified 
           size="sm"
           variant="outline"
           disabled={!!busy}
-          onClick={() => update({ user_type: 'consumer' }, 'Demoted to consumer.', 'demote_admin')}
+          onClick={() => dispatch('demote_admin')}
         >
           {busy === 'demote_admin' ? '…' : 'Remove admin'}
         </Button>

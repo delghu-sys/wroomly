@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -24,6 +24,35 @@ export function ListingsFilters({
 }: ListingsFiltersProps) {
   const router = useRouter()
   const pathname = usePathname()
+
+  // `new Date()` in render produces a hydration mismatch when the server
+  // and client clocks straddle a month boundary. Lock the option list to
+  // mount-time so SSR and the first client render produce identical HTML.
+  const availableFromCurrent = currentFilters.available_from ?? ''
+  const availableFromOptions = useMemo(() => {
+    const monthNames = [
+      'Jan','Feb','Mar','Apr','May','Jun',
+      'Jul','Aug','Sep','Oct','Nov','Dec',
+    ]
+    const now = new Date()
+    const opts = Array.from({ length: 18 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
+      const y = d.getFullYear()
+      const m = String(d.getMonth() + 1).padStart(2, '0')
+      return {
+        value: `${y}-${m}-01`,
+        label: `${monthNames[d.getMonth()]} ${y}`,
+      }
+    })
+    if (availableFromCurrent && !opts.some(o => o.value === availableFromCurrent)) {
+      const [y, m] = availableFromCurrent.split('-').map(Number)
+      opts.unshift({
+        value: availableFromCurrent,
+        label: `${monthNames[(m - 1) || 0]} ${y}`,
+      })
+    }
+    return opts
+  }, [availableFromCurrent])
 
   const updateFilters = useCallback(
     (patch: Record<string, string | undefined>) => {
@@ -211,39 +240,21 @@ export function ListingsFilters({
             </button>
           )}
         </div>
-        {(() => {
-          const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-          const now = new Date()
-          const options = Array.from({ length: 18 }, (_, i) => {
-            const d = new Date(now.getFullYear(), now.getMonth() + i, 1)
-            const y = d.getFullYear()
-            const m = String(d.getMonth() + 1).padStart(2, '0')
-            return { value: `${y}-${m}-01`, label: `${monthNames[d.getMonth()]} ${y}` }
-          })
-          const current = currentFilters.available_from ?? ''
-          if (current && !options.some(o => o.value === current)) {
-            const [y, m] = current.split('-').map(Number)
-            options.unshift({
-              value: current,
-              label: `${monthNames[(m - 1) || 0]} ${y}`,
-            })
-          }
-          return (
-            <Select
-              value={current}
-              onValueChange={v => updateFilter('available_from', v || undefined)}
-            >
-              <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
-                <SelectValue placeholder="Any month" />
-              </SelectTrigger>
-              <SelectContent>
-                {options.map(o => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )
-        })()}
+        <Select
+          value={availableFromCurrent}
+          onValueChange={v => updateFilter('available_from', v || undefined)}
+        >
+          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+            <SelectValue placeholder="Any month" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableFromOptions.map(o => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <p className="text-xs text-ink-muted leading-relaxed">
           Shows places available by this month.
         </p>

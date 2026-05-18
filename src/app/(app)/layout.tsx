@@ -1,9 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { FooterGate } from '@/components/layout/FooterGate'
+import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
 import type { User } from '@/types/database'
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const supabase = await createClient()
 
   const {
@@ -22,14 +27,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
     profile = profileRes.data as User | null
 
-    // Self-heal: create profile from auth metadata if missing
-    // (covers users whose email-verify callback never ran)
+    // Self-heal: create a profile row from auth metadata if missing (covers
+    // users whose email-verify callback never ran). `user_metadata` is
+    // CLIENT-MUTABLE — never trust it for trust-sensitive fields:
+    //   • `user_type` is forced through the same @umich.edu check as the
+    //     callback route. A supplier claim is rejected unless the verified
+    //     email is on the U-M domain.
+    //   • `is_verified` is set only because reaching this code path means
+    //     Supabase has already verified the email at the auth layer.
+    //   • `admin` is never accepted from metadata.
     if (!profile) {
       const meta = (authUser.user_metadata ?? {}) as {
         full_name?: string
         university?: string
         user_type?: 'supplier' | 'consumer'
       }
+
+      const claimedType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
+      const emailIsUmich =
+        authUser.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`) ?? false
+      const effectiveType =
+        claimedType === 'supplier' && !emailIsUmich ? 'consumer' : claimedType
+
       const upsertRes = await supabase
         .from('users')
         .upsert(
@@ -38,7 +57,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             email: authUser.email!,
             full_name: meta.full_name ?? null,
             university: meta.university ?? null,
-            user_type: meta.user_type ?? 'consumer',
+            user_type: effectiveType,
             is_verified: true,
           },
           { onConflict: 'id' }
@@ -48,7 +67,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       profile = upsertRes.data as User | null
     }
 
-    // Get conversation IDs the user is part of
+    // Conversation IDs the user participates in (for the unread badge).
     const convoRes = await supabase
       .from('conversations')
       .select('id')
@@ -69,7 +88,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-[100dvh]">
       <Navbar user={profile} unreadCount={unreadCount} />
       <main className="flex-1">{children}</main>
       <FooterGate />

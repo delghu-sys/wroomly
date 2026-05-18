@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
-import { createClient } from '@/lib/supabase/client'
 import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
@@ -62,54 +61,45 @@ export function InquiryPinnedCard({
   async function decide(next: 'accepted' | 'rejected') {
     if (loading) return
     setLoading(next === 'accepted' ? 'accept' : 'reject')
-    const supabase = createClient()
 
-    const { error } = await supabase
-      .from('inquiries')
-      .update({ status: next })
-      .eq('id', inquiry.id)
+    // Server route enforces supplier ownership + payout-ready check + posts
+    // the ::deal_accepted:: system message. Browser doesn't get to write
+    // directly anymore.
+    let okResponse = false
+    let serverError: string | null = null
+    try {
+      const res = await fetch(`/api/inquiries/${inquiry.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: next === 'accepted' ? 'accept' : 'decline',
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        serverError = data.error ?? 'Action failed. Please try again.'
+      } else {
+        okResponse = true
+      }
+    } catch {
+      serverError = 'Network error — please try again.'
+    }
 
-    if (error) {
-      toast.error('Action failed. Please try again.')
+    if (!okResponse) {
+      toast.error(serverError ?? 'Action failed. Please try again.')
       setLoading(null)
       return
     }
 
     if (next === 'accepted') {
-      // Fire confetti burst + post the deal_accepted system message
       setShowBurst(true)
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (user) {
-        // Find the conversation
-        const { data: convo } = await supabase
-          .from('conversations')
-          .select('id')
-          .eq('inquiry_id', inquiry.id)
-          .maybeSingle()
-
-        if (convo) {
-          const payload = JSON.stringify({
-            title: listing.title,
-            type: listing.type,
-            price: listing.price_per_month ?? 0,
-            listing_id: listing.id,
-          })
-          await supabase.from('messages').insert({
-            conversation_id: convo.id,
-            sender_id: user.id,
-            content: `::deal_accepted::${payload}`,
-          })
-        }
-      }
-
       setTimeout(() => setShowBurst(false), 1200)
     }
 
     setStatus(next)
-    toast.success(next === 'accepted' ? 'Inquiry accepted' : 'Inquiry declined')
+    toast.success(
+      next === 'accepted' ? 'Inquiry accepted' : 'Inquiry declined'
+    )
     setLoading(null)
     router.refresh()
   }

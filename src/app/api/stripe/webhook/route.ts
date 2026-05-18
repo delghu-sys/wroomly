@@ -1,16 +1,31 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { stripe } from '@/lib/stripe'
+import { stripe, calculateFees } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase/server'
 import type Stripe from 'stripe'
 
+/**
+ * POST /api/stripe/webhook
+ *
+ * Stripe → Wroomly event sink. Verifies signature, dedupes via the
+ * `webhook_events` table (added in migration 007), then dispatches.
+ *
+ * Source of truth for all post-payment state mutations: the consumer's
+ * /payment/success page is read-only. Anything that writes lives here.
+ */
 export async function POST(request: Request) {
   const body = await request.text()
   const headersList = await headers()
-  const signature = headersList.get('stripe-signature')!
+  const signature = headersList.get('stripe-signature')
+
+  if (!signature) {
+    return NextResponse.json(
+      { error: 'Missing stripe-signature header' },
+      { status: 400 }
+    )
+  }
 
   let event: Stripe.Event
-
   try {
     event = stripe.webhooks.constructEvent(
       body,
@@ -23,109 +38,274 @@ export async function POST(request: Request) {
 
   const supabase = await createServiceClient()
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session
-      const listingId = session.metadata?.listing_id
-      const inquiryId = session.metadata?.inquiry_id
-      const payerId = session.metadata?.payer_id
-      const payeeId = session.metadata?.payee_id
-      const platformFeeCents = parseInt(session.metadata?.platform_fee_cents ?? '0', 10)
-      const releaseDate = session.metadata?.release_date || null
-      const paymentIntentId = typeof session.payment_intent === 'string'
-        ? session.payment_intent
-        : session.payment_intent?.id
+  // Idempotency. Stripe will retry, sometimes weeks later. We insert the
+  // event id first; if it's already there, this delivery is a replay and
+  // we exit without re-applying state changes.
+  const { error: dedupeErr } = await supabase
+    .from('webhook_events')
+    .insert({ id: event.id, type: event.type })
 
-      if (listingId && payerId && payeeId && paymentIntentId) {
-        // Verify metadata matches actual database state
-        const { data: listing } = await supabase
-          .from('listings')
-          .select('id, supplier_id')
-          .eq('id', listingId)
-          .single()
-
-        if (!listing || listing.supplier_id !== payeeId) {
-          console.error('Webhook metadata mismatch: listing/payee mismatch', { listingId, payeeId })
-          break
-        }
-
-        // Record transaction (idempotent)
-        const { data: existing } = await supabase
-          .from('transactions')
-          .select('id')
-          .eq('stripe_payment_intent_id', paymentIntentId)
-          .maybeSingle()
-
-        if (!existing) {
-          await supabase.from('transactions').insert({
-            listing_id: listingId,
-            payer_id: payerId,
-            payee_id: payeeId,
-            type: 'first_month',
-            amount_cents: session.amount_total ?? 0,
-            platform_fee_cents: platformFeeCents,
-            stripe_payment_intent_id: paymentIntentId,
-            status: 'succeeded',
-            release_date: releaseDate,
-          })
-        } else {
-          await supabase
-            .from('transactions')
-            .update({ status: 'succeeded' })
-            .eq('stripe_payment_intent_id', paymentIntentId)
-        }
-
-        // Mark listing as rented
-        await supabase.from('listings').update({ status: 'rented' }).eq('id', listingId)
-
-        // Post ::paid:: system message in the conversation
-        if (inquiryId) {
-          const { data: convo } = await supabase
-            .from('conversations')
-            .select('id')
-            .eq('inquiry_id', inquiryId)
-            .maybeSingle()
-          if (convo) {
-            await supabase.from('messages').insert({
-              conversation_id: convo.id,
-              sender_id: payerId,
-              content: '::paid::{}',
-            })
-          }
-        }
-      }
-      break
+  if (dedupeErr) {
+    // 23505 = unique_violation in Postgres → replay, safe to drop.
+    if ('code' in dedupeErr && dedupeErr.code === '23505') {
+      return NextResponse.json({ received: true, replay: true })
     }
+    // Any other error: log and still attempt processing so we don't lose
+    // critical events because the dedupe table is unreachable.
+    console.error('webhook dedupe insert failed:', dedupeErr)
+  }
 
-    case 'payment_intent.succeeded': {
-      const pi = event.data.object as Stripe.PaymentIntent
-      await supabase
-        .from('transactions')
-        .update({ status: 'succeeded' })
-        .eq('stripe_payment_intent_id', pi.id)
-      break
-    }
+  try {
+    switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutCompleted(
+          supabase,
+          event.data.object as Stripe.Checkout.Session
+        )
+        break
 
-    case 'payment_intent.payment_failed': {
-      const pi = event.data.object as Stripe.PaymentIntent
-      await supabase
-        .from('transactions')
-        .update({ status: 'failed' })
-        .eq('stripe_payment_intent_id', pi.id)
-      break
-    }
+      case 'payment_intent.succeeded':
+        await handlePaymentIntentSucceeded(
+          supabase,
+          event.data.object as Stripe.PaymentIntent
+        )
+        break
 
-    case 'charge.refunded': {
-      const charge = event.data.object as Stripe.Charge
-      if (charge.payment_intent) {
-        await supabase
-          .from('transactions')
-          .update({ status: 'refunded' })
-          .eq('stripe_payment_intent_id', charge.payment_intent as string)
-      }
-      break
+      case 'payment_intent.payment_failed':
+      case 'payment_intent.canceled':
+        await transitionTxStatus(
+          supabase,
+          (event.data.object as Stripe.PaymentIntent).id,
+          event.type === 'payment_intent.canceled' ? 'failed' : 'failed'
+        )
+        break
+
+      case 'charge.refunded':
+      case 'charge.refund.updated':
+        await handleRefund(supabase, event.data.object as Stripe.Charge)
+        break
+
+      case 'charge.dispute.created':
+      case 'charge.dispute.closed':
+        await handleDispute(supabase, event.data.object as Stripe.Dispute)
+        break
+
+      case 'account.updated':
+        await handleAccountUpdated(
+          supabase,
+          event.data.object as Stripe.Account
+        )
+        break
     }
+  } catch (err) {
+    console.error('webhook handler error:', err)
+    return NextResponse.json({ error: 'Handler failed' }, { status: 500 })
   }
 
   return NextResponse.json({ received: true })
+}
+
+// ── Handlers ──────────────────────────────────────────────────────────
+
+type ServiceClient = Awaited<ReturnType<typeof createServiceClient>>
+
+async function handleCheckoutCompleted(
+  supabase: ServiceClient,
+  session: Stripe.Checkout.Session
+) {
+  const listingId = session.metadata?.listing_id
+  const inquiryId = session.metadata?.inquiry_id
+  const payerId = session.metadata?.payer_id
+  const payeeId = session.metadata?.payee_id
+  const metaReleaseDate = session.metadata?.release_date || null
+
+  const paymentIntentId =
+    typeof session.payment_intent === 'string'
+      ? session.payment_intent
+      : session.payment_intent?.id
+
+  if (!listingId || !payerId || !payeeId || !paymentIntentId) {
+    console.error('checkout.session.completed missing metadata')
+    return
+  }
+
+  // Trust the DB, not the metadata. Recompute the fee from the listing
+  // price so a bug or future caller can't poison `platform_fee_cents`.
+  const { data: listing } = await supabase
+    .from('listings')
+    .select('id, supplier_id, price_per_month')
+    .eq('id', listingId)
+    .single()
+
+  if (!listing || listing.supplier_id !== payeeId) {
+    console.error('checkout webhook listing/payee mismatch', {
+      listingId,
+      payeeId,
+    })
+    return
+  }
+
+  const rentCents = listing.price_per_month ?? 0
+  const { platformFee } = calculateFees(rentCents)
+  const amountTotal = session.amount_total ?? rentCents + platformFee
+
+  // Clamp release_date — same logic as the payment-intent route.
+  const releaseDate = clampReleaseDate(metaReleaseDate)
+
+  // INSERT … ON CONFLICT DO UPDATE so concurrent webhook + success-page
+  // retries don't crash on the UNIQUE constraint added in migration 007.
+  await supabase
+    .from('transactions')
+    .upsert(
+      {
+        listing_id: listingId,
+        payer_id: payerId,
+        payee_id: payeeId,
+        type: 'first_month',
+        amount_cents: amountTotal,
+        platform_fee_cents: platformFee,
+        stripe_payment_intent_id: paymentIntentId,
+        status: 'succeeded',
+        release_date: releaseDate,
+      },
+      { onConflict: 'stripe_payment_intent_id' }
+    )
+
+  await supabase
+    .from('listings')
+    .update({ status: 'rented' })
+    .eq('id', listingId)
+
+  if (inquiryId) {
+    const { data: convo } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('inquiry_id', inquiryId)
+      .maybeSingle()
+    if (convo) {
+      // Already-posted ::paid:: is idempotent thanks to our LIKE check.
+      const { data: existing } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', convo.id)
+        .like('content', '::paid::%')
+        .maybeSingle()
+      if (!existing) {
+        await supabase.from('messages').insert({
+          conversation_id: convo.id,
+          sender_id: payerId,
+          content: '::paid::{}',
+        })
+      }
+    }
+  }
+}
+
+async function handlePaymentIntentSucceeded(
+  supabase: ServiceClient,
+  pi: Stripe.PaymentIntent
+) {
+  // Only transition pending → succeeded. Anything already in a terminal
+  // state (refunded, failed) is left alone.
+  const { data: tx } = await supabase
+    .from('transactions')
+    .select('status')
+    .eq('stripe_payment_intent_id', pi.id)
+    .maybeSingle()
+
+  if (!tx || tx.status !== 'pending') return
+
+  await supabase
+    .from('transactions')
+    .update({ status: 'succeeded' })
+    .eq('stripe_payment_intent_id', pi.id)
+}
+
+async function transitionTxStatus(
+  supabase: ServiceClient,
+  paymentIntentId: string,
+  next: 'failed' | 'refunded'
+) {
+  // Don't clobber a `succeeded` row that has already happened to be
+  // refunded — only set `failed` while pending, only set `refunded` while
+  // succeeded.
+  const allowed =
+    next === 'refunded' ? ['succeeded'] : ['pending']
+
+  await supabase
+    .from('transactions')
+    .update({ status: next })
+    .eq('stripe_payment_intent_id', paymentIntentId)
+    .in('status', allowed)
+}
+
+async function handleRefund(supabase: ServiceClient, charge: Stripe.Charge) {
+  if (!charge.payment_intent) return
+  const pi =
+    typeof charge.payment_intent === 'string'
+      ? charge.payment_intent
+      : charge.payment_intent.id
+  // Full refunds flip status; partial refunds are still tracked but the
+  // transaction row stays `succeeded` (you can add a `refunded_cents`
+  // column later for partial reconciliation).
+  const isFullRefund = charge.amount_refunded === charge.amount
+  if (isFullRefund) {
+    await transitionTxStatus(supabase, pi, 'refunded')
+  }
+}
+
+async function handleDispute(
+  supabase: ServiceClient,
+  dispute: Stripe.Dispute
+) {
+  const paymentIntentId =
+    typeof dispute.payment_intent === 'string'
+      ? dispute.payment_intent
+      : dispute.payment_intent?.id
+  if (!paymentIntentId) return
+
+  // Future: write to a dedicated `disputes` table + notify the admin.
+  // For now we just log so a chargeback doesn't silently vanish.
+  console.warn('Stripe dispute event:', {
+    id: dispute.id,
+    status: dispute.status,
+    reason: dispute.reason,
+    payment_intent: paymentIntentId,
+  })
+}
+
+async function handleAccountUpdated(
+  supabase: ServiceClient,
+  account: Stripe.Account
+) {
+  // Mirror the supplier's Stripe readiness onto the users table. This is
+  // an optimisation: fetchConnectStatus() still re-queries Stripe, but
+  // having a flag in our DB lets us gate features without a Stripe RTT.
+  // (We aren't storing the flag yet — wiring would need a column. Leave a
+  // log so we know events are arriving and we can act on them when the
+  // column ships.)
+  const userId = account.metadata?.user_id
+  if (!userId) return
+  // Suppress unused-var while we don't yet have a column to write into:
+  void supabase
+  console.info('account.updated', {
+    userId,
+    chargesEnabled: account.charges_enabled,
+    payoutsEnabled: account.payouts_enabled,
+  })
+}
+
+// Server-clamped release date — same logic as the payment-intent route.
+function clampReleaseDate(meta: string | null): string {
+  const todayMidnight = new Date()
+  todayMidnight.setUTCHours(0, 0, 0, 0)
+
+  if (!meta) return todayMidnight.toISOString().slice(0, 10)
+
+  const parsed = new Date(meta)
+  if (Number.isNaN(parsed.getTime())) {
+    return todayMidnight.toISOString().slice(0, 10)
+  }
+  const later = parsed.getTime() > todayMidnight.getTime() ? parsed : todayMidnight
+  return later.toISOString().slice(0, 10)
 }

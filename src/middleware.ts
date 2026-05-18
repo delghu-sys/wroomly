@@ -11,9 +11,22 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 
+  // Stripe webhook validates its own signature; don't burn an auth lookup
+  // or the cookie roundtrip on every event delivery.
+  if (pathname === '/api/stripe/webhook') {
+    return supabaseResponse
+  }
+
+  // The /suspended terminal page must be reachable even with a session —
+  // otherwise suspended users hit a redirect loop.
+  if (pathname === '/suspended') {
+    return supabaseResponse
+  }
+
   // Allow public and auth routes
   if (
     AUTH_ROUTES.some(r => pathname.startsWith(r)) ||
+    pathname.startsWith('/reset-password') ||
     PUBLIC_ROUTES.some(r => pathname === r) ||
     (pathname.startsWith('/listings/') && !pathname.endsWith('/edit') && !pathname.endsWith('/new')) ||
     pathname.startsWith('/users/')
