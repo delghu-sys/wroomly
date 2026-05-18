@@ -245,9 +245,19 @@ async function handleRefund(supabase: ServiceClient, charge: Stripe.Charge) {
     typeof charge.payment_intent === 'string'
       ? charge.payment_intent
       : charge.payment_intent.id
-  // Full refunds flip status; partial refunds are still tracked but the
-  // transaction row stays `succeeded` (you can add a `refunded_cents`
-  // column later for partial reconciliation).
+
+  // Always mirror Stripe's authoritative refunded-amount on the row.
+  // Stripe ships `amount_refunded` as the running total, so re-applying
+  // the same event is safe (idempotent set, not an increment).
+  const { error: refundedErr } = await supabase
+    .from('transactions')
+    .update({ refunded_cents: charge.amount_refunded })
+    .eq('stripe_payment_intent_id', pi)
+  if (refundedErr) {
+    console.error('[handleRefund] failed to write refunded_cents', refundedErr)
+  }
+
+  // Full refund additionally flips status.
   const isFullRefund = charge.amount_refunded === charge.amount
   if (isFullRefund) {
     await transitionTxStatus(supabase, pi, 'refunded')

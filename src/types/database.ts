@@ -219,6 +219,7 @@ export interface Transaction {
   type: TransactionType
   amount_cents: number
   platform_fee_cents: number
+  refunded_cents: number
   stripe_payment_intent_id: string | null
   stripe_transfer_id: string | null
   status: TransactionStatus

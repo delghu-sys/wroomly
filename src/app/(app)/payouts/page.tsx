@@ -43,18 +43,24 @@ export default async function PayoutsPage() {
 
   const succeeded = transactions.filter(t => t.status === 'succeeded')
 
+  // Supplier net = rent received − platform fee − whatever Stripe already
+  // sent back to the consumer via refunds. (Refunds reduce the destination
+  // account's balance automatically; we mirror that here so the UI matches
+  // what Stripe will actually pay out.)
+  const supplierNet = (t: Transaction) =>
+    t.amount_cents - t.platform_fee_cents - (t.refunded_cents ?? 0)
+
   // Pending: payment received but release_date hasn't passed yet (+ 24h buffer like Airbnb)
   const pendingPayout = succeeded
     .filter(t => t.release_date && !isPast(addDays(parseISO(t.release_date), 1)))
-    .reduce((sum, t) => sum + t.amount_cents - t.platform_fee_cents, 0)
+    .reduce((sum, t) => sum + supplierNet(t), 0)
 
   // Available: release_date has passed — ready for payout
   const availablePayout = succeeded
     .filter(t => !t.release_date || isPast(addDays(parseISO(t.release_date), 1)))
-    .reduce((sum, t) => sum + t.amount_cents - t.platform_fee_cents, 0)
+    .reduce((sum, t) => sum + supplierNet(t), 0)
 
-  const totalEarned = succeeded
-    .reduce((sum, t) => sum + t.amount_cents - t.platform_fee_cents, 0)
+  const totalEarned = succeeded.reduce((sum, t) => sum + supplierNet(t), 0)
 
   const STATUS_COLORS: Record<string, string> = {
     pending: 'text-[oklch(0.55_0.15_75)] border-[oklch(0.85_0.1_75)] bg-[oklch(0.97_0.04_75)]',
