@@ -6,7 +6,6 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "cwd": "/Users/hugo/claude/michigan-nest",
-      "port": 3000,
       "autoPort": true
     }
   ]

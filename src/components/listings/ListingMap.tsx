@@ -1,19 +1,17 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 
-// Mapbox v3 wires up its internal authenticator at module-eval time. The
-// previous shape — setting `mapboxgl.accessToken` inside useEffect — was
-// too late and threw "Neither apiKey nor config.authenticator provided"
-// before the effect ever ran. Set the token at module scope so it's there
-// before the first `new mapboxgl.Map()` call.
+// Mapbox v3 instantiates its authenticator at module evaluation time —
+// statically importing `mapbox-gl` before the token is registered throws
+// "Neither apiKey nor config.authenticator provided" at the page load.
+// Defer the import until the component actually mounts on the client and
+// we've confirmed a token exists, so the SDK never enters its broken
+// no-token path. The CSS is still safe to import statically.
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-if (MAPBOX_TOKEN) {
-  mapboxgl.accessToken = MAPBOX_TOKEN
-}
 
 interface ListingMapProps {
   lat: number
@@ -23,58 +21,76 @@ interface ListingMapProps {
 
 export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
-  const map = useRef<mapboxgl.Map | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const map = useRef<any>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
-    // Bail cleanly if no token — render a styled placeholder instead of
-    // letting Mapbox throw. Surfaces a missing env var as a graceful
-    // degradation rather than a crashed listing page.
-    if (!MAPBOX_TOKEN) return
-    if (map.current || !mapContainer.current) return
+    if (!MAPBOX_TOKEN || !mapContainer.current || map.current) return
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [lng, lat],
-      zoom: 14,
-    })
+    let cancelled = false
 
-    // Add a blurred circle instead of exact pin for privacy
-    map.current.on('load', () => {
-      if (!map.current) return
-      map.current.addLayer({
-        id: 'listing-location',
-        type: 'circle',
-        source: {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: { type: 'Point', coordinates: [lng, lat] },
-            properties: {},
-          },
-        },
-        paint: {
-          // Maize-tinted privacy circle in brand color
-          'circle-radius': 60,
-          'circle-color': '#e8b73f',
-          'circle-opacity': 0.22,
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#e8b73f',
-          'circle-stroke-opacity': 0.55,
-        },
-      })
-    })
+    ;(async () => {
+      try {
+        // Dynamic import — first reference to mapbox-gl in the bundle.
+        // Webpack/Turbopack split this into a separate chunk that only
+        // loads after MAPBOX_TOKEN is set in module scope below.
+        const mapboxgl = (await import('mapbox-gl')).default
+        if (cancelled) return
+
+        mapboxgl.accessToken = MAPBOX_TOKEN!
+
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current!,
+          style: 'mapbox://styles/mapbox/light-v11',
+          center: [lng, lat],
+          zoom: 14,
+        })
+
+        map.current.on('load', () => {
+          if (!map.current || cancelled) return
+          map.current.addLayer({
+            id: 'listing-location',
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [lng, lat] },
+                properties: {},
+              },
+            },
+            paint: {
+              // Maize-tinted privacy circle in brand color
+              'circle-radius': 60,
+              'circle-color': '#e8b73f',
+              'circle-opacity': 0.22,
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#e8b73f',
+              'circle-stroke-opacity': 0.55,
+            },
+          })
+        })
+      } catch (err) {
+        // Mapbox throwing anywhere (missing token, bad token, network
+        // hiccup, SDK API drift) lands here. Don't bring the whole listing
+        // page down — fall back to the placeholder.
+        console.error('[ListingMap] failed to load Mapbox', err)
+        if (!cancelled) setLoadFailed(true)
+      }
+    })()
 
     return () => {
-      map.current?.remove()
-      map.current = null
+      cancelled = true
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
     }
   }, [lat, lng])
 
-  // Token-missing fallback — neighborhood pill on a muted backdrop, no
-  // hard crash. Lets the listing page still render in environments where
-  // the Mapbox token is undefined (e.g. preview builds without env vars).
-  if (!MAPBOX_TOKEN) {
+  // Placeholder fallback — token missing OR Mapbox blew up at runtime.
+  if (!MAPBOX_TOKEN || loadFailed) {
     return (
       <div className="space-y-2">
         <div className="h-64 rounded-3xl border border-line bg-[oklch(0.97_0.01_85)] flex flex-col items-center justify-center text-ink-muted">
