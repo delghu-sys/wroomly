@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { motion, useMotionValue, useSpring } from 'motion/react'
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react'
 
 interface TiltCardProps {
   children: React.ReactNode
@@ -9,6 +9,7 @@ interface TiltCardProps {
 }
 
 export function TiltCard({ children, className }: TiltCardProps) {
+  const prefersReducedMotion = useReducedMotion()
   const ref = useRef<HTMLDivElement>(null)
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -20,6 +21,7 @@ export function TiltCard({ children, className }: TiltCardProps) {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
+      if (prefersReducedMotion) return
       const rect = ref.current?.getBoundingClientRect()
       if (!rect) return
       const x = e.clientX - rect.left
@@ -32,7 +34,7 @@ export function TiltCard({ children, className }: TiltCardProps) {
       setMousePos({ x, y })
       setIsHovered(true)
     },
-    [rotateX, rotateY]
+    [rotateX, rotateY, prefersReducedMotion]
   )
 
   const handleMouseLeave = useCallback(() => {
@@ -44,8 +46,8 @@ export function TiltCard({ children, className }: TiltCardProps) {
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseMove={prefersReducedMotion ? undefined : handleMouseMove}
+      onMouseLeave={prefersReducedMotion ? undefined : handleMouseLeave}
       style={{
         rotateX: springX,
         rotateY: springY,

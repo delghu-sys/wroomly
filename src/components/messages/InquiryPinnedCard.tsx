@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
@@ -57,6 +57,7 @@ export function InquiryPinnedCard({
   const [status, setStatus] = useState<InquiryStatus>(inquiry.status)
   const [loading, setLoading] = useState<'accept' | 'reject' | null>(null)
   const [showBurst, setShowBurst] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   async function decide(next: 'accepted' | 'rejected') {
     if (loading) return
@@ -91,7 +92,7 @@ export function InquiryPinnedCard({
       return
     }
 
-    if (next === 'accepted') {
+    if (next === 'accepted' && !prefersReducedMotion) {
       setShowBurst(true)
       setTimeout(() => setShowBurst(false), 1200)
     }

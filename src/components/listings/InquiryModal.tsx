@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { createClient } from '@/lib/supabase/client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -51,6 +51,7 @@ export function InquiryModal({
   authUserId,
 }: InquiryModalProps) {
   const router = useRouter()
+  const prefersReducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<'form' | 'success'>('form')
 
   // Pre-compute particle layout once per mount so re-renders don't reshuffle.
@@ -362,9 +363,9 @@ export function InquiryModal({
                   transition={popSpring}
                   className="relative px-6 py-14 text-center"
                 >
-                  {/* Particle burst */}
+                  {/* Particle burst — skipped for reduced-motion users. */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    {particles.map(p => (
+                    {!prefersReducedMotion && particles.map(p => (
                       <motion.span
                         key={p.i}
                         initial={{ x: 0, y: 0, opacity: 1, scale: 0.6 }}

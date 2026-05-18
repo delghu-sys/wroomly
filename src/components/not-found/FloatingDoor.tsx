@@ -1,15 +1,18 @@
 'use client'
 
 import { memo } from 'react'
-import { motion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
 import { Door, Keyhole } from '@phosphor-icons/react/dist/ssr'
 
 /**
  * Decorative floating door + keyhole motif for the 404 page.
  * Memoized + isolated — perpetual float animations never re-render
  * the parent route segment.
+ *
+ * Reduced-motion users get the static door + keyhole with no loops.
  */
 export const FloatingDoor = memo(function FloatingDoor() {
+  const prefersReducedMotion = useReducedMotion()
   return (
     <div className="relative w-full h-full" aria-hidden>
       {/* Backdrop blob */}
@@ -35,13 +38,17 @@ export const FloatingDoor = memo(function FloatingDoor() {
 
           {/* Door icon — gentle floating spring */}
           <motion.div
-            initial={{ y: 12, rotate: -2 }}
-            animate={{ y: [-8, 8, -8], rotate: [-2, 2, -2] }}
-            transition={{
-              duration: 6,
-              ease: 'easeInOut',
-              repeat: Infinity,
-            }}
+            initial={prefersReducedMotion ? false : { y: 12, rotate: -2 }}
+            animate={
+              prefersReducedMotion
+                ? { y: 0, rotate: 0 }
+                : { y: [-8, 8, -8], rotate: [-2, 2, -2] }
+            }
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : { duration: 6, ease: 'easeInOut', repeat: Infinity }
+            }
             className="absolute inset-0 flex items-center justify-center"
           >
             <Door
@@ -53,17 +60,17 @@ export const FloatingDoor = memo(function FloatingDoor() {
 
           {/* Tiny floating keyhole — counter-rotates */}
           <motion.div
-            initial={{ y: -4, opacity: 0 }}
-            animate={{
-              y: [4, -4, 4],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 4.5,
-              ease: 'easeInOut',
-              repeat: Infinity,
-              delay: 0.4,
-            }}
+            initial={prefersReducedMotion ? { opacity: 1 } : { y: -4, opacity: 0 }}
+            animate={
+              prefersReducedMotion
+                ? { y: 0, opacity: 1 }
+                : { y: [4, -4, 4], opacity: [0.7, 1, 0.7] }
+            }
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : { duration: 4.5, ease: 'easeInOut', repeat: Infinity, delay: 0.4 }
+            }
             className="absolute top-6 right-6"
           >
             <Keyhole

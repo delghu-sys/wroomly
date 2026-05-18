@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import { motion, useMotionValue, useSpring } from 'motion/react'
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
 
 interface MagneticButtonProps {
@@ -17,13 +17,17 @@ export function MagneticButton({
   showArrow = false,
   className = '',
 }: MagneticButtonProps) {
+  const prefersReducedMotion = useReducedMotion()
   const ref = useRef<HTMLDivElement>(null)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const springX = useSpring(x, { stiffness: 150, damping: 15 })
   const springY = useSpring(y, { stiffness: 150, damping: 15 })
 
+  // Reduced-motion users: don't track the cursor at all. The magnetic
+  // pull is decorative — they get a static button with no hover scale.
   function handleMouseMove(e: React.MouseEvent) {
+    if (prefersReducedMotion) return
     const rect = ref.current?.getBoundingClientRect()
     if (!rect) return
     x.set((e.clientX - rect.left - rect.width / 2) * 0.25)
@@ -51,8 +55,8 @@ export function MagneticButton({
       className={`inline-block ${className}`}
     >
       <motion.div
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
+        whileHover={prefersReducedMotion ? undefined : { scale: 1.03 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         className={`relative inline-flex items-center gap-2 h-12 px-7 rounded-full text-sm tracking-tight transition-shadow duration-500 cursor-pointer ${styles[variant]}`}
       >

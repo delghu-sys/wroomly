@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { motion, useMotionValue, useSpring } from 'motion/react'
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react'
 import { Send } from 'lucide-react'
 
 interface MessageInputProps {
@@ -15,6 +15,7 @@ const MAX_ROWS = 4
 const LINE_HEIGHT = 22
 
 export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputProps) {
+  const prefersReducedMotion = useReducedMotion()
   const [value, setValue] = useState('')
   const [sending, setSending] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -59,7 +60,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
   }
 
   function onMouseMove(e: React.MouseEvent) {
-    if (!ready) return
+    if (!ready || prefersReducedMotion) return
     const r = sendRef.current?.getBoundingClientRect()
     if (!r) return
     mx.set((e.clientX - r.left - r.width / 2) * 0.30)
@@ -137,7 +138,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
           onMouseMove={onMouseMove}
           onMouseLeave={onMouseLeave}
           disabled={!ready}
-          whileTap={ready ? { scale: 0.92, y: 1 } : undefined}
+          whileTap={ready && !prefersReducedMotion ? { scale: 0.92, y: 1 } : undefined}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
           style={{ x: sx, y: sy }}
           className={`
