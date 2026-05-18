@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { createClient } from '@/lib/supabase/client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -53,6 +54,7 @@ export function InquiryModal({
   const router = useRouter()
   const prefersReducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<'form' | 'success'>('form')
+  const dialogRef = useFocusTrap<HTMLDivElement>(open)
 
   // Pre-compute particle layout once per mount so re-renders don't reshuffle.
   const particles = useMemo(
@@ -175,6 +177,7 @@ export function InquiryModal({
 
           {/* Morphing modal — spring expand from center */}
           <motion.div
+            ref={dialogRef}
             initial={{ opacity: 0, scale: 0.9, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 24 }}

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import type { ListingImage } from '@/types/database'
 import { getListingImageUrl } from '@/lib/utils/listing'
 import { ChevronLeft, ChevronRight, BedDouble, X } from 'lucide-react'
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface BrandedGalleryProps {
   images: ListingImage[]
@@ -18,6 +19,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
   const [current, setCurrent] = useState(0)
   const [direction, setDirection] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const lightboxRef = useFocusTrap<HTMLDivElement>(lightboxOpen)
 
   const prev = useCallback(() => {
     setDirection(-1)
@@ -192,6 +194,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
       {/* Lightbox */}
       {lightboxOpen && (
         <div
+          ref={lightboxRef}
           role="dialog"
           aria-modal="true"
           aria-label={`Photo lightbox — ${title}`}
