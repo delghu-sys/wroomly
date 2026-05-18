@@ -63,7 +63,12 @@ function SignInForm() {
       password: data.password,
     })
     if (signInError) {
-      setError(signInError.message)
+      // Don't leak whether the email exists — Supabase distinguishes
+      // "Invalid login credentials" from "Email not confirmed" etc.
+      // We only surface a generic message to thwart enumeration.
+      // The original error still lands in the console for our own debugging.
+      console.warn('[sign-in] auth error:', signInError.message)
+      setError("That email and password didn't match. Try again.")
       return
     }
     router.push(next)

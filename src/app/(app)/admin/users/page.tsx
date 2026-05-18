@@ -38,7 +38,16 @@ export default async function AdminUsersPage({
     query = query.eq('user_type', role)
   }
   if (q) {
-    query = query.or(`email.ilike.%${q}%,full_name.ilike.%${q}%,university.ilike.%${q}%`)
+    // PostgREST `.or()` uses `,` as the term separator and `()` for grouping —
+    // a raw `q` like `foo),user_type.eq.admin,(x` would break out of the
+    // intended filter. Strip the metachars before interpolation. We also
+    // cap length so a malicious value can't be used to DoS the query planner.
+    const safe = q.replace(/[(),*]/g, '').slice(0, 80)
+    if (safe) {
+      query = query.or(
+        `email.ilike.%${safe}%,full_name.ilike.%${safe}%,university.ilike.%${safe}%`,
+      )
+    }
   }
 
   const { data: usersData } = await query.limit(200)

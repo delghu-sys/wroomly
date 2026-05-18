@@ -95,6 +95,9 @@ export interface User {
   instagram_handle: string | null
   stripe_account_id: string | null
   stripe_customer_id: string | null
+  stripe_charges_enabled: boolean
+  stripe_payouts_enabled: boolean
+  stripe_details_submitted: boolean
   is_verified: boolean
   is_suspended: boolean
   created_at: string

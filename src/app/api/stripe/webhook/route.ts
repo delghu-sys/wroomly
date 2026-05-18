@@ -278,21 +278,33 @@ async function handleAccountUpdated(
   supabase: ServiceClient,
   account: Stripe.Account
 ) {
-  // Mirror the supplier's Stripe readiness onto the users table. This is
-  // an optimisation: fetchConnectStatus() still re-queries Stripe, but
-  // having a flag in our DB lets us gate features without a Stripe RTT.
-  // (We aren't storing the flag yet — wiring would need a column. Leave a
-  // log so we know events are arriving and we can act on them when the
-  // column ships.)
+  // Mirror the supplier's Stripe readiness onto the users table so feature
+  // gates (inquiry accept, listing publish) don't need a Stripe RTT.
   const userId = account.metadata?.user_id
-  if (!userId) return
-  // Suppress unused-var while we don't yet have a column to write into:
-  void supabase
-  console.info('account.updated', {
-    userId,
-    chargesEnabled: account.charges_enabled,
-    payoutsEnabled: account.payouts_enabled,
-  })
+  if (!userId) {
+    // Fall back to stripe_account_id lookup — older Connect accounts may
+    // pre-date the metadata convention.
+    const { error } = await supabase
+      .from('users')
+      .update({
+        stripe_charges_enabled: !!account.charges_enabled,
+        stripe_payouts_enabled: !!account.payouts_enabled,
+        stripe_details_submitted: !!account.details_submitted,
+      })
+      .eq('stripe_account_id', account.id)
+    if (error) console.error('[account.updated] update by acct id failed', error)
+    return
+  }
+
+  const { error } = await supabase
+    .from('users')
+    .update({
+      stripe_charges_enabled: !!account.charges_enabled,
+      stripe_payouts_enabled: !!account.payouts_enabled,
+      stripe_details_submitted: !!account.details_submitted,
+    })
+    .eq('id', userId)
+  if (error) console.error('[account.updated] update by user id failed', error)
 }
 
 // Server-clamped release date — same logic as the payment-intent route.
