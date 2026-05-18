@@ -47,7 +47,7 @@ export default function SuspendedPage() {
           this is resolved.
         </p>
 
-        <p className="mt-3 text-base text-white/55 max-w-xl mx-auto leading-relaxed">
+        <p className="mt-3 text-base text-white/75 max-w-xl mx-auto leading-relaxed">
           If you think this is a mistake, reach out and we&rsquo;ll take another
           look.
         </p>

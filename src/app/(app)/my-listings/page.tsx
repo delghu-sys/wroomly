@@ -33,6 +33,7 @@ export default async function MyListingsPage() {
     .select('*')
     .eq('supplier_id', user.id)
     .order('created_at', { ascending: false })
+    .limit(200)
 
   const listings = (listingsData ?? []) as Listing[]
 

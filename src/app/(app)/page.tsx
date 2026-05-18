@@ -269,7 +269,7 @@ export default async function HomePage() {
                 We&rsquo;ll handle the rest.
               </span>
             </h2>
-            <p className="mt-8 text-lg text-white/45 max-w-2xl mx-auto leading-relaxed">
+            <p className="mt-8 text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
               List your apartment in minutes. We handle verification, payments,
               and messaging — so you can focus on your study abroad, internship,
               or co-op.

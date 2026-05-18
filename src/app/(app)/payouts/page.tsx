@@ -26,7 +26,8 @@ export default async function PayoutsPage() {
       .from('transactions')
       .select('*')
       .eq('payee_id', user.id)
-      .order('created_at', { ascending: false }),
+      .order('created_at', { ascending: false })
+      .limit(200),
   ])
 
   const profile = profileRes.data as Pick<

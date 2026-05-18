@@ -30,6 +30,7 @@ export default async function ApplicationsPage() {
     `)
     .eq('consumer_id', user.id)
     .order('created_at', { ascending: false })
+    .limit(200)
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

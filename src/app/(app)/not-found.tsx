@@ -77,7 +77,7 @@ export default function NotFound() {
               </MagneticLinkCta>
             </div>
 
-            <p className="mt-10 text-[12.5px] text-white/55 max-w-md leading-relaxed">
+            <p className="mt-10 text-[12.5px] text-white/75 max-w-md leading-relaxed">
               If you got here from a Wroomly email or message, the listing was
               likely taken down by its owner or rented to someone else.
             </p>

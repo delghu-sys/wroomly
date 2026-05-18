@@ -28,6 +28,7 @@ export default async function FavoritesPage() {
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+    .limit(200)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const listings = ((favorites ?? []) as any[])
