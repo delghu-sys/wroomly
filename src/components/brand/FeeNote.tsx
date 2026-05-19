@@ -27,13 +27,13 @@ export function FeeNote({ variant = 'inline' }: FeeNoteProps) {
           color: 'oklch(0.32 0.10 85)',
         }}
       >
-        + {PLATFORM_FEE_PERCENT}% service fee
+        + {PLATFORM_FEE_PERCENT}% fee + processing
       </span>
     )
   }
   return (
     <span className="text-[11.5px] text-ink-muted leading-snug">
-      + {PLATFORM_FEE_PERCENT}% Wroomly service fee at checkout
+      + {PLATFORM_FEE_PERCENT}% service fee + card processing at checkout
     </span>
   )
 }

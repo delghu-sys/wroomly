@@ -147,8 +147,16 @@ async function handleCheckoutCompleted(
 
   const rentCents = listing.price_per_month ?? 0
   const depositCents = Math.max(0, listing.deposit_amount ?? 0)
-  const { platformFee } = calculateFees(rentCents)
-  const amountTotal = session.amount_total ?? rentCents + depositCents + platformFee
+  // Recompute the full fee breakdown from the DB-trusted rent + deposit.
+  // `applicationFeeCents` is what Stripe took as the application fee
+  // (Wroomly's 5% + Stripe processing pass-through). `totalChargeCents`
+  // is the gross we expected to charge the consumer; trust Stripe's
+  // `amount_total` first since occasional drift is possible.
+  const {
+    applicationFeeCents,
+    totalChargeCents: expectedTotal,
+  } = calculateFees(rentCents, depositCents)
+  const amountTotal = session.amount_total ?? expectedTotal
 
   // Clamp release_date — same logic as the payment-intent route.
   const releaseDate = clampReleaseDate(metaReleaseDate)
@@ -164,7 +172,10 @@ async function handleCheckoutCompleted(
         payee_id: payeeId,
         type: 'first_month',
         amount_cents: amountTotal,
-        platform_fee_cents: platformFee,
+        // platform_fee_cents stores the gross application fee — what
+        // Wroomly collected before Stripe subtracted its actual fee.
+        // Supplier net = amount_cents - platform_fee_cents = rent + deposit.
+        platform_fee_cents: applicationFeeCents,
         deposit_cents: depositCents,
         stripe_payment_intent_id: paymentIntentId,
         status: 'succeeded',

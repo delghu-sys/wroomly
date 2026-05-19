@@ -113,11 +113,16 @@ export async function POST(request: Request) {
     )
   }
 
-  // Platform fee charged on rent only — deposit is "held" money, not
-  // consumed, and Wroomly shouldn't double-dip when it's returned. The
-  // deposit flows straight through to the supplier alongside rent.
-  const { platformFee } = calculateFees(rentCents)
-  const totalSupplierAmount = rentCents + depositCents // what lands on supplier's connected account
+  // Fee model: Wroomly's 5% is on rent only, Stripe's processing fee is
+  // passed through to the consumer as a separate line item, deposit
+  // flows straight through to the supplier alongside rent.
+  const {
+    wroomlyFeeCents,
+    stripeFeeCents,
+    applicationFeeCents,
+    supplierAmountCents,
+    totalChargeCents,
+  } = calculateFees(rentCents, depositCents)
   const releaseDate = inquiry.move_in_date ?? listing.available_from
 
   try {
@@ -180,7 +185,7 @@ export async function POST(request: Request) {
       quantity: 1,
       price_data: {
         currency: 'usd',
-        unit_amount: platformFee,
+        unit_amount: wroomlyFeeCents,
         product_data: {
           name: `Wroomly service fee (${PLATFORM_FEE_PERCENT}%)`,
           description: 'Covers verification, escrowed payments, and in-app messaging.',
@@ -188,17 +193,37 @@ export async function POST(request: Request) {
       },
     })
 
+    // Stripe processing fee passed to the consumer as a transparent line
+    // item — they see exactly what their bank/card costs and Wroomly's
+    // 5% stays a true net margin.
+    if (stripeFeeCents > 0) {
+      lineItems!.push({
+        quantity: 1,
+        price_data: {
+          currency: 'usd',
+          unit_amount: stripeFeeCents,
+          product_data: {
+            name: 'Card processing',
+            description:
+              "Stripe's fee for processing this payment. Same as you'd pay anywhere card-on-file.",
+          },
+        },
+      })
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer: customerId,
       line_items: lineItems,
       // Stripe Connect — destination charge.
-      // `application_fee_amount` is the slice Stripe routes back to the
-      // platform account; the remainder (rent + deposit) lands on the
-      // supplier's connected account. We deliberately do NOT charge the
-      // platform fee on the deposit portion.
+      // `application_fee_amount` includes Wroomly's 5% + the Stripe
+      // processing fee we collected from the consumer. Stripe deducts its
+      // actual processing fee from the platform balance, so Wroomly nets
+      // its 5% (or very close — the actual fee can drift a cent or two
+      // depending on card type). The supplier's destination account
+      // always receives exactly rent + deposit.
       payment_intent_data: {
-        application_fee_amount: platformFee,
+        application_fee_amount: applicationFeeCents,
         transfer_data: {
           destination: supplier.stripe_account_id,
         },
@@ -209,8 +234,10 @@ export async function POST(request: Request) {
           inquiry_id: inquiry.id,
           rent_cents: String(rentCents),
           deposit_cents: String(depositCents),
-          platform_fee_cents: String(platformFee),
-          supplier_total_cents: String(totalSupplierAmount),
+          wroomly_fee_cents: String(wroomlyFeeCents),
+          stripe_fee_cents: String(stripeFeeCents),
+          application_fee_cents: String(applicationFeeCents),
+          supplier_total_cents: String(supplierAmountCents),
         },
       },
       metadata: {
@@ -220,7 +247,9 @@ export async function POST(request: Request) {
         inquiry_id: inquiry.id,
         rent_cents: String(rentCents),
         deposit_cents: String(depositCents),
-        platform_fee_cents: String(platformFee),
+        wroomly_fee_cents: String(wroomlyFeeCents),
+        stripe_fee_cents: String(stripeFeeCents),
+        application_fee_cents: String(applicationFeeCents),
         release_date: releaseDate ?? '',
       },
       success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
