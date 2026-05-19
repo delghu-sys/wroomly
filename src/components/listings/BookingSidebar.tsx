@@ -40,7 +40,12 @@ export function BookingSidebar({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={spring}
-      className="sticky top-24"
+      // Cap height to the viewport minus the sticky offset + a small gap;
+      // overflow-y:auto inside lets the sidebar scroll independently when
+      // the inquiry form + price stack + trust line exceed available space
+      // (which happens at common laptop heights). Without this the submit
+      // button is unreachable on shorter screens.
+      className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-3xl"
     >
       <div
         className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl"
