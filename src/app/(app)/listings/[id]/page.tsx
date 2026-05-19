@@ -83,6 +83,10 @@ export default async function ListingDetailPage({
   const { id } = await params
   const supabase = await createClient()
 
+  // Fetch the listing regardless of status. We do the visibility check
+  // below, after we know whether the viewer is the owner or the consumer
+  // who paid — both of whom can see the page even if the listing has
+  // been moved out of public visibility (archived after rent, etc.).
   const { data: listing } = await supabase
     .from('listings')
     .select(`
@@ -93,7 +97,6 @@ export default async function ListingDetailPage({
       users(id, full_name, avatar_url, university, created_at, bio, instagram_handle)
     `)
     .eq('id', id)
-    .in('status', ['active', 'rented', 'swapped'])
     .single()
 
   if (!listing) notFound()
@@ -128,7 +131,9 @@ export default async function ListingDetailPage({
   const isOwner = authUser?.id === l.supplier_id
 
   // Existing inquiry & conversation + paid status can fan out together for
-  // authenticated non-owners.
+  // authenticated non-owners. Note: we check `hasPaid` BEFORE the
+  // visibility gate so a consumer who booked the place can still see it
+  // after status moves to `archived` or any other non-public state.
   let existingInquiry: { id: string; status: string } | null = null
   let conversationId: string | null = null
   let hasPaid = false
@@ -163,12 +168,65 @@ export default async function ListingDetailPage({
     }
   }
 
+  // Visibility gate. Public statuses (active/rented/swapped) are visible
+  // to anyone. Non-public statuses (archived/draft/pending_review) are
+  // only visible to the owner — so they can manage their own listings —
+  // or to the consumer who paid for it — so their "My applications" link
+  // never 404s after the supplier archives the listing post-booking.
+  const PUBLIC_STATUSES = ['active', 'rented', 'swapped']
+  const isPubliclyVisible = PUBLIC_STATUSES.includes(l.status)
+  if (!isPubliclyVisible && !isOwner && !hasPaid) {
+    notFound()
+  }
+
   const sortedImages = l.listing_images.sort((a, b) => a.display_order - b.display_order)
   const amenities = l.listing_amenities.map(a => a.amenity)
 
   return (
     <div className="bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        {/* "Your reservation" banner — shown when the viewer has paid for
+            this listing. Makes it immediately obvious they're looking at
+            their own booking (which is why the page works even though the
+            listing's status is no longer public). */}
+        {hasPaid && (
+          <div
+            className="mb-6 rounded-2xl border px-5 py-4 flex items-center gap-3"
+            style={{
+              background: 'oklch(0.96 0.04 142)',
+              borderColor: 'oklch(0.85 0.10 142)',
+              color: 'oklch(0.35 0.13 142)',
+            }}
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+              style={{ background: 'oklch(0.55 0.15 142)' }}
+            >
+              <svg
+                className="w-4 h-4 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="font-display text-base tracking-tight">
+                Your reservation
+              </p>
+              <p className="text-xs opacity-80 mt-0.5">
+                You booked this place. It&apos;s hidden from the public browse
+                but stays here for you in <strong>My applications</strong>.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           {/* Left: main content */}
           <div className="lg:col-span-2 space-y-10">

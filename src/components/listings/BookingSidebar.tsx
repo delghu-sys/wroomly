@@ -33,7 +33,13 @@ export function BookingSidebar({
   conversationId,
   hasPaid,
 }: BookingSidebarProps) {
-  const closed = listing.status === 'rented' || listing.status === 'swapped'
+  // "Closed" suppresses the inquiry/payment CTAs and shows a generic
+  // "no longer available" message. Skip it when the current viewer is
+  // the consumer who paid — they should see the InquiryForm's "Booking
+  // confirmed" state with a link back to their host chat, not a stark
+  // "this place has been rented" message that reads as if they lost it.
+  const closed =
+    (listing.status === 'rented' || listing.status === 'swapped') && !hasPaid
 
   return (
     <motion.div
