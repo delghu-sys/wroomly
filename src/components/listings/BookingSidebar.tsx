@@ -119,6 +119,14 @@ export function BookingSidebar({
                   <p className="mt-2">
                     <FeeNote variant="inline" />
                   </p>
+                  {/* Wroomly handles the first month + deposit. After that
+                      the consumer arranges payment with the host directly.
+                      Setting expectation here avoids a "where's my month
+                      2?" support ticket post-booking. */}
+                  <p className="text-[11.5px] text-ink-muted leading-snug mt-3 pt-3 border-t border-line/60">
+                    Wroomly charges your first month + deposit at booking.
+                    You&rsquo;ll pay your host directly for months 2 onward.
+                  </p>
                 </div>
               )}
 
