@@ -129,11 +129,11 @@ async function handleCheckoutCompleted(
     return
   }
 
-  // Trust the DB, not the metadata. Recompute the fee from the listing
-  // price so a bug or future caller can't poison `platform_fee_cents`.
+  // Trust the DB, not the metadata. Recompute fee + deposit from the
+  // listing so a bug or future caller can't poison the transaction row.
   const { data: listing } = await supabase
     .from('listings')
-    .select('id, supplier_id, price_per_month')
+    .select('id, supplier_id, price_per_month, deposit_amount')
     .eq('id', listingId)
     .single()
 
@@ -146,8 +146,9 @@ async function handleCheckoutCompleted(
   }
 
   const rentCents = listing.price_per_month ?? 0
+  const depositCents = Math.max(0, listing.deposit_amount ?? 0)
   const { platformFee } = calculateFees(rentCents)
-  const amountTotal = session.amount_total ?? rentCents + platformFee
+  const amountTotal = session.amount_total ?? rentCents + depositCents + platformFee
 
   // Clamp release_date — same logic as the payment-intent route.
   const releaseDate = clampReleaseDate(metaReleaseDate)
@@ -164,6 +165,7 @@ async function handleCheckoutCompleted(
         type: 'first_month',
         amount_cents: amountTotal,
         platform_fee_cents: platformFee,
+        deposit_cents: depositCents,
         stripe_payment_intent_id: paymentIntentId,
         status: 'succeeded',
         release_date: releaseDate,

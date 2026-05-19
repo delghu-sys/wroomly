@@ -32,7 +32,13 @@ export function AcceptedSystemCard({
   const [paying, setPaying] = useState(false)
 
   const payloadStr = rawContent.slice('::deal_accepted::'.length)
-  let data: { title?: string; type?: string; price?: number; listing_id?: string } = {}
+  let data: {
+    title?: string
+    type?: string
+    price?: number
+    deposit?: number
+    listing_id?: string
+  } = {}
   try {
     data = JSON.parse(payloadStr)
   } catch {}
@@ -108,6 +114,11 @@ export function AcceptedSystemCard({
                 ${(data.price / 100).toLocaleString()}
                 <span className="text-sm text-ink-muted font-normal"> /mo</span>
               </p>
+              {data.deposit !== undefined && data.deposit > 0 && (
+                <p className="text-[12.5px] text-ink-muted mt-1">
+                  + ${(data.deposit / 100).toLocaleString()} refundable deposit
+                </p>
+              )}
               {isConsumer && !hasPaid && (
                 <div className="mt-1.5">
                   <FeeNote variant="pill" />

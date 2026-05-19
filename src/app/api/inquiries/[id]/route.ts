@@ -46,7 +46,7 @@ export async function PATCH(
       `
       id, status, consumer_id, listing_id,
       listings:listing_id (
-        id, supplier_id, title, type, price_per_month,
+        id, supplier_id, title, type, price_per_month, deposit_amount,
         users:supplier_id ( stripe_account_id )
       )
     `
@@ -68,6 +68,7 @@ export async function PATCH(
     title: string | null
     type: string
     price_per_month: number | null
+    deposit_amount: number | null
     users: unknown
   } | null
 
@@ -133,6 +134,7 @@ export async function PATCH(
         title: listing.title ?? '',
         type: listing.type ?? 'sublet',
         price: listing.price_per_month ?? 0,
+        deposit: listing.deposit_amount ?? 0,
         listing_id: listing.id,
       })
       await service.from('messages').insert({

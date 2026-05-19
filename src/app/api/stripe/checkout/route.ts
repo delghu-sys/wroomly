@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import type Stripe from 'stripe'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { stripe, calculateFees, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
       title,
       type,
       price_per_month,
+      deposit_amount,
       supplier_id,
       available_from,
       users:supplier_id(stripe_account_id)
@@ -86,6 +88,9 @@ export async function POST(request: Request) {
   }
 
   const rentCents = listing.price_per_month ?? 0
+  // Deposit is optional — a supplier can skip it. Coerce nullish/negative
+  // values to 0 so a missing field can't break checkout.
+  const depositCents = Math.max(0, listing.deposit_amount ?? 0)
   if (rentCents <= 0) {
     return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
   }
@@ -108,7 +113,11 @@ export async function POST(request: Request) {
     )
   }
 
+  // Platform fee charged on rent only — deposit is "held" money, not
+  // consumed, and Wroomly shouldn't double-dip when it's returned. The
+  // deposit flows straight through to the supplier alongside rent.
   const { platformFee } = calculateFees(rentCents)
+  const totalSupplierAmount = rentCents + depositCents // what lands on supplier's connected account
   const releaseDate = inquiry.move_in_date ?? listing.available_from
 
   try {
@@ -134,41 +143,60 @@ export async function POST(request: Request) {
 
     const origin = process.env.NEXT_PUBLIC_APP_URL!
 
-    // Two line items so the consumer sees the rent + fee broken out in
-    // the hosted Checkout UI. The fee is the platform application fee;
-    // representing it as a Stripe line item too keeps receipts clear.
+    // Line items shown in Stripe's hosted Checkout. We show rent, deposit
+    // (if any), and the service fee as separate rows so the consumer sees
+    // exactly where their money goes. The fee is charged on rent only —
+    // the deposit is held money, not consumed.
+    const lineItems: Stripe.Checkout.SessionCreateParams['line_items'] = [
+      {
+        quantity: 1,
+        price_data: {
+          currency: 'usd',
+          unit_amount: rentCents,
+          product_data: {
+            name: `${listing.title} — first month`,
+            description: 'Rent paid to your host.',
+          },
+        },
+      },
+    ]
+
+    if (depositCents > 0) {
+      lineItems!.push({
+        quantity: 1,
+        price_data: {
+          currency: 'usd',
+          unit_amount: depositCents,
+          product_data: {
+            name: 'Security deposit',
+            description:
+              'Held by your host. Returned at the end of the lease (less any damages, by agreement).',
+          },
+        },
+      })
+    }
+
+    lineItems!.push({
+      quantity: 1,
+      price_data: {
+        currency: 'usd',
+        unit_amount: platformFee,
+        product_data: {
+          name: `Wroomly service fee (${PLATFORM_FEE_PERCENT}%)`,
+          description: 'Covers verification, escrowed payments, and in-app messaging.',
+        },
+      },
+    })
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer: customerId,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'usd',
-            unit_amount: rentCents,
-            product_data: {
-              name: `${listing.title} — first month`,
-              description: 'Rent paid to your host.',
-            },
-          },
-        },
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'usd',
-            unit_amount: platformFee,
-            product_data: {
-              name: `Wroomly service fee (${PLATFORM_FEE_PERCENT}%)`,
-              description:
-                'Covers verification, escrowed payments, and in-app messaging.',
-            },
-          },
-        },
-      ],
+      line_items: lineItems,
       // Stripe Connect — destination charge.
       // `application_fee_amount` is the slice Stripe routes back to the
-      // platform account; the remainder (rent) lands on the supplier's
-      // connected account.
+      // platform account; the remainder (rent + deposit) lands on the
+      // supplier's connected account. We deliberately do NOT charge the
+      // platform fee on the deposit portion.
       payment_intent_data: {
         application_fee_amount: platformFee,
         transfer_data: {
@@ -180,7 +208,9 @@ export async function POST(request: Request) {
           payee_id: listing.supplier_id,
           inquiry_id: inquiry.id,
           rent_cents: String(rentCents),
+          deposit_cents: String(depositCents),
           platform_fee_cents: String(platformFee),
+          supplier_total_cents: String(totalSupplierAmount),
         },
       },
       metadata: {
@@ -189,6 +219,7 @@ export async function POST(request: Request) {
         payee_id: listing.supplier_id,
         inquiry_id: inquiry.id,
         rent_cents: String(rentCents),
+        deposit_cents: String(depositCents),
         platform_fee_cents: String(platformFee),
         release_date: releaseDate ?? '',
       },
