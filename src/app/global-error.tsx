@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 
 interface GlobalErrorProps {
@@ -11,9 +12,13 @@ interface GlobalErrorProps {
  * Last-resort error boundary that runs *before* the root layout is mounted.
  * Must render its own <html>/<body>. Kept intentionally framework-bare so a
  * broken root layout can't break the recovery screen.
+ *
+ * Mirrors the error to Sentry as well as the local console so we can
+ * forensic it from outside the user's browser session.
  */
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
+    Sentry.captureException(error)
     // eslint-disable-next-line no-console
     console.error('global error boundary:', error)
   }, [error])
