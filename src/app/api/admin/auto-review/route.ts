@@ -119,8 +119,15 @@ export async function POST(request: Request) {
 
     const ids = ((pending ?? []) as { id: string }[]).map(p => p.id)
     const results = []
-    for (const id of ids) {
-      results.push(await reviewOne(service, id))
+    try {
+      for (const id of ids) {
+        results.push(await reviewOne(service, id))
+      }
+    } catch (err) {
+      return NextResponse.json(
+        { error: humanizeReviewError(err), reviewed: results.length, results },
+        { status: 502 }
+      )
     }
     return NextResponse.json({ reviewed: results.length, results })
   }
@@ -142,6 +149,40 @@ export async function POST(request: Request) {
     }
   }
 
-  const result = await reviewOne(service, body.listingId)
-  return NextResponse.json(result)
+  try {
+    const result = await reviewOne(service, body.listingId)
+    return NextResponse.json(result)
+  } catch (err) {
+    return NextResponse.json(
+      { error: humanizeReviewError(err) },
+      { status: 502 }
+    )
+  }
+}
+
+/**
+ * Translate raw Anthropic / SDK errors into messages an admin can act on
+ * from the toast in /admin/listings. The full stack is still logged to
+ * Vercel for debugging — this is just the user-facing summary.
+ */
+function humanizeReviewError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err)
+  console.error('[auto-review] reviewListing failed:', err)
+
+  if (msg.includes('ANTHROPIC_API_KEY')) {
+    return 'AI moderation is not configured (missing API key). Reviews will be manual until this is set.'
+  }
+  if (msg.includes('credit balance is too low')) {
+    return 'Anthropic credit balance is too low. Top up at console.anthropic.com → Billing.'
+  }
+  if (msg.includes('invalid x-api-key') || msg.includes('authentication')) {
+    return 'Anthropic API key is invalid or revoked. Rotate it in Vercel.'
+  }
+  if (msg.includes('not_found_error') && msg.includes('model')) {
+    return 'AI model name is invalid (deprecated?). Tell engineering to update lib/reviewers/listing-reviewer.ts.'
+  }
+  if (msg.includes('rate_limit')) {
+    return 'Anthropic rate limit hit. Try again in a minute.'
+  }
+  return `AI review failed: ${msg.slice(0, 200)}`
 }
