@@ -175,7 +175,11 @@ export function InquiryModal({
             className="absolute inset-0 bg-[oklch(0.10_0.02_260/0.55)] backdrop-blur-sm"
           />
 
-          {/* Morphing modal — spring expand from center */}
+          {/* Morphing modal — spring expand from center.
+              Uses flex column so the form below grows to fill leftover
+              space after the header (no magic-number height calcs). dvh
+              instead of vh to handle iOS Safari's dynamic URL bar
+              correctly. */}
           <motion.div
             ref={dialogRef}
             initial={{ opacity: 0, scale: 0.9, y: 40 }}
@@ -184,7 +188,7 @@ export function InquiryModal({
             transition={spring}
             className="
               relative w-full sm:max-w-lg
-              max-h-[92vh] overflow-hidden
+              max-h-[92dvh] flex flex-col overflow-hidden
               rounded-t-3xl sm:rounded-3xl
               bg-white border border-line
               shadow-[0_30px_80px_oklch(0.10_0.02_260/0.30)]
@@ -207,10 +211,13 @@ export function InquiryModal({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25 }}
-                  className="relative"
+                  // flex-1 + min-h-0 lets the form below grow to fill
+                  // whatever's left after the header, instead of relying
+                  // on a hardcoded subtract-the-header-height calc.
+                  className="relative flex flex-col flex-1 min-h-0"
                 >
-                  {/* Header */}
-                  <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-start gap-4 border-b border-line">
+                  {/* Header — natural height, never compresses */}
+                  <div className="shrink-0 px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-start gap-4 border-b border-line">
                     <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-[oklch(0.95_0.01_85)] ring-1 ring-line">
                       {listing.thumbnailUrl ? (
                         <Image
@@ -244,10 +251,14 @@ export function InquiryModal({
                     </button>
                   </div>
 
-                  {/* Form */}
+                  {/* Form — fills the rest of the modal and scrolls
+                      inside itself when content exceeds available space.
+                      overscroll-contain prevents the page behind from
+                      scrolling along when the user hits the form's
+                      scroll edges (annoying on iOS). */}
                   <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className="px-5 sm:px-6 py-5 space-y-4 max-h-[calc(92vh-180px)] overflow-y-auto"
+                    className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 sm:px-6 py-5 space-y-4"
                   >
                     {/* Message */}
                     <div className="space-y-2">
@@ -364,7 +375,7 @@ export function InquiryModal({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={popSpring}
-                  className="relative px-6 py-14 text-center"
+                  className="relative flex-1 flex flex-col items-center justify-center px-6 py-14 text-center"
                 >
                   {/* Particle burst — skipped for reduced-motion users. */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
