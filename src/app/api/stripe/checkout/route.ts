@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       id,
       title,
       type,
+      status,
       price_per_month,
       deposit_amount,
       supplier_id,
@@ -84,6 +85,22 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: 'Listing not available for payment' },
       { status: 404 }
+    )
+  }
+
+  // Block new checkouts when the place is already booked. A supplier
+  // can accept multiple inquiries — those consumers race to pay — and
+  // once one wins, the others must be turned away here rather than
+  // letting them complete the Stripe session and double-charge. The
+  // webhook also has a safety net for truly-simultaneous payments
+  // (refunds the loser).
+  if (listing.status !== 'active') {
+    return NextResponse.json(
+      {
+        error:
+          'This place was just booked by someone else. Your inquiry was closed and no payment was taken.',
+      },
+      { status: 409 }
     )
   }
 

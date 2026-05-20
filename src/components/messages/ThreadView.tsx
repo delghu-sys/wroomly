@@ -17,6 +17,7 @@ import { AcceptedSystemCard } from './AcceptedSystemCard'
 const DEAL_ACCEPTED_PREFIX = '::deal_accepted::'
 const PAYMENT_REQUEST_PREFIX = '::payment_request::'
 const PAID_PREFIX = '::paid::'
+const BOOKED_BY_OTHER_PREFIX = '::booked_by_other::'
 
 interface ConversationData {
   id: string
@@ -268,6 +269,29 @@ export function ThreadView({
                       }}
                     >
                       Payment received · booking confirmed
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+
+            // System pill posted when this inquiry was beaten to the
+            // payment by another accepted consumer on the same listing.
+            // No payment was taken from the recipient (any duplicate
+            // charge was auto-refunded by the webhook).
+            if (msg.content.startsWith(BOOKED_BY_OTHER_PREFIX)) {
+              return (
+                <div key={msg.id}>
+                  {showDate && <DateSeparator iso={msg.created_at} />}
+                  <div className="flex justify-center my-3">
+                    <div
+                      className="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12px] font-semibold text-center max-w-[320px] leading-snug"
+                      style={{
+                        background: 'oklch(0.95 0.04 25)',
+                        color: 'oklch(0.45 0.15 25)',
+                      }}
+                    >
+                      This place was booked by someone else. No payment taken.
                     </div>
                   </div>
                 </div>

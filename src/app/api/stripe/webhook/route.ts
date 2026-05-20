@@ -161,6 +161,86 @@ async function handleCheckoutCompleted(
   // Clamp release_date — same logic as the payment-intent route.
   const releaseDate = clampReleaseDate(metaReleaseDate)
 
+  // ── Idempotency check (webhook retry safety) ───────────────────────
+  // Stripe retries webhooks with exponential backoff on non-2xx responses.
+  // The transactions table has UNIQUE(stripe_payment_intent_id) from 007,
+  // so re-running the upsert below is safe — but we also need to skip the
+  // listing-status flip and system message on retries so we don't auto-
+  // decline the same losing inquiries twice.
+  const { data: existingTxForThisPi } = await supabase
+    .from('transactions')
+    .select('id')
+    .eq('stripe_payment_intent_id', paymentIntentId)
+    .maybeSingle()
+  const isRetry = !!existingTxForThisPi
+
+  // ── Atomic race claim ──────────────────────────────────────────────
+  // Try to flip the listing from `active` → `rented`. The WHERE clause
+  // makes this a single Postgres operation, so when two webhooks fire
+  // simultaneously only one update succeeds. The loser refunds itself
+  // and bails out below.
+  let wonRace = isRetry // a retry inherits the original win
+  if (!isRetry) {
+    const { data: updatedListings } = await supabase
+      .from('listings')
+      .update({ status: 'rented' })
+      .eq('id', listingId)
+      .eq('status', 'active')
+      .select('id')
+    wonRace = !!updatedListings && updatedListings.length > 0
+  }
+
+  if (!wonRace) {
+    // We lost the race — another consumer's payment landed first and
+    // already marked the listing rented. Refund this payment so the
+    // consumer isn't charged for a place they didn't get. We do NOT
+    // insert a transaction row; the refund will fire a separate webhook
+    // that handles the bookkeeping.
+    console.warn('[webhook] lost booking race, refunding duplicate payment', {
+      paymentIntentId,
+      listingId,
+      payerId,
+    })
+    try {
+      await stripe.refunds.create({
+        payment_intent: paymentIntentId,
+        reason: 'requested_by_customer',
+        metadata: {
+          reason: 'listing_already_rented',
+          listing_id: listingId,
+          payer_id: payerId,
+        },
+      })
+    } catch (err) {
+      console.error('[webhook] failed to refund losing payment', err)
+    }
+
+    // Tell the losing consumer in their chat thread, so they don't sit
+    // around wondering what happened.
+    if (inquiryId) {
+      const { data: convo } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('inquiry_id', inquiryId)
+        .maybeSingle()
+      if (convo) {
+        await supabase.from('messages').insert({
+          conversation_id: convo.id,
+          sender_id: payeeId, // posted "from" the supplier
+          content: '::booked_by_other::',
+        })
+      }
+      // Mark the inquiry rejected so the listing detail page no longer
+      // shows the "pay now" CTA to this consumer.
+      await supabase
+        .from('inquiries')
+        .update({ status: 'rejected' })
+        .eq('id', inquiryId)
+    }
+    return
+  }
+
+  // ── Won the race — record the transaction ──────────────────────────
   // INSERT … ON CONFLICT DO UPDATE so concurrent webhook + success-page
   // retries don't crash on the UNIQUE constraint added in migration 007.
   await supabase
@@ -184,10 +264,42 @@ async function handleCheckoutCompleted(
       { onConflict: 'stripe_payment_intent_id' }
     )
 
-  await supabase
-    .from('listings')
-    .update({ status: 'rented' })
-    .eq('id', listingId)
+  // Auto-decline OTHER accepted-but-unpaid inquiries on the same listing.
+  // Suppliers can accept multiple consumers; first-to-pay wins, the
+  // others get a system message explaining and their inquiry closes.
+  // Skip on retries to avoid double-posting messages.
+  if (!isRetry) {
+    const { data: losingInquiries } = await supabase
+      .from('inquiries')
+      .select('id, consumer_id')
+      .eq('listing_id', listingId)
+      .eq('status', 'accepted')
+      .neq('consumer_id', payerId)
+
+    if (losingInquiries && losingInquiries.length > 0) {
+      const losingIds = losingInquiries.map(i => i.id)
+      await supabase
+        .from('inquiries')
+        .update({ status: 'rejected' })
+        .in('id', losingIds)
+
+      // Post a system message in each losing conversation.
+      for (const inq of losingInquiries) {
+        const { data: convo } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('inquiry_id', inq.id)
+          .maybeSingle()
+        if (convo) {
+          await supabase.from('messages').insert({
+            conversation_id: convo.id,
+            sender_id: payeeId, // from the supplier
+            content: '::booked_by_other::',
+          })
+        }
+      }
+    }
+  }
 
   if (inquiryId) {
     const { data: convo } = await supabase

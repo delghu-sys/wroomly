@@ -58,6 +58,8 @@ function previewLabel(content: string): { text: string; icon?: 'payment' | 'acce
   if (content.startsWith('::deal_accepted::'))
     return { text: 'Inquiry accepted', icon: 'accepted' }
   if (content.startsWith('::paid::')) return { text: 'Payment confirmed', icon: 'accepted' }
+  if (content.startsWith('::booked_by_other::'))
+    return { text: 'Booked by someone else' }
   return { text: content }
 }
 
