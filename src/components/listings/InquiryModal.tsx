@@ -161,8 +161,13 @@ export function InquiryModal({
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6">
-          {/* Backdrop */}
+        // On mobile we go full-screen (items-stretch + p-0) so the modal
+        // owns the whole viewport — no grey backdrop visible around the
+        // edges. On sm+ we center it as a card.
+        <div className="fixed inset-0 z-[100] flex items-stretch sm:items-center justify-center p-0 sm:p-6">
+          {/* Backdrop — visible only on sm+ where the modal is a card.
+              On mobile the modal fills the screen so this is invisible
+              anyway, but we keep it for the entrance fade. */}
           <motion.button
             type="button"
             aria-label="Close inquiry"
@@ -174,26 +179,24 @@ export function InquiryModal({
             className="absolute inset-0 bg-[oklch(0.10_0.02_260/0.55)] backdrop-blur-sm"
           />
 
-          {/* Morphing modal — spring expand from center.
-              Uses flex column so the form below grows to fill leftover
-              space after the header (no magic-number height calcs). dvh
-              instead of vh to handle iOS Safari's dynamic URL bar
-              correctly. */}
+          {/* Modal surface.
+              Mobile: w-full + h-[100dvh] = literally the whole screen,
+                no rounded corners (looks like an app screen, not a
+                floating card). dvh keeps iOS Safari's URL bar from
+                eating into our height as it expands/collapses.
+              Desktop: max-w-xl card, max-h-[92dvh], rounded-3xl. */}
           <motion.div
             ref={dialogRef}
-            initial={{ opacity: 0, scale: 0.9, y: 40 }}
+            initial={{ opacity: 0, scale: 0.95, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 24 }}
+            exit={{ opacity: 0, scale: 0.97, y: 12 }}
             transition={spring}
-            // Width: capped to sm:max-w-xl (wider than the previous lg)
-            // so two-line titles + the dates row + the price strip all
-            // fit comfortably without pinching. dvh for iOS Safari.
             className="
-              relative w-full sm:max-w-xl
-              max-h-[92dvh] flex flex-col overflow-hidden
-              rounded-t-3xl sm:rounded-3xl
-              bg-white border border-line
-              shadow-[0_30px_80px_oklch(0.10_0.02_260/0.30)]
+              relative w-full h-[100dvh] sm:h-auto sm:max-w-xl sm:max-h-[92dvh]
+              flex flex-col overflow-hidden
+              rounded-none sm:rounded-3xl
+              bg-white sm:border sm:border-line
+              shadow-none sm:shadow-[0_30px_80px_oklch(0.10_0.02_260/0.30)]
             "
             role="dialog"
             aria-modal="true"
@@ -245,12 +248,17 @@ export function InquiryModal({
 
                   {/* Form — fills the rest of the modal and scrolls
                       inside itself when content exceeds available space.
-                      overscroll-contain prevents the page behind from
-                      scrolling along when the user hits the form's
-                      scroll edges (annoying on iOS). */}
+                      `touch-pan-y` + `-webkit-overflow-scrolling: touch`
+                      (via inline style) give iOS proper momentum scroll.
+                      overscroll-contain stops the page behind from
+                      scrolling when the user hits the form's edges.
+                      Extra bottom padding so the Send button isn't
+                      flush with the bottom edge of the viewport on
+                      mobile. */}
                   <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5 sm:px-6 py-5 space-y-4"
+                    className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y px-5 sm:px-6 pt-5 pb-8 sm:pb-6 space-y-4"
+                    style={{ WebkitOverflowScrolling: 'touch' }}
                   >
                     {/* Message */}
                     <div className="space-y-2">
