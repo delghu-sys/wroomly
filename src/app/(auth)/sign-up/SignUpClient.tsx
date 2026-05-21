@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'motion/react'
 import { useForm, Controller } from 'react-hook-form'
@@ -77,7 +77,18 @@ const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
 export default function SignUpClient() {
   const router = useRouter()
-  const [role, setRole] = useState<Role | null>(null)
+  const searchParams = useSearchParams()
+  // Read ?as=supplier (or consumer) from the URL so deep-links from the
+  // landing page's "List your place" CTA skip the role-picker step the
+  // user has effectively already answered. Invalid values just fall
+  // through to the standard picker.
+  const initialRole: Role | null =
+    searchParams.get('as') === 'supplier'
+      ? 'supplier'
+      : searchParams.get('as') === 'consumer'
+        ? 'consumer'
+        : null
+  const [role, setRole] = useState<Role | null>(initialRole)
   const [pendingRole, setPendingRole] = useState<Role | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

@@ -89,7 +89,7 @@ export function HomeHero() {
                   Browse listings
                 </MagneticButton>
               </Link>
-              <Link href="/sign-up">
+              <Link href="/list-place">
                 <MagneticButton variant="secondary">
                   List your place
                 </MagneticButton>

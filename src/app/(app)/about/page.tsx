@@ -200,7 +200,7 @@ export default function AboutPage() {
                   Browse listings
                 </MagneticButton>
               </Link>
-              <Link href="/sign-up">
+              <Link href="/list-place">
                 <MagneticButton variant="secondary">List your place</MagneticButton>
               </Link>
             </div>

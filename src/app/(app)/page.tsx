@@ -275,7 +275,7 @@ export default async function HomePage() {
               or co-op.
             </p>
             <div className="mt-10">
-              <Link href="/sign-up">
+              <Link href="/list-place">
                 <MagneticButton variant="primary" showArrow>
                   List your place — it&rsquo;s free
                 </MagneticButton>
