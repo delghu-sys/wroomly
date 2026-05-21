@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import SignUpClient from './SignUpClient'
 
 // The desired title doesn't fit the "%s | Wroomly" template — use `absolute`
@@ -25,5 +26,13 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <SignUpClient />
+  // useSearchParams() inside SignUpClient forces a Suspense boundary
+  // during prerender — Next refuses to statically generate the page
+  // without one. Wrapping here keeps the page eligible for partial
+  // prerendering while letting the role-picker hydrate from ?as=...
+  return (
+    <Suspense fallback={null}>
+      <SignUpClient />
+    </Suspense>
+  )
 }
