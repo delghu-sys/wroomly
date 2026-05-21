@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 import { createClient } from '@/lib/supabase/client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Calendar, Loader2, BedDouble, Send, CheckCircle2 } from 'lucide-react'
+import { X, Calendar, Loader2, Send, CheckCircle2 } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { Label } from '@/components/ui/label'
@@ -219,42 +218,28 @@ export function InquiryModal({
                   // on a hardcoded subtract-the-header-height calc.
                   className="relative flex flex-col flex-1 min-h-0"
                 >
-                  {/* Header — natural height, never compresses.
-                      Slightly more breathing room (pt-6 sm:pt-7) so the
-                      thumbnail doesn't feel glued to the edge. Title
-                      can wrap to 2 lines so longer listing names don't
-                      get truncated mid-word. */}
-                  <div className="shrink-0 px-5 sm:px-6 pt-6 sm:pt-7 pb-4 flex items-start gap-4 border-b border-line">
-                    <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-[oklch(0.95_0.01_85)] ring-1 ring-line">
-                      {listing.thumbnailUrl ? (
-                        <Image
-                          src={listing.thumbnailUrl}
-                          alt={listing.title}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <BedDouble className="w-5 h-5 text-ink-muted/40" />
-                        </div>
-                      )}
-                    </div>
+                  {/* Header — focused on the action ("Send inquiry")
+                      with the listing context as supporting text below.
+                      The thumbnail was redundant with the listing page
+                      behind the modal; dropping it gives the title room
+                      to breathe and removes the "empty bed-icon" look
+                      when a listing has no photos. */}
+                  <div className="shrink-0 px-5 sm:px-7 pt-6 sm:pt-7 pb-5 flex items-start justify-between gap-4 border-b border-line/70">
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted font-semibold">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-2">
                         Send inquiry
                       </p>
-                      <p className="font-display text-lg sm:text-xl tracking-tight text-ink leading-tight line-clamp-2 mt-1">
+                      <h2 className="font-display text-[1.35rem] sm:text-2xl tracking-tight text-ink leading-[1.15]">
                         {listing.title}
-                      </p>
+                      </h2>
                     </div>
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-ink-muted hover:bg-ink-muted/10 transition-colors active:scale-95 shrink-0"
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-ink-muted hover:bg-ink-muted/10 transition-all duration-200 ease-out active:scale-95 shrink-0 -mr-1"
                       aria-label="Close"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" strokeWidth={2.25} />
                     </button>
                   </div>
 
