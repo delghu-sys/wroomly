@@ -59,3 +59,11 @@ When the user says "check sentry" (or anything similar — "look at sentry", "fi
 
 5. **If unsure**, list the issue in your reply WITHOUT opening a PR. Under-fixing is safer than auto-merging nonsense.
 <!-- END:sentry-auto-fix -->
+
+<!-- BEGIN:parked-features -->
+# Parked features — designs ready, not yet built
+
+When the user says "let's build monthly payments" / "recurring rent" / "Option C", or asks how to charge subsequent months: read **`docs/recurring-rent-design.md`** first. It has the full architecture (migration 013, save-card-at-checkout, nightly cron, retry policy, cancellation flow, edge cases, ~31h effort estimate) so you don't redesign it from scratch.
+
+The decision to defer until after 5 beta users validate the basic flow was deliberate — don't ship recurring before validation unless the user explicitly overrides.
+<!-- END:parked-features -->
