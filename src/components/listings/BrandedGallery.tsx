@@ -191,16 +191,22 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
         )}
       </div>
 
-      {/* Lightbox */}
-      {lightboxOpen && (
-        <div
-          ref={lightboxRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Photo lightbox — ${title}`}
-          className="fixed inset-0 z-[100] bg-[oklch(0.10_0.02_260/0.97)] flex items-center justify-center backdrop-blur-sm"
-          onClick={() => setLightboxOpen(false)}
-        >
+      {/* Lightbox — wrapped in AnimatePresence so the open/close fade
+          isn't a hard cut. Backdrop fades, image scales up subtly. */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            ref={lightboxRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Photo lightbox — ${title}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[100] bg-[oklch(0.10_0.02_260/0.97)] flex items-center justify-center backdrop-blur-sm"
+            onClick={() => setLightboxOpen(false)}
+          >
           <button
             onClick={() => setLightboxOpen(false)}
             className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/[0.08] hover:bg-white/[0.15] backdrop-blur flex items-center justify-center transition-colors"
@@ -238,9 +244,13 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             </>
           )}
 
-          <div
+          <motion.div
             className="relative w-full max-w-5xl max-h-[85vh] mx-4 aspect-auto"
             onClick={e => e.stopPropagation()}
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.97, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 28 }}
           >
             <Image
               src={getListingImageUrl(images[current].storage_path)}
@@ -251,9 +261,10 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
               className="object-contain w-full h-full max-h-[85vh] rounded-2xl"
               sizes="100vw"
             />
-          </div>
-        </div>
-      )}
+          </motion.div>
+        </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

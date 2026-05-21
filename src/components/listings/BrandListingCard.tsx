@@ -56,7 +56,10 @@ export function BrandListingCard({
 
   return (
     <TiltCard className="rounded-3xl h-full">
-      <Link href={`/listings/${listing.id}`} className="group block h-full">
+      <Link
+        href={`/listings/${listing.id}`}
+        className="group block h-full transition-transform duration-200 ease-out active:scale-[0.985] motion-reduce:active:scale-100"
+      >
         <div className="relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden shadow-[0_2px_16px_oklch(0_0_0/0.05)] hover:shadow-[0_18px_50px_oklch(0_0_0/0.10)] transition-shadow duration-500">
           {/* Image with zoom on hover */}
           <div className="relative aspect-[4/3] bg-[oklch(0.95_0.01_85)] overflow-hidden">
