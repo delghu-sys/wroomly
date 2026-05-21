@@ -186,8 +186,11 @@ export function InquiryModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 24 }}
             transition={spring}
+            // Width: capped to sm:max-w-xl (wider than the previous lg)
+            // so two-line titles + the dates row + the price strip all
+            // fit comfortably without pinching. dvh for iOS Safari.
             className="
-              relative w-full sm:max-w-lg
+              relative w-full sm:max-w-xl
               max-h-[92dvh] flex flex-col overflow-hidden
               rounded-t-3xl sm:rounded-3xl
               bg-white border border-line
@@ -216,8 +219,12 @@ export function InquiryModal({
                   // on a hardcoded subtract-the-header-height calc.
                   className="relative flex flex-col flex-1 min-h-0"
                 >
-                  {/* Header — natural height, never compresses */}
-                  <div className="shrink-0 px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-start gap-4 border-b border-line">
+                  {/* Header — natural height, never compresses.
+                      Slightly more breathing room (pt-6 sm:pt-7) so the
+                      thumbnail doesn't feel glued to the edge. Title
+                      can wrap to 2 lines so longer listing names don't
+                      get truncated mid-word. */}
+                  <div className="shrink-0 px-5 sm:px-6 pt-6 sm:pt-7 pb-4 flex items-start gap-4 border-b border-line">
                     <div className="relative w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-[oklch(0.95_0.01_85)] ring-1 ring-line">
                       {listing.thumbnailUrl ? (
                         <Image
@@ -237,7 +244,7 @@ export function InquiryModal({
                       <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted font-semibold">
                         Send inquiry
                       </p>
-                      <p className="font-display text-lg sm:text-xl tracking-tight text-ink leading-tight line-clamp-1 mt-1">
+                      <p className="font-display text-lg sm:text-xl tracking-tight text-ink leading-tight line-clamp-2 mt-1">
                         {listing.title}
                       </p>
                     </div>

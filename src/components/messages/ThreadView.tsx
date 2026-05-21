@@ -118,7 +118,10 @@ export function ThreadView({
     router.refresh()
   }, [router])
 
-  // Realtime subscription
+  // Realtime subscription — listens for both INSERT (new messages from
+  // either side) and UPDATE (e.g. is_read flipping when the other party
+  // opens the thread). The UPDATE listener is what makes the sender's
+  // single-check (delivered) flip to double-check (read) live.
   useEffect(() => {
     const channel = supabase
       .channel(`conversation:${conversation.id}`)
@@ -133,7 +136,22 @@ export function ThreadView({
         payload => {
           const newMsg = payload.new as Message
           setMessages(prev => {
+            // De-dupe by real id (handles realtime echo of our own
+            // server insert) AND by content match against pending
+            // optimistic messages (so the temp row gets replaced by
+            // the real one instead of duplicated).
             if (prev.some(m => m.id === newMsg.id)) return prev
+            const optimisticIdx = prev.findIndex(
+              m =>
+                m.id.startsWith('temp-') &&
+                m.sender_id === newMsg.sender_id &&
+                m.content === newMsg.content,
+            )
+            if (optimisticIdx >= 0) {
+              const next = [...prev]
+              next[optimisticIdx] = newMsg
+              return next
+            }
             return [...prev, newMsg]
           })
           setFreshIds(prev => {
@@ -142,13 +160,35 @@ export function ThreadView({
             return next
           })
           if (newMsg.sender_id !== currentUserId) {
+            // Mark read immediately on the client (don't wait for a
+            // server round-trip + refresh — it makes the unread badge
+            // lag). The DB update + nav refresh still happen below.
             supabase
               .from('messages')
               .update({ is_read: true })
               .eq('id', newMsg.id)
               .then(() => router.refresh())
           }
-        }
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversation.id}`,
+        },
+        payload => {
+          // Reflect read-receipt and other field changes onto our
+          // in-memory list. This is what makes the sender's "delivered"
+          // check turn into "read" double-check as soon as the other
+          // person opens the thread.
+          const updated = payload.new as Message
+          setMessages(prev =>
+            prev.map(m => (m.id === updated.id ? { ...m, ...updated } : m)),
+          )
+        },
       )
       .subscribe()
 
@@ -158,12 +198,49 @@ export function ThreadView({
   }, [conversation.id, currentUserId, supabase, router])
 
   async function handleSend(text: string) {
-    const { error } = await supabase.from('messages').insert({
+    // Optimistic insert: stick a temp message into local state
+    // immediately so the bubble appears the instant the user hits send.
+    // Realtime will replace this temp row with the real one once the
+    // DB returns (see INSERT handler above — it swaps by matching
+    // sender + content).
+    const tempId = `temp-${crypto.randomUUID()}`
+    const tempMsg: Message = {
+      id: tempId,
       conversation_id: conversation.id,
       sender_id: currentUserId,
       content: text,
+      created_at: new Date().toISOString(),
+      is_read: false,
+    }
+    setMessages(prev => [...prev, tempMsg])
+    setFreshIds(prev => {
+      const next = new Set(prev)
+      next.add(tempId)
+      return next
     })
-    if (error) throw error
+
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: conversation.id,
+        sender_id: currentUserId,
+        content: text,
+      })
+      .select('*')
+      .single()
+
+    if (error) {
+      // Roll the optimistic message back out so the user sees the send failed.
+      setMessages(prev => prev.filter(m => m.id !== tempId))
+      throw error
+    }
+
+    if (data) {
+      // Replace temp with real, in case realtime hasn't fired yet.
+      setMessages(prev =>
+        prev.map(m => (m.id === tempId ? (data as Message) : m)),
+      )
+    }
   }
 
   const listing = conversation.listings

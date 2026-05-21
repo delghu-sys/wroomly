@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { Message, InquiryStatus } from '@/types/database'
 import { MessagesShell } from '@/components/messages/MessagesShell'
 import { ThreadView } from '@/components/messages/ThreadView'
@@ -110,8 +110,13 @@ export default async function ConversationPage({
   const messages = (messagesRes.data ?? []) as Message[]
   const hasPaid = !!paidRes.data
 
-  // Mark-as-read is a side effect; don't block the render on it.
-  void supabase
+  // Mark all unread messages from the other party as read. Awaited so
+  // the row updates definitely commit (the old `void` + auth-bound
+  // client was unreliable — Next.js Server Components don't guarantee
+  // fire-and-forget queries execute, and RLS-bound writes can get
+  // dropped silently). Service role bypasses RLS; the auth check on
+  // user.id above already gates this route.
+  await createServiceClient()
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', id)
