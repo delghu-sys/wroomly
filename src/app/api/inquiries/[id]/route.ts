@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email/send'
+import { inquiryAcceptedEmail, inquiryDeclinedEmail } from '@/lib/email/templates'
 
 /**
  * PATCH /api/inquiries/[id]
@@ -122,6 +124,7 @@ export async function PATCH(
 
   // On accept, post the `::deal_accepted::` system message so the
   // consumer sees the payment CTA in the chat thread.
+  let convoId: string | null = null
   if (body.action === 'accept') {
     const { data: convo } = await service
       .from('conversations')
@@ -130,6 +133,7 @@ export async function PATCH(
       .maybeSingle()
 
     if (convo) {
+      convoId = convo.id
       const payload = JSON.stringify({
         title: listing.title ?? '',
         type: listing.type ?? 'sublet',
@@ -145,5 +149,60 @@ export async function PATCH(
     }
   }
 
+  // Email the consumer the accept/decline outcome. Fire-and-forget — the
+  // status update + system message already landed; the email is bonus.
+  void sendOutcomeEmail({
+    action: body.action,
+    consumerId: inquiry.consumer_id,
+    supplierId: listing.supplier_id,
+    listingTitle: listing.title ?? 'Wroomly listing',
+    conversationId: convoId,
+  })
+
   return NextResponse.json({ ok: true, status: nextStatus })
+}
+
+/**
+ * Look up the consumer + supplier, render the right outcome email,
+ * and ship it. Awaited inside a `void` so the parent response isn't
+ * blocked by Resend's RTT.
+ */
+async function sendOutcomeEmail(opts: {
+  action: 'accept' | 'decline'
+  consumerId: string
+  supplierId: string
+  listingTitle: string
+  conversationId: string | null
+}) {
+  try {
+    const svc = createServiceClient()
+    const [{ data: consumer }, { data: supplier }] = await Promise.all([
+      svc.from('users').select('email, full_name').eq('id', opts.consumerId).maybeSingle(),
+      svc.from('users').select('full_name').eq('id', opts.supplierId).maybeSingle(),
+    ])
+    if (!consumer?.email) return
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
+
+    if (opts.action === 'accept') {
+      const { subject, html } = inquiryAcceptedEmail({
+        consumerName: consumer.full_name,
+        supplierName: supplier?.full_name ?? null,
+        listingTitle: opts.listingTitle,
+        conversationUrl: opts.conversationId
+          ? `${appUrl}/messages/${opts.conversationId}`
+          : `${appUrl}/applications`,
+      })
+      await sendEmail({ to: consumer.email, subject, html })
+    } else {
+      const { subject, html } = inquiryDeclinedEmail({
+        consumerName: consumer.full_name,
+        listingTitle: opts.listingTitle,
+        browseUrl: `${appUrl}/listings`,
+      })
+      await sendEmail({ to: consumer.email, subject, html })
+    }
+  } catch (err) {
+    console.error('[inquiry-outcome-email] failed', err)
+  }
 }

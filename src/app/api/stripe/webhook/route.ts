@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe, calculateFees } from '@/lib/stripe'
 import { createServiceClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email/send'
+import {
+  paymentConfirmedConsumerEmail,
+  paymentConfirmedSupplierEmail,
+} from '@/lib/email/templates'
 import type Stripe from 'stripe'
 
 /**
@@ -133,7 +138,7 @@ async function handleCheckoutCompleted(
   // listing so a bug or future caller can't poison the transaction row.
   const { data: listing } = await supabase
     .from('listings')
-    .select('id, supplier_id, price_per_month, deposit_amount')
+    .select('id, supplier_id, price_per_month, deposit_amount, title')
     .eq('id', listingId)
     .single()
 
@@ -301,6 +306,7 @@ async function handleCheckoutCompleted(
     }
   }
 
+  let convoIdForEmail: string | null = null
   if (inquiryId) {
     const { data: convo } = await supabase
       .from('conversations')
@@ -308,6 +314,7 @@ async function handleCheckoutCompleted(
       .eq('inquiry_id', inquiryId)
       .maybeSingle()
     if (convo) {
+      convoIdForEmail = convo.id
       // Already-posted ::paid:: is idempotent thanks to our LIKE check.
       const { data: existing } = await supabase
         .from('messages')
@@ -323,6 +330,88 @@ async function handleCheckoutCompleted(
         })
       }
     }
+  }
+
+  // Fire booking-confirmation emails to both parties. Best-effort —
+  // payment + DB updates already landed; this is the courtesy ping
+  // outside the app so both sides know it's real.
+  if (wonRace) {
+    void sendBookingEmails({
+      payerId,
+      payeeId,
+      listingTitle: listing.title ?? 'Wroomly listing',
+      amountCents: amountTotal,
+      supplierAmountCents: amountTotal - applicationFeeCents,
+      releaseDate,
+      conversationId: convoIdForEmail,
+    })
+  }
+}
+
+async function sendBookingEmails(opts: {
+  payerId: string
+  payeeId: string
+  listingTitle: string
+  amountCents: number
+  supplierAmountCents: number
+  releaseDate: string | null
+  conversationId: string | null
+}) {
+  try {
+    const svc = createServiceClient()
+    const [{ data: consumer }, { data: supplier }] = await Promise.all([
+      svc
+        .from('users')
+        .select('email, full_name')
+        .eq('id', opts.payerId)
+        .maybeSingle(),
+      svc
+        .from('users')
+        .select('email, full_name')
+        .eq('id', opts.payeeId)
+        .maybeSingle(),
+    ])
+
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
+    const formatCentsUsd = (c: number) =>
+      `$${(c / 100).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`
+    const moveInLabel = opts.releaseDate
+      ? new Date(opts.releaseDate).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : null
+    const conversationUrl = opts.conversationId
+      ? `${appUrl}/messages/${opts.conversationId}`
+      : `${appUrl}/applications`
+
+    if (consumer?.email) {
+      const { subject, html } = paymentConfirmedConsumerEmail({
+        consumerName: consumer.full_name,
+        listingTitle: opts.listingTitle,
+        amountPaid: formatCentsUsd(opts.amountCents),
+        moveInDate: moveInLabel,
+        conversationUrl,
+      })
+      await sendEmail({ to: consumer.email, subject, html })
+    }
+
+    if (supplier?.email) {
+      const { subject, html } = paymentConfirmedSupplierEmail({
+        supplierName: supplier.full_name,
+        consumerName: consumer?.full_name ?? null,
+        listingTitle: opts.listingTitle,
+        supplierAmount: formatCentsUsd(opts.supplierAmountCents),
+        payoutsUrl: `${appUrl}/payouts`,
+      })
+      await sendEmail({ to: supplier.email, subject, html })
+    }
+  } catch (err) {
+    console.error('[booking-confirmation-emails] failed', err)
   }
 }
 

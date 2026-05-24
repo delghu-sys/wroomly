@@ -145,6 +145,13 @@ export function InquiryModal({
       content: data.message,
     })
 
+    // Fire-and-forget supplier notification email. We don't await —
+    // the inquiry + chat are already saved, the email is bonus. Any
+    // failure is logged server-side and surfaced via Sentry.
+    fetch(`/api/inquiries/${inquiry.id}/notify-created`, {
+      method: 'POST',
+    }).catch(() => {})
+
     // Success phase — show in-modal confirmation, then close + navigate
     setPhase('success')
     setTimeout(() => {
