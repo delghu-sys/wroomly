@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import type { ListingWithDetails } from '@/types/database'
 import { ListingsFilters } from '@/components/listings/ListingsFilters'
 import { QuickFilterChips } from '@/components/listings/QuickFilterChips'
+import { SaveSearchButton } from '@/components/listings/SaveSearchButton'
 import { ListingsMap, type MapListing } from '@/components/listings/ListingsMap'
 import { ListingsQuickFilters } from '@/components/listings/ListingsQuickFilters'
 import { MobileFilterSheet } from '@/components/listings/MobileFilterSheet'
@@ -188,11 +189,17 @@ export default async function ListingsPage({
 
       {/* ── Content area ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        {/* Preset quick filters — one-tap chips for the common cases.
-            Mobile users browse without ever opening the sidebar, so
-            these need to be reachable from the first scroll position. */}
-        <div className="mb-4">
-          <QuickFilterChips currentFilters={filters} />
+        {/* Preset quick filters + save-search action. Mobile users
+            browse without opening the sidebar, so these need to be
+            reachable from the first scroll position. */}
+        <div className="mb-4 flex items-center gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <QuickFilterChips currentFilters={filters} />
+          </div>
+          <SaveSearchButton
+            currentFilters={filters}
+            authed={!!authUser}
+          />
         </div>
 
         {/* Active filters + count strip */}

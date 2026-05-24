@@ -199,6 +199,9 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
                         <DropdownMenuItem onClick={nav('/favorites')} className="rounded-lg">
                           Saved listings
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={nav('/saved-searches')} className="rounded-lg">
+                          Saved searches
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={nav('/applications')} className="rounded-lg">
                           Applications
                         </DropdownMenuItem>
@@ -324,6 +327,9 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
                   <>
                     <MobileLink href="/favorites" onClick={() => setMobileOpen(false)}>
                       Saved listings
+                    </MobileLink>
+                    <MobileLink href="/saved-searches" onClick={() => setMobileOpen(false)}>
+                      Saved searches
                     </MobileLink>
                     <MobileLink href="/applications" onClick={() => setMobileOpen(false)}>
                       Applications

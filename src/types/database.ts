@@ -228,6 +228,16 @@ export interface Transaction {
   created_at: string
 }
 
+export interface SavedSearch {
+  id: string
+  user_id: string
+  name: string | null
+  filters: Record<string, string>
+  email_alerts: boolean
+  last_alerted_at: string
+  created_at: string
+}
+
 export interface Review {
   id: string
   listing_id: string
