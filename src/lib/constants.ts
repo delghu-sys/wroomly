@@ -73,6 +73,15 @@ export const ANN_ARBOR_NEIGHBORHOODS = [
   'Lower Town',
 ] as const
 
+// Subset considered walking distance to the main classrooms / Diag.
+// Used by the "Near campus" quick filter on /listings.
+export const NEAR_CAMPUS_NEIGHBORHOODS = [
+  'Central Campus',
+  'South University',
+  'Kerrytown',
+  'Downtown',
+] as const
+
 export const MAX_LISTING_IMAGES = 10
 
 // Type of property. "residence" = a named student residence / apartment building
