@@ -67,3 +67,27 @@ When the user says "let's build monthly payments" / "recurring rent" / "Option C
 
 The decision to defer until after 5 beta users validate the basic flow was deliberate — don't ship recurring before validation unless the user explicitly overrides.
 <!-- END:parked-features -->
+
+<!-- BEGIN:legal-roadmap -->
+# Legal & compliance roadmap
+
+When the user asks about "legal", "contracts", "ToS", "privacy",
+"compliance", "fair housing", "lawyer", "what do I need to launch":
+read **`docs/legal-checklist.md`** first. It enumerates every item
+sorted by risk (pre-launch blocker / first 30 days / as you grow),
+with cost estimates and whether a lawyer is required.
+
+Implementation pieces I can ship without a lawyer:
+- Marketplace disclaimer in ToS + at checkout
+- Fair Housing notice on listing creation
+- Sublease agreement at checkout (DRAFT only — needs lawyer review
+  for Michigan-specific enforceability)
+- Privacy policy update with sub-processors + GDPR rights
+- 18+ age gate at signup
+- Refund-policy page
+
+Things only a lawyer should sign off on:
+- Final sublease template enforceability under Michigan landlord-tenant law
+- Limitation-of-liability / arbitration clauses in ToS
+- Trademark filing strategy
+<!-- END:legal-roadmap -->
