@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
+import { BUILDINGS } from '@/lib/seo/buildings'
+import { GUIDES } from '@/lib/seo/guides'
 
 const ORIGIN = 'https://wroomly.app'
 
@@ -53,6 +56,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    {
+      url: `${ORIGIN}/guides`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+  ]
+
+  // SEO landing pages — neighborhood + building + guide pages. These are
+  // statically generated and carry the bulk of the long-tail ranking
+  // surface, so they belong in the sitemap with solid priority.
+  const neighborhoodRoutes: MetadataRoute.Sitemap = NEIGHBORHOOD_CONTENT.map(n => ({
+    url: `${ORIGIN}/ann-arbor/${n.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  }))
+
+  const buildingRoutes: MetadataRoute.Sitemap = BUILDINGS.map(b => ({
+    url: `${ORIGIN}/buildings/${b.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.6,
+  }))
+
+  const guideRoutes: MetadataRoute.Sitemap = GUIDES.map(g => ({
+    url: `${ORIGIN}/guides/${g.slug}`,
+    lastModified: new Date(g.updated),
+    changeFrequency: 'monthly',
+    priority: 0.5,
+  }))
+
+  const landingRoutes = [
+    ...neighborhoodRoutes,
+    ...buildingRoutes,
+    ...guideRoutes,
   ]
 
   // Best-effort listings — if Supabase is unreachable at build/edge time, fall
@@ -83,8 +122,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })
       )
 
-    return [...staticRoutes, ...listingRoutes]
+    return [...staticRoutes, ...landingRoutes, ...listingRoutes]
   } catch {
-    return staticRoutes
+    // Even if listings are unreachable, the static + landing pages still
+    // ship — they don't depend on the DB query.
+    return [...staticRoutes, ...landingRoutes]
   }
 }

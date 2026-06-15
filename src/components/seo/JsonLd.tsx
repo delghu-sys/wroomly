@@ -22,6 +22,41 @@ export function JsonLd({ data }: { data: Record<string, unknown> | Record<string
 
 const ORIGIN = 'https://wroomly.app'
 
+/** FAQPage — pass [{question, answer}] (answer as plain text). */
+export function faqJsonLd(
+  faqs: { question: string; answer: string }[],
+): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  }
+}
+
+/** Article schema for a guide page. */
+export function articleJsonLd(opts: {
+  slug: string
+  headline: string
+  description: string
+  datePublished: string
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: opts.headline,
+    description: opts.description,
+    datePublished: opts.datePublished,
+    dateModified: opts.datePublished,
+    mainEntityOfPage: `${ORIGIN}/guides/${opts.slug}`,
+    author: { '@type': 'Organization', name: 'Wroomly', url: ORIGIN },
+    publisher: { '@id': `${ORIGIN}/#organization` },
+  }
+}
+
 /** BreadcrumbList — pass ordered [{name, url}] crumbs. */
 export function breadcrumbJsonLd(
   crumbs: { name: string; path: string }[],

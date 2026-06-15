@@ -9,6 +9,7 @@ import { CinematicMarquee } from '@/components/home/CinematicMarquee'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
 import { TiltCard } from '@/components/home/TiltCard'
 import { MagneticButton } from '@/components/home/MagneticButton'
+import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 
 const NOISE_SVG =
   "data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
@@ -68,6 +69,42 @@ export default async function HomePage() {
 
       {/* ── Marquee ── */}
       <CinematicMarquee />
+
+      {/* ── Browse by neighborhood (SEO: contextual internal links to the
+            Ann Arbor neighborhood landing pages) ── */}
+      <section className="py-20 sm:py-24 border-b border-line">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <p className="text-xs uppercase tracking-[0.2em] text-ink-muted font-medium mb-4">
+              Browse by neighborhood
+            </p>
+            <h2 className="font-display text-3xl sm:text-4xl tracking-tight text-ink max-w-2xl leading-[1.05]">
+              University of Michigan sublets,{' '}
+              <span className="italic font-light text-navy">by Ann Arbor neighborhood.</span>
+            </h2>
+          </ScrollReveal>
+          <div className="mt-8 flex flex-wrap gap-2.5">
+            {NEIGHBORHOOD_CONTENT.map(n => (
+              <Link
+                key={n.slug}
+                href={`/ann-arbor/${n.slug}`}
+                className="inline-flex items-center gap-1.5 px-4 h-10 rounded-full text-sm font-medium bg-surface border border-line text-ink-soft hover:border-maize/50 hover:text-ink hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <MapPin className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
+                {n.name}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Link
+              href="/guides"
+              className="text-sm text-navy hover:text-ink inline-flex items-center gap-1 underline-offset-2 hover:underline"
+            >
+              New to subletting? Read the guides <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── How it works ── */}
       <section className="py-28 sm:py-32" style={{ background: 'oklch(0.97 0.008 75)' }}>

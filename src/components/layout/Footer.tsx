@@ -1,5 +1,14 @@
 import Link from 'next/link'
 import { LogoMark } from '@/components/brand/Logo'
+import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
+import { GUIDES } from '@/lib/seo/guides'
+
+// SEO: surface a curated set of neighborhood + guide links in the footer
+// so crawl equity flows from every page to the landing pages. Capped to a
+// readable handful; the full set is reachable via each landing page's
+// "other neighborhoods / buildings" link cloud + the sitemap.
+const FOOTER_NEIGHBORHOODS = NEIGHBORHOOD_CONTENT.slice(0, 5)
+const FOOTER_GUIDES = GUIDES.slice(0, 4)
 
 export function Footer() {
   return (
@@ -25,7 +34,7 @@ export function Footer() {
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4 group">
               <LogoMark size={28} />
@@ -42,21 +51,31 @@ export function Footer() {
               { href: '/listings', label: 'All listings' },
               { href: '/listings?type=sublet', label: 'Sublets' },
               { href: '/listings?type=swap', label: 'Housing swaps' },
+              { href: '/guides', label: 'Guides & FAQ' },
             ]}
+          />
+          <FooterCol
+            title="Neighborhoods"
+            links={FOOTER_NEIGHBORHOODS.map(n => ({
+              href: `/ann-arbor/${n.slug}`,
+              label: n.name,
+            }))}
+          />
+          <FooterCol
+            title="Guides"
+            links={FOOTER_GUIDES.map(g => ({
+              href: `/guides/${g.slug}`,
+              label: g.title.replace(/ at the University of Michigan$/, '').slice(0, 32),
+            }))}
           />
           <FooterCol
             title="Company"
             links={[
               { href: '/about', label: 'How it works' },
               { href: '/about#trust', label: 'Trust & safety' },
-              { href: 'mailto:hello@wroomly.com', label: 'Contact us', external: true },
-            ]}
-          />
-          <FooterCol
-            title="Legal"
-            links={[
-              { href: '/terms', label: 'Terms of service' },
-              { href: '/privacy', label: 'Privacy policy' },
+              { href: '/terms', label: 'Terms' },
+              { href: '/privacy', label: 'Privacy' },
+              { href: 'mailto:help@wroomly.app', label: 'Contact', external: true },
             ]}
           />
         </div>
