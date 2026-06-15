@@ -7,6 +7,7 @@ import { ThreadView } from '@/components/messages/ThreadView'
 import { loadConversations } from '@/components/messages/loadConversations'
 import { fetchConnectStatus } from '@/lib/stripe'
 import { getListingImageUrl } from '@/lib/utils/listing'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 export const metadata: Metadata = { title: 'Chat' }
 
@@ -31,8 +32,8 @@ interface ConvoRow {
     neighborhood: string | null
     listing_images: { storage_path: string; display_order: number }[] | null
   } | null
-  supplier: { id: string; full_name: string | null; avatar_url: string | null } | null
-  consumer: { id: string; full_name: string | null; avatar_url: string | null } | null
+  supplier: { id: string; full_name: string | null; avatar_url: string | null; email: string | null; phone: string | null } | null
+  consumer: { id: string; full_name: string | null; avatar_url: string | null; email: string | null; phone: string | null } | null
 }
 
 interface InquiryRow {
@@ -65,8 +66,8 @@ export default async function ConversationPage({
       .select(`
         *,
         listings(id, title, type, price_per_month, available_from, available_to, neighborhood, listing_images(storage_path, display_order)),
-        supplier:supplier_id(id, full_name, avatar_url),
-        consumer:consumer_id(id, full_name, avatar_url)
+        supplier:supplier_id(id, full_name, avatar_url, email, phone),
+        consumer:consumer_id(id, full_name, avatar_url, email, phone)
       `)
       .eq('id', id)
       .single(),
@@ -125,14 +126,34 @@ export default async function ConversationPage({
 
   // Lookup supplier's Stripe Connect status so the inquiry accept gate
   // can decide whether the supplier can take the booking right now.
-  const { data: supplierProfile } = await supabase
-    .from('users')
-    .select('stripe_account_id')
-    .eq('id', conv.supplier_id)
-    .single()
-  const supplierConnect = await fetchConnectStatus(
-    supplierProfile?.stripe_account_id ?? null
-  )
+  // Skipped when payments are disabled — there's no payout gate, so the
+  // supplier can always accept (it's just a match).
+  let supplierPayoutReady = true
+  if (PAYMENTS_ENABLED) {
+    const { data: supplierProfile } = await supabase
+      .from('users')
+      .select('stripe_account_id')
+      .eq('id', conv.supplier_id)
+      .single()
+    const supplierConnect = await fetchConnectStatus(
+      supplierProfile?.stripe_account_id ?? null
+    )
+    supplierPayoutReady = supplierConnect.status === 'active'
+  }
+
+  // Matching-only launch: once an inquiry is accepted, reveal the OTHER
+  // party's contact info so they can arrange everything off-platform.
+  // Only computed when payments are off + the inquiry is accepted.
+  const viewerIsSupplier = conv.supplier_id === user.id
+  const otherParty = viewerIsSupplier ? conv.consumer : conv.supplier
+  const otherContact =
+    !PAYMENTS_ENABLED && inquiry?.status === 'accepted' && otherParty
+      ? {
+          name: otherParty.full_name,
+          email: otherParty.email,
+          phone: otherParty.phone,
+        }
+      : null
 
   // Shape listing for ThreadView
   const firstImage = conv.listings?.listing_images
@@ -182,7 +203,8 @@ export default async function ConversationPage({
           initialMessages={messages}
           currentUserId={user.id}
           hasPaid={hasPaid}
-          supplierPayoutReady={supplierConnect.status === 'active'}
+          supplierPayoutReady={supplierPayoutReady}
+          otherContact={otherContact}
         />
       }
     />

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/send'
 import { inquiryAcceptedEmail, inquiryDeclinedEmail } from '@/lib/email/templates'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 /**
  * PATCH /api/inquiries/[id]
@@ -91,7 +92,9 @@ export async function PATCH(
 
   // Sublet inquiries can't be accepted until the supplier has finished
   // Stripe Connect — otherwise there's nowhere for the rent to land.
-  if (body.action === 'accept' && listing.type === 'sublet') {
+  // Skipped entirely while payments are disabled (matching-only launch):
+  // acceptance just connects the two parties, no money flows through us.
+  if (PAYMENTS_ENABLED && body.action === 'accept' && listing.type === 'sublet') {
     const rawSupplier = listing.users as unknown
     const supplierConnect = (
       Array.isArray(rawSupplier) ? rawSupplier[0] : rawSupplier

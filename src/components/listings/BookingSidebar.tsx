@@ -9,6 +9,7 @@ import {
 } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 import { InquiryForm } from './InquiryForm'
 import { Button } from '@/components/ui/button'
 import { FeeNote } from '@/components/brand/FeeNote'
@@ -116,17 +117,24 @@ export function BookingSidebar({
                       + {formatCents(listing.deposit_amount)} deposit
                     </p>
                   )}
-                  <p className="mt-2">
-                    <FeeNote variant="inline" />
-                  </p>
-                  {/* Wroomly handles the first month + deposit. After that
-                      the consumer arranges payment with the host directly.
-                      Setting expectation here avoids a "where's my month
-                      2?" support ticket post-booking. */}
-                  <p className="text-[11.5px] text-ink-muted leading-snug mt-3 pt-3 border-t border-line/60">
-                    Wroomly charges your first month + deposit at booking.
-                    You&rsquo;ll pay your host directly for months 2 onward.
-                  </p>
+                  {PAYMENTS_ENABLED ? (
+                    <>
+                      <p className="mt-2">
+                        <FeeNote variant="inline" />
+                      </p>
+                      <p className="text-[11.5px] text-ink-muted leading-snug mt-3 pt-3 border-t border-line/60">
+                        Wroomly charges your first month + deposit at booking.
+                        You&rsquo;ll pay your host directly for months 2 onward.
+                      </p>
+                    </>
+                  ) : (
+                    // Matching-only launch: rent + deposit are arranged
+                    // directly between renter and host after they connect.
+                    <p className="text-[11.5px] text-ink-muted leading-snug mt-3 pt-3 border-t border-line/60">
+                      Rent and deposit are arranged directly with the host.
+                      Send an inquiry to get connected.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -173,7 +181,7 @@ export function BookingSidebar({
                 hasPaid={hasPaid}
               />
 
-              {/* Stripe trust line */}
+              {/* Trust line */}
               {listing.type === 'sublet' && (
                 <div className="pt-3 mt-1 flex items-center justify-center gap-1.5 border-t border-line/70">
                   <ShieldCheck
@@ -182,9 +190,18 @@ export function BookingSidebar({
                     className="text-[oklch(0.45_0.13_85)] shrink-0"
                   />
                   <p className="text-[11.5px] text-ink-muted leading-snug tracking-tight">
-                    Secure payments via{' '}
-                    <span className="font-semibold text-ink-soft">Stripe</span>
-                    {' '}— rent held in escrow until move-in.
+                    {PAYMENTS_ENABLED ? (
+                      <>
+                        Secure payments via{' '}
+                        <span className="font-semibold text-ink-soft">Stripe</span>
+                        {' '}— rent held in escrow until move-in.
+                      </>
+                    ) : (
+                      <>
+                        Every member is{' '}
+                        <span className="font-semibold text-ink-soft">@umich.edu verified</span>.
+                      </>
+                    )}
                   </p>
                 </div>
               )}

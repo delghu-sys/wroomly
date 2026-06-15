@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { ShieldCheck, CreditCard, MessageSquare } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, MessageSquare } from 'lucide-react'
 import { Robot, Info } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 import { TextScramble } from './TextScramble'
@@ -13,7 +13,7 @@ const NOISE_SVG =
 
 const trustBadges = [
   { icon: ShieldCheck, label: '@umich.edu verified' },
-  { icon: CreditCard, label: 'Escrowed payments' },
+  { icon: CheckCircle2, label: 'Reviewed listings' },
   { icon: MessageSquare, label: 'Private messaging' },
 ] as const
 
@@ -81,7 +81,7 @@ export function HomeHero() {
               className="mt-7 text-lg sm:text-xl text-white/70 max-w-lg leading-relaxed"
             >
               Sublet or swap your Ann&nbsp;Arbor apartment with verified
-              U&nbsp;of&nbsp;M students. Secure payments, in-app messaging,
+              U&nbsp;of&nbsp;M students. Verified profiles, in-app messaging,
               and not a single Craigslist email.
             </motion.p>
 

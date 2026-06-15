@@ -10,6 +10,7 @@ import { format, parseISO } from 'date-fns'
 import type { User, Listing, Inquiry, Transaction } from '@/types/database'
 import { fetchConnectStatus } from '@/lib/stripe'
 import { PayoutSetupBanner } from '@/components/payments/PayoutSetupBanner'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -53,7 +54,10 @@ export default async function DashboardPage() {
           .neq('sender_id', user.id)
           .in('conversation_id', convoIds)
       })(),
-      fetchConnectStatus(profile.stripe_account_id),
+      // Skip the Stripe round-trip entirely when payments are disabled.
+      PAYMENTS_ENABLED
+        ? fetchConnectStatus(profile.stripe_account_id)
+        : Promise.resolve({ status: 'none' as const, chargesEnabled: false, payoutsEnabled: false, detailsSubmitted: false }),
     ])
 
     const listings = (listingsRes.data ?? []) as Pick<Listing, 'id' | 'status' | 'title'>[]
@@ -91,7 +95,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Payout setup nudge — auto-hides once Stripe is fully active. */}
-        <PayoutSetupBanner status={connect.status} />
+        {PAYMENTS_ENABLED && <PayoutSetupBanner status={connect.status} />}
 
         <div className="stagger-reveal grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           {[

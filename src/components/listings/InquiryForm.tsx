@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { ListingWithDetails } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 import { CheckCircle2, CreditCard, MessageSquare, Send, Loader2 } from 'lucide-react'
 import { PaperPlaneTilt, UserPlus } from '@phosphor-icons/react/dist/ssr'
 import { InquiryModal } from './InquiryModal'
@@ -151,32 +152,40 @@ export function InquiryForm({
         <div>
           <p className="font-display text-lg text-ink">Inquiry accepted</p>
           <p className="text-sm text-ink-soft mt-0.5">
-            Confirm your booking to lock in this place.
+            {PAYMENTS_ENABLED
+              ? 'Confirm your booking to lock in this place.'
+              : "You're connected — arrange the details with your host in chat."}
           </p>
         </div>
-        <Button
-          onClick={startCheckout}
-          disabled={paying}
-          className="
-            group relative w-full h-11 rounded-full overflow-hidden
-            bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
-            font-semibold
-            shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-            hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
-            transition-shadow duration-500 active:scale-[0.98]
-          "
-        >
-          <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-          <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
-            {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-            {paying ? 'Redirecting…' : 'Pay now'}
-          </span>
-        </Button>
+        {PAYMENTS_ENABLED && (
+          <Button
+            onClick={startCheckout}
+            disabled={paying}
+            className="
+              group relative w-full h-11 rounded-full overflow-hidden
+              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
+              font-semibold
+              shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
+              hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+              transition-shadow duration-500 active:scale-[0.98]
+            "
+          >
+            <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+            <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+              {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+              {paying ? 'Redirecting…' : 'Pay now'}
+            </span>
+          </Button>
+        )}
         {conversationId && (
           <Link href={`/messages/${conversationId}`} className="block">
             <Button
-              variant="outline"
-              className="w-full h-11 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]"
+              className={
+                PAYMENTS_ENABLED
+                  ? 'w-full h-11 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]'
+                  : 'w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]'
+              }
+              variant={PAYMENTS_ENABLED ? 'outline' : 'default'}
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Open chat

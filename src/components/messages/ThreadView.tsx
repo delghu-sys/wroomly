@@ -65,6 +65,15 @@ interface ThreadViewProps {
    * inquiries can't be accepted before the host can receive money.
    */
   supplierPayoutReady: boolean
+  /**
+   * The other party's contact, revealed in the accepted-card after a
+   * match when payments are disabled. Null otherwise.
+   */
+  otherContact?: {
+    name: string | null
+    email: string | null
+    phone: string | null
+  } | null
 }
 
 const QUICK_PROMPTS = [
@@ -84,6 +93,7 @@ export function ThreadView({
   currentUserId,
   hasPaid,
   supplierPayoutReady,
+  otherContact,
 }: ThreadViewProps) {
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -307,6 +317,7 @@ export function ThreadView({
                     hasPaid={hasPaid}
                     defaultTitle={listing?.title}
                     defaultType={listing?.type}
+                    otherContact={otherContact}
                   />
                 </div>
               )

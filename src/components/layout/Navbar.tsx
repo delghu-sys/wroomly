@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Menu, X } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 interface NavbarProps {
   user: User | null
@@ -189,9 +190,11 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
                         <DropdownMenuItem onClick={nav('/inquiries')} className="rounded-lg">
                           Inquiries
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={nav('/payouts')} className="rounded-lg">
-                          Payouts
-                        </DropdownMenuItem>
+                        {PAYMENTS_ENABLED && (
+                          <DropdownMenuItem onClick={nav('/payouts')} className="rounded-lg">
+                            Payouts
+                          </DropdownMenuItem>
+                        )}
                       </>
                     )}
                     {user.user_type === 'consumer' && (

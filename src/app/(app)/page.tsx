@@ -223,8 +223,8 @@ export default async function HomePage() {
               </span>
             </h2>
             <p className="mt-5 text-lg text-white/70 max-w-xl mx-auto leading-relaxed">
-              Verified students, secure payments, zero Craigslist sketch. List in
-              minutes.
+              Verified U of M students, private messaging, zero Craigslist
+              sketch. List in minutes.
             </p>
             <div className="mt-8">
               <Link href="/list-place">

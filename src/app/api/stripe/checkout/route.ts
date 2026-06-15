@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 import type Stripe from 'stripe'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
@@ -16,6 +17,11 @@ const schema = z.object({
 // platform's application fee. No "release funds" step — Stripe handles
 // settlement timing on the Connect side.
 export async function POST(request: Request) {
+  // Payments disabled for the matching-only launch. Hard stop so even a
+  // crafted request can't reach Stripe.
+  if (!PAYMENTS_ENABLED) {
+    return NextResponse.json({ error: 'Payments are not enabled.' }, { status: 403 })
+  }
   const supabase = await createClient()
   const {
     data: { user },

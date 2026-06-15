@@ -23,8 +23,8 @@ const ITEMS: { icon: PhosphorIcon; title: string; body: string }[] = [
   },
   {
     icon: Lock,
-    title: 'Payments held in escrow',
-    body: 'Rent and deposit are charged through Stripe and only released after both parties confirm move-in. No wire transfers, no Venmo strangers.',
+    title: 'Connect, then arrange directly',
+    body: 'Once a host accepts your inquiry, you both get connected and can sort out rent, deposit, and move-in directly — on your terms. No middleman holding your money.',
   },
   {
     icon: Flag,

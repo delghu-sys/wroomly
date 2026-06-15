@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
-import { CreditCard, CheckCircle2, Loader2 } from 'lucide-react'
+import { CreditCard, CheckCircle2, Loader2, Mail, Phone } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import { FeeNote } from '@/components/brand/FeeNote'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 interface AcceptedSystemCardProps {
   rawContent: string
@@ -15,6 +16,16 @@ interface AcceptedSystemCardProps {
   hasPaid: boolean
   defaultTitle?: string
   defaultType?: string
+  /**
+   * The other party's contact details, revealed after acceptance when
+   * payments are disabled (matching-only launch) so the two can arrange
+   * everything directly. Null while payments are on.
+   */
+  otherContact?: {
+    name: string | null
+    email: string | null
+    phone: string | null
+  } | null
 }
 
 /**
@@ -28,6 +39,7 @@ export function AcceptedSystemCard({
   hasPaid,
   defaultTitle,
   defaultType,
+  otherContact,
 }: AcceptedSystemCardProps) {
   const [paying, setPaying] = useState(false)
 
@@ -108,6 +120,7 @@ export function AcceptedSystemCard({
           {title && (
             <p className="text-sm text-ink-soft mt-1.5 leading-relaxed">{title}</p>
           )}
+          {/* Price + deposit (informational — rent is still useful to see) */}
           {isSublet && data.price && data.price > 0 && (
             <>
               <p className="font-display text-2xl tracking-tight text-ink mt-3">
@@ -116,10 +129,10 @@ export function AcceptedSystemCard({
               </p>
               {data.deposit !== undefined && data.deposit > 0 && (
                 <p className="text-[12.5px] text-ink-muted mt-1">
-                  + ${(data.deposit / 100).toLocaleString()} refundable deposit
+                  + ${(data.deposit / 100).toLocaleString()} deposit
                 </p>
               )}
-              {isConsumer && !hasPaid && (
+              {PAYMENTS_ENABLED && isConsumer && !hasPaid && (
                 <div className="mt-1.5">
                   <FeeNote variant="pill" />
                 </div>
@@ -127,7 +140,44 @@ export function AcceptedSystemCard({
             </>
           )}
 
-          {isConsumer && isSublet && !hasPaid && (
+          {/* ── Matching-only launch: connect + share contact ── */}
+          {!PAYMENTS_ENABLED && (
+            <div className="mt-4">
+              <p className="text-[13px] text-ink-soft leading-relaxed">
+                You&rsquo;re connected. Arrange move-in, rent, and deposit
+                directly with{' '}
+                {otherContact?.name?.split(' ')[0] ?? 'each other'}.
+              </p>
+              {(otherContact?.email || otherContact?.phone) && (
+                <div className="mt-3 space-y-1.5 text-left rounded-2xl border border-line bg-surface/70 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-muted font-semibold">
+                    Contact {otherContact?.name?.split(' ')[0] ?? ''}
+                  </p>
+                  {otherContact?.email && (
+                    <a
+                      href={`mailto:${otherContact.email}`}
+                      className="flex items-center gap-2 text-[13px] text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors break-all"
+                    >
+                      <Mail className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
+                      {otherContact.email}
+                    </a>
+                  )}
+                  {otherContact?.phone && (
+                    <a
+                      href={`tel:${otherContact.phone}`}
+                      className="flex items-center gap-2 text-[13px] text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors"
+                    >
+                      <Phone className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
+                      {otherContact.phone}
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Payments-enabled: pay flow (unchanged) ── */}
+          {PAYMENTS_ENABLED && isConsumer && isSublet && !hasPaid && (
             <Button
               onClick={startCheckout}
               disabled={paying}
@@ -151,7 +201,7 @@ export function AcceptedSystemCard({
             </Button>
           )}
 
-          {hasPaid && (
+          {PAYMENTS_ENABLED && hasPaid && (
             <div
               className="mt-4 inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium"
               style={{ background: 'oklch(0.55 0.15 142 / 0.15)', color: 'oklch(0.40 0.13 142)' }}

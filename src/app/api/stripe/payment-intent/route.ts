@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { stripe, calculateFees } from '@/lib/stripe'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 const schema = z.object({
   listing_id: z.string().uuid(),
@@ -14,6 +15,9 @@ const schema = z.object({
 // destination-charge pattern (consumer pays rent + 5% fee, Stripe routes
 // rent to the supplier, Wroomly keeps the application fee).
 export async function POST(request: Request) {
+  if (!PAYMENTS_ENABLED) {
+    return NextResponse.json({ error: 'Payments are not enabled.' }, { status: 403 })
+  }
   const supabase = await createClient()
   const {
     data: { user },

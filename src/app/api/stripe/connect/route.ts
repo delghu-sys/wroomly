@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 /**
  * POST /api/stripe/connect
@@ -15,6 +16,9 @@ import { stripe } from '@/lib/stripe'
  *               want to see payouts / change bank info.
  */
 export async function POST(request: Request) {
+  if (!PAYMENTS_ENABLED) {
+    return NextResponse.json({ error: 'Payments are not enabled.' }, { status: 403 })
+  }
   const supabase = await createClient()
   const {
     data: { user },

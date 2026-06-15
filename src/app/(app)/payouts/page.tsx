@@ -8,10 +8,15 @@ import { format, parseISO, isPast, addDays } from 'date-fns'
 import type { Transaction, User } from '@/types/database'
 import { fetchConnectStatus } from '@/lib/stripe'
 import { PayoutAccountCard } from '@/components/payments/PayoutAccountCard'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 export const metadata: Metadata = { title: 'Payouts' }
 
 export default async function PayoutsPage() {
+  // Payouts don't exist in the matching-only launch. Send anyone who
+  // lands here (old link, bookmark) back to their dashboard.
+  if (!PAYMENTS_ENABLED) redirect('/dashboard')
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')

@@ -1,4 +1,5 @@
 import { PLATFORM_FEE_PERCENT } from '@/lib/fees'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 
 interface FeeNoteProps {
   /**
@@ -11,10 +12,13 @@ interface FeeNoteProps {
 /**
  * A small, consistent disclosure that Wroomly's service fee is added
  * on top of the listed rent at checkout. Render this near every place
- * the rent is shown *before* the consumer reaches Stripe — the hosted
- * Checkout UI shows the full breakdown, but we want no surprises.
+ * the rent is shown *before* the consumer reaches Stripe.
+ *
+ * Renders nothing while payments are disabled (launch phase) — there's
+ * no fee when Wroomly is matching-only.
  */
 export function FeeNote({ variant = 'inline' }: FeeNoteProps) {
+  if (!PAYMENTS_ENABLED) return null
   if (variant === 'pill') {
     return (
       <span
