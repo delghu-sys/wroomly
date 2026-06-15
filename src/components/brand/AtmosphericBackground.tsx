@@ -17,7 +17,7 @@ interface AtmosphericBackgroundProps {
 }
 
 export function AtmosphericBackground({
-  base = 'oklch(0.10 0.02 260)',
+  base = 'oklch(0.22 0.075 256)',
   variant = 'hero',
 }: AtmosphericBackgroundProps) {
   return (

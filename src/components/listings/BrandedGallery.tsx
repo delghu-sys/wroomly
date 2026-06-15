@@ -64,7 +64,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
           role="button"
           tabIndex={0}
           aria-label="Open photo lightbox"
-          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.10_0.02_260)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.50)]"
+          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.22_0.075_256)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.50)]"
           onClick={() => setLightboxOpen(true)}
           onKeyDown={e => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -100,7 +100,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(180deg, transparent 50%, oklch(0.10 0.02 260 / 0.45) 100%)',
+                'linear-gradient(180deg, transparent 50%, oklch(0.22 0.075 256 / 0.45) 100%)',
             }}
             aria-hidden
           />
@@ -204,7 +204,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[100] bg-[oklch(0.10_0.02_260/0.97)] flex items-center justify-center backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-[oklch(0.22_0.075_256/0.97)] flex items-center justify-center backdrop-blur-sm"
             onClick={() => setLightboxOpen(false)}
           >
           <button

@@ -51,7 +51,7 @@ export default async function FavoritesPage() {
           <div
             className="inline-flex w-14 h-14 rounded-2xl items-center justify-center mb-4"
             style={{
-              background: 'oklch(0.10 0.02 260)',
+              background: 'oklch(0.22 0.075 256)',
               color: 'oklch(0.84 0.17 85)',
             }}
           >
@@ -68,7 +68,7 @@ export default async function FavoritesPage() {
             you can come back later.
           </p>
           <Link href="/listings">
-            <Button className="press rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)] hover:shadow-[0_8px_24px_oklch(0.84_0.17_85/0.35)] h-11 px-6 font-semibold transition-shadow duration-500">
+            <Button className="press rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] hover:shadow-[0_8px_24px_oklch(0.84_0.17_85/0.35)] h-11 px-6 font-semibold transition-shadow duration-500">
               Browse listings
             </Button>
           </Link>

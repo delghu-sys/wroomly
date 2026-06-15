@@ -55,7 +55,7 @@ export function ThreadHeader({
           <AvatarFallback
             className="text-xs font-semibold"
             style={{
-              background: 'oklch(0.10 0.02 260)',
+              background: 'oklch(0.22 0.075 256)',
               color: 'oklch(0.84 0.17 85)',
             }}
           >
@@ -69,7 +69,7 @@ export function ThreadHeader({
               {otherName ?? 'Unknown'}
             </p>
             <BadgeCheck
-              className="w-4 h-4 shrink-0 fill-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]"
+              className="w-4 h-4 shrink-0 fill-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]"
               strokeWidth={2.25}
               aria-label="Verified"
             />

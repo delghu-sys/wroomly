@@ -57,7 +57,7 @@ export default function SuspendedPage() {
             href="mailto:help@wroomly.com"
             className="
               group inline-flex items-center gap-2 h-12 px-5 rounded-full
-              bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
               text-sm font-semibold tracking-tight
               shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
               hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]

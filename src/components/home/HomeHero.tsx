@@ -23,7 +23,7 @@ export function HomeHero() {
   return (
     <section
       className="relative min-h-[100dvh] flex items-center overflow-hidden -mt-16 pt-16"
-      style={{ background: 'oklch(0.10 0.02 260)' }}
+      style={{ background: 'oklch(0.22 0.075 256)' }}
     >
       {/* Noise texture */}
       <div

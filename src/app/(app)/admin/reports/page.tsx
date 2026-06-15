@@ -80,7 +80,7 @@ export default async function AdminReportsPage() {
           <div
             className="inline-flex w-12 h-12 rounded-2xl items-center justify-center"
             style={{
-              background: 'oklch(0.10 0.02 260)',
+              background: 'oklch(0.22 0.075 256)',
               color: 'oklch(0.84 0.17 85)',
             }}
           >

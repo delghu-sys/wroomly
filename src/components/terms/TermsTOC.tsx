@@ -170,7 +170,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setMobileOpen(false)}
-                className="fixed inset-0 z-40 bg-[oklch(0.10_0.02_260/0.40)] backdrop-blur-sm"
+                className="fixed inset-0 z-40 bg-[oklch(0.22_0.075_256/0.40)] backdrop-blur-sm"
               />
               <motion.div
                 initial={{ opacity: 0, y: -6 }}

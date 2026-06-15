@@ -145,7 +145,7 @@ export function ListingsFilters({
                 onClick={() => updateFilter('type', opt.value || undefined)}
                 className={`text-sm py-2 px-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] border-[oklch(0.10_0.02_260)] shadow-[0_4px_16px_oklch(0.10_0.02_260/0.30)]'
+                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
                     : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
                 }`}
               >
@@ -304,7 +304,7 @@ export function ListingsFilters({
                 onClick={() => updateFilter('bedrooms', opt.value || undefined)}
                 className={`text-sm py-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] border-[oklch(0.10_0.02_260)] shadow-[0_4px_16px_oklch(0.10_0.02_260/0.30)]'
+                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
                     : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
                 }`}
               >
@@ -324,7 +324,7 @@ export function ListingsFilters({
             id="furnished"
             checked={currentFilters.furnished === 'true'}
             onCheckedChange={v => updateFilter('furnished', v ? 'true' : undefined)}
-            className="data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
+            className="data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
           />
           <Label htmlFor="furnished" className="cursor-pointer text-sm text-ink-soft">Furnished</Label>
         </div>
@@ -333,7 +333,7 @@ export function ListingsFilters({
             id="pets"
             checked={currentFilters.pets === 'true'}
             onCheckedChange={v => updateFilter('pets', v ? 'true' : undefined)}
-            className="data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
+            className="data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
           />
           <Label htmlFor="pets" className="cursor-pointer text-sm text-ink-soft">Pets allowed</Label>
         </div>

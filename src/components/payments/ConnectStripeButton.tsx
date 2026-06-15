@@ -71,7 +71,7 @@ export function ConnectStripeButton({
     'group relative inline-flex items-center justify-center gap-2 rounded-full overflow-hidden font-semibold tracking-tight transition-shadow duration-500 active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)] disabled:opacity-60 disabled:cursor-not-allowed'
 
   const solid =
-    'px-5 bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)] hover:shadow-[0_12px_32px_oklch(0.84_0.17_85/0.45)]'
+    'px-5 bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)] hover:shadow-[0_12px_32px_oklch(0.84_0.17_85/0.45)]'
 
   const ghost =
     'px-4 bg-white border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
@@ -86,7 +86,7 @@ export function ConnectStripeButton({
       {variant === 'solid' && (
         <span
           className="absolute inset-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={{ background: 'oklch(0.10 0.02 260)' }}
+          style={{ background: 'oklch(0.22 0.075 256)' }}
           aria-hidden
         />
       )}

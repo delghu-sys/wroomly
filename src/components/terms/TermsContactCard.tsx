@@ -13,7 +13,7 @@ export function TermsContactCard() {
         border border-line bg-white/85 backdrop-blur-xl
         p-5 sm:p-6
         shadow-[0_2px_12px_oklch(0_0_0/0.04)]
-        hover:shadow-[0_18px_50px_oklch(0.10_0.02_260/0.10)]
+        hover:shadow-[0_18px_50px_oklch(0.22_0.075_256/0.10)]
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
         hover:-translate-y-0.5
       "
@@ -37,7 +37,7 @@ export function TermsContactCard() {
             group-hover:scale-110 group-hover:-rotate-[6deg]
           "
           style={{
-            background: 'oklch(0.10 0.02 260)',
+            background: 'oklch(0.22 0.075 256)',
             color: 'oklch(0.84 0.17 85)',
           }}
         >

@@ -63,7 +63,7 @@ export function SocialPill({ network, handle }: SocialPillProps) {
         style={{ background: 'oklch(0.84 0.17 85)' }}
         aria-hidden
       />
-      <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.10_0.02_260)] transition-colors duration-500">
+      <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.22_0.075_256)] transition-colors duration-500">
         <InstagramLogo
           size={16}
           weight="duotone"

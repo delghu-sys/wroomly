@@ -115,7 +115,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   className="absolute top-4 right-4 inline-flex w-7 h-7 rounded-full items-center justify-center shadow-[0_4px_14px_oklch(0.84_0.17_85/0.40)]"
                   style={{
                     background: 'oklch(0.84 0.17 85)',
-                    color: 'oklch(0.10 0.02 260)',
+                    color: 'oklch(0.22 0.075 256)',
                   }}
                   aria-hidden
                 >
@@ -136,8 +136,8 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   transition-colors duration-500
                   ${
                     active
-                      ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] shadow-[0_8px_24px_oklch(0.10_0.02_260/0.25)]'
-                      : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-[oklch(0.10_0.02_260)] group-hover:text-[oklch(0.84_0.17_85)]'
+                      ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_8px_24px_oklch(0.22_0.075_256/0.25)]'
+                      : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-[oklch(0.22_0.075_256)] group-hover:text-[oklch(0.84_0.17_85)]'
                   }
                 `}
               >

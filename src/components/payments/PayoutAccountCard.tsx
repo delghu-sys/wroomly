@@ -60,7 +60,7 @@ export function PayoutAccountCard({
       ? 'oklch(0.55 0.15 142)' // emerald
       : tone === 'warn'
         ? 'oklch(0.65 0.15 75)' // amber
-        : 'oklch(0.10 0.02 260)' // navy
+        : 'oklch(0.22 0.075 256)' // navy
 
   const tileFg =
     tone === 'success'

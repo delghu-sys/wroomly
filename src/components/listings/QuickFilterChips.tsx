@@ -161,7 +161,7 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
                 transition-all duration-200 ease-out active:scale-[0.97]
                 ${
                   active
-                    ? 'bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] shadow-[0_4px_14px_oklch(0.10_0.02_260/0.25)]'
+                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_4px_14px_oklch(0.22_0.075_256/0.25)]'
                     : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink'
                 }
               `}

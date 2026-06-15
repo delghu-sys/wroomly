@@ -66,7 +66,7 @@ export function InquiryModal({
           x: Math.cos(angle) * dist,
           y: Math.sin(angle) * dist,
           color:
-            i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.10 0.02 260)',
+            i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.22 0.075 256)',
         }
       }),
     []
@@ -183,7 +183,7 @@ export function InquiryModal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[oklch(0.10_0.02_260/0.55)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[oklch(0.22_0.075_256/0.55)] backdrop-blur-sm"
           />
 
           {/* Modal surface.
@@ -203,7 +203,7 @@ export function InquiryModal({
               flex flex-col overflow-hidden
               rounded-none sm:rounded-3xl
               bg-white sm:border sm:border-line
-              shadow-none sm:shadow-[0_30px_80px_oklch(0.10_0.02_260/0.30)]
+              shadow-none sm:shadow-[0_30px_80px_oklch(0.22_0.075_256/0.30)]
             "
             role="dialog"
             aria-modal="true"
@@ -349,7 +349,7 @@ export function InquiryModal({
                       disabled={isSubmitting}
                       className="
                         group relative w-full h-12 rounded-full overflow-hidden mt-2
-                        bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+                        bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
                         font-semibold text-sm tracking-tight
                         shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)]
                         hover:shadow-[0_10px_32px_oklch(0.84_0.17_85/0.50)]
@@ -358,7 +358,7 @@ export function InquiryModal({
                         transition-all duration-300
                       "
                     >
-                      <span className="absolute inset-0 bg-[oklch(0.10_0.02_260)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                      <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
                       <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
                         {isSubmitting ? (
                           <>
@@ -413,7 +413,7 @@ export function InquiryModal({
                     className="relative inline-flex w-16 h-16 rounded-3xl items-center justify-center mx-auto shadow-[0_8px_28px_oklch(0.84_0.17_85/0.40)]"
                     style={{
                       background: 'oklch(0.84 0.17 85)',
-                      color: 'oklch(0.10 0.02 260)',
+                      color: 'oklch(0.22 0.075 256)',
                     }}
                   >
                     <CheckCircle2 className="w-7 h-7" strokeWidth={2.25} />

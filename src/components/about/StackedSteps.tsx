@@ -93,7 +93,7 @@ function Step({
 
           <div className="relative">
             <div className="inline-flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-xl bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] flex items-center justify-center shadow-[0_8px_24px_oklch(0.10_0.02_260/0.20)]">
+              <div className="w-11 h-11 rounded-xl bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] flex items-center justify-center shadow-[0_8px_24px_oklch(0.22_0.075_256/0.20)]">
                 <Icon className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <span className="text-xs uppercase tracking-[0.2em] text-ink-muted font-semibold">
@@ -129,7 +129,7 @@ function Step({
                 style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-display text-[8rem] leading-none tracking-tighter text-[oklch(0.10_0.02_260)] italic font-light">
+                <span className="font-display text-[8rem] leading-none tracking-tighter text-[oklch(0.22_0.075_256)] italic font-light">
                   {n}
                 </span>
               </div>

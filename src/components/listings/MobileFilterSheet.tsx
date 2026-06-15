@@ -64,7 +64,7 @@ export function MobileFilterSheet({
         <SlidersHorizontal size={14} weight="bold" />
         Filters
         {activeFilterCount > 0 && (
-          <span className="w-5 h-5 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] text-[10px] font-bold flex items-center justify-center">
+          <span className="w-5 h-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-[10px] font-bold flex items-center justify-center">
             {activeFilterCount}
           </span>
         )}

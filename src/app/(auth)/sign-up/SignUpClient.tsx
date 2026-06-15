@@ -336,7 +336,7 @@ export default function SignUpClient() {
                         id="agreed_to_terms"
                         checked={!!field.value}
                         onCheckedChange={checked => field.onChange(checked === true)}
-                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
+                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
                       />
                     )}
                   />
@@ -349,7 +349,7 @@ export default function SignUpClient() {
                         id="agreed_to_terms"
                         checked={!!field.value}
                         onCheckedChange={checked => field.onChange(checked === true)}
-                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.10_0.02_260)] data-[state=checked]:border-[oklch(0.10_0.02_260)]"
+                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
                       />
                     )}
                   />

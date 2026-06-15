@@ -95,7 +95,7 @@ function Tile({
         <div
           className="
             w-12 h-12 rounded-2xl
-            bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]
+            bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]
             flex items-center justify-center mb-5
             transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
             group-hover:scale-110

@@ -16,7 +16,7 @@ export function UnreadPulse({ count }: { count?: number }) {
         className="relative inline-flex h-2.5 min-w-2.5 px-1 rounded-full items-center justify-center text-[9px] font-bold"
         style={{
           background: 'oklch(0.84 0.17 85)',
-          color: 'oklch(0.10 0.02 260)',
+          color: 'oklch(0.22 0.075 256)',
         }}
       >
         {count && count > 1 ? (count > 9 ? '9+' : count) : ''}

@@ -65,7 +65,7 @@ export function RoleContinueCta({ selected, onContinue }: RoleContinueCtaProps) 
             style={{ x: sx, y: sy }}
             className="
               group relative w-full h-12 rounded-full overflow-hidden
-              bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
               font-semibold text-sm tracking-tight
               shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)]
               hover:shadow-[0_10px_32px_oklch(0.84_0.17_85/0.50)]
@@ -75,7 +75,7 @@ export function RoleContinueCta({ selected, onContinue }: RoleContinueCtaProps) 
             {/* Directional navy fill */}
             <span
               className="absolute inset-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{ background: 'oklch(0.10 0.02 260)' }}
+              style={{ background: 'oklch(0.22 0.075 256)' }}
               aria-hidden
             />
             <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">

@@ -74,7 +74,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
                 <AvatarFallback
                   className="text-xs font-semibold"
                   style={{
-                    background: 'oklch(0.10 0.02 260)',
+                    background: 'oklch(0.22 0.075 256)',
                     color: 'oklch(0.84 0.17 85)',
                   }}
                 >

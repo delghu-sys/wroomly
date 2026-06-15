@@ -52,7 +52,7 @@ export default async function SavedSearchesPage() {
           </p>
           <Link
             href="/listings"
-            className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] text-sm font-semibold tracking-tight hover:bg-[oklch(0.10_0.02_260)]/90 transition active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold tracking-tight hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98]"
           >
             Browse listings <ArrowRight className="w-4 h-4" />
           </Link>

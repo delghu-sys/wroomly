@@ -42,9 +42,9 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
           className="relative inline-flex"
         >
           <div
-            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-[0_18px_50px_oklch(0.10_0.02_260/0.25)]"
+            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-[0_18px_50px_oklch(0.22_0.075_256/0.25)]"
             style={{
-              background: 'oklch(0.10 0.02 260)',
+              background: 'oklch(0.22 0.075 256)',
               color: 'oklch(0.84 0.17 85)',
             }}
           >
@@ -55,7 +55,7 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
             <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
             <span
               className="rounded-full h-3.5 w-3.5 bg-emerald-400 ring-2"
-              style={{ '--tw-ring-color': 'oklch(0.10 0.02 260)' } as React.CSSProperties}
+              style={{ '--tw-ring-color': 'oklch(0.22 0.075 256)' } as React.CSSProperties}
             />
           </span>
         </motion.div>

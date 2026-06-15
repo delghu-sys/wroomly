@@ -57,7 +57,7 @@ export function AuthSubmitButton({
       style={{ x: springX, y: springY }}
       className={`
         group relative w-full h-12 rounded-full overflow-hidden
-        bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+        bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
         font-semibold text-sm tracking-tight
         disabled:opacity-60 disabled:cursor-not-allowed
         shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
@@ -68,7 +68,7 @@ export function AuthSubmitButton({
     >
       {/* Directional fill from left */}
       <span
-        className="absolute inset-0 bg-[oklch(0.10_0.02_260)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
         aria-hidden
       />
 

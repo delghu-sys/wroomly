@@ -74,7 +74,7 @@ export function ProfileHero({
               className="font-display tracking-tight"
               style={{
                 background: 'oklch(0.84 0.17 85)',
-                color: 'oklch(0.10 0.02 260)',
+                color: 'oklch(0.22 0.075 256)',
                 fontSize: 30,
                 lineHeight: 1,
               }}
@@ -126,7 +126,7 @@ export function ProfileHero({
           </span>
           {isAdmin && (
             <span
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-[oklch(0.10_0.02_260)] text-white"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-[oklch(0.22_0.075_256)] text-white"
             >
               <Crown size={11} weight="fill" />
               Admin

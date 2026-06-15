@@ -101,7 +101,7 @@ export default async function PaymentSuccessPage({
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           {conversationId && (
             <Link href={`/messages/${conversationId}`}>
-              <Button className="press rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 h-11 px-6 font-semibold">
+              <Button className="press rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 h-11 px-6 font-semibold">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Message your host
               </Button>

@@ -64,13 +64,13 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
         <div className="relative">
           <Avatar className="h-14 w-14 ring-1 ring-line">
             <AvatarImage src={user.avatar_url ?? undefined} />
-            <AvatarFallback className="bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] font-semibold">
+            <AvatarFallback className="bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
           <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-[oklch(0.84_0.17_85)] flex items-center justify-center ring-2 ring-white">
             <ShieldCheck
-              className="w-3.5 h-3.5 text-[oklch(0.10_0.02_260)]"
+              className="w-3.5 h-3.5 text-[oklch(0.22_0.075_256)]"
               strokeWidth={2.25}
             />
             <span className="absolute inset-0 rounded-full bg-[oklch(0.84_0.17_85)] animate-ping opacity-30" />

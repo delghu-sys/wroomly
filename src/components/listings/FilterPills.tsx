@@ -87,7 +87,7 @@ export function FilterPills({ filters }: FilterPillsProps) {
             )}
             <span
               className={`relative z-10 ${
-                active ? 'text-[oklch(0.10_0.02_260)]' : 'text-white/65 hover:text-white'
+                active ? 'text-[oklch(0.22_0.075_256)]' : 'text-white/65 hover:text-white'
               }`}
             >
               {pill.label}

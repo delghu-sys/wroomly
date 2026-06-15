@@ -42,7 +42,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
         <div
           className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_oklch(0.84_0.17_85/0.30)]"
           style={{
-            background: 'oklch(0.10 0.02 260)',
+            background: 'oklch(0.22 0.075 256)',
             color: 'oklch(0.84 0.17 85)',
           }}
         >

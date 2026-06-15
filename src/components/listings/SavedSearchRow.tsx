@@ -148,7 +148,7 @@ export function SavedSearchRow({ search }: SavedSearchRowProps) {
         </button>
         <Link
           href={browseUrl}
-          className="inline-flex items-center gap-1 h-9 px-3 rounded-full text-[12px] font-medium bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 transition active:scale-[0.97]"
+          className="inline-flex items-center gap-1 h-9 px-3 rounded-full text-[12px] font-medium bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.97]"
         >
           Browse <ArrowRight className="w-3 h-3" />
         </Link>

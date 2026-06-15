@@ -57,7 +57,7 @@ export function BookingSidebar({
         className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl"
         style={{
           boxShadow:
-            'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 28px 70px oklch(0.84 0.17 85 / 0.22), 0 8px 24px oklch(0.10 0.02 260 / 0.06)',
+            'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 28px 70px oklch(0.84 0.17 85 / 0.22), 0 8px 24px oklch(0.22 0.075 256 / 0.06)',
         }}
       >
         {/* Subtle gold mesh */}
@@ -83,7 +83,7 @@ export function BookingSidebar({
               </p>
               {existingInquiry?.status === 'accepted' && conversationId && (
                 <Link href={`/messages/${conversationId}`} className="block mt-4">
-                  <Button className="w-full h-11 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.10_0.02_260)]/90 transition-all duration-300 active:scale-[0.98]">
+                  <Button className="w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]">
                     Open chat
                   </Button>
                 </Link>
@@ -101,7 +101,7 @@ export function BookingSidebar({
                     <p
                       className="font-display tracking-tight leading-none"
                       style={{
-                        color: 'oklch(0.10 0.02 260)',
+                        color: 'oklch(0.22 0.075 256)',
                         fontSize: 'clamp(2.5rem, 5.5vw, 3.25rem)',
                       }}
                     >
@@ -132,7 +132,7 @@ export function BookingSidebar({
 
               {listing.type === 'swap' && (
                 <div className="rounded-2xl p-4 border border-[oklch(0.84_0.17_85/0.40)] bg-[oklch(0.84_0.17_85/0.08)]">
-                  <p className="font-display font-semibold text-[oklch(0.10_0.02_260)] flex items-center gap-2 text-lg tracking-tight">
+                  <p className="font-display font-semibold text-[oklch(0.22_0.075_256)] flex items-center gap-2 text-lg tracking-tight">
                     <ArrowsLeftRightPh size={16} weight="bold" />
                     Housing swap
                   </p>
@@ -147,7 +147,7 @@ export function BookingSidebar({
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{
-                    background: 'oklch(0.10 0.02 260)',
+                    background: 'oklch(0.22 0.075 256)',
                     color: 'oklch(0.84 0.17 85)',
                   }}
                 >

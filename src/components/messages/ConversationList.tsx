@@ -87,7 +87,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
         {filtered.length === 0 ? (
           query ? (
             <div className="text-center py-12">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]">
+              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
                 <Search className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <p className="font-display text-base text-ink">No matches</p>
@@ -97,7 +97,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
             </div>
           ) : (
             <div className="text-center py-12 px-4">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]">
+              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
                 <MessageSquare className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <p className="font-display text-base text-ink">No conversations yet</p>

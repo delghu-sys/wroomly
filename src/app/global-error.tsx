@@ -31,7 +31,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           minHeight: '100dvh',
           fontFamily:
             'ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
-          background: 'oklch(0.10 0.02 260)',
+          background: 'oklch(0.22 0.075 256)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
@@ -98,7 +98,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               fontWeight: 600,
               fontSize: 14,
               background: 'oklch(0.84 0.17 85)',
-              color: 'oklch(0.10 0.02 260)',
+              color: 'oklch(0.22 0.075 256)',
               boxShadow: '0 4px 18px oklch(0.84 0.17 85 / 0.30)',
             }}
           >

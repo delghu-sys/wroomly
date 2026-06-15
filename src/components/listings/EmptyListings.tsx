@@ -39,12 +39,12 @@ export function EmptyListings() {
           transition={{ ...spring, delay: 0.1 }}
           className="relative inline-flex"
         >
-          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] shadow-[0_18px_50px_oklch(0.10_0.02_260/0.30)]">
+          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_18px_50px_oklch(0.22_0.075_256/0.30)]">
             <Compass className="w-9 h-9" strokeWidth={1.5} />
             {/* Live pulse */}
             <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
               <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
-              <span className="rounded-full h-3 w-3 bg-emerald-400 border-2 border-[oklch(0.10_0.02_260)]" />
+              <span className="rounded-full h-3 w-3 bg-emerald-400 border-2 border-[oklch(0.22_0.075_256)]" />
             </span>
           </div>
         </motion.div>

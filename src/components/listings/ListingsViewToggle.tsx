@@ -42,7 +42,7 @@ export function ListingsViewToggle({ view }: { view: 'grid' | 'map' }) {
             )}
             <span
               className={`relative z-10 inline-flex items-center gap-1.5 ${
-                active ? 'text-[oklch(0.10_0.02_260)]' : 'text-white/65 hover:text-white'
+                active ? 'text-[oklch(0.22_0.075_256)]' : 'text-white/65 hover:text-white'
               }`}
             >
               <Icon className="w-4 h-4" strokeWidth={2} />

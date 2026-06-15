@@ -98,7 +98,7 @@ export function RotatingTestimonial({
               "
               style={{
                 background: 'oklch(0.84 0.17 85)',
-                color: 'oklch(0.10 0.02 260)',
+                color: 'oklch(0.22 0.075 256)',
               }}
             >
               {t.initials}

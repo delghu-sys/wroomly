@@ -53,7 +53,7 @@ export function BrandTooltip({
               data-[instant]:duration-0
             "
             style={{
-              background: 'oklch(0.10 0.02 260 / 0.92)',
+              background: 'oklch(0.22 0.075 256 / 0.92)',
               boxShadow:
                 'inset 0 1px 0 oklch(1 0 0 / 0.10), 0 18px 50px oklch(0 0 0 / 0.40)',
             }}
@@ -67,7 +67,7 @@ export function BrandTooltip({
             {content}
             <Tooltip.Arrow
               className="
-                fill-[oklch(0.10_0.02_260/0.92)]
+                fill-[oklch(0.22_0.075_256/0.92)]
                 stroke-white/[0.10]
                 data-[side=top]:-bottom-[7px]
                 data-[side=bottom]:-top-[7px]

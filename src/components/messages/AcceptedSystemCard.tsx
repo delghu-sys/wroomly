@@ -133,14 +133,14 @@ export function AcceptedSystemCard({
               disabled={paying}
               className="
                 group relative w-full mt-4 h-11 rounded-full overflow-hidden
-                bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]
-                hover:shadow-[0_8px_24px_oklch(0.10_0.02_260/0.30)]
+                bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]
+                hover:shadow-[0_8px_24px_oklch(0.22_0.075_256/0.30)]
                 transition-shadow duration-500
                 active:scale-[0.98]
               "
             >
               <span className="absolute inset-0 bg-[oklch(0.84_0.17_85)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.10_0.02_260)] transition-colors duration-500">
+              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.22_0.075_256)] transition-colors duration-500">
                 {paying ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (

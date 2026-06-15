@@ -53,7 +53,7 @@ export const MessageBubble = memo(function MessageBubble({
           {showAvatar && (
             <Avatar className="h-7 w-7 ring-1 ring-line">
               <AvatarImage src={otherAvatarUrl ?? undefined} />
-              <AvatarFallback className="text-[10px] bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] font-semibold">
+              <AvatarFallback className="text-[10px] bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold">
                 {otherInitials}
               </AvatarFallback>
             </Avatar>

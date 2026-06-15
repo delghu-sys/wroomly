@@ -67,7 +67,7 @@ export function InquiryActions({
           className="
             inline-flex items-center gap-1.5 h-9 px-4 rounded-full
             text-[13px] font-semibold tracking-tight
-            bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)]
+            bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
             shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
             hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
             transition-shadow duration-500 active:scale-[0.97]

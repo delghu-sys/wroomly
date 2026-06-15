@@ -64,7 +64,7 @@ export function MagneticLinkCta({
     'group relative inline-flex w-full items-center justify-center gap-2 rounded-full overflow-hidden font-semibold tracking-tight transition-shadow duration-500 active:scale-[0.97]'
 
   const primary =
-    'bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)] hover:shadow-[0_12px_36px_oklch(0.84_0.17_85/0.45)]'
+    'bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)] hover:shadow-[0_12px_36px_oklch(0.84_0.17_85/0.45)]'
 
   const ghostLight =
     'bg-white text-ink-soft border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)] hover:shadow-[0_6px_18px_oklch(0_0_0/0.04)] hover:border-[oklch(0.84_0.17_85/0.40)]'
@@ -94,7 +94,7 @@ export function MagneticLinkCta({
           style={{
             background:
               variant === 'primary'
-                ? 'oklch(0.10 0.02 260)'
+                ? 'oklch(0.22 0.075 256)'
                 : tone === 'dark'
                   ? 'oklch(0.84 0.17 85 / 0.15)'
                   : 'oklch(0.84 0.17 85 / 0.10)',

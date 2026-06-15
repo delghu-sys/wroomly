@@ -78,7 +78,7 @@ export function BrandListingCard({
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background:
-                      'linear-gradient(180deg, oklch(0.10 0.02 260 / 0.10) 0%, transparent 30%, transparent 60%, oklch(0.10 0.02 260 / 0.25) 100%)',
+                      'linear-gradient(180deg, oklch(0.22 0.075 256 / 0.10) 0%, transparent 30%, transparent 60%, oklch(0.22 0.075 256 / 0.25) 100%)',
                   }}
                   aria-hidden
                 />
@@ -108,7 +108,7 @@ export function BrandListingCard({
 
             {/* Photo count */}
             {imageCount > 1 && (
-              <div className="absolute bottom-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[oklch(0.10_0.02_260/0.55)] backdrop-blur-sm text-white">
+              <div className="absolute bottom-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[oklch(0.22_0.075_256/0.55)] backdrop-blur-sm text-white">
                 {imageCount} photos
               </div>
             )}
@@ -190,7 +190,7 @@ export function BrandListingCard({
               <div className="flex items-center gap-1.5">
                 <Avatar className="h-6 w-6 ring-1 ring-line">
                   <AvatarImage src={listing.users?.avatar_url ?? undefined} />
-                  <AvatarFallback className="text-[10px] bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)]">
+                  <AvatarFallback className="text-[10px] bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

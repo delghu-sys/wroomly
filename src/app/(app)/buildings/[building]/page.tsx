@@ -111,7 +111,7 @@ export default async function BuildingPage({
             </p>
             <Link
               href="/listings"
-              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-[oklch(0.10_0.02_260)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.10_0.02_260)]/90 transition"
+              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
             >
               Browse all listings <ArrowRight className="w-4 h-4" />
             </Link>

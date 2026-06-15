@@ -147,7 +147,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
             transition-all duration-300
             ${
               ready
-                ? 'bg-[oklch(0.84_0.17_85)] text-[oklch(0.10_0.02_260)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.40)] hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.50)]'
+                ? 'bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.40)] hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.50)]'
                 : 'bg-ink-muted/10 text-ink-muted cursor-not-allowed'
             }
           `}
