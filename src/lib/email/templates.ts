@@ -95,6 +95,39 @@ function escapeHtml(s: string): string {
 // Templates
 // ─────────────────────────────────────────────────────────────────────
 
+export function listingImportClaimEmail(opts: {
+  claimUrl: string
+  listingTitle: string | null
+}) {
+  const titleLine = opts.listingTitle
+    ? `We turned your post into a draft: <strong style="color:#1a1a2e;">${escapeHtml(opts.listingTitle)}</strong>.`
+    : 'We created a Wroomly draft from your existing sublet post.'
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#9a7a1e;">Your draft is ready</p>
+    <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;letter-spacing:-0.02em;color:#1a1a2e;font-weight:600;">
+      Review &amp; publish your Wroomly listing
+    </h1>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.55;color:#4a4a5a;">
+      ${titleLine} Click below to review the details, create your account, and
+      publish it. <strong style="color:#1a1a2e;">Nothing goes live until you confirm.</strong>
+    </p>
+    ${ctaButton({ href: opts.claimUrl, label: 'Review my listing →' })}
+    <p style="margin:20px 0 0;font-size:13px;line-height:1.5;color:#6b6b7a;">
+      AI can make mistakes — please check the rent, dates, and details before
+      publishing. This link expires in 7 days.
+    </p>
+  `
+
+  return {
+    subject: 'Your Wroomly listing draft is ready',
+    html: shell({
+      preheader: 'Review and publish your Wroomly draft — nothing goes live until you confirm.',
+      bodyHtml: body,
+    }),
+  }
+}
+
 export function inquiryReceivedEmail(opts: {
   supplierName: string | null
   consumerName: string | null

@@ -13,7 +13,16 @@ const SUPPLIER_ROUTES = ['/my-listings', '/listings/new', '/inquiries', '/payout
 // login page in Search Console, and would have made every neighborhood /
 // building / guide page invisible to search.
 const PUBLIC_FILES = ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest']
-const PUBLIC_PREFIXES = ['/ann-arbor/', '/buildings/', '/guides/']
+// /import-listing + /claim-listing/ are public entry points for the AI
+// Listing Importer (a visitor may not have an account yet). The claim page
+// validates the token server-side; the claim/publish APIs do their own auth.
+const PUBLIC_PREFIXES = [
+  '/ann-arbor/',
+  '/buildings/',
+  '/guides/',
+  '/import-listing',
+  '/claim-listing/',
+]
 
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
@@ -22,6 +31,14 @@ export async function middleware(request: NextRequest) {
   // Stripe webhook validates its own signature; don't burn an auth lookup
   // or the cookie roundtrip on every event delivery.
   if (pathname === '/api/stripe/webhook') {
+    return supabaseResponse
+  }
+
+  // AI Listing Importer API. /api/listing-imports (create) is intentionally
+  // public — a visitor without an account submits here. The claim/publish
+  // sub-routes enforce their own auth, so let them through the middleware
+  // instead of redirecting unauthenticated POSTs to /sign-in.
+  if (pathname.startsWith('/api/listing-imports')) {
     return supabaseResponse
   }
 
