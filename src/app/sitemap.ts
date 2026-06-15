@@ -57,6 +57,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Best-effort listings — if Supabase is unreachable at build/edge time, fall
   // back to the static routes only so the sitemap still serves.
+  //
+  // SEO: `status = 'active'` is also our test-data exclusion. Placeholder /
+  // test listings should be set to status='archived' (reversible, keeps the
+  // row) so they drop out of the sitemap, browse grid, and structured data
+  // without a schema change. We deliberately don't add an is_test column —
+  // it would create a deploy-ordering hazard (code filtering a column the
+  // prod DB doesn't have yet) for no gain over status-based exclusion.
   try {
     const supabase = await createClient()
     const { data } = await supabase

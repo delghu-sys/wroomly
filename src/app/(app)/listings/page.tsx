@@ -18,13 +18,20 @@ import {
 import { getListingImageUrl } from '@/lib/utils/listing'
 
 export const metadata: Metadata = {
-  title: 'Browse Listings',
+  title: 'Browse University of Michigan Sublets in Ann Arbor',
   description:
-    'Find verified sublets and apartment swaps near the University of Michigan.',
+    'Browse verified University of Michigan sublets and apartment swaps in Ann Arbor. Filter by neighborhood, price, bedrooms, and move-in date. @umich.edu-verified, escrow payments.',
+  // SEO: every filtered variant (?type=sublet, ?furnished=true, ?q=…) is the
+  // same content sliced differently — canonicalize them all to the bare
+  // /listings URL so crawl equity isn't split across thousands of
+  // near-duplicate parameter URLs.
+  alternates: {
+    canonical: '/listings',
+  },
   openGraph: {
-    title: 'Browse Listings | Wroomly',
+    title: 'Browse University of Michigan Sublets in Ann Arbor | Wroomly',
     description:
-      'Find verified sublets and apartment swaps near the University of Michigan.',
+      'Verified UMich sublets & apartment swaps in Ann Arbor. Filter by neighborhood, price, and dates.',
     images: ['/og-default.png'],
   },
 }

@@ -10,8 +10,13 @@ import { BookingSidebar } from '@/components/listings/BookingSidebar'
 import { BrandChip } from '@/components/brand/BrandChip'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
 import { BedDouble, Bath, Maximize2, Calendar, ArrowLeftRight, MapPin } from 'lucide-react'
-import { formatDateRange } from '@/lib/utils/listing'
+import { formatDateRange, getListingImageUrl } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
+import {
+  JsonLd,
+  listingJsonLd,
+  breadcrumbJsonLd,
+} from '@/components/seo/JsonLd'
 
 export async function generateMetadata({
   params,
@@ -22,7 +27,9 @@ export async function generateMetadata({
   const supabase = await createClient()
   const { data } = await supabase
     .from('listings')
-    .select('title, bedrooms, neighborhood, available_from, available_to')
+    .select(
+      'title, type, bedrooms, neighborhood, price_per_month, available_from, available_to',
+    )
     .eq('id', id)
     .single()
 
@@ -37,10 +44,21 @@ export async function generateMetadata({
     data.bedrooms === 0
       ? 'Studio'
       : data.bedrooms === 1
-        ? '1 bedroom'
+        ? '1-bedroom'
         : data.bedrooms
           ? `${data.bedrooms}-bedroom`
           : 'Room'
+
+  const typeLabel = data.type === 'swap' ? 'housing swap' : 'sublet'
+  const where = data.neighborhood ? `${data.neighborhood}, Ann Arbor` : 'Ann Arbor'
+  const priceLabel =
+    data.type === 'sublet' && data.price_per_month
+      ? ` — $${Math.round(data.price_per_month / 100).toLocaleString()}/mo`
+      : ''
+
+  // SEO: keyword-led, unique per listing — "{bedrooms} {type} near
+  // {neighborhood}, Ann Arbor — $price/mo". Real fields, never hardcoded.
+  const seoTitle = `${bedroomLabel} ${typeLabel} near ${where}${priceLabel}`
 
   const dateRange =
     data.available_from && data.available_to
@@ -54,21 +72,23 @@ export async function generateMetadata({
         })}`
       : 'flexible dates'
 
-  const description = `${bedroomLabel}${
-    data.neighborhood ? ` in ${data.neighborhood}` : ''
-  } — available ${dateRange}. Listed by a verified U of M student.`
+  const description = `${bedroomLabel} ${typeLabel} in ${where}, available ${dateRange}. Listed by a verified University of Michigan student on Wroomly — secure escrow payment, no scams.`
 
   return {
-    title: data.title,
+    title: seoTitle,
     description,
+    alternates: {
+      canonical: `/listings/${id}`,
+    },
     openGraph: {
-      title: `${data.title} | Wroomly`,
+      title: `${seoTitle} | Wroomly`,
       description,
+      type: 'website',
       images: ['/og-default.png'],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${data.title} | Wroomly`,
+      title: `${seoTitle} | Wroomly`,
       description,
       images: ['/og-default.png'],
     },
@@ -182,8 +202,42 @@ export default async function ListingDetailPage({
   const sortedImages = l.listing_images.sort((a, b) => a.display_order - b.display_order)
   const amenities = l.listing_amenities.map(a => a.amenity)
 
+  // SEO: only emit Accommodation/Breadcrumb structured data for publicly
+  // visible (active) listings. Don't mark up an archived/rented listing
+  // that's only reachable because the viewer booked it — those shouldn't
+  // surface as available inventory in search.
+  const emitStructuredData = isPubliclyVisible
+
   return (
     <div className="bg-background">
+      {emitStructuredData && (
+        <JsonLd
+          data={[
+            listingJsonLd({
+              id: l.id,
+              title: l.title,
+              description: l.description,
+              type: l.type,
+              pricePerMonthCents: l.price_per_month,
+              bedrooms: l.bedrooms,
+              bathrooms: l.bathrooms,
+              neighborhood: l.neighborhood,
+              city: l.city,
+              state: l.state,
+              availableFrom: l.available_from,
+              availableTo: l.available_to,
+              furnished: l.furnished,
+              petsAllowed: l.pets_allowed,
+              imageUrls: sortedImages.map(img => getListingImageUrl(img.storage_path)),
+            }),
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Browse', path: '/listings' },
+              { name: l.title, path: `/listings/${l.id}` },
+            ]),
+          ]}
+        />
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* "Your reservation" banner — shown when the viewer has paid for
             this listing. Makes it immediately obvious they're looking at

@@ -57,11 +57,18 @@ export function HomeHero() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-20 items-center">
           {/* Left — content */}
           <div>
-            <h1 className="font-display text-[clamp(2.8rem,7vw,5.5rem)] leading-[0.95] tracking-tight text-white">
-              <TextScramble text="Make room for" />
+            {/* SEO: brand tagline kept as a kicker (not the heading) so the
+                <h1> can lead with the real intent keyword "University of
+                Michigan sublets". Single h1 per page; scramble animation
+                preserved on both heading lines. */}
+            <p className="font-display text-sm uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] mb-4">
+              Make room for connection.
+            </p>
+            <h1 className="font-display text-[clamp(2.6rem,6.4vw,5rem)] leading-[0.98] tracking-tight text-white">
+              <TextScramble text="University of Michigan" />
               <br />
               <TextScramble
-                text="connection."
+                text="sublets in Ann Arbor."
                 delay={400}
                 className="italic font-light text-[oklch(0.84_0.17_85)]"
               />
