@@ -53,6 +53,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  // Google Search Console domain/URL-prefix verification. Renders as
+  // <meta name="google-site-verification" content="…"> in <head>.
+  verification: {
+    google: 'pWJX73rXPY1_5JM6qjWQq1YT7trlQibJCNcvkJQB1ks',
+  },
   // NOTE: /og-default.png is a placeholder — drop a real 1200×630 OG image
   // (navy background, maize logo, headline) into /public to ship.
   openGraph: {
