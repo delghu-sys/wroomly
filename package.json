@@ -10,6 +10,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:rls": "node --env-file=.env.local scripts/test-rls-self-promote.mjs",
+    "test:unit": "node --test tests/unit/*.test.ts",
     "sentry:check": "node --env-file=.env.sentry-build-plugin scripts/sentry-issues.mjs --include-event"
   },
   "dependencies": {
