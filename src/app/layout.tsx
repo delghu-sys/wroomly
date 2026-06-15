@@ -19,6 +19,7 @@ const display = Syne({
 const mono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 // Set the canonical origin for all metadata URLs (og:image, twitter:image,
