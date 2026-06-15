@@ -2,10 +2,18 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
 
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy']
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides']
 const AUTH_ROUTES = ['/sign-in', '/sign-up', '/verify-email']
 const ADMIN_ROUTES = ['/admin']
 const SUPPLIER_ROUTES = ['/my-listings', '/listings/new', '/inquiries', '/payouts']
+
+// SEO: crawler-facing files + public landing-page sections. Without these
+// the middleware bounces logged-out requests (including Googlebot) to
+// /sign-in — which is exactly why /sitemap.xml was being read as an HTML
+// login page in Search Console, and would have made every neighborhood /
+// building / guide page invisible to search.
+const PUBLIC_FILES = ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest']
+const PUBLIC_PREFIXES = ['/ann-arbor/', '/buildings/', '/guides/']
 
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
@@ -28,6 +36,8 @@ export async function middleware(request: NextRequest) {
     AUTH_ROUTES.some(r => pathname.startsWith(r)) ||
     pathname.startsWith('/reset-password') ||
     PUBLIC_ROUTES.some(r => pathname === r) ||
+    PUBLIC_FILES.includes(pathname) ||
+    PUBLIC_PREFIXES.some(p => pathname.startsWith(p)) ||
     (pathname.startsWith('/listings/') && !pathname.endsWith('/edit') && !pathname.endsWith('/new')) ||
     pathname.startsWith('/users/')
   ) {
