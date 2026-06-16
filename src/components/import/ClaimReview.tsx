@@ -14,6 +14,8 @@ interface ClaimReviewProps {
   personalPhotos: { path: string; url: string }[]
   buildingPhotos: { path: string; url: string }[]
   enrichmentUsed: boolean
+  /** Whether the signed-in account is a verified @umich.edu email. */
+  isUmichEmail: boolean
 }
 
 const LABEL_TEXT: Record<SourceLabel, string> = {
@@ -44,7 +46,7 @@ const labelCls = 'flex items-center gap-2 text-[13px] font-medium text-ink-soft 
 const inputCls =
   'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition'
 
-export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
+export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed, isUmichEmail }: ClaimReviewProps) {
   const router = useRouter()
   const [draft, setDraft] = useState<ExtractedListingDraft>(initial)
   // Photos can grow at review time (essential for text-only imports).
@@ -115,6 +117,10 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
   async function publish() {
     if (publishing) return
+    if (!isUmichEmail) {
+      toast.error('You need a verified @umich.edu email to publish.')
+      return
+    }
     setMissing([])
     setPublishing(true)
     const confirmedPhotoPaths = personalPhotos.filter(p => selectedPhotos.has(p.url)).map(p => p.path)
@@ -308,7 +314,18 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         )}
       </div>
 
-      <button type="button" onClick={publish} disabled={publishing}
+      {!isUmichEmail && (
+        <div className="rounded-2xl border border-[oklch(0.85_0.10_75)] bg-[oklch(0.97_0.04_75)] px-4 py-3 text-[13px] text-[oklch(0.45_0.14_75)] flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <span>
+            You’re signed in with a non-@umich.edu email. Publishing a listing
+            requires a verified University of Michigan email — sign in with your
+            @umich.edu account to publish. Your draft is saved.
+          </span>
+        </div>
+      )}
+
+      <button type="button" onClick={publish} disabled={publishing || !isUmichEmail}
         className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98] disabled:opacity-60">
         {publishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</> : 'Review complete — publish listing'}
       </button>
