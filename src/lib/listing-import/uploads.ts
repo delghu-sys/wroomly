@@ -49,8 +49,9 @@ export async function uploadImportImages(
     }
 
     const ext = EXT_BY_MIME[file.type] ?? 'jpg'
-    // Server-generated path — never trust the client filename.
-    const path = `imports/${opts.requestId}/${opts.kind}/${i}.${ext}`
+    // Server-generated path — never trust the client filename. Timestamp
+    // prefix keeps later review-time additions from overwriting the originals.
+    const path = `imports/${opts.requestId}/${opts.kind}/${Date.now()}-${i}.${ext}`
 
     const { error } = await service.storage
       .from(BUCKET)

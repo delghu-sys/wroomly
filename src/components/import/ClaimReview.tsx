@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Loader2, AlertTriangle, Info } from 'lucide-react'
+import { Loader2, AlertTriangle, Info, Upload } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { mapSourceAttribution, type SourceLabel } from '@/lib/listing-import/normalize'
 
@@ -44,22 +44,52 @@ const labelCls = 'flex items-center gap-2 text-[13px] font-medium text-ink-soft 
 const inputCls =
   'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition'
 
-export function ClaimReview({ token, draft: initial, personalPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
+export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
   const router = useRouter()
   const [draft, setDraft] = useState<ExtractedListingDraft>(initial)
+  // Photos can grow at review time (essential for text-only imports).
+  const [personalPhotos, setPersonalPhotos] = useState(initialPhotos)
+  const [uploadingPhotos, setUploadingPhotos] = useState(false)
   const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(
     // Default-select personal photos the AI thinks are housing photos.
     new Set(
       initial.photos
         .filter(p => p.sourceType === 'USER_UPLOADED_PERSONAL' && p.isLikelyHousingPhoto && !p.shouldRequireUserConfirmationBeforePublish)
         .map(p => p.sourceUrl)
-        .filter(url => personalPhotos.some(pp => pp.url === url)),
+        .filter(url => initialPhotos.some(pp => pp.url === url)),
     ),
   )
   const [confirmAccuracy, setConfirmAccuracy] = useState(false)
   const [confirmEnrichment, setConfirmEnrichment] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [missing, setMissing] = useState<string[]>([])
+
+  async function addPhotos(files: File[]) {
+    if (files.length === 0 || uploadingPhotos) return
+    setUploadingPhotos(true)
+    try {
+      const fd = new FormData()
+      fd.append('token', token)
+      files.forEach(f => fd.append('photos', f))
+      const res = await fetch('/api/listing-imports/photos', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok || !json.ok) {
+        toast.error(json.error ?? 'Could not upload photos.')
+        return
+      }
+      const added: { path: string; url: string }[] = json.photos
+      setPersonalPhotos(prev => [...prev, ...added])
+      setSelectedPhotos(prev => {
+        const next = new Set(prev)
+        added.forEach(p => next.add(p.url))
+        return next
+      })
+    } catch {
+      toast.error('Could not upload photos.')
+    } finally {
+      setUploadingPhotos(false)
+    }
+  }
 
   // Associate the draft with this account on mount (idempotent).
   useEffect(() => {
@@ -198,10 +228,30 @@ export function ClaimReview({ token, draft: initial, personalPhotos, buildingPho
         </div>
       )}
 
-      {/* Photo selection */}
-      {personalPhotos.length > 0 && (
-        <div>
-          <p className={labelCls}>Your photos — pick which to publish</p>
+      {/* Photo selection + add */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <p className={`${labelCls} mb-0`}>
+            {personalPhotos.length > 0 ? 'Your photos — pick which to publish' : 'Add photos of your place'}
+          </p>
+          <label className="inline-flex items-center gap-1.5 text-[12px] font-medium text-navy hover:text-ink cursor-pointer">
+            {uploadingPhotos ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+            {uploadingPhotos ? 'Uploading…' : 'Add photos'}
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp"
+              multiple
+              className="hidden"
+              disabled={uploadingPhotos}
+              onChange={e => addPhotos(Array.from(e.target.files ?? []))}
+            />
+          </label>
+        </div>
+        {personalPhotos.length === 0 ? (
+          <p className="text-[12px] text-ink-muted">
+            You imported text only — add at least one real photo of your place to publish.
+          </p>
+        ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {personalPhotos.map(p => {
               const on = selectedPhotos.has(p.url)
@@ -214,8 +264,8 @@ export function ClaimReview({ token, draft: initial, personalPhotos, buildingPho
               )
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {buildingPhotos.length > 0 && (
         <p className="text-[12px] text-ink-muted">
           Building/floor-plan images you uploaded are kept as reference and are <strong>not</strong> published as listing photos.

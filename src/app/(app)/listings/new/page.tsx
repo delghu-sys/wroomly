@@ -123,6 +123,25 @@ export default async function NewListingPage() {
           It only takes a few minutes. You can save drafts and come back.
         </p>
       </div>
+
+      {/* Shortcut: import an existing post instead of filling this out by hand. */}
+      <Link
+        href="/import-listing"
+        className="group mb-8 flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-[oklch(0.84_0.17_85/0.5)] transition"
+      >
+        <div>
+          <p className="font-medium text-ink text-[15px]">
+            Already posted this sublet somewhere else?
+          </p>
+          <p className="text-[13px] text-ink-muted mt-0.5">
+            Paste your post or upload screenshots — we’ll draft it for you.
+          </p>
+        </div>
+        <span className="shrink-0 inline-flex items-center gap-1 text-[13px] font-semibold text-navy group-hover:gap-2 transition-all">
+          Import it →
+        </span>
+      </Link>
+
       <ListingWizard userId={user.id} />
     </div>
   )

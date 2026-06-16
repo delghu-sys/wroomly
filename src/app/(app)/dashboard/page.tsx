@@ -87,11 +87,19 @@ export default async function DashboardPage() {
             </h1>
             <p className="text-ink-muted mt-2">Here&apos;s what&apos;s happening with your listings.</p>
           </div>
-          <Link href="/listings/new">
-            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-5 shadow-[0_8px_24px_oklch(0.27_0.07_257_/_0.22)]">
-              <Plus className="w-4 h-4 mr-1" /> List a place
-            </Button>
-          </Link>
+          <div className="flex flex-col items-stretch sm:items-end gap-1.5">
+            <Link href="/listings/new">
+              <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-5 shadow-[0_8px_24px_oklch(0.27_0.07_257_/_0.22)]">
+                <Plus className="w-4 h-4 mr-1" /> List a place
+              </Button>
+            </Link>
+            <Link
+              href="/import-listing"
+              className="text-[12.5px] text-navy hover:text-ink text-center sm:text-right underline-offset-2 hover:underline"
+            >
+              or import an existing post
+            </Link>
+          </div>
         </div>
 
         {/* Payout setup nudge — auto-hides once Stripe is fully active. */}
