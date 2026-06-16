@@ -72,14 +72,15 @@ export default async function HomePage() {
                   <Sparkles className="w-3.5 h-3.5" /> New · AI Listing Importer
                 </p>
                 <h2 className="font-display text-2xl sm:text-3xl tracking-tight text-white leading-[1.1]">
-                  Already posted your sublet elsewhere?{' '}
+                  List your place in seconds —{' '}
                   <span className="italic font-light text-[oklch(0.84_0.17_85)]">
-                    Import it in seconds.
+                    just upload photos.
                   </span>
                 </h2>
                 <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
-                  Paste your Facebook, GroupMe, or Reddit post — or upload screenshots — and
-                  Wroomly drafts your listing for you. Review and publish in minutes.
+                  Upload photos of your room or apartment (plus screenshots of an existing
+                  post, if you have one) and Wroomly drafts your listing. Review and publish
+                  in minutes.
                 </p>
               </div>
               <span className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] font-semibold text-sm shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)] group-hover:gap-3 transition-all">

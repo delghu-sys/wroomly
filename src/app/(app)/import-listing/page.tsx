@@ -3,9 +3,9 @@ import { ImportListingForm } from '@/components/import/ImportListingForm'
 import { Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Import your sublet post',
+  title: 'List your place with photos',
   description:
-    'Already posted your sublet on Facebook, GroupMe, Reddit, or Craigslist? Paste it or upload screenshots — Wroomly turns it into a draft listing you can review and publish.',
+    'Upload photos of your room or apartment — and screenshots of your existing post if you have one. Wroomly turns them into a draft listing you can review and publish.',
   alternates: { canonical: '/import-listing' },
 }
 
@@ -17,12 +17,13 @@ export default function ImportListingPage() {
           <Sparkles className="w-3.5 h-3.5" /> AI Listing Importer
         </p>
         <h1 className="font-display text-3xl sm:text-4xl tracking-tight text-ink leading-[1.05] text-balance">
-          Already posted your sublet{' '}
-          <span className="italic font-light text-navy">somewhere else?</span>
+          Upload your photos.{' '}
+          <span className="italic font-light text-navy">We’ll draft the listing.</span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          Paste your post or upload screenshots. Wroomly will turn it into a draft
-          listing you can review and publish.
+          Add photos of your room or apartment — and screenshots of your existing post
+          if you have one. Wroomly turns them into a draft you can review and publish.
+          A written description is optional.
         </p>
       </header>
 

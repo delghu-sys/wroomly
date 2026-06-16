@@ -4,10 +4,11 @@ import type { ListingImportInput, ExtractedListingDraft } from '@/types/listing-
 import { extractedListingDraftSchema } from '@/lib/listing-import/schema'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 
-// Vision-capable, cheap. Extraction is mostly OCR + structuring, which Haiku
-// handles well. Bump to a Sonnet model here if extraction quality demands it.
-const MODEL = 'claude-haiku-4-5'
-const MAX_TOKENS = 3000
+// Sonnet — extraction quality from photos + screenshots matters far more
+// than the per-import cost (one call per listing, low volume). Sonnet reads
+// messy screenshots and writes far better listing copy than Haiku.
+const MODEL = 'claude-sonnet-4-6'
+const MAX_TOKENS = 3500
 
 let _client: Anthropic | null = null
 function getAnthropic(): Anthropic {
@@ -43,6 +44,8 @@ RULES:
 - Flag safety concerns: suspicious payment asks / scam signals (suspiciousOrScamLike), private/sensitive info visible in screenshots (mayContainPersonalInfo), unclear ownership (unclearOwnership), repost risk (duplicateOrRepostRisk), copyrighted building marketing (copyrightedBuildingMarketingContentRisk), unclear building-photo permission (buildingPhotosPermissionUnclear).
 - Never include discriminatory or illegal housing language.
 - generatedMarketingCopy.polishedDescription / shortTitle: your own clean rewrite from known facts only. Mark these field names in fieldsGeneratedByAI.
+- PHOTO-FIRST: many submissions are photos of the room/apartment with little or no text. Read the images carefully and extract everything visible — room type, furnishings (furnished vs empty), apparent bedroom/bathroom layout, in-unit laundry, view, kitchen, condition — and any rent/dates/address visible in a screenshot. Always write an appealing, accurate title + description from what the photos actually show. Do NOT invent rent, exact dates, address, or policies that aren't visible; leave those null and list them in missingFields so the user fills them in. A photo-only listing should still come out clean and compelling.
+- Always produce a non-null title and description, even from photos alone (describe the space honestly). Only leave them null if there is genuinely nothing to describe.
 - All confidence values are between 0 and 1.
 
 Return ONLY a single valid JSON object matching the schema the user message specifies. No prose, no code fences.`

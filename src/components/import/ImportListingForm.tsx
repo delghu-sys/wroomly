@@ -41,7 +41,7 @@ export function ImportListingForm() {
     // Client-side mirror of the key rules (server re-validates).
     const personalText = (fd.get('personalPastedText') as string)?.trim()
     if (!personalText && personalFiles.length === 0) {
-      setFieldErrors({ personalPastedText: 'Paste your post or upload at least one screenshot.' })
+      setFieldErrors({ personalPastedText: 'Add at least one photo or screenshot of your place.' })
       return
     }
     if (fd.get('consentConfirmed') !== 'true') {
@@ -105,31 +105,52 @@ export function ImportListingForm() {
         {fieldErrors.email && <p className="text-xs text-[oklch(0.55_0.20_25)] mt-1">{fieldErrors.email}</p>}
       </div>
 
-      {/* ── Personal source section ── */}
+      {/* ── PRIMARY: photos + screenshots ── */}
+      <section className="rounded-3xl border-2 border-[oklch(0.84_0.17_85/0.45)] bg-surface p-5 sm:p-7 space-y-4 shadow-[0_8px_30px_oklch(0.84_0.17_85/0.10)]">
+        <div>
+          <h2 className="font-display text-xl tracking-tight text-ink">
+            Add photos of your place
+          </h2>
+          <p className="text-[14px] text-ink-soft mt-1.5 leading-relaxed">
+            Upload photos of the room or apartment — and screenshots of your existing
+            post (Facebook, GroupMe, Reddit…) if you have one. That’s all Wroomly needs
+            to draft your listing.
+          </p>
+        </div>
+
+        <FileField
+          label="Photos & screenshots"
+          files={personalFiles}
+          onChange={setPersonalFiles}
+          large
+        />
+        {fieldErrors.personalPastedText && (
+          <p className="text-xs text-[oklch(0.55_0.20_25)]">{fieldErrors.personalPastedText}</p>
+        )}
+      </section>
+
+      {/* ── OPTIONAL: description / existing post ── */}
       <section className="rounded-3xl border border-line bg-surface p-5 sm:p-6 space-y-4">
         <div>
-          <h2 className="font-display text-lg tracking-tight text-ink">Your existing sublet post</h2>
+          <h2 className="font-display text-lg tracking-tight text-ink flex items-center gap-2">
+            Add a description
+            <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-ink-muted bg-line/60 px-2 py-0.5 rounded-full">Optional</span>
+          </h2>
           <p className="text-[13px] text-ink-muted mt-1">
-            Paste your Facebook, GroupMe, Reddit, Craigslist, or other sublet post — or upload screenshots.
+            Paste your existing post or describe the place in your own words. The more
+            you add, the more accurate your draft.
           </p>
         </div>
 
         <div>
-          <label htmlFor="personalSourceUrl" className={labelCls}>Existing sublet post link (optional)</label>
-          <input id="personalSourceUrl" name="personalSourceUrl" type="url" placeholder="https://…" className={inputCls} />
+          <label htmlFor="personalPastedText" className={labelCls}>Description or pasted post</label>
+          <textarea id="personalPastedText" name="personalPastedText" rows={5} placeholder="Subletting my room May–Aug, $900/mo, 1 bed in a 4 bed 2 bath near Central. Furnished, utilities included…" className={inputCls} />
         </div>
 
         <div>
-          <label htmlFor="personalPastedText" className={labelCls}>Paste your sublet post</label>
-          <textarea id="personalPastedText" name="personalPastedText" rows={6} placeholder="Subletting my room May–Aug, $900/mo, 1 bed in a 4 bed 2 bath near Central…" className={inputCls} />
-          {fieldErrors.personalPastedText && <p className="text-xs text-[oklch(0.55_0.20_25)] mt-1">{fieldErrors.personalPastedText}</p>}
+          <label htmlFor="personalSourceUrl" className={labelCls}>Existing post link (optional)</label>
+          <input id="personalSourceUrl" name="personalSourceUrl" type="url" placeholder="https://…" className={inputCls} />
         </div>
-
-        <FileField
-          label="Upload screenshots or photos of your sublet post"
-          files={personalFiles}
-          onChange={setPersonalFiles}
-        />
       </section>
 
       {/* ── Building enrichment section ── */}
@@ -212,18 +233,30 @@ function FileField({
   label,
   files,
   onChange,
+  large = false,
 }: {
   label: string
   files: File[]
   onChange: (f: File[]) => void
+  large?: boolean
 }) {
   return (
     <div>
-      <span className={labelCls}>{label}</span>
-      <label className="flex flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-line hover:border-[oklch(0.84_0.17_85/0.5)] bg-white/60 px-4 py-6 cursor-pointer transition">
-        <Upload className="w-5 h-5 text-ink-muted" />
-        <span className="text-[13px] text-ink-soft">
-          {files.length > 0 ? `${files.length} file${files.length === 1 ? '' : 's'} selected` : 'Click to choose images'}
+      {!large && <span className={labelCls}>{label}</span>}
+      <label
+        className={`flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed cursor-pointer transition ${
+          large
+            ? 'border-[oklch(0.84_0.17_85/0.5)] hover:border-[oklch(0.84_0.17_85/0.8)] bg-[oklch(0.84_0.17_85/0.05)] px-4 py-12'
+            : 'border-line hover:border-[oklch(0.84_0.17_85/0.5)] bg-white/60 px-4 py-6'
+        }`}
+      >
+        <Upload className={large ? 'w-8 h-8 text-[oklch(0.45_0.13_85)]' : 'w-5 h-5 text-ink-muted'} />
+        <span className={large ? 'text-[15px] font-medium text-ink' : 'text-[13px] text-ink-soft'}>
+          {files.length > 0
+            ? `${files.length} file${files.length === 1 ? '' : 's'} selected`
+            : large
+              ? 'Click to upload photos & screenshots'
+              : 'Click to choose images'}
         </span>
         <span className="text-[11px] text-ink-muted">JPG, PNG, WebP · up to 10 · 8MB each</span>
         <input
