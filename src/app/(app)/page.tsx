@@ -53,44 +53,6 @@ export default async function HomePage() {
       {/* ── Hero — value prop + primary CTA ── */}
       <HomeHero />
 
-      {/* ── Supplier-only: prominent AI importer banner ── */}
-      {isSupplier && (
-        <section className="px-4 sm:px-6 lg:px-8 -mt-2 mb-2">
-          <Link
-            href="/import-listing"
-            className="group relative block max-w-7xl mx-auto overflow-hidden rounded-3xl border border-[oklch(0.84_0.17_85/0.55)] bg-[oklch(0.22_0.075_256)] px-6 sm:px-10 py-7 sm:py-8 shadow-[0_18px_50px_oklch(0.22_0.075_256/0.30)]"
-          >
-            {/* maize glow */}
-            <div
-              className="pointer-events-none absolute -top-16 -right-10 w-64 h-64 rounded-full blur-3xl opacity-40"
-              style={{ background: 'oklch(0.84 0.17 85 / 0.40)' }}
-              aria-hidden
-            />
-            <div className="relative flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
-              <div className="flex-1">
-                <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-bold mb-2">
-                  <Sparkles className="w-3.5 h-3.5" /> New · AI Listing Importer
-                </p>
-                <h2 className="font-display text-2xl sm:text-3xl tracking-tight text-white leading-[1.1]">
-                  List your place in seconds —{' '}
-                  <span className="italic font-light text-[oklch(0.84_0.17_85)]">
-                    just upload photos.
-                  </span>
-                </h2>
-                <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
-                  Upload photos of your room or apartment (plus screenshots of an existing
-                  post, if you have one) and Wroomly drafts your listing. Review and publish
-                  in minutes.
-                </p>
-              </div>
-              <span className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] font-semibold text-sm shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)] group-hover:gap-3 transition-all">
-                Import my post <ArrowRight className="w-4 h-4" />
-              </span>
-            </div>
-          </Link>
-        </section>
-      )}
-
       {/* ── Marquee — brand texture, one line ── */}
       <CinematicMarquee />
 
@@ -103,6 +65,37 @@ export default async function HomePage() {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Supplier-only: AI importer — light card matching the section's
+              card language (white surface, rounded-3xl, navy→maize CTA),
+              with a maize accent so it stands out without clashing. */}
+          {isSupplier && (
+            <ScrollReveal>
+              <Link
+                href="/import-listing"
+                className="group flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-10 rounded-3xl border border-[oklch(0.84_0.17_85/0.5)] bg-white/80 backdrop-blur-xl p-5 sm:p-6 shadow-[0_2px_16px_oklch(0_0_0/0.05)] hover:shadow-[0_12px_40px_oklch(0_0_0/0.10)] transition-shadow duration-500"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-[oklch(0.84_0.17_85/0.16)] text-[oklch(0.45_0.13_85)] flex items-center justify-center shrink-0">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[oklch(0.45_0.13_85)] font-bold mb-1">
+                    List your place
+                  </p>
+                  <h3 className="font-display text-xl tracking-tight text-ink leading-snug">
+                    Just upload photos — we’ll draft your listing.
+                  </h3>
+                  <p className="text-[13.5px] text-ink-muted mt-1 leading-relaxed">
+                    Add photos of your room (and screenshots of an existing post, if you
+                    have one). Review and publish in minutes.
+                  </p>
+                </div>
+                <span className="shrink-0 inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold group-hover:gap-3 transition-all">
+                  Import my listing <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </ScrollReveal>
+          )}
+
           <div className="flex items-end justify-between mb-10 gap-6 flex-wrap">
             <ScrollReveal>
               <p className="text-xs uppercase tracking-[0.2em] text-ink-muted font-medium mb-3">
