@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingWithDetails } from '@/types/database'
 import { formatCents, getListingImageUrl } from '@/lib/utils/listing'
-import { ArrowRight, MapPin, BedDouble } from 'lucide-react'
+import { ArrowRight, MapPin, BedDouble, Sparkles } from 'lucide-react'
 import { HomeHero } from '@/components/home/HomeHero'
 import { CinematicMarquee } from '@/components/home/CinematicMarquee'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
@@ -16,6 +16,22 @@ const NOISE_SVG =
 
 export default async function HomePage() {
   const supabase = await createClient()
+
+  // Detect a signed-in supplier so we can surface the AI importer
+  // prominently for them (they're the side that lists places).
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  let isSupplier = false
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('user_type')
+      .eq('id', user.id)
+      .single()
+    const t = (profile as { user_type?: string } | null)?.user_type
+    isSupplier = t === 'supplier' || t === 'admin'
+  }
 
   const { data: featuredListings } = await supabase
     .from('listings')
@@ -36,6 +52,43 @@ export default async function HomePage() {
     <div>
       {/* ── Hero — value prop + primary CTA ── */}
       <HomeHero />
+
+      {/* ── Supplier-only: prominent AI importer banner ── */}
+      {isSupplier && (
+        <section className="px-4 sm:px-6 lg:px-8 -mt-2 mb-2">
+          <Link
+            href="/import-listing"
+            className="group relative block max-w-7xl mx-auto overflow-hidden rounded-3xl border border-[oklch(0.84_0.17_85/0.55)] bg-[oklch(0.22_0.075_256)] px-6 sm:px-10 py-7 sm:py-8 shadow-[0_18px_50px_oklch(0.22_0.075_256/0.30)]"
+          >
+            {/* maize glow */}
+            <div
+              className="pointer-events-none absolute -top-16 -right-10 w-64 h-64 rounded-full blur-3xl opacity-40"
+              style={{ background: 'oklch(0.84 0.17 85 / 0.40)' }}
+              aria-hidden
+            />
+            <div className="relative flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
+              <div className="flex-1">
+                <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-bold mb-2">
+                  <Sparkles className="w-3.5 h-3.5" /> New · AI Listing Importer
+                </p>
+                <h2 className="font-display text-2xl sm:text-3xl tracking-tight text-white leading-[1.1]">
+                  Already posted your sublet elsewhere?{' '}
+                  <span className="italic font-light text-[oklch(0.84_0.17_85)]">
+                    Import it in seconds.
+                  </span>
+                </h2>
+                <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
+                  Paste your Facebook, GroupMe, or Reddit post — or upload screenshots — and
+                  Wroomly drafts your listing for you. Review and publish in minutes.
+                </p>
+              </div>
+              <span className="shrink-0 inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] font-semibold text-sm shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)] group-hover:gap-3 transition-all">
+                Import my post <ArrowRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+        </section>
+      )}
 
       {/* ── Marquee — brand texture, one line ── */}
       <CinematicMarquee />
