@@ -101,6 +101,11 @@ export function HomeHero() {
                   List your place
                 </MagneticButton>
               </Link>
+              <Link href="/import-listing">
+                <MagneticButton variant="secondary">
+                  Import your post
+                </MagneticButton>
+              </Link>
             </motion.div>
 
             {/* Trust badges — live indicators */}
