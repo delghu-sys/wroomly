@@ -104,6 +104,18 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
           <label className={labelCls}>Available to</label>
           <input type="date" className={inputCls} value={draft.availableTo ?? ''} onChange={e => set('availableTo', e.target.value || null)} />
         </div>
+        <div className="sm:col-span-2">
+          <label className={labelCls}>
+            Street address{' '}
+            <span className="text-[oklch(0.55_0.20_25)] font-bold">— required for the map (fill in if AI missed it)</span>
+          </label>
+          <input
+            className={`${inputCls} ${!draft.address ? 'border-[oklch(0.80_0.12_25)] bg-[oklch(0.99_0.01_25)]' : ''}`}
+            placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
+            value={draft.address ?? ''}
+            onChange={e => set('address', e.target.value || null)}
+          />
+        </div>
         <div>
           <label className={labelCls}>Neighborhood</label>
           <input className={inputCls} value={draft.neighborhood ?? ''} onChange={e => set('neighborhood', e.target.value || null)} />

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
 import { getListingImageUrl } from '@/lib/utils/listing'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
+import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { ClaimReview } from '@/components/import/ClaimReview'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react'
@@ -159,7 +159,7 @@ export default async function ClaimListingPage({
         personalPhotos={personalPhotos}
         buildingPhotos={buildingPhotos}
         enrichmentUsed={enrichmentUsed}
-        isUmichEmail={!!user.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`)}
+        canPublish={isAllowedSupplierEmail(user.email)}
       />
     </Shell>
   )

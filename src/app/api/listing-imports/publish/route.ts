@@ -4,7 +4,7 @@ import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-
 import { extractedListingDraftSchema } from '@/lib/listing-import/schema'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
+import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -37,12 +37,11 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Please sign in first.' }, { status: 401 })
 
-  // Imported listings must meet the same bar as the signup flow: only
-  // verified University of Michigan students can publish housing.
-  if (!user.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`)) {
+  if (!isAllowedSupplierEmail(user.email)) {
     return NextResponse.json(
       {
-        error: `You need a verified @${UMICH_EMAIL_DOMAIN} email to publish a listing. Sign in with your University of Michigan email.`,
+        error:
+          'You need a verified @umich.edu email to publish a listing. Sign in with your University of Michigan email.',
       },
       { status: 403 },
     )

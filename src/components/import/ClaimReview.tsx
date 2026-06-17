@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { toast } from 'sonner'
-import { Loader2, AlertTriangle, Info, Upload } from 'lucide-react'
+import { Loader2, AlertTriangle, Info, Upload, MapPin } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { mapSourceAttribution, type SourceLabel } from '@/lib/listing-import/normalize'
 
@@ -14,8 +14,8 @@ interface ClaimReviewProps {
   personalPhotos: { path: string; url: string }[]
   buildingPhotos: { path: string; url: string }[]
   enrichmentUsed: boolean
-  /** Whether the signed-in account is a verified @umich.edu email. */
-  isUmichEmail: boolean
+  /** Whether the signed-in account is allowed to publish (umich.edu or allowlisted). */
+  canPublish: boolean
 }
 
 const LABEL_TEXT: Record<SourceLabel, string> = {
@@ -46,7 +46,7 @@ const labelCls = 'flex items-center gap-2 text-[13px] font-medium text-ink-soft 
 const inputCls =
   'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition'
 
-export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed, isUmichEmail }: ClaimReviewProps) {
+export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed, canPublish }: ClaimReviewProps) {
   const router = useRouter()
   const [draft, setDraft] = useState<ExtractedListingDraft>(initial)
   // Photos can grow at review time (essential for text-only imports).
@@ -103,6 +103,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
   }, [token])
 
   const attribution = useMemo(() => mapSourceAttribution(draft.sourceAttribution), [draft.sourceAttribution])
+  const addressMissing = !draft.address || draft.address.trim().length === 0
   const set = <K extends keyof ExtractedListingDraft>(k: K, v: ExtractedListingDraft[K]) =>
     setDraft(d => ({ ...d, [k]: v }))
 
@@ -117,7 +118,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
   async function publish() {
     if (publishing) return
-    if (!isUmichEmail) {
+    if (!canPublish) {
       toast.error('You need a verified @umich.edu email to publish.')
       return
     }
@@ -164,6 +165,12 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           <span>Some details were enriched from the building or floor plan source you provided. Confirm they apply to your specific unit before publishing.</span>
         </div>
       )}
+      {addressMissing && (
+        <div className="rounded-2xl border border-[oklch(0.85_0.10_25)] bg-[oklch(0.97_0.04_25)] px-4 py-3 text-[13px] text-[oklch(0.45_0.18_25)] flex items-start gap-2">
+          <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
+          <span><strong>Street address required.</strong> The AI didn't detect your exact address — fill it in below so the map works for interested students.</span>
+        </div>
+      )}
 
       {/* Core editable fields */}
       <Field label="Title" badge={attribution.title}>
@@ -172,6 +179,21 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
       <Field label="Description" badge={attribution.description}>
         <textarea className={inputCls} rows={5} value={draft.description ?? ''} onChange={e => set('description', e.target.value || null)} />
       </Field>
+
+      {/* Address — required for the map; shown full-width, highlighted when empty */}
+      <div>
+        <span className={labelCls}>
+          <span>Street address</span>
+          <span className="text-[oklch(0.55_0.20_25)] text-[11px] font-bold uppercase tracking-[0.12em]">Required for map</span>
+          {attribution.address && <Badge label={attribution.address as SourceLabel} />}
+        </span>
+        <input
+          className={`${inputCls} ${addressMissing ? 'border-[oklch(0.80_0.12_25)] bg-[oklch(0.99_0.01_25)]' : ''}`}
+          placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
+          value={draft.address ?? ''}
+          onChange={e => set('address', e.target.value || null)}
+        />
+      </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <Field label="Monthly rent (USD)" badge={attribution.rentMonthly}>
@@ -314,7 +336,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         )}
       </div>
 
-      {!isUmichEmail && (
+      {!canPublish && (
         <div className="rounded-2xl border border-[oklch(0.85_0.10_75)] bg-[oklch(0.97_0.04_75)] px-4 py-3 text-[13px] text-[oklch(0.45_0.14_75)] flex items-start gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>
@@ -325,7 +347,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         </div>
       )}
 
-      <button type="button" onClick={publish} disabled={publishing || !isUmichEmail}
+      <button type="button" onClick={publish} disabled={publishing || !canPublish}
         className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98] disabled:opacity-60">
         {publishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</> : 'Review complete — publish listing'}
       </button>

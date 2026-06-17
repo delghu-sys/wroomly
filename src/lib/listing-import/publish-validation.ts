@@ -45,11 +45,8 @@ export function validatePublishRequirements(
 
   if (!draft.listingType) missing.push('A listing type (room, studio, etc.)')
 
-  const hasLocation =
-    !!draft.neighborhood ||
-    !!draft.address ||
-    (draft.campusArea != null && draft.campusArea !== 'UNKNOWN')
-  if (!hasLocation) missing.push('A location (neighborhood or campus area)')
+  if (!draft.address || draft.address.trim().length === 0)
+    missing.push('Street address — required for the map to work')
 
   if (ctx.confirmedPhotoCount < 1) missing.push('At least one photo')
 
