@@ -95,6 +95,35 @@ function escapeHtml(s: string): string {
 // Templates
 // ─────────────────────────────────────────────────────────────────────
 
+export function importReviewAdminEmail(opts: {
+  reviewUrl: string
+  submitterEmail: string
+  listingTitle: string | null
+}) {
+  const body = `
+    <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#9a7a1e;">Admin · needs review</p>
+    <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;letter-spacing:-0.02em;color:#1a1a2e;font-weight:600;">
+      New AI import to review
+    </h1>
+    <p style="margin:0 0 8px;font-size:15px;line-height:1.55;color:#4a4a5a;">
+      Submitted by <strong style="color:#1a1a2e;">${escapeHtml(opts.submitterEmail)}</strong>.
+      ${opts.listingTitle ? `Draft title: <strong style="color:#1a1a2e;">${escapeHtml(opts.listingTitle)}</strong>.` : ''}
+    </p>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.55;color:#4a4a5a;">
+      Review what they submitted vs. what the AI created, edit if needed, then
+      approve. The submitter only gets their claim email <strong style="color:#1a1a2e;">after you approve</strong>.
+    </p>
+    ${ctaButton({ href: opts.reviewUrl, label: 'Review this import →' })}
+  `
+  return {
+    subject: `Review needed: AI import from ${opts.submitterEmail}`,
+    html: shell({
+      preheader: `An AI listing import from ${opts.submitterEmail} is waiting for your approval.`,
+      bodyHtml: body,
+    }),
+  }
+}
+
 export function listingImportClaimEmail(opts: {
   claimUrl: string
   listingTitle: string | null

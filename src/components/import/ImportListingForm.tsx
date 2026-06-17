@@ -85,10 +85,11 @@ export function ImportListingForm() {
         >
           <CheckCircle2 className="w-7 h-7" />
         </div>
-        <h2 className="font-display text-2xl tracking-tight text-ink">Your draft is ready</h2>
+        <h2 className="font-display text-2xl tracking-tight text-ink">Draft received</h2>
         <p className="text-ink-muted mt-2 max-w-md mx-auto leading-relaxed">
-          We emailed you a secure link to review and publish it. Nothing goes live
-          until you confirm. Check your inbox (and spam, just in case).
+          Our team is giving it a quick look. Once it’s approved, we’ll email you a
+          secure link to review and publish it (usually within a day). Nothing goes
+          live until you confirm.
         </p>
       </div>
     )

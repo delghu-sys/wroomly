@@ -3,13 +3,9 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { importInputSchema } from '@/lib/listing-import/schema'
 import { uploadImportImages, UploadError } from '@/lib/listing-import/uploads'
 import { extractListingDraft } from '@/lib/ai/listing-importer'
-import {
-  generateClaimToken,
-  hashClaimToken,
-  claimTokenExpiry,
-} from '@/lib/listing-import/claim-token'
 import { sendEmail } from '@/lib/email/send'
-import { listingImportClaimEmail } from '@/lib/email/templates'
+import { importReviewAdminEmail } from '@/lib/email/templates'
+import { getAdminEmails } from '@/lib/listing-import/admins'
 import type { ListingImportInput } from '@/types/listing-import'
 
 export const runtime = 'nodejs'
@@ -149,17 +145,15 @@ export async function POST(request: Request) {
     conflicts: extraction.draft.conflictsBetweenSources.length,
   })
 
-  // 4. Mint claim token + persist everything.
-  const rawToken = generateClaimToken()
+  // 4. Persist the draft and hold for admin review. No claim token + no
+  //    user email yet — those happen only after an admin approves.
   const { error: finalizeErr } = await service
     .from('listing_import_requests')
     .update({
-      status: 'completed',
+      status: 'awaiting_admin_review',
       extracted_data: extraction.draft,
       personal_image_paths: personalImages.map(i => i.path),
       building_image_paths: buildingImages.map(i => i.path),
-      claim_token_hash: hashClaimToken(rawToken),
-      claim_token_expires_at: claimTokenExpiry().toISOString(),
     })
     .eq('id', requestId)
 
@@ -167,24 +161,22 @@ export async function POST(request: Request) {
     console.error('[listing-imports] finalize failed', finalizeErr)
     return NextResponse.json({ error: 'Could not save the draft. Please try again.' }, { status: 500 })
   }
-  console.info('[listing-imports] draft created', { requestId })
+  console.info('[listing-imports] draft created, awaiting admin review', { requestId })
 
-  // 5. Email the magic link. Never log the raw token.
-  const claimUrl = `${APP_URL}/claim-listing/${rawToken}`
-  const { subject, html } = listingImportClaimEmail({
-    claimUrl,
-    listingTitle: extraction.draft.title,
-  })
-  const emailResult = await sendEmail({ to: input.email, subject, html })
-  if (!emailResult.ok) {
-    // Draft is saved; only the email failed. Surface it so the user knows.
-    console.error('[listing-imports] claim email failed', { requestId })
-    return NextResponse.json(
-      { ok: false, error: 'Your draft was created, but we couldn’t send the email. Please contact help@wroomly.app.' },
-      { status: 502 },
-    )
+  // 5. Notify admins to review. The submitter's claim email is sent only
+  //    after an admin approves (see /api/admin/import-review). Best-effort.
+  const adminEmails = await getAdminEmails()
+  if (adminEmails.length > 0) {
+    const { subject, html } = importReviewAdminEmail({
+      reviewUrl: `${APP_URL}/admin/import-review/${requestId}`,
+      submitterEmail: input.email,
+      listingTitle: extraction.draft.title,
+    })
+    await sendEmail({ to: adminEmails, subject, html })
+    console.info('[listing-imports] admin review email sent', { requestId, recipients: adminEmails.length })
+  } else {
+    console.error('[listing-imports] no admin recipients — review email not sent', { requestId })
   }
-  console.info('[listing-imports] claim email sent', { requestId })
 
   return NextResponse.json({ ok: true })
 }
