@@ -34,6 +34,13 @@ export async function POST(request: Request) {
   if (files.length === 0) {
     return NextResponse.json({ error: 'No photos provided.' }, { status: 400 })
   }
+  // Review-time uploads become listing photos — images only, not PDFs.
+  if (files.some(f => f.type === 'application/pdf')) {
+    return NextResponse.json(
+      { error: 'Listing photos must be images (JPG, PNG, or WebP), not PDFs.' },
+      { status: 400 },
+    )
+  }
 
   const service = createServiceClient()
   const { data: req } = await service

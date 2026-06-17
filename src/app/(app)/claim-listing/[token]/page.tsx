@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
 import { getListingImageUrl } from '@/lib/utils/listing'
 import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
+import { isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { ClaimReview } from '@/components/import/ClaimReview'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react'
@@ -130,20 +131,20 @@ export default async function ClaimListingPage({
   }
 
   // Signed in + (unclaimed or own) → editable review.
-  const personalPhotos = (req.personal_image_paths ?? []).map((path: string) => ({
-    path,
-    url: getListingImageUrl(path),
-  }))
-  const buildingPhotos = (req.building_image_paths ?? []).map((path: string) => ({
-    path,
-    url: getListingImageUrl(path),
-  }))
+  // PDFs are AI source material, not publishable listing photos — exclude them
+  // from the photo picker so they don't render as broken thumbnails.
+  const personalPhotos = (req.personal_image_paths ?? [])
+    .filter(isPublishablePhotoPath)
+    .map((path: string) => ({ path, url: getListingImageUrl(path) }))
+  const buildingPhotos = (req.building_image_paths ?? [])
+    .filter(isPublishablePhotoPath)
+    .map((path: string) => ({ path, url: getListingImageUrl(path) }))
   const enrichmentUsed =
     !!req.building_source_url ||
     !!req.building_pasted_text ||
     !!req.building_name ||
     !!req.floor_plan_name ||
-    buildingPhotos.length > 0
+    (req.building_image_paths?.length ?? 0) > 0
 
   return (
     <Shell>

@@ -16,6 +16,7 @@ const EXT_BY_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
+  'application/pdf': 'pdf',
 }
 
 /**
@@ -42,10 +43,14 @@ export async function uploadImportImages(
     const file = files[i]
 
     if (!(UPLOAD_LIMITS.acceptedMimeTypes as readonly string[]).includes(file.type)) {
-      throw new UploadError('Only JPG, PNG, and WebP images are allowed.')
+      throw new UploadError('Only JPG, PNG, WebP images, or PDF files are allowed.')
     }
-    if (file.size > UPLOAD_LIMITS.maxBytesPerFile) {
-      throw new UploadError('Each image must be 8MB or smaller.')
+    const isPdf = file.type === 'application/pdf'
+    const sizeLimit = isPdf ? UPLOAD_LIMITS.maxPdfBytesPerFile : UPLOAD_LIMITS.maxBytesPerFile
+    if (file.size > sizeLimit) {
+      throw new UploadError(
+        isPdf ? 'Each PDF must be 25MB or smaller.' : 'Each image must be 8MB or smaller.',
+      )
     }
 
     const ext = EXT_BY_MIME[file.type] ?? 'jpg'

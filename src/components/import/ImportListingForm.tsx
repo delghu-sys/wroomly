@@ -6,15 +6,18 @@ import { Loader2, Upload, CheckCircle2, AlertCircle, Sparkles } from 'lucide-rea
 
 type Phase = 'form' | 'submitting' | 'success'
 
-const ACCEPT = '.jpg,.jpeg,.png,.webp'
+const ACCEPT = '.jpg,.jpeg,.png,.webp,.pdf'
 
 function filesValid(files: File[]): string | null {
   if (files.length > UPLOAD_LIMITS.maxFiles)
     return `Upload at most ${UPLOAD_LIMITS.maxFiles} files.`
   for (const f of files) {
     if (!(UPLOAD_LIMITS.acceptedMimeTypes as readonly string[]).includes(f.type))
-      return 'Only JPG, PNG, and WebP images are allowed.'
-    if (f.size > UPLOAD_LIMITS.maxBytesPerFile) return 'Each image must be 8MB or smaller.'
+      return 'Only JPG, PNG, WebP images, or PDF files are allowed.'
+    const isPdf = f.type === 'application/pdf'
+    const limit = isPdf ? UPLOAD_LIMITS.maxPdfBytesPerFile : UPLOAD_LIMITS.maxBytesPerFile
+    if (f.size > limit)
+      return isPdf ? 'Each PDF must be 25MB or smaller.' : 'Each image must be 8MB or smaller.'
   }
   return null
 }
@@ -113,14 +116,14 @@ export function ImportListingForm() {
             Add photos of your place
           </h2>
           <p className="text-[14px] text-ink-soft mt-1.5 leading-relaxed">
-            Upload photos of the room or apartment — and screenshots of your existing
-            post (Facebook, GroupMe, Reddit…) if you have one. That’s all Wroomly needs
-            to draft your listing.
+            Upload photos of the room or apartment — plus screenshots of your existing
+            post (Facebook, GroupMe, Reddit…) or a PDF of your lease/flyer if you have
+            one. That’s all Wroomly needs to draft your listing.
           </p>
         </div>
 
         <FileField
-          label="Photos & screenshots"
+          label="Photos, screenshots & PDFs"
           files={personalFiles}
           onChange={setPersonalFiles}
           large
@@ -256,10 +259,10 @@ function FileField({
           {files.length > 0
             ? `${files.length} file${files.length === 1 ? '' : 's'} selected`
             : large
-              ? 'Click to upload photos & screenshots'
-              : 'Click to choose images'}
+              ? 'Click to upload photos, screenshots & PDFs'
+              : 'Click to choose files'}
         </span>
-        <span className="text-[11px] text-ink-muted">JPG, PNG, WebP · up to 10 · 8MB each</span>
+        <span className="text-[11px] text-ink-muted">JPG, PNG, WebP, PDF · up to 10 · images 8MB, PDFs 25MB</span>
         <input
           type="file"
           accept={ACCEPT}

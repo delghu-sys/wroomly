@@ -6,7 +6,8 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getListingImageUrl } from '@/lib/utils/listing'
 import { AdminImportReview } from '@/components/admin/AdminImportReview'
 import type { ExtractedListingDraft } from '@/types/listing-import'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, FileText } from 'lucide-react'
+import { isPublishablePhotoPath } from '@/lib/listing-import/schema'
 
 export const metadata: Metadata = {
   title: 'Review AI import',
@@ -42,8 +43,17 @@ export default async function AdminImportReviewPage({
   if (!req) notFound()
 
   const draft = req.extracted_data as ExtractedListingDraft | null
-  const personalImages = (req.personal_image_paths ?? []).map((p: string) => getListingImageUrl(p))
-  const buildingImages = (req.building_image_paths ?? []).map((p: string) => getListingImageUrl(p))
+  const splitMedia = (paths: string[] | null) => {
+    const all = paths ?? []
+    return {
+      images: all.filter(isPublishablePhotoPath).map((p: string) => getListingImageUrl(p)),
+      pdfs: all.filter((p: string) => !isPublishablePhotoPath(p)).map((p: string) => getListingImageUrl(p)),
+    }
+  }
+  const personal = splitMedia(req.personal_image_paths)
+  const building = splitMedia(req.building_image_paths)
+  const personalImages = personal.images
+  const buildingImages = building.images
 
   const handled = req.status !== 'awaiting_admin_review'
 
@@ -80,19 +90,28 @@ export default async function AdminImportReviewPage({
             </Field>
           )}
 
-          <Field label={`Photos & screenshots (${personalImages.length})`}>
-            {personalImages.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
-                {personalImages.map((url: string, i: number) => (
-                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-lg overflow-hidden border border-line">
-                    <Image src={url} alt="" fill className="object-cover" sizes="120px" />
+          <Field label={`Photos, screenshots & PDFs (${personalImages.length + personal.pdfs.length})`}>
+            {personalImages.length > 0 || personal.pdfs.length > 0 ? (
+              <div className="space-y-2">
+                {personalImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2">
+                    {personalImages.map((url: string, i: number) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-lg overflow-hidden border border-line">
+                        <Image src={url} alt="" fill className="object-cover" sizes="120px" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {personal.pdfs.map((url: string, i: number) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-[13px] text-navy hover:border-navy/40">
+                    <FileText className="w-4 h-4 shrink-0" /> View submitted PDF {i + 1}
                   </a>
                 ))}
               </div>
             ) : <Empty>None</Empty>}
           </Field>
 
-          {(req.building_name || req.floor_plan_name || req.building_source_url || req.building_pasted_text || buildingImages.length > 0) && (
+          {(req.building_name || req.floor_plan_name || req.building_source_url || req.building_pasted_text || buildingImages.length > 0 || building.pdfs.length > 0) && (
             <Field label="Building / floor-plan enrichment">
               <div className="space-y-1.5 text-[13px] text-ink-soft">
                 {req.building_name && <p>Building: <strong className="text-ink">{req.building_name}</strong></p>}
@@ -108,6 +127,11 @@ export default async function AdminImportReviewPage({
                     ))}
                   </div>
                 )}
+                {building.pdfs.map((url: string, i: number) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-navy underline">
+                    <FileText className="w-4 h-4 shrink-0" /> View building PDF {i + 1}
+                  </a>
+                ))}
               </div>
             </Field>
           )}

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
-import { extractedListingDraftSchema } from '@/lib/listing-import/schema'
+import { extractedListingDraftSchema, isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
 import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
@@ -75,6 +75,9 @@ export async function POST(request: Request) {
   if (req.claimed_by_user_id !== user.id)
     return NextResponse.json({ error: 'You don’t have access to this draft.' }, { status: 403 })
 
+  // PDFs are AI source material, never listing photos — drop any that slip in.
+  const confirmedPhotoPaths = body.confirmedPhotoPaths.filter(isPublishablePhotoPath)
+
   const draft = normalizeExtractedListing(body.draft)
   const enrichmentUsed =
     !!req.building_source_url ||
@@ -89,7 +92,7 @@ export async function POST(request: Request) {
     userConfirmedAccuracy: body.userConfirmedAccuracy,
     enrichmentUsed,
     userConfirmedEnrichment: body.userConfirmedEnrichment,
-    confirmedPhotoCount: body.confirmedPhotoPaths.length,
+    confirmedPhotoCount: confirmedPhotoPaths.length,
   })
   if (!check.ok) {
     return NextResponse.json(
@@ -133,9 +136,9 @@ export async function POST(request: Request) {
 
   // Confirmed photos → listing_images (files already live in the bucket
   // under imports/…; storage_path can point there, same bucket).
-  if (body.confirmedPhotoPaths.length > 0) {
+  if (confirmedPhotoPaths.length > 0) {
     await service.from('listing_images').insert(
-      body.confirmedPhotoPaths.map((path, i) => ({
+      confirmedPhotoPaths.map((path, i) => ({
         listing_id: listingId,
         storage_path: path,
         display_order: i,

@@ -44,32 +44,49 @@ RULES:
 - Flag safety concerns: suspicious payment asks / scam signals (suspiciousOrScamLike), private/sensitive info visible in screenshots (mayContainPersonalInfo), unclear ownership (unclearOwnership), repost risk (duplicateOrRepostRisk), copyrighted building marketing (copyrightedBuildingMarketingContentRisk), unclear building-photo permission (buildingPhotosPermissionUnclear).
 - Never include discriminatory or illegal housing language.
 - generatedMarketingCopy.polishedDescription / shortTitle: your own clean rewrite from known facts only. Mark these field names in fieldsGeneratedByAI.
+- PDFs: some sources are PDF documents (lease/sublease agreements, building flyers, floor-plan sheets). Read the full document — extract rent, dates, address, unit details, amenities, and policies from the text and any embedded floor plans or photos. A PDF lease often contains the most reliable rent/date/address facts; treat a personal-source PDF as authoritative the same as the user's own post.
 - PHOTO-FIRST: many submissions are photos of the room/apartment with little or no text. Read the images carefully and extract everything visible — room type, furnishings (furnished vs empty), apparent bedroom/bathroom layout, in-unit laundry, view, kitchen, condition — and any rent/dates/address visible in a screenshot. Always write an appealing, accurate title + description from what the photos actually show. Do NOT invent rent, exact dates, address, or policies that aren't visible; leave those null and list them in missingFields so the user fills them in. A photo-only listing should still come out clean and compelling.
 - Always produce a non-null title and description, even from photos alone (describe the space honestly). Only leave them null if there is genuinely nothing to describe.
 - All confidence values are between 0 and 1.
 
 Return ONLY a single valid JSON object matching the schema the user message specifies. No prose, no code fences.`
 
-type ImageBlock = Anthropic.ImageBlockParam
+type MediaBlock = Anthropic.ImageBlockParam | Anthropic.DocumentBlockParam
 
-function buildImageBlocks(
+/**
+ * Build vision/document blocks from uploaded source files. Images become
+ * `image` blocks; PDFs become `document` blocks (Sonnet reads PDF pages
+ * natively — text + layout + embedded images).
+ */
+function buildMediaBlocks(
   urls: string[] | undefined,
   base64: ListingImportInput['personalImageBase64Payloads'],
-): ImageBlock[] {
-  const blocks: ImageBlock[] = []
+): MediaBlock[] {
+  const blocks: MediaBlock[] = []
   for (const url of urls ?? []) {
-    blocks.push({ type: 'image', source: { type: 'url', url } })
+    if (/\.pdf$/i.test(url)) {
+      blocks.push({ type: 'document', source: { type: 'url', url } })
+    } else {
+      blocks.push({ type: 'image', source: { type: 'url', url } })
+    }
   }
   for (const p of base64 ?? []) {
-    blocks.push({
-      type: 'image',
-      source: {
-        type: 'base64',
-        // SDK expects a specific media-type union; cast the validated value.
-        media_type: p.mimeType as 'image/jpeg' | 'image/png' | 'image/webp',
-        data: p.data,
-      },
-    })
+    if (p.mimeType === 'application/pdf') {
+      blocks.push({
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: p.data },
+      })
+    } else {
+      blocks.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          // SDK expects a specific media-type union; cast the validated value.
+          media_type: p.mimeType as 'image/jpeg' | 'image/png' | 'image/webp',
+          data: p.data,
+        },
+      })
+    }
   }
   return blocks
 }
@@ -122,12 +139,12 @@ export async function extractListingDraft(
 ${input.personalSourceUrl ? `Source link (for reference only, not scraped): ${input.personalSourceUrl}\n` : ''}${input.personalPastedText ? `Pasted post:\n${input.personalPastedText}` : '(no pasted text — see images below)'}`,
   })
 
-  const personalImgs = buildImageBlocks(
+  const personalImgs = buildMediaBlocks(
     input.personalImageUrls,
     input.personalImageBase64Payloads,
   )
   if (personalImgs.length) {
-    userBlocks.push({ type: 'text', text: 'Personal sublet screenshots/photos:' })
+    userBlocks.push({ type: 'text', text: 'Personal sublet screenshots, photos, and PDFs:' })
     userBlocks.push(...personalImgs)
   }
 
@@ -145,12 +162,12 @@ ${input.personalSourceUrl ? `Source link (for reference only, not scraped): ${in
       text: `=== BUILDING / FLOOR-PLAN ENRICHMENT SOURCE (factual enrichment only) ===
 ${input.buildingName ? `Building name: ${input.buildingName}\n` : ''}${input.floorPlanName ? `Floor plan: ${input.floorPlanName}\n` : ''}${input.buildingSourceUrl ? `Building link (reference only): ${input.buildingSourceUrl}\n` : ''}${input.buildingPastedText ? `Pasted building/floor-plan details:\n${input.buildingPastedText}` : ''}`,
     })
-    const buildingImgs = buildImageBlocks(
+    const buildingImgs = buildMediaBlocks(
       input.buildingImageUrls,
       input.buildingImageBase64Payloads,
     )
     if (buildingImgs.length) {
-      userBlocks.push({ type: 'text', text: 'Building/floor-plan screenshots:' })
+      userBlocks.push({ type: 'text', text: 'Building/floor-plan screenshots and PDFs:' })
       userBlocks.push(...buildingImgs)
     }
   }

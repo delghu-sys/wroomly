@@ -3,9 +3,15 @@ import { z } from 'zod'
 // ── Upload limits (shared between client + server validation) ──
 export const UPLOAD_LIMITS = {
   maxFiles: 10,
-  maxBytesPerFile: 8 * 1024 * 1024, // 8MB
-  acceptedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'] as const,
-  acceptedExtensions: ['jpg', 'jpeg', 'png', 'webp'] as const,
+  maxBytesPerFile: 8 * 1024 * 1024, // 8MB (images)
+  maxPdfBytesPerFile: 25 * 1024 * 1024, // 25MB (PDFs can be larger)
+  acceptedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const,
+  acceptedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf'] as const,
+}
+
+/** True when a stored file is a publishable image (not a PDF source doc). */
+export function isPublishablePhotoPath(path: string): boolean {
+  return !/\.pdf$/i.test(path)
 }
 
 export const MAX_PASTED_TEXT = 20_000 // chars — generous, prevents abuse
