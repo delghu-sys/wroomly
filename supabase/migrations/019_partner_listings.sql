@@ -20,7 +20,10 @@ alter type listing_source add value if not exists 'partner';
 -- 2. Forwarding address for partner inquiries.
 alter table listings add column if not exists inquiry_email text;
 
--- 3. Idempotency key for the partner importer: one row per address.
-create index if not exists listings_partner_dedupe_idx
-  on listings (address)
-  where source = 'partner';
+-- 3. Idempotency key for the partner importer: dedupe lookups are
+--    (source='partner' AND address=…). Index the COLUMN, not the literal
+--    'partner' value — a partial `where source = 'partner'` predicate would
+--    reference the freshly-added enum value in the same transaction, which
+--    Postgres rejects (55P04). A composite (source, address) index serves the
+--    same lookup and is safe to create in one migration.
+create index if not exists listings_source_address_idx on listings (source, address);
