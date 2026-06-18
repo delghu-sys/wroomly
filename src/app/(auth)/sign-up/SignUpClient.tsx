@@ -8,7 +8,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
+import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
@@ -54,7 +54,9 @@ const supplierSchema = z.object({
   email: z
     .string()
     .email('Invalid email')
-    .refine(e => e.endsWith(`@${UMICH_EMAIL_DOMAIN}`), {
+    // @umich.edu by default, plus any address on the supplier allowlist
+    // (NEXT_PUBLIC_ALLOWED_SUPPLIER_EMAILS) — same rule the publish gate uses.
+    .refine(isAllowedSupplierEmail, {
       message: 'Suppliers must use a @umich.edu email address',
     }),
   university: z.literal('University of Michigan'),
