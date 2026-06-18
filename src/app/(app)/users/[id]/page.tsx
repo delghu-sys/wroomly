@@ -96,7 +96,7 @@ export default async function UserProfilePage({
       .eq('supplier_id', id)
       .eq('status', 'active')
       .order('created_at', { ascending: false })
-      .limit(8),
+      .limit(24),
   ])
 
   const photos = (photosRes.data ?? []) as UserPhoto[]
@@ -184,8 +184,11 @@ export default async function UserProfilePage({
             </ScrollReveal>
           </div>
 
-          {/* ── Right column — listings + reviews ── */}
-          <div className="space-y-12">
+          {/* ── Right column — listings + reviews ──
+              min-w-0 lets this 1fr grid track shrink below the listings strip's
+              content width so the strip scrolls horizontally instead of blowing
+              the grid out and overlapping the profile column. */}
+          <div className="space-y-12 min-w-0">
             {/* Listings */}
             <ScrollReveal>
               <section>
