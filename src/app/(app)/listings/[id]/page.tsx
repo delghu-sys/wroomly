@@ -316,6 +316,24 @@ export default async function ListingDetailPage({
                     {l.neighborhood}, {l.city}, {l.state}
                   </p>
                 )}
+                {/* Seed provenance — honest attribution + link to the source. */}
+                {l.source === 'seed' && l.source_name && (
+                  <p className="mt-2 text-[13px] text-ink-muted">
+                    Listed on{' '}
+                    {l.source_url ? (
+                      <a
+                        href={l.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="text-navy underline underline-offset-2 hover:text-ink"
+                      >
+                        {l.source_name}
+                      </a>
+                    ) : (
+                      <span className="text-ink-soft">{l.source_name}</span>
+                    )}
+                  </p>
+                )}
               </div>
             </ScrollReveal>
 

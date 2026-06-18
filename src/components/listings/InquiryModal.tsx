@@ -37,6 +37,9 @@ interface InquiryModalProps {
     available_to: string
     supplier_id: string
     thumbnailUrl: string | null
+    // Seed listings have no real owner — inquiries go to an honest waitlist.
+    source?: 'user' | 'seed'
+    source_name?: string | null
   }
   authUserId: string
 }
@@ -103,6 +106,38 @@ export function InquiryModal({
 
   async function onSubmit(data: FormValues) {
     const supabase = createClient()
+
+    // Seed listings have no real owner to message. Capture the inquirer's
+    // interest on an honest waitlist (seed_inquiry) instead of opening a fake
+    // "message sent to landlord" chat thread. No conversation, no email.
+    if (listing.source === 'seed') {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('full_name, email')
+        .eq('id', authUserId)
+        .maybeSingle()
+      const { error: seedErr } = await supabase.from('seed_inquiry').insert({
+        listing_id: listing.id,
+        user_id: authUserId,
+        name: profile?.full_name ?? 'Wroomly user',
+        email: profile?.email ?? '',
+        message: data.message,
+      })
+      if (seedErr) {
+        toast.error('Could not save your request. Please try again.')
+        return
+      }
+      setPhase('success')
+      setTimeout(() => {
+        onClose()
+        reset()
+        setPhase('form')
+        toast.success('Thanks — we’ll notify you as listings open up.', {
+          icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+        })
+      }, 1400)
+      return
+    }
 
     const { data: inquiry, error: inquiryError } = await supabase
       .from('inquiries')
@@ -418,16 +453,33 @@ export function InquiryModal({
                   >
                     <CheckCircle2 className="w-7 h-7" strokeWidth={2.25} />
                   </motion.div>
-                  <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
-                    Inquiry sent —
-                    <br />
-                    <span className="italic font-light text-[oklch(0.45_0.13_85)]">
-                      you&rsquo;ll hear back soon.
-                    </span>
-                  </p>
-                  <p className="relative text-sm text-ink-muted mt-3">
-                    Opening your chat…
-                  </p>
+                  {listing.source === 'seed' ? (
+                    <>
+                      <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
+                        Thanks —
+                        <br />
+                        <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                          we&rsquo;ll notify you as listings open up.
+                        </span>
+                      </p>
+                      <p className="relative text-sm text-ink-muted mt-3">
+                        We&rsquo;ve added you to the waitlist for places like this.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
+                        Inquiry sent —
+                        <br />
+                        <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                          you&rsquo;ll hear back soon.
+                        </span>
+                      </p>
+                      <p className="relative text-sm text-ink-muted mt-3">
+                        Opening your chat…
+                      </p>
+                    </>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

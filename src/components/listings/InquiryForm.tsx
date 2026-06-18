@@ -303,6 +303,8 @@ export function InquiryForm({
           available_to: listing.available_to,
           supplier_id: listing.supplier_id,
           thumbnailUrl,
+          source: listing.source,
+          source_name: listing.source_name,
         }}
         authUserId={authUser.id}
       />

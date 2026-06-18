@@ -148,6 +148,10 @@ export interface Listing {
   auto_review_reason: string | null
   auto_review_flags: string[] | null
   auto_reviewed_at: string | null
+  // Provenance — 'user' for real listings, 'seed' for launch imports.
+  source: 'user' | 'seed'
+  source_name: string | null
+  source_url: string | null
   created_at: string
   updated_at: string
 }

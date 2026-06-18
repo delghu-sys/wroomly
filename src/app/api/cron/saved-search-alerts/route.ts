@@ -133,6 +133,9 @@ async function findMatches(
       listing_images ( storage_path, display_order )
     `)
     .eq('status', 'active')
+    // Never alert on seed listings — they're launch supply, not real new
+    // matches, and would otherwise email users about all 120 at once.
+    .eq('source', 'user')
     .gt('created_at', search.last_alerted_at)
     .order('created_at', { ascending: false })
     .limit(10)
