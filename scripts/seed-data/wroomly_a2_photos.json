@@ -1,0 +1,156 @@
+{
+  "note": "A2 Management photos for the 6 partner listings. Sy Berman (A2) authorized use of these images. Source: a2managementrentals.com (WordPress media library). 'listing_galleries' maps each listing to a recommended set of photo URLs; 'building_photo_pools' is the full categorized set if you want to pick differently. Claude Code should download each URL into /public/a2-photos/<building-slug>/ keeping the filename, then set each listing's images[] to the local paths. Floor-plan and map images are listed separately and are optional.",
+  "listing_galleries": [
+    {
+      "address": "915 S. Division #105",
+      "bedrooms": 3,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-outside2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-living1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/919-s-div-apt-305-3bd_kitchen.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/div-2bd-apt-201-bdrm-2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/div-1bd-bthrm.jpg"
+      ]
+    },
+    {
+      "address": "915 S. Division #206",
+      "bedrooms": 3,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-outside3.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-living2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/919-s-div-apt-305-3bd_kitchen.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/div-2bd-apt-201-lv-rm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/div-1bd-bthrm.jpg"
+      ]
+    },
+    {
+      "address": "820 Fuller #B1",
+      "bedrooms": null,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f-310-liv-rm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-kitchen4.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bedroom1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bathroom1.jpg"
+      ]
+    },
+    {
+      "address": "820 Fuller #110",
+      "bedrooms": 3,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-view3.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f-310-liv-rm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-209-layout-3_kitchen-1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bedroom2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bathroom1.jpg"
+      ]
+    },
+    {
+      "address": "820 Fuller #209",
+      "bedrooms": 3,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside3.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-view3.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-209-layout-3_kitchen-1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f309-lvbalcony.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f-310-bdrm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bathroom1.jpg"
+      ]
+    },
+    {
+      "address": "820 Fuller #303",
+      "bedrooms": 3,
+      "images": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside4.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-305-pk-lot-view-layout-3_moment2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-kitchen4.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-208-layout-3a_moment2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bedroom1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bathroom1.jpg"
+      ]
+    }
+  ],
+  "building_photo_pools": {
+    "820 Fuller": {
+      "exterior": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside3.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-outside4.jpg"
+      ],
+      "bedroom": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bedroom1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bedroom2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f-310-bdrm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-301-layout1_bdrm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-208-layout-3a_moment2.jpg"
+      ],
+      "living": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f-310-liv-rm.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/f309-lvbalcony.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/ful-partition-balcony.jpg"
+      ],
+      "kitchen": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-kitchen4.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-209-layout-3_kitchen-1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-305-pk-lot-view-layout-3_moment-4.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/820-fuller-apt-305-pk-lot-view-layout-3_moment2.jpg"
+      ],
+      "bathroom": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-bathroom1.jpg"
+      ],
+      "view": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-view3.jpg"
+      ],
+      "laundry": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-laundry1.jpg"
+      ],
+      "floorplans_optional": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-layout1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-layout2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/fuller-layout3.jpg"
+      ]
+    },
+    "915 S. Division": {
+      "exterior": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-outside1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-outside2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-outside3.jpg"
+      ],
+      "living": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-living1.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-living2.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-living31.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/div-2bd-apt-201-lv-rm.jpg"
+      ],
+      "bedroom": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/div-2bd-apt-201-bdrm-2.jpg"
+      ],
+      "kitchen": [
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/919-s-div-apt-305-3bd_kitchen.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/kit-renov-2bd-101104.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/919-s-div-apt-304-2bd_moment.jpg"
+      ],
+      "bathroom": [
+        "https://a2managementrentals.com/wp-content/uploads/2021/10/div-1bd-bthrm.jpg"
+      ],
+      "laundry": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-laundry1.jpg"
+      ],
+      "other_interior": [
+        "https://a2managementrentals.com/wp-content/uploads/2020/10/20200813_085112.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2020/10/20200813_085620.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2020/10/20200824_135110.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2020/10/20200824_135201.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2020/10/20200824_135309-1.jpg"
+      ],
+      "floorplans_optional": [
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-layout1br.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-layout2br.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-layout2bropen.jpg",
+        "https://a2managementrentals.com/wp-content/uploads/2012/01/division-layout3br.jpg"
+      ]
+    }
+  }
+}

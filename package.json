@@ -14,6 +14,7 @@
     "sentry:check": "node --env-file=.env.sentry-build-plugin scripts/sentry-issues.mjs --include-event",
     "seed:placeholders": "node scripts/generateSeedPlaceholders.mjs",
     "seed:import": "node --env-file=.env.local scripts/importSeed.mjs",
+    "partners:photos": "node scripts/downloadA2Photos.mjs",
     "partners:import": "node --env-file=.env.local scripts/importPartners.mjs",
     "seed:teardown": "node --env-file=.env.local scripts/teardownSeed.mjs",
     "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs"

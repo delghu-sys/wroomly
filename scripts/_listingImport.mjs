@@ -92,6 +92,25 @@ export async function ensurePlaceholders(db) {
   return paths
 }
 
+// ── upload local /public images to the public bucket ─────────────────────────
+// Takes paths like "/a2-photos/820-fuller/x.jpg" (as stored in a listing's
+// images[]), uploads public/<path> to the listing-images bucket under the same
+// key, and returns the storage paths for listing_images rows.
+export async function uploadPublicImages(db, localPaths) {
+  const out = []
+  for (const p of localPaths) {
+    const rel = p.replace(/^\//, '') // a2-photos/820-fuller/x.jpg
+    const abs = fileURLToPath(new URL('../public/' + rel, import.meta.url))
+    const buf = await readFile(abs)
+    const ext = rel.split('.').pop().toLowerCase()
+    const contentType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
+    const { error } = await db.storage.from(PUBLIC_BUCKET).upload(rel, buf, { upsert: true, contentType })
+    if (error) throw new Error(`Image upload failed (${rel}): ${error.message}`)
+    out.push(rel)
+  }
+  return out
+}
+
 // ── system user (owns seed / partner listings; supplier_id is NOT NULL) ───────
 export async function ensureSystemUser(db, { email, name, university = null }) {
   const { data: existing } = await db.from('users').select('id').eq('email', email).maybeSingle()

@@ -7,9 +7,21 @@
     "bedrooms": 3,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Three-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $2,775/month, available August 24, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Can also be rented by the room at $900 per room. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/915-s-division/division-outside2.jpg",
+      "/a2-photos/915-s-division/division-living1.jpg",
+      "/a2-photos/915-s-division/919-s-div-apt-305-3bd_kitchen.jpg",
+      "/a2-photos/915-s-division/div-2bd-apt-201-bdrm-2.jpg",
+      "/a2-photos/915-s-division/div-1bd-bthrm.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
@@ -23,9 +35,21 @@
     "bedrooms": 3,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Three-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $2,925/month, available August 24, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/915-s-division/division-outside3.jpg",
+      "/a2-photos/915-s-division/division-living2.jpg",
+      "/a2-photos/915-s-division/919-s-div-apt-305-3bd_kitchen.jpg",
+      "/a2-photos/915-s-division/div-2bd-apt-201-lv-rm.jpg",
+      "/a2-photos/915-s-division/div-1bd-bthrm.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
@@ -39,9 +63,21 @@
     "bedrooms": null,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Basement apartment at 820 Fuller in Ann Arbor, near the University of Michigan. $1,750/month, available August 24, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/820-fuller/fuller-outside1.jpg",
+      "/a2-photos/820-fuller/f-310-liv-rm.jpg",
+      "/a2-photos/820-fuller/fuller-kitchen4.jpg",
+      "/a2-photos/820-fuller/fuller-bedroom1.jpg",
+      "/a2-photos/820-fuller/fuller-bathroom1.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/820-fuller/",
@@ -55,9 +91,23 @@
     "bedrooms": 3,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air", "river view"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air",
+      "river view"
+    ],
     "description": "Three-bedroom apartment at 820 Fuller in Ann Arbor, near the University of Michigan, with a river view. $1,900/month, available August 24, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/820-fuller/fuller-outside2.jpg",
+      "/a2-photos/820-fuller/fuller-view3.jpg",
+      "/a2-photos/820-fuller/f-310-liv-rm.jpg",
+      "/a2-photos/820-fuller/820-fuller-apt-209-layout-3_kitchen-1.jpg",
+      "/a2-photos/820-fuller/fuller-bedroom2.jpg",
+      "/a2-photos/820-fuller/fuller-bathroom1.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/820-fuller/",
@@ -71,9 +121,23 @@
     "bedrooms": 3,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air", "river view"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air",
+      "river view"
+    ],
     "description": "Three-bedroom apartment at 820 Fuller in Ann Arbor, near the University of Michigan, with a river view. $2,000/month, available August 24, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/820-fuller/fuller-outside3.jpg",
+      "/a2-photos/820-fuller/fuller-view3.jpg",
+      "/a2-photos/820-fuller/820-fuller-apt-209-layout-3_kitchen-1.jpg",
+      "/a2-photos/820-fuller/f309-lvbalcony.jpg",
+      "/a2-photos/820-fuller/f-310-bdrm.jpg",
+      "/a2-photos/820-fuller/fuller-bathroom1.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/820-fuller/",
@@ -87,9 +151,22 @@
     "bedrooms": 3,
     "bathrooms": null,
     "available_date": "Aug 1 or Aug 15, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Three-bedroom apartment (3A layout) at 820 Fuller in Ann Arbor, near the University of Michigan. $1,900/month, available August 1 or August 15, 2026. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/820-fuller/fuller-outside4.jpg",
+      "/a2-photos/820-fuller/820-fuller-apt-305-pk-lot-view-layout-3_moment2.jpg",
+      "/a2-photos/820-fuller/fuller-kitchen4.jpg",
+      "/a2-photos/820-fuller/820-fuller-apt-208-layout-3a_moment2.jpg",
+      "/a2-photos/820-fuller/fuller-bedroom1.jpg",
+      "/a2-photos/820-fuller/fuller-bathroom1.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/820-fuller/",
@@ -103,9 +180,21 @@
     "bedrooms": 1,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/915-s-division/division-outside2.jpg",
+      "/a2-photos/915-s-division/division-living1.jpg",
+      "/a2-photos/915-s-division/919-s-div-apt-305-3bd_kitchen.jpg",
+      "/a2-photos/915-s-division/div-2bd-apt-201-bdrm-2.jpg",
+      "/a2-photos/915-s-division/div-1bd-bthrm.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
@@ -119,9 +208,21 @@
     "bedrooms": 1,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/915-s-division/division-outside2.jpg",
+      "/a2-photos/915-s-division/division-living1.jpg",
+      "/a2-photos/915-s-division/919-s-div-apt-305-3bd_kitchen.jpg",
+      "/a2-photos/915-s-division/div-2bd-apt-201-bdrm-2.jpg",
+      "/a2-photos/915-s-division/div-1bd-bthrm.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
@@ -135,9 +236,21 @@
     "bedrooms": 1,
     "bathrooms": null,
     "available_date": "Aug 24, 2026",
-    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "amenities": [
+      "furnished",
+      "dishwasher",
+      "in-unit laundry",
+      "parking",
+      "central air"
+    ],
     "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
-    "images": [],
+    "images": [
+      "/a2-photos/915-s-division/division-outside2.jpg",
+      "/a2-photos/915-s-division/division-living1.jpg",
+      "/a2-photos/915-s-division/919-s-div-apt-305-3bd_kitchen.jpg",
+      "/a2-photos/915-s-division/div-2bd-apt-201-bdrm-2.jpg",
+      "/a2-photos/915-s-division/div-1bd-bthrm.jpg"
+    ],
     "source": "partner",
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",

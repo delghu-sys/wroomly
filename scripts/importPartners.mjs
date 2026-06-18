@@ -24,6 +24,7 @@ import {
   isFurnished,
   ensurePlaceholders,
   ensureSystemUser,
+  uploadPublicImages,
   HAS_MAPBOX,
 } from './_listingImport.mjs'
 
@@ -136,10 +137,16 @@ async function main() {
         )
       }
 
-      // Image — one round-robin placeholder until A2 provides real photos.
+      // Images — use the partner's real photos (images[]) when present, else a
+      // neutral placeholder. Real photos are uploaded from /public to storage.
       await db.from('listing_images').delete().eq('listing_id', listingId)
-      const pick = placeholders[i % placeholders.length]
-      await db.from('listing_images').insert({ listing_id: listingId, storage_path: pick, display_order: 0 })
+      const localImgs = Array.isArray(r.images) ? r.images.filter(Boolean) : []
+      const storagePaths = localImgs.length
+        ? await uploadPublicImages(db, localImgs)
+        : [placeholders[i % placeholders.length]]
+      await db.from('listing_images').insert(
+        storagePaths.map((sp, idx) => ({ listing_id: listingId, storage_path: sp, display_order: idx })),
+      )
     } catch (e) {
       failed++
       console.error(`  ✗ "${r.title}" (${r.address}):`, e.message ?? e)
