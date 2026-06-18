@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
-import { getListingImageUrl } from '@/lib/utils/listing'
+import { signImportUrls } from '@/lib/listing-import/uploads'
 import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { ClaimReview } from '@/components/import/ClaimReview'
@@ -133,12 +133,13 @@ export default async function ClaimListingPage({
   // Signed in + (unclaimed or own) → editable review.
   // PDFs are AI source material, not publishable listing photos — exclude them
   // from the photo picker so they don't render as broken thumbnails.
-  const personalPhotos = (req.personal_image_paths ?? [])
-    .filter(isPublishablePhotoPath)
-    .map((path: string) => ({ path, url: getListingImageUrl(path) }))
-  const buildingPhotos = (req.building_image_paths ?? [])
-    .filter(isPublishablePhotoPath)
-    .map((path: string) => ({ path, url: getListingImageUrl(path) }))
+  // Source files live in the PRIVATE imports bucket, so render them through
+  // short-lived signed URLs rather than public URLs.
+  const personalPaths = (req.personal_image_paths ?? []).filter(isPublishablePhotoPath)
+  const buildingPaths = (req.building_image_paths ?? []).filter(isPublishablePhotoPath)
+  const signed = await signImportUrls([...personalPaths, ...buildingPaths])
+  const personalPhotos = personalPaths.map((path: string) => ({ path, url: signed[path] ?? '' }))
+  const buildingPhotos = buildingPaths.map((path: string) => ({ path, url: signed[path] ?? '' }))
   const enrichmentUsed =
     !!req.building_source_url ||
     !!req.building_pasted_text ||

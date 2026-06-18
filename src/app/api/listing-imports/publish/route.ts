@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
 import { extractedListingDraftSchema, isPublishablePhotoPath } from '@/lib/listing-import/schema'
+import { copyImportFileToPublic } from '@/lib/listing-import/uploads'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
 import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
@@ -134,16 +135,25 @@ export async function POST(request: Request) {
   }
   const listingId = listing.id as string
 
-  // Confirmed photos → listing_images (files already live in the bucket
-  // under imports/…; storage_path can point there, same bucket).
+  // Confirmed photos live in the PRIVATE imports bucket. Copy each chosen
+  // photo into the PUBLIC listing-images bucket (same path) so the live
+  // listing can display it, then record only the ones that copied.
   if (confirmedPhotoPaths.length > 0) {
-    await service.from('listing_images').insert(
-      confirmedPhotoPaths.map((path, i) => ({
-        listing_id: listingId,
-        storage_path: path,
-        display_order: i,
-      })),
-    )
+    const copied: string[] = []
+    for (const path of confirmedPhotoPaths) {
+      if (await copyImportFileToPublic(path)) copied.push(path)
+    }
+    if (copied.length > 0) {
+      await service.from('listing_images').insert(
+        copied.map((path, i) => ({
+          listing_id: listingId,
+          storage_path: path,
+          display_order: i,
+        })),
+      )
+    } else {
+      console.error('[listing-imports/publish] no photos copied to public', { requestId: req.id, listingId })
+    }
   }
 
   // Amenities (unioned set from the draft).

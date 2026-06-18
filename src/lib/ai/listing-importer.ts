@@ -64,7 +64,8 @@ function buildMediaBlocks(
 ): MediaBlock[] {
   const blocks: MediaBlock[] = []
   for (const url of urls ?? []) {
-    if (/\.pdf$/i.test(url)) {
+    // Match .pdf before any query string — signed URLs append ?token=…
+    if (/\.pdf(\?|#|$)/i.test(url)) {
       blocks.push({ type: 'document', source: { type: 'url', url } })
     } else {
       blocks.push({ type: 'image', source: { type: 'url', url } })

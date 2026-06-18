@@ -56,24 +56,61 @@ const schema = z.object({
   furnished: z.boolean(),
   pets_allowed: z.boolean(),
   utilities_included: z.boolean(),
-  status: z.enum(['active', 'paused', 'archived', 'pending_review', 'rented', 'swapped', 'draft']),
+  status: z.enum(['active', 'archived', 'pending_review', 'rented', 'swapped', 'draft']),
 })
 
 type FormValues = z.infer<typeof schema>
 
-const STATUS_OPTIONS: { value: FormValues['status']; label: string; help: string }[] = [
-  { value: 'active', label: 'Active', help: 'Visible to everyone' },
-  { value: 'paused', label: 'Paused', help: 'Hidden temporarily — you can re-publish anytime' },
+type StatusOption = { value: FormValues['status']; label: string; help: string }
+
+const LIFECYCLE_OPTIONS: StatusOption[] = [
   { value: 'rented', label: 'Rented', help: 'Marked as rented out' },
   { value: 'swapped', label: 'Swapped', help: 'Marked as swap complete' },
   { value: 'archived', label: 'Archived', help: 'Permanently hidden from listings' },
 ]
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: 'Draft',
+  pending_review: 'Pending review',
+  active: 'Active',
+  rented: 'Rented',
+  swapped: 'Swapped',
+  archived: 'Archived',
+}
+
+// Status transitions a supplier may make from the browser. Activation
+// ('active') is reserved for service-role review (migration 016), so we only
+// offer "Active" for an already-active listing. A non-active listing can be
+// re-submitted for review ('pending_review') instead — that goes back through
+// moderation before going live. Mirrors the RLS WITH CHECK exactly so the
+// supplier never hits a confusing row-level-security error on save.
+function statusOptionsFor(current: string): StatusOption[] {
+  if (current === 'active') {
+    return [{ value: 'active', label: 'Active', help: 'Visible to everyone' }, ...LIFECYCLE_OPTIONS]
+  }
+  const opts: StatusOption[] = [
+    {
+      value: current as FormValues['status'],
+      label: `${STATUS_LABELS[current] ?? current} (current)`,
+      help: 'Leave unchanged',
+    },
+    {
+      value: 'pending_review',
+      label: 'Submit for review',
+      help: 'Send for review before it goes live',
+    },
+    ...LIFECYCLE_OPTIONS,
+  ]
+  // Dedupe by value (current status may already be in the lifecycle list).
+  return opts.filter((o, i) => opts.findIndex(x => x.value === o.value) === i)
+}
 
 export function EditListingForm({ listing }: { listing: Listing }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const isSublet = listing.type === 'sublet'
+  const STATUS_OPTIONS = statusOptionsFor(listing.status)
 
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

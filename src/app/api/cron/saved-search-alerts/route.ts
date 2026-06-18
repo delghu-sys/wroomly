@@ -48,8 +48,11 @@ export async function GET(request: Request) {
   // Vercel Cron auth — header is "Authorization: Bearer <CRON_SECRET>"
   // (Vercel auto-injects the value of the env var). In local dev the
   // user can set CRON_SECRET in .env.local and curl with that header.
+  // Fail closed: if the secret isn't configured we reject everything rather
+  // than comparing against "Bearer undefined" (which a caller could forge).
+  const cronSecret = process.env.CRON_SECRET
   const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

@@ -13,6 +13,12 @@ export const maxDuration = 60 // AI extraction can take a few seconds
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
 const RATE_LIMIT_PER_HOUR = 5
+// Global circuit-breaker on the unauthenticated AI-import endpoint. The
+// per-email limit is bypassable by rotating the email field, so this bounds
+// total Anthropic + storage cost from any source. Deliberately NOT per-IP:
+// UMich students share the campus NAT, so an IP limit would lock out everyone
+// on campus wifi at once. Set generously above expected legit volume.
+const GLOBAL_RATE_LIMIT_PER_HOUR = 60
 
 function str(v: FormDataEntryValue | null): string | undefined {
   if (typeof v !== 'string') return undefined
@@ -68,6 +74,19 @@ export async function POST(request: Request) {
   if ((count ?? 0) >= RATE_LIMIT_PER_HOUR) {
     return NextResponse.json(
       { error: 'Too many imports from this email. Please try again later.' },
+      { status: 429 },
+    )
+  }
+
+  // Global circuit-breaker — caps total AI-extraction cost across all callers
+  // (the per-email cap above is bypassable by rotating the email field).
+  const { count: globalCount } = await service
+    .from('listing_import_requests')
+    .select('id', { count: 'exact', head: true })
+    .gte('created_at', oneHourAgo)
+  if ((globalCount ?? 0) >= GLOBAL_RATE_LIMIT_PER_HOUR) {
+    return NextResponse.json(
+      { error: 'We’re processing a lot of imports right now. Please try again in a little while.' },
       { status: 429 },
     )
   }

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { getListingImageUrl } from '@/lib/utils/listing'
+import { signImportUrls } from '@/lib/listing-import/uploads'
 import { AdminImportReview } from '@/components/admin/AdminImportReview'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { ArrowLeft, FileText } from 'lucide-react'
@@ -43,11 +43,15 @@ export default async function AdminImportReviewPage({
   if (!req) notFound()
 
   const draft = req.extracted_data as ExtractedListingDraft | null
+  // Source files live in the PRIVATE imports bucket — render via short-lived
+  // signed URLs (the admin page is server-rendered).
+  const allPaths = [...(req.personal_image_paths ?? []), ...(req.building_image_paths ?? [])]
+  const signed = await signImportUrls(allPaths)
   const splitMedia = (paths: string[] | null) => {
     const all = paths ?? []
     return {
-      images: all.filter(isPublishablePhotoPath).map((p: string) => getListingImageUrl(p)),
-      pdfs: all.filter((p: string) => !isPublishablePhotoPath(p)).map((p: string) => getListingImageUrl(p)),
+      images: all.filter(isPublishablePhotoPath).map((p: string) => signed[p] ?? ''),
+      pdfs: all.filter((p: string) => !isPublishablePhotoPath(p)).map((p: string) => signed[p] ?? ''),
     }
   }
   const personal = splitMedia(req.personal_image_paths)
