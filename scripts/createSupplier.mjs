@@ -24,6 +24,7 @@ function arg(flag, fallback = null) {
 async function main() {
   const email = (arg('--email') ?? '').trim().toLowerCase()
   const fullName = arg('--name') // optional; user can complete profile later
+  const password = arg('--password') // optional; if set, account is ready to log in immediately
   if (!email || !email.includes('@')) {
     console.error('Usage: node --env-file=.env.local scripts/createSupplier.mjs --email <addr> [--name "Name"]')
     process.exit(1)
@@ -67,9 +68,26 @@ async function main() {
     console.log('public.users row already present — left as-is.')
   }
 
-  // 3. Generate a recovery ("set your password") link. We do NOT email it from
-  //    here — print it so you can send it to her directly (she's already
-  //    emailing you), avoiding any dependency on auto-email delivery.
+  // 3a. If a password was supplied, set it directly so the account is ready to
+  //     log in immediately. (Recommended: have the user change it after first
+  //     login, since it was shared out-of-band.)
+  if (password) {
+    const { error: pwErr } = await db.auth.admin.updateUserById(authId, {
+      password,
+      email_confirm: true,
+    })
+    if (pwErr) throw new Error(`Could not set password: ${pwErr.message}`)
+    console.log('\n── Account ready ──')
+    console.log(`  email   : ${email}`)
+    console.log(`  type    : supplier (verified)`)
+    console.log('  password: (set as provided)')
+    console.log('\n  She can log in now at the SIGN IN page (not sign up) with this')
+    console.log('  email + password. Recommend she change the password after first login.')
+    return
+  }
+
+  // 3b. Otherwise generate a recovery ("set your password") link. We do NOT
+  //     email it from here — print it so you can send it to her directly.
   const { data: link, error: linkErr } = await db.auth.admin.generateLink({
     type: 'recovery',
     email,
