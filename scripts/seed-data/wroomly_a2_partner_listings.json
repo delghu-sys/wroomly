@@ -94,5 +94,53 @@
     "sourceName": "A2 Management",
     "sourceUrl": "https://a2managementrentals.com/properties/820-fuller/",
     "inquiryEmail": "a2management@comcast.net"
+  },
+  {
+    "title": "Private Room in 3-Bedroom at 915 S. Division",
+    "address": "915 S. Division #105 — Room 1",
+    "city": "Ann Arbor, MI",
+    "price_per_month": 900,
+    "bedrooms": 1,
+    "bathrooms": null,
+    "available_date": "Aug 24, 2026",
+    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
+    "images": [],
+    "source": "partner",
+    "sourceName": "A2 Management",
+    "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
+    "inquiryEmail": "a2management@comcast.net"
+  },
+  {
+    "title": "Private Room in 3-Bedroom at 915 S. Division",
+    "address": "915 S. Division #105 — Room 2",
+    "city": "Ann Arbor, MI",
+    "price_per_month": 900,
+    "bedrooms": 1,
+    "bathrooms": null,
+    "available_date": "Aug 24, 2026",
+    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
+    "images": [],
+    "source": "partner",
+    "sourceName": "A2 Management",
+    "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
+    "inquiryEmail": "a2management@comcast.net"
+  },
+  {
+    "title": "Private Room in 3-Bedroom at 915 S. Division",
+    "address": "915 S. Division #105 — Room 3",
+    "city": "Ann Arbor, MI",
+    "price_per_month": 900,
+    "bedrooms": 1,
+    "bathrooms": null,
+    "available_date": "Aug 24, 2026",
+    "amenities": ["furnished", "dishwasher", "in-unit laundry", "parking", "central air"],
+    "description": "Private room in a shared 3-bedroom apartment at 915 S. Division in Ann Arbor, near the University of Michigan. $900/month per room, available August 24, 2026. Shared with up to two other residents. Furnished, with dishwasher, in-unit laundry, parking, and central air. Managed by A2 Management.",
+    "images": [],
+    "source": "partner",
+    "sourceName": "A2 Management",
+    "sourceUrl": "https://a2managementrentals.com/properties/915-s-division/",
+    "inquiryEmail": "a2management@comcast.net"
   }
 ]
