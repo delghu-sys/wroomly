@@ -148,10 +148,12 @@ export interface Listing {
   auto_review_reason: string | null
   auto_review_flags: string[] | null
   auto_reviewed_at: string | null
-  // Provenance — 'user' for real listings, 'seed' for launch imports.
-  source: 'user' | 'seed'
+  // Provenance — 'user' real listings, 'seed' launch supply, 'partner' managed
+  // partner inventory (real + claimable; inquiries forward to inquiry_email).
+  source: 'user' | 'seed' | 'partner'
   source_name: string | null
   source_url: string | null
+  inquiry_email: string | null
   created_at: string
   updated_at: string
 }

@@ -1,56 +1,62 @@
 /**
- * Seed-listing importer.  Run with:
- *   node --env-file=.env.local scripts/importSeed.mjs        (npm run seed:import)
+ * Partner-listing importer. Run with:
+ *   node --env-file=.env.local scripts/importPartners.mjs   (npm run partners:import)
  *
- * Reads scripts/seed-data/wroomly_seed_listings.json and loads each record as
- * a real `listings` row tagged source='seed', owned by a dedicated system user.
- * Idempotent: re-running UPDATES the matching seed row (keyed on address +
- * price_per_month) instead of creating duplicates.
+ * Loads scripts/seed-data/wroomly_a2_partner_listings.json as REAL partner
+ * listings (source='partner'), owned by a partner system user. Unlike seed
+ * listings these are kept by the seed teardown, use the partner's own
+ * description as-is, and forward inquiries by email (inquiry_email).
  *
- * Uses ONLY the data in the JSON file — nothing is fetched from the source
- * site, and images are local placeholders (see scripts/generateSeedPlaceholders.mjs),
- * never external/copyrighted media.
- *
- * Service-role client → bypasses RLS, so seed rows can be created 'active' and
- * owned by the system user. Nothing here is reachable from the browser.
+ * Idempotent on ADDRESS (each unit address is unique). Re-running updates the
+ * matching partner row. Images are neutral placeholders until the partner
+ * provides real photos (drop them in and re-run).
  */
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { serviceClient, assertSchemaReady, SEED_SOURCE, SEED_USER_EMAIL, SEED_USER_NAME } from './_seedShared.mjs'
-import { buildSeedDescription } from './_seedDescription.mjs'
+import { serviceClient, PARTNER_SOURCE } from './_seedShared.mjs'
 import {
   geocode,
   parseAvailableFrom,
   iso,
   plusMonths,
   splitCity,
+  isFurnished,
   ensurePlaceholders,
   ensureSystemUser,
   HAS_MAPBOX,
 } from './_listingImport.mjs'
 
-const DATA_FILE = fileURLToPath(new URL('./seed-data/wroomly_seed_listings.json', import.meta.url))
+const DATA_FILE = fileURLToPath(new URL('./seed-data/wroomly_a2_partner_listings.json', import.meta.url))
+const PARTNER_OWNER = { email: 'partner-a2@wroomly.app', name: 'A2 Management' }
 
-// ── main ─────────────────────────────────────────────────────────────────────
+// Fail loudly if migration 019 (partner enum value + inquiry_email) isn't applied.
+async function assertPartnerSchema(db) {
+  const { error } = await db.from('listings').select('inquiry_email').limit(1)
+  if (error && /column .*inquiry_email.* does not exist/i.test(error.message)) {
+    console.error(
+      '\n✗ The `listings.inquiry_email` column is missing. Apply migration 019 in the\n' +
+        '  Supabase SQL Editor first (supabase/migrations/019_partner_listings.sql).\n',
+    )
+    process.exit(1)
+  }
+  if (error) {
+    console.error('Unexpected error checking schema:', error.message)
+    process.exit(1)
+  }
+}
+
 async function main() {
   const db = serviceClient()
-  await assertSchemaReady(db)
+  await assertPartnerSchema(db)
 
   const records = JSON.parse(await readFile(DATA_FILE, 'utf8'))
-  console.log(`Loaded ${records.length} records from ${path.basename(DATA_FILE)}`)
+  console.log(`Loaded ${records.length} partner records from ${path.basename(DATA_FILE)}`)
 
-  const supplierId = await ensureSystemUser(db, {
-    email: SEED_USER_EMAIL,
-    name: SEED_USER_NAME,
-    university: 'University of Michigan',
-  })
+  const ownerId = await ensureSystemUser(db, { email: PARTNER_OWNER.email, name: PARTNER_OWNER.name })
   const placeholders = await ensurePlaceholders(db)
-  console.log(`Seed owner ready (${SEED_USER_EMAIL}); ${placeholders.length} placeholder images in storage.`)
-
-  if (!HAS_MAPBOX) {
-    console.warn('⚠ NEXT_PUBLIC_MAPBOX_TOKEN not set — listings will load without map coordinates.')
-  }
+  console.log(`Partner owner ready (${PARTNER_OWNER.email}); ${placeholders.length} placeholder images in storage.`)
+  if (!HAS_MAPBOX) console.warn('⚠ NEXT_PUBLIC_MAPBOX_TOKEN not set — listings will load without map coordinates.')
 
   let created = 0
   let updated = 0
@@ -66,17 +72,14 @@ async function main() {
       const { city, state } = splitCity(r.city)
       const address = r.address ?? null
 
-      // Idempotency key: (source='seed', address, price_per_month). Pull the
-      // existing coords too so we don't re-geocode the same address each run.
+      // Idempotency key: (source='partner', address). Reuse existing coords.
       const { data: existing } = await db
         .from('listings')
         .select('id, lat, lng')
-        .eq('source', SEED_SOURCE)
+        .eq('source', PARTNER_SOURCE)
         .eq('address', address)
-        .eq('price_per_month', price)
         .maybeSingle()
 
-      // Geocode the real address only when we don't already have coordinates.
       let lat = existing?.lat ?? null
       let lng = existing?.lng ?? null
       if ((lat == null || lng == null) && address) {
@@ -89,10 +92,10 @@ async function main() {
       }
 
       const row = {
-        supplier_id: supplierId,
+        supplier_id: ownerId,
         type: 'sublet',
         title: r.title,
-        description: buildSeedDescription(r), // varied, generated from the data
+        description: r.description ?? null, // real partner copy, used as-is
         address,
         city,
         state,
@@ -101,12 +104,14 @@ async function main() {
         price_per_month: price,
         bedrooms: r.bedrooms ?? null,
         bathrooms: r.bathrooms ?? null,
+        furnished: isFurnished(r.amenities),
         available_from: iso(from),
         available_to: iso(plusMonths(from, 12)),
         status: 'active',
-        source: SEED_SOURCE,
+        source: PARTNER_SOURCE,
         source_name: r.sourceName ?? null,
         source_url: r.sourceUrl ?? null,
+        inquiry_email: r.inquiryEmail ?? null,
       }
 
       let listingId
@@ -122,7 +127,7 @@ async function main() {
         created++
       }
 
-      // Amenities — replace the set each run so re-imports stay in sync.
+      // Amenities — replace the set each run.
       await db.from('listing_amenities').delete().eq('listing_id', listingId)
       const amenities = Array.isArray(r.amenities) ? r.amenities.filter(Boolean) : []
       if (amenities.length) {
@@ -131,22 +136,17 @@ async function main() {
         )
       }
 
-      // Image — one round-robin placeholder per listing. Replace seed image
-      // each run so it stays consistent with the placeholder set.
+      // Image — one round-robin placeholder until A2 provides real photos.
       await db.from('listing_images').delete().eq('listing_id', listingId)
       const pick = placeholders[i % placeholders.length]
-      await db.from('listing_images').insert({
-        listing_id: listingId,
-        storage_path: pick,
-        display_order: 0,
-      })
+      await db.from('listing_images').insert({ listing_id: listingId, storage_path: pick, display_order: 0 })
     } catch (e) {
       failed++
       console.error(`  ✗ "${r.title}" (${r.address}):`, e.message ?? e)
     }
   }
 
-  console.log('\n── Import summary ──')
+  console.log('\n── Partner import summary ──')
   console.log(`  created:  ${created}`)
   console.log(`  updated:  ${updated}`)
   console.log(`  geocoded: ${geocoded} (new coordinates this run)`)

@@ -106,10 +106,10 @@ export function BrandListingCard({
               )}
             </div>
 
-            {/* Seed provenance — bottom-left. Plain chip (no link): the whole
-                card is already a <Link>, so the clickable source link lives on
-                the listing detail page instead. */}
-            {listing.source === 'seed' && listing.source_name && (
+            {/* Source provenance (seed or partner) — bottom-left. Plain chip
+                (no link): the whole card is already a <Link>, so the clickable
+                source link lives on the listing detail page instead. */}
+            {listing.source !== 'user' && listing.source_name && (
               <div className="absolute bottom-3 left-3">
                 <span className="inline-flex items-center rounded-full bg-white/85 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-ink-soft shadow-sm">
                   Listed on {listing.source_name}

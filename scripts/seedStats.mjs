@@ -21,9 +21,12 @@ async function main() {
   const userAll = await countWhere(db, q => q.eq('source', 'user'))
   const seedActive = await countWhere(db, q => q.eq('source', 'seed').eq('status', 'active'))
   const seedAll = await countWhere(db, q => q.eq('source', 'seed'))
+  const partnerActive = await countWhere(db, q => q.eq('source', 'partner').eq('status', 'active'))
+  const partnerAll = await countWhere(db, q => q.eq('source', 'partner'))
 
   console.log('\n── Wroomly listing supply ──')
   console.log(`  Real user listings   : ${userActive} active  (${userAll} total)`)
+  console.log(`  Partner listings     : ${partnerActive} active  (${partnerAll} total)`)
   console.log(`  Seed listings        : ${seedActive} active  (${seedAll} total)`)
   const total = userActive + seedActive
   const pct = total ? Math.round((userActive / total) * 100) : 0

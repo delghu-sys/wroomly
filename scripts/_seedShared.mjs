@@ -6,6 +6,7 @@
 import { createClient } from '@supabase/supabase-js'
 
 export const SEED_SOURCE = 'seed'
+export const PARTNER_SOURCE = 'partner'
 // Dedicated system account that owns every seed listing (listings.supplier_id
 // is NOT NULL). Created on demand by the importer via the auth admin API.
 export const SEED_USER_EMAIL = 'listings@wroomly.app'

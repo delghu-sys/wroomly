@@ -157,6 +157,53 @@ export function listingImportClaimEmail(opts: {
   }
 }
 
+/**
+ * Forwarded to a partner manager (e.g. A2 Management) when a student inquires
+ * on one of their listings. Reply-to is set to the student so the partner can
+ * respond directly. No Wroomly account/chat is involved on the partner side.
+ */
+export function partnerInquiryEmail(opts: {
+  partnerName: string | null
+  listingTitle: string
+  inquirerName: string | null
+  inquirerEmail: string
+  message: string
+  moveIn?: string | null
+  moveOut?: string | null
+}) {
+  const partnerFirst = (opts.partnerName ?? 'there').split(' ')[0]
+  const who = opts.inquirerName ?? 'A verified student'
+  const dates =
+    opts.moveIn || opts.moveOut
+      ? `<p style="margin:0 0 16px 0; font-size:14px; color:#4a4a5a;">Requested dates: <strong style="color:#1a1a2e;">${escapeHtml(opts.moveIn ?? '?')} → ${escapeHtml(opts.moveOut ?? '?')}</strong></p>`
+      : ''
+
+  const body = `
+    <p style="margin:0 0 8px 0; font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:#9a7a1e;">New inquiry via Wroomly</p>
+    <h1 style="margin:0 0 16px 0; font-size:24px; line-height:1.2; letter-spacing:-0.02em; color:#1a1a2e; font-weight:600;">
+      ${escapeHtml(partnerFirst)} — someone&rsquo;s interested in ${escapeHtml(opts.listingTitle)}.
+    </h1>
+    <p style="margin:0 0 8px 0; font-size:15px; line-height:1.55; color:#4a4a5a;">
+      <strong style="color:#1a1a2e;">${escapeHtml(who)}</strong> (${escapeHtml(opts.inquirerEmail)}) sent an inquiry.
+    </p>
+    ${dates}
+    <blockquote style="margin:0 0 28px 0; padding:16px 20px; border-left:3px solid #e8b73f; background:#fdfaf2; border-radius:8px; font-size:14px; line-height:1.55; color:#3a3a4a; font-style:italic;">
+      ${escapeHtml(opts.message.slice(0, 600))}${opts.message.length > 600 ? '…' : ''}
+    </blockquote>
+    <p style="margin:0; font-size:13px; line-height:1.5; color:#6b6b7a;">
+      Just reply to this email to reach ${escapeHtml(who)} directly — your reply goes straight to them.
+    </p>
+  `
+
+  return {
+    subject: `New inquiry for ${opts.listingTitle}`,
+    html: shell({
+      preheader: `${who} is interested in ${opts.listingTitle}`,
+      bodyHtml: body,
+    }),
+  }
+}
+
 export function inquiryReceivedEmail(opts: {
   supplierName: string | null
   consumerName: string | null

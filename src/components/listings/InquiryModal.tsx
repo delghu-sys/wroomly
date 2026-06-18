@@ -37,8 +37,8 @@ interface InquiryModalProps {
     available_to: string
     supplier_id: string
     thumbnailUrl: string | null
-    // Seed listings have no real owner — inquiries go to an honest waitlist.
-    source?: 'user' | 'seed'
+    // 'seed' → honest waitlist; 'partner' → forwarded by email; else chat.
+    source?: 'user' | 'seed' | 'partner'
     source_name?: string | null
   }
   authUserId: string
@@ -133,6 +133,37 @@ export function InquiryModal({
         reset()
         setPhase('form')
         toast.success('Thanks — we’ll notify you as listings open up.', {
+          icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+        })
+      }, 1400)
+      return
+    }
+
+    // Partner listings (e.g. A2 Management) are real and claimable, but have no
+    // Wroomly chat counterpart — forward the message to the partner by email
+    // (server looks up the address) and show a normal "sent" confirmation.
+    if (listing.source === 'partner') {
+      const res = await fetch('/api/inquiries/partner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          listingId: listing.id,
+          message: data.message,
+          moveIn: data.move_in_date || null,
+          moveOut: data.move_out_date || null,
+        }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.ok) {
+        toast.error(json.error ?? 'Could not send your message. Please try again.')
+        return
+      }
+      setPhase('success')
+      setTimeout(() => {
+        onClose()
+        reset()
+        setPhase('form')
+        toast.success('Message sent — the manager will be in touch.', {
           icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
         })
       }, 1400)
@@ -476,7 +507,9 @@ export function InquiryModal({
                         </span>
                       </p>
                       <p className="relative text-sm text-ink-muted mt-3">
-                        Opening your chat…
+                        {listing.source === 'partner'
+                          ? 'We’ve forwarded your message to the manager.'
+                          : 'Opening your chat…'}
                       </p>
                     </>
                   )}

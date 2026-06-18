@@ -316,8 +316,8 @@ export default async function ListingDetailPage({
                     {l.neighborhood}, {l.city}, {l.state}
                   </p>
                 )}
-                {/* Seed provenance — honest attribution + link to the source. */}
-                {l.source === 'seed' && l.source_name && (
+                {/* Source provenance (seed or partner) — honest attribution + link. */}
+                {l.source !== 'user' && l.source_name && (
                   <p className="mt-2 text-[13px] text-ink-muted">
                     Listed on{' '}
                     {l.source_url ? (
