@@ -25,6 +25,29 @@ import {
   SEED_USER_NAME,
   PUBLIC_BUCKET,
 } from './_seedShared.mjs'
+import { buildSeedDescription } from './_seedDescription.mjs'
+
+// Geocoding — turn the real source addresses into lat/lng so the map works.
+// Uses your existing Mapbox token. Biased to the Ann Arbor area.
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+async function geocode(address, cityRaw) {
+  if (!MAPBOX_TOKEN || !address) return null
+  const q = encodeURIComponent(`${address}, ${cityRaw || 'Ann Arbor, MI'}`)
+  const url =
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json` +
+    `?access_token=${MAPBOX_TOKEN}&limit=1&country=us&proximity=-83.7430,42.2808`
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const j = await res.json()
+    const center = j.features?.[0]?.center
+    if (!Array.isArray(center)) return null
+    const [lng, lat] = center
+    return { lat, lng }
+  } catch {
+    return null
+  }
+}
 
 const DATA_FILE = fileURLToPath(new URL('./seed-data/wroomly_seed_listings.json', import.meta.url))
 const PLACEHOLDER_DIR = fileURLToPath(new URL('../public/seed-placeholders/', import.meta.url))
@@ -134,26 +157,57 @@ async function main() {
   const placeholders = await ensurePlaceholders(db)
   console.log(`Seed owner ready (${SEED_USER_EMAIL}); ${placeholders.length} placeholder images in storage.`)
 
+  if (!MAPBOX_TOKEN) {
+    console.warn('⚠ NEXT_PUBLIC_MAPBOX_TOKEN not set — listings will load without map coordinates.')
+  }
+
   let created = 0
   let updated = 0
   let failed = 0
+  let geocoded = 0
 
   for (let i = 0; i < records.length; i++) {
     const r = records[i]
     try {
       const priceCents = Math.round(Number(r.price_per_month) * 100)
+      const price = Number.isFinite(priceCents) ? priceCents : null
       const from = parseAvailableFrom(r.available_date)
       const { city, state } = splitCity(r.city)
+      const address = r.address ?? null
+
+      // Idempotency key: (source='seed', address, price_per_month). Pull the
+      // existing coords too so we don't re-geocode the same address each run.
+      const { data: existing } = await db
+        .from('listings')
+        .select('id, lat, lng')
+        .eq('source', SEED_SOURCE)
+        .eq('address', address)
+        .eq('price_per_month', price)
+        .maybeSingle()
+
+      // Geocode the real address only when we don't already have coordinates.
+      let lat = existing?.lat ?? null
+      let lng = existing?.lng ?? null
+      if ((lat == null || lng == null) && address) {
+        const c = await geocode(address, r.city)
+        if (c) {
+          lat = c.lat
+          lng = c.lng
+          geocoded++
+        }
+      }
 
       const row = {
         supplier_id: supplierId,
         type: 'sublet',
         title: r.title,
-        description: r.description ?? null,
-        address: r.address ?? null,
+        description: buildSeedDescription(r), // varied, generated from the data
+        address,
         city,
         state,
-        price_per_month: Number.isFinite(priceCents) ? priceCents : null,
+        lat,
+        lng,
+        price_per_month: price,
         bedrooms: r.bedrooms ?? null,
         bathrooms: r.bathrooms ?? null,
         available_from: iso(from),
@@ -163,15 +217,6 @@ async function main() {
         source_name: r.sourceName ?? null,
         source_url: r.sourceUrl ?? null,
       }
-
-      // Idempotency key: (source='seed', address, price_per_month).
-      const { data: existing } = await db
-        .from('listings')
-        .select('id')
-        .eq('source', SEED_SOURCE)
-        .eq('address', row.address)
-        .eq('price_per_month', row.price_per_month)
-        .maybeSingle()
 
       let listingId
       if (existing?.id) {
@@ -211,10 +256,11 @@ async function main() {
   }
 
   console.log('\n── Import summary ──')
-  console.log(`  created: ${created}`)
-  console.log(`  updated: ${updated}`)
-  if (failed) console.log(`  failed:  ${failed}`)
-  console.log(`  total:   ${records.length}`)
+  console.log(`  created:  ${created}`)
+  console.log(`  updated:  ${updated}`)
+  console.log(`  geocoded: ${geocoded} (new coordinates this run)`)
+  if (failed) console.log(`  failed:   ${failed}`)
+  console.log(`  total:    ${records.length}`)
 }
 
 main().catch(e => {

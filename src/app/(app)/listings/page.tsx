@@ -9,6 +9,7 @@ import { ListingsQuickFilters } from '@/components/listings/ListingsQuickFilters
 import { MobileFilterSheet } from '@/components/listings/MobileFilterSheet'
 import { BrowseHero } from '@/components/listings/BrowseHero'
 import { ListingsGrid } from '@/components/listings/ListingsGrid'
+import { ListingsPagination } from '@/components/listings/ListingsPagination'
 import { EmptyListings } from '@/components/listings/EmptyListings'
 import {
   ANN_ARBOR_NEIGHBORHOODS,
@@ -53,13 +54,16 @@ export default async function ListingsPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('listings')
-    .select(`
+    .select(
+      `
       *,
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
       users:supplier_id(id, full_name, avatar_url, university)
-    `)
+    `,
+      { count: 'exact' },
+    )
     .eq('status', 'active')
 
   if (filters.q) {
@@ -123,7 +127,21 @@ export default async function ListingsPage({
       query = query.order('created_at', { ascending: false })
   }
 
-  const { data: listings } = await query.limit(48)
+  // Grid view paginates; map view loads a larger set so all pins show.
+  const PAGE_SIZE = 24
+  const isMapView = filters.view === 'map'
+  const page = Math.max(1, parseInt(filters.page ?? '1', 10) || 1)
+
+  if (isMapView) {
+    query = query.limit(500)
+  } else {
+    const from = (page - 1) * PAGE_SIZE
+    query = query.range(from, from + PAGE_SIZE - 1)
+  }
+
+  const { data: listings, count } = await query
+  const totalCount = count ?? (listings?.length ?? 0)
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
   // Favorites (auth-gated) + supplier ratings are independent — fan out
   // so we save a round trip per browse page load.
@@ -188,7 +206,7 @@ export default async function ListingsPage({
     <div className="min-h-[100dvh]">
       {/* ── Atmospheric hero — dark navy, mesh, noise ── */}
       <BrowseHero
-        totalCount={typedListings.length}
+        totalCount={totalCount}
         currentQuery={filters.q}
         filters={filters}
         view={view}
@@ -220,7 +238,7 @@ export default async function ListingsPage({
           />
           <ListingsQuickFilters
             currentFilters={filters}
-            totalCount={typedListings.length}
+            totalCount={totalCount}
           />
         </div>
 
@@ -249,12 +267,20 @@ export default async function ListingsPage({
                 )}
               </div>
             ) : (
-              <ListingsGrid
-                listings={typedListings}
-                userId={authUser?.id ?? null}
-                favoriteIds={favoriteIds}
-                ratingBySupplier={ratingBySupplier}
-              />
+              <>
+                <ListingsGrid
+                  listings={typedListings}
+                  userId={authUser?.id ?? null}
+                  favoriteIds={favoriteIds}
+                  ratingBySupplier={ratingBySupplier}
+                />
+                <ListingsPagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  totalCount={totalCount}
+                  filters={filters}
+                />
+              </>
             )}
           </div>
         </div>
