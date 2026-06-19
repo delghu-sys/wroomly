@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/profile/ProfileForm'
+import { ChangePasswordCard } from '@/components/profile/ChangePasswordCard'
 import type { User, UserPhoto } from '@/types/database'
 
 export const metadata: Metadata = { title: 'Profile Settings' }
@@ -40,6 +41,9 @@ export default async function ProfilePage() {
       </div>
       <div className="animate-fade-up delay-100">
         <ProfileForm profile={profile as User} initialPhotos={(photos ?? []) as UserPhoto[]} />
+      </div>
+      <div className="animate-fade-up delay-200 mt-8">
+        <ChangePasswordCard email={(profile as User).email} />
       </div>
     </div>
   )
