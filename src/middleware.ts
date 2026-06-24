@@ -1,8 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
+import { SUPPLY_ONLY_MODE } from '@/lib/config'
+import {
+  isSupplyOnlyAllowedPath,
+  COMING_SOON_PATH,
+  BYPASS_COOKIE,
+} from '@/lib/supplyOnly'
 
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides']
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback
@@ -35,7 +41,7 @@ const PUBLIC_PREFIXES = [
 ]
 
 export async function middleware(request: NextRequest) {
-  const { supabaseResponse, user } = await updateSession(request)
+  const { supabaseResponse, user, supabase: sessionClient } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 
   // Stripe webhook validates its own signature; don't burn an auth lookup
@@ -52,10 +58,58 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Public renter-waitlist endpoint (supply-only). Validates its own input and
+  // needs no session, so never gate it behind auth.
+  if (pathname.startsWith('/api/waitlist')) {
+    return supabaseResponse
+  }
+
   // The /suspended terminal page must be reachable even with a session —
   // otherwise suspended users hit a redirect loop.
   if (pathname === '/suspended') {
     return supabaseResponse
+  }
+
+  // ── Supply-only soft-launch gate ────────────────────────────────────────────
+  // No-op unless SUPPLY_ONLY_MODE === 'true'. When on, non-exempt visitors
+  // (renters / anon) are redirected to /coming-soon; admins, suppliers, and
+  // anyone holding the preview-bypass cookie keep the full site.
+  if (SUPPLY_ONLY_MODE) {
+    // Preview bypass: visiting any URL with ?bypass=<SUPPLY_ONLY_BYPASS_TOKEN>
+    // sets a cookie that unlocks the full site for this browser, then strips
+    // the token from the URL. Lets the founder/QA browse as any role.
+    const bypassToken = process.env.SUPPLY_ONLY_BYPASS_TOKEN
+    const provided = request.nextUrl.searchParams.get('bypass')
+    if (bypassToken && provided && provided === bypassToken) {
+      const cleanUrl = request.nextUrl.clone()
+      cleanUrl.searchParams.delete('bypass')
+      const res = NextResponse.redirect(cleanUrl)
+      res.cookies.set(BYPASS_COOKIE, '1', {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 60, // 60 days
+      })
+      return res
+    }
+
+    const hasBypass = request.cookies.get(BYPASS_COOKIE)?.value === '1'
+    if (!hasBypass) {
+      // Admins and suppliers get the full site; everyone else is gated.
+      let exempt = false
+      if (user) {
+        const { data: profile } = await sessionClient
+          .from('users')
+          .select('user_type')
+          .eq('id', user.id)
+          .single()
+        const t = (profile as { user_type?: string } | null)?.user_type
+        exempt = t === 'admin' || t === 'supplier'
+      }
+      if (!exempt && !isSupplyOnlyAllowedPath(pathname)) {
+        return NextResponse.redirect(new URL(COMING_SOON_PATH, request.url))
+      }
+    }
   }
 
   // Allow public and auth routes
