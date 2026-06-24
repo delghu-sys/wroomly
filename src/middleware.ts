@@ -3,7 +3,17 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { createServerClient } from '@supabase/ssr'
 
 const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides']
-const AUTH_ROUTES = ['/sign-in', '/sign-up', '/verify-email']
+// /callback handles the OAuth + email-confirm code exchange — it MUST be
+// reachable while logged-out, because it's the request that creates the
+// session. Gating it behind auth bounces the user to /sign-in?next=/callback
+// before the exchange can run. /forgot-password is likewise pre-auth.
+const AUTH_ROUTES = [
+  '/sign-in',
+  '/sign-up',
+  '/verify-email',
+  '/forgot-password',
+  '/callback',
+]
 const ADMIN_ROUTES = ['/admin']
 const SUPPLIER_ROUTES = ['/my-listings', '/listings/new', '/inquiries', '/payouts']
 
