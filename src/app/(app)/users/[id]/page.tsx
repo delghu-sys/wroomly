@@ -61,9 +61,14 @@ export default async function UserProfilePage({
   const { id } = await params
   const supabase = await createClient()
 
+  // Public profile: select only non-sensitive columns. The anon role is
+  // column-restricted on `users` (migration 021), so `select('*')` would 403
+  // for logged-out visitors. These are exactly the fields rendered below.
   const { data: user } = await supabase
     .from('users')
-    .select('*')
+    .select(
+      'id, full_name, avatar_url, university, bio, instagram_handle, user_type, is_verified, created_at'
+    )
     .eq('id', id)
     .single()
 

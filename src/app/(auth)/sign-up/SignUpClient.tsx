@@ -14,6 +14,8 @@ import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
+import { AuthDivider } from '@/components/auth/AuthDivider'
 import { RoleSelectorCards, type Role } from '@/components/auth/RoleSelectorCards'
 import { RoleContinueCta } from '@/components/auth/RoleContinueCta'
 import type { Testimonial } from '@/components/auth/RotatingTestimonial'
@@ -201,6 +203,25 @@ export default function SignUpClient() {
               />
             </div>
 
+            {/* Google sign-up — appears once a side is picked, so we know
+                which user_type to create. Supplier is still gated to @umich.edu
+                server-side in /callback. */}
+            {pendingRole && (
+              <div className="mt-5 space-y-3">
+                <AuthDivider label="or" />
+                <GoogleAuthButton
+                  intendedType={pendingRole}
+                  onError={setError}
+                  label="Continue with Google"
+                />
+                {error && (
+                  <p className="text-center text-xs text-[oklch(0.55_0.20_25)]">
+                    {error}
+                  </p>
+                )}
+              </div>
+            )}
+
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -282,10 +303,37 @@ export default function SignUpClient() {
             </p>
           </motion.div>
 
-          <motion.form
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.1 }}
+            className="space-y-3 mb-5"
+          >
+            <GoogleAuthButton
+              intendedType={role}
+              onError={setError}
+              label="Sign up with Google"
+            />
+            <p className="text-center text-[12px] text-ink-muted leading-snug">
+              By continuing with Google, you agree to our{' '}
+              <Link
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 hover:underline"
+              >
+                Terms of Service
+              </Link>
+              .
+              {isSupplier && ' Supplier accounts require a @umich.edu Google login.'}
+            </p>
+            <AuthDivider label="or sign up with email" />
+          </motion.div>
+
+          <motion.form
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...spring, delay: 0.15 }}
             onSubmit={onSubmit}
             className="space-y-5"
           >

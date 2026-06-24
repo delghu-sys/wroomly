@@ -8,9 +8,10 @@ export async function GET(request: Request) {
   const type = searchParams.get('type') // Supabase sets this for recovery flows
   const rawNext = searchParams.get('next') ?? '/dashboard'
 
-  // Prevent open redirect — only allow relative paths, not protocol-relative URLs.
-  const next =
-    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
+  // Prevent open redirect — allow only same-origin relative paths. Rejects
+  // protocol-relative ("//evil.com") and backslash-bypass ("/\evil.com",
+  // which browsers normalize toward "//evil.com") forms.
+  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/dashboard'
 
   if (!code) {
     return NextResponse.redirect(
@@ -41,11 +42,21 @@ export async function GET(request: Request) {
     user_type?: 'supplier' | 'consumer'
   }
 
+  // Google OAuth can't carry user_metadata up front, so the chosen role rides
+  // along as a query param on the redirect. Prefer it; fall back to the email
+  // sign-up's metadata claim. Google also gives us a name to seed the profile.
+  const intendedType = searchParams.get('intended_type')
+  const claimedRaw = intendedType ?? meta.user_type
+  const googleName =
+    (meta as { name?: string; full_name?: string }).name ??
+    (meta as { full_name?: string }).full_name ??
+    null
+
   // Server-side enforcement: `user_type` claim is only accepted if
   //  (a) it's not `admin` (you don't make yourself admin via signup), and
   //  (b) for `supplier`, the verified email is actually on the U-M domain.
   // Otherwise we coerce to `consumer`.
-  const claimedType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
+  const claimedType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
   const emailIsUmich =
     data.user.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`) ?? false
   const effectiveType =
@@ -64,7 +75,7 @@ export async function GET(request: Request) {
     await supabase.from('users').insert({
       id: data.user.id,
       email: data.user.email!,
-      full_name: meta.full_name ?? null,
+      full_name: googleName,
       university: meta.university ?? null,
       user_type: effectiveType,
       is_verified: true,

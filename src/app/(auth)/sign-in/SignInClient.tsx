@@ -12,6 +12,8 @@ import { AlertCircle } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
+import { AuthDivider } from '@/components/auth/AuthDivider'
 import type { Testimonial } from '@/components/auth/RotatingTestimonial'
 
 const TESTIMONIALS: Testimonial[] = [
@@ -45,8 +47,9 @@ function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const rawNext = searchParams.get('next') ?? '/dashboard'
-  const next =
-    rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard'
+  // Same-origin relative paths only — block protocol-relative ("//evil.com")
+  // and backslash-bypass ("/\evil.com") open-redirect forms.
+  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/dashboard'
   const [error, setError] = useState<string | null>(null)
 
   const {
@@ -107,12 +110,22 @@ function SignInForm() {
             </p>
           </motion.div>
 
-          <motion.form
+          <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.1 }}
-            onSubmit={handleSubmit(onSubmit)}
             className="space-y-5"
+          >
+            <GoogleAuthButton next={next} onError={setError} />
+            <AuthDivider label="or sign in with email" />
+          </motion.div>
+
+          <motion.form
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...spring, delay: 0.15 }}
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-5 mt-5"
           >
             <BrandFormInput
               label="Email"
