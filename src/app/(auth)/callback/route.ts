@@ -6,12 +6,12 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const type = searchParams.get('type') // Supabase sets this for recovery flows
-  const rawNext = searchParams.get('next') ?? '/dashboard'
+  const rawNext = searchParams.get('next') ?? '/'
 
   // Prevent open redirect — allow only same-origin relative paths. Rejects
   // protocol-relative ("//evil.com") and backslash-bypass ("/\evil.com",
   // which browsers normalize toward "//evil.com") forms.
-  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/dashboard'
+  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/'
 
   // Surface the real reason instead of a generic message. When an OAuth
   // round-trip fails (provider/redirect/linking issue) Supabase comes back

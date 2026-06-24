@@ -54,7 +54,7 @@ interface GoogleAuthButtonProps {
 export function GoogleAuthButton({
   label = 'Continue with Google',
   intendedType,
-  next = '/dashboard',
+  next = '/',
   disabled = false,
   onError,
 }: GoogleAuthButtonProps) {
