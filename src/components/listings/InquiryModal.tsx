@@ -183,7 +183,18 @@ export function InquiryModal({
       .single()
 
     if (inquiryError || !inquiry) {
-      toast.error('Failed to send inquiry. Please try again.')
+      // 23505 = duplicate pending inquiry (partial unique index);
+      // 42501 = blocked by the RLS insert policy, i.e. the per-hour rate limit.
+      const code = (inquiryError as { code?: string } | null)?.code
+      if (code === '23505') {
+        toast.error('You already have a pending inquiry for this listing.')
+      } else if (code === '42501') {
+        toast.error(
+          'You’re sending inquiries too quickly. Please try again later.'
+        )
+      } else {
+        toast.error('Failed to send inquiry. Please try again.')
+      }
       return
     }
 
