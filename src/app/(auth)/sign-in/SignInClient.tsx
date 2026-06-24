@@ -50,7 +50,8 @@ function SignInForm() {
   // Same-origin relative paths only — block protocol-relative ("//evil.com")
   // and backslash-bypass ("/\evil.com") open-redirect forms.
   const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/dashboard'
-  const [error, setError] = useState<string | null>(null)
+  // Show a reason passed back from /callback (e.g. a failed Google round-trip).
+  const [error, setError] = useState<string | null>(searchParams.get('error'))
 
   const {
     register,

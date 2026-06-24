@@ -13,9 +13,22 @@ export async function GET(request: Request) {
   // which browsers normalize toward "//evil.com") forms.
   const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/dashboard'
 
-  if (!code) {
+  // Surface the real reason instead of a generic message. When an OAuth
+  // round-trip fails (provider/redirect/linking issue) Supabase comes back
+  // with ?error=&error_description= and NO code; pass that through + log it.
+  const providerError =
+    searchParams.get('error_description') || searchParams.get('error')
+  if (providerError) {
+    console.error('[callback] provider error:', providerError)
     return NextResponse.redirect(
-      `${origin}/sign-in?error=Could%20not%20verify%20email`
+      `${origin}/sign-in?error=${encodeURIComponent(providerError)}`
+    )
+  }
+
+  if (!code) {
+    console.error('[callback] no code in callback url')
+    return NextResponse.redirect(
+      `${origin}/sign-in?error=${encodeURIComponent('No authorization code was returned. Check the Supabase redirect URL allowlist.')}`
     )
   }
 
@@ -23,8 +36,9 @@ export async function GET(request: Request) {
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error || !data.user) {
+    console.error('[callback] exchangeCodeForSession failed:', error?.message)
     return NextResponse.redirect(
-      `${origin}/sign-in?error=Could%20not%20verify%20email`
+      `${origin}/sign-in?error=${encodeURIComponent(error?.message ?? 'Could not complete sign-in.')}`
     )
   }
 
