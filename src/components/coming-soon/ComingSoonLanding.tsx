@@ -9,9 +9,8 @@ import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WaitlistForm } from './WaitlistForm'
 
 const EASE = [0.22, 1, 0.36, 1] as const
-// Both supplier CTAs point at the public AI-import entry — it matches the
-// "screenshot your post, our AI builds the listing" copy and needs no account.
-const SUPPLIER_HREF = '/import-listing'
+// Supplier CTAs go to the chooser (import from a post vs. create manually).
+const SUPPLIER_HREF = '/start-listing'
 const NAVY = 'oklch(0.22 0.075 256)'
 
 /** Inline Instagram glyph — lucide-react dropped brand icons. */

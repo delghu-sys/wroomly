@@ -8,7 +8,7 @@ import {
   BYPASS_COOKIE,
 } from '@/lib/supplyOnly'
 
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon']
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon', '/start-listing']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback

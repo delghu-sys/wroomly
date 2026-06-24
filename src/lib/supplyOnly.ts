@@ -26,8 +26,9 @@ const ALLOWED_EXACT = new Set<string>([
   // Legal.
   '/terms',
   '/privacy',
-  // Supplier "list your place" landing.
+  // Supplier "list your place" landing + chooser.
   '/list-place',
+  '/start-listing',
 ])
 
 const ALLOWED_PREFIXES = [
