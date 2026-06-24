@@ -26,10 +26,21 @@ export async function GET(request: Request) {
   }
 
   if (!code) {
-    console.error('[callback] no code in callback url')
-    return NextResponse.redirect(
-      `${origin}/sign-in?error=${encodeURIComponent('No authorization code was returned. Check the Supabase redirect URL allowlist.')}`
-    )
+    // TEMP DEBUG: render the full client-side URL (incl. #hash, which the
+    // server can't see) so we can tell implicit-flow (#access_token) from a
+    // redirect/allowlist problem. Remove once OAuth is confirmed working.
+    console.error('[callback] no code. server url:', request.url)
+    const html = `<!doctype html><html><body style="font-family:ui-monospace,monospace;padding:24px;max-width:700px;margin:auto">
+<h2>Callback debug — no authorization code</h2>
+<p>Copy this whole block and paste it back in the chat:</p>
+<pre id="out" style="background:#f4f4f5;padding:16px;border-radius:8px;white-space:pre-wrap;word-break:break-all">loading…</pre>
+<p><a href="/sign-in">← back to sign in</a></p>
+<script>document.getElementById('out').textContent = JSON.stringify({href:location.href,search:location.search,hash:location.hash},null,2)</script>
+</body></html>`
+    return new NextResponse(html, {
+      status: 200,
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    })
   }
 
   const supabase = await createClient()
