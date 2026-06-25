@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
 import { signImportUrls } from '@/lib/listing-import/uploads'
-import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { ClaimReview } from '@/components/import/ClaimReview'
 import type { ExtractedListingDraft } from '@/types/listing-import'
@@ -161,7 +160,6 @@ export default async function ClaimListingPage({
         personalPhotos={personalPhotos}
         buildingPhotos={buildingPhotos}
         enrichmentUsed={enrichmentUsed}
-        canPublish={isAllowedSupplierEmail(user.email)}
       />
     </Shell>
   )

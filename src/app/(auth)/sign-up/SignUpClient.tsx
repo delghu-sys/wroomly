@@ -8,7 +8,6 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
-import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
@@ -53,14 +52,7 @@ const termsAgreement = z.literal(true, {
 
 const supplierSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z
-    .string()
-    .email('Invalid email')
-    // @umich.edu by default, plus any address on the supplier allowlist
-    // (NEXT_PUBLIC_ALLOWED_SUPPLIER_EMAILS) — same rule the publish gate uses.
-    .refine(isAllowedSupplierEmail, {
-      message: 'Suppliers must use a @umich.edu email address',
-    }),
+  email: z.string().email('Invalid email'),
   university: z.literal('University of Michigan'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
@@ -211,8 +203,7 @@ export default function SignUpClient({
             </div>
 
             {/* Google sign-up — appears once a side is picked, so we know
-                which user_type to create. Supplier is still gated to @umich.edu
-                server-side in /callback. */}
+                which user_type to create. */}
             {pendingRole && (
               <div className="mt-5 space-y-3">
                 <AuthDivider label="or" />
@@ -334,7 +325,6 @@ export default function SignUpClient({
                 Terms of Service
               </Link>
               .
-              {isSupplier && ' Supplier accounts require a @umich.edu Google login.'}
             </p>
             <AuthDivider label="or sign up with email" />
           </motion.div>
@@ -358,7 +348,7 @@ export default function SignUpClient({
             <BrandFormInput
               label="Email"
               type="email"
-              placeholder={isSupplier ? 'mwhitfield@umich.edu' : 'you@email.com'}
+              placeholder="you@email.com"
               {...(isSupplier
                 ? supplierForm.register('email')
                 : consumerForm.register('email'))}

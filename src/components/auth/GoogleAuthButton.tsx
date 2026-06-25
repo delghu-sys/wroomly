@@ -35,8 +35,6 @@ interface GoogleAuthButtonProps {
    * Role the user is signing up as. Carried to /callback via the redirect so a
    * brand-new account is created with the right `user_type`. Omit for sign-in
    * (existing users keep their type; new ones default to consumer).
-   * Supplier is still gated server-side to @umich.edu — a non-UM Google account
-   * that picks "supplier" is created as a consumer.
    */
   intendedType?: 'supplier' | 'consumer'
   /** Where to land after auth (already sanitized by the caller). */
@@ -74,13 +72,7 @@ export function GoogleAuthButton({
       provider: 'google',
       options: {
         redirectTo,
-        // Suppliers are U-M Google Workspace accounts; hint that domain so the
-        // chooser surfaces the @umich.edu identity. Hint only — /callback still
-        // enforces the supplier email rule.
-        queryParams:
-          intendedType === 'supplier'
-            ? { prompt: 'select_account', hd: 'umich.edu' }
-            : { prompt: 'select_account' },
+        queryParams: { prompt: 'select_account' },
       },
     })
 

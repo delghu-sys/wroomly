@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
 import { PaperPlaneTilt } from '@phosphor-icons/react/dist/ssr'
@@ -65,8 +64,7 @@ export default async function ListPlacePage() {
         </h1>
         <p className="mt-5 text-ink-muted text-base leading-relaxed max-w-md mx-auto">
           That&rsquo;s the side of Wroomly for finding a sublet. To list your
-          own place, you need a supplier account with a verified{' '}
-          <strong className="text-ink">@{UMICH_EMAIL_DOMAIN}</strong> email.
+          own place, you need a separate supplier account.
         </p>
 
         {/* Status line — show the current email so they know which
@@ -81,7 +79,7 @@ export default async function ListPlacePage() {
 
         <p className="mt-7 text-[13px] text-ink-muted leading-relaxed max-w-md mx-auto">
           Sign out of this account first, then sign up again as a supplier
-          with your <strong className="text-ink">@{UMICH_EMAIL_DOMAIN}</strong> email.
+          with a different email address.
         </p>
 
         <div className="mt-7 flex flex-col sm:flex-row gap-3 items-center justify-center">

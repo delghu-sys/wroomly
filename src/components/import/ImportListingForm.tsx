@@ -105,7 +105,7 @@ export function ImportListingForm() {
       {/* Email */}
       <div>
         <label htmlFor="email" className={labelCls}>Your email</label>
-        <input id="email" name="email" type="email" required placeholder="you@umich.edu" className={inputCls} />
+        <input id="email" name="email" type="email" required placeholder="you@email.com" className={inputCls} />
         {fieldErrors.email && <p className="text-xs text-[oklch(0.55_0.20_25)] mt-1">{fieldErrors.email}</p>}
       </div>
 

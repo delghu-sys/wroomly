@@ -1,5 +1,3 @@
-export const UMICH_EMAIL_DOMAIN = 'umich.edu'
-
 export const LISTING_TYPES = {
   SUBLET: 'sublet',
   SWAP: 'swap',

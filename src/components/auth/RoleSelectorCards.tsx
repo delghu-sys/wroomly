@@ -33,8 +33,8 @@ const ROLES: RoleDef[] = [
     value: 'supplier',
     icon: House,
     title: 'I have a place',
-    body: 'U of M student subletting or swapping your apartment or room.',
-    badge: 'Requires @umich.edu email',
+    body: 'Subletting or swapping your apartment or room near U of M.',
+    badge: 'Any email accepted',
     badgeIcon: ShieldCheck,
   },
   {

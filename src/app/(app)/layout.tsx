@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { FooterGate } from '@/components/layout/FooterGate'
 import { PageTransition } from '@/components/layout/PageTransition'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
 import { SUPPLY_ONLY_MODE } from '@/lib/config'
 import type { User } from '@/types/database'
 
@@ -32,9 +31,8 @@ export default async function AppLayout({
     // Self-heal: create a profile row from auth metadata if missing (covers
     // users whose email-verify callback never ran). `user_metadata` is
     // CLIENT-MUTABLE — never trust it for trust-sensitive fields:
-    //   • `user_type` is forced through the same @umich.edu check as the
-    //     callback route. A supplier claim is rejected unless the verified
-    //     email is on the U-M domain.
+    //   • `user_type` is forced through the same rule as the callback route:
+    //     any value other than `supplier` is coerced to `consumer`.
     //   • `is_verified` is set only because reaching this code path means
     //     Supabase has already verified the email at the auth layer.
     //   • `admin` is never accepted from metadata.
@@ -45,11 +43,7 @@ export default async function AppLayout({
         user_type?: 'supplier' | 'consumer'
       }
 
-      const claimedType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
-      const emailIsUmich =
-        authUser.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`) ?? false
-      const effectiveType =
-        claimedType === 'supplier' && !emailIsUmich ? 'consumer' : claimedType
+      const effectiveType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
 
       const upsertRes = await supabase
         .from('users')

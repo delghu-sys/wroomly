@@ -59,7 +59,7 @@ export default async function NewListingPage() {
             </h1>
 
             <p className="mt-4 text-ink-soft leading-relaxed max-w-[55ch]">
-              Only verified U-of-M students can post a place. Your account is
+              Only supplier accounts can post a place. Your account is
               registered as a consumer, so the listing wizard is unavailable.
             </p>
 
@@ -72,9 +72,9 @@ export default async function NewListingPage() {
               <p className="text-[13.5px] text-ink-soft leading-relaxed">
                 To become a supplier, sign up again with a{' '}
                 <strong className="font-semibold text-[oklch(0.32_0.10_85)]">
-                  @umich.edu
+                  different email address
                 </strong>{' '}
-                email. The system verifies the domain server-side.
+                and pick &ldquo;I have a place&rdquo;.
               </p>
             </div>
 

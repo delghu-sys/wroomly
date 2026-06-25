@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -66,15 +65,10 @@ export async function GET(request: Request) {
     (meta as { full_name?: string }).full_name ??
     null
 
-  // Server-side enforcement: `user_type` claim is only accepted if
-  //  (a) it's not `admin` (you don't make yourself admin via signup), and
-  //  (b) for `supplier`, the verified email is actually on the U-M domain.
-  // Otherwise we coerce to `consumer`.
-  const claimedType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
-  const emailIsUmich =
-    data.user.email?.toLowerCase().endsWith(`@${UMICH_EMAIL_DOMAIN}`) ?? false
-  const effectiveType =
-    claimedType === 'supplier' && !emailIsUmich ? 'consumer' : claimedType
+  // Server-side enforcement: `user_type` claim is only accepted if it's not
+  // `admin` (you don't make yourself admin via signup). Any email may be a
+  // supplier — there's no domain restriction.
+  const effectiveType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
 
   // Critical: only create a `users` row on first login. NEVER overwrite an
   // existing row's `user_type` — that would silently demote admins back to

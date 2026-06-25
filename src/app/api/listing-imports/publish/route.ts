@@ -5,7 +5,6 @@ import { extractedListingDraftSchema, isPublishablePhotoPath } from '@/lib/listi
 import { copyImportFileToPublic } from '@/lib/listing-import/uploads'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
-import { isAllowedSupplierEmail } from '@/lib/listing-import/allowed-emails'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -37,16 +36,6 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Please sign in first.' }, { status: 401 })
-
-  if (!isAllowedSupplierEmail(user.email)) {
-    return NextResponse.json(
-      {
-        error:
-          'You need a verified @umich.edu email to publish a listing. Sign in with your University of Michigan email.',
-      },
-      { status: 403 },
-    )
-  }
 
   let body: z.infer<typeof bodySchema>
   try {
