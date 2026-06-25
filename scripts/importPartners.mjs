@@ -1,11 +1,16 @@
 /**
  * Partner-listing importer. Run with:
- *   node --env-file=.env.local scripts/importPartners.mjs   (npm run partners:import)
+ *   node --env-file=.env.local scripts/importPartners.mjs                 (A2, default)
+ *   node --env-file=.env.local scripts/importPartners.mjs --file=<name>   (any partner)
  *
- * Loads scripts/seed-data/wroomly_a2_partner_listings.json as REAL partner
- * listings (source='partner'), owned by a partner system user. Unlike seed
- * listings these are kept by the seed teardown, use the partner's own
- * description as-is, and forward inquiries by email (inquiry_email).
+ *   npm run partners:import       → A2 Management
+ *   npm run partners:import:mr    → MichiganRental
+ *
+ * Loads a seed-data JSON file as REAL partner listings (source='partner'), owned
+ * by a per-partner system user. Unlike seed listings these are kept by the seed
+ * teardown, use the partner's own description as-is, and forward inquiries by
+ * email (inquiry_email). The owning system account is derived from the data's
+ * sourceName, so each partner's listings are owned (and deletable) separately.
  *
  * Idempotent on ADDRESS (each unit address is unique). Re-running updates the
  * matching partner row. Images are neutral placeholders until the partner
@@ -28,8 +33,23 @@ import {
   HAS_MAPBOX,
 } from './_listingImport.mjs'
 
-const DATA_FILE = fileURLToPath(new URL('./seed-data/wroomly_a2_partner_listings.json', import.meta.url))
-const PARTNER_OWNER = { email: 'partner-a2@wroomly.app', name: 'A2 Management' }
+// Which partner file to import. Defaults to A2 for back-compat; pass
+// --file=wroomly_michiganrental_listings.json (or just "michiganrental") for others.
+const fileArg = process.argv.find(a => a.startsWith('--file='))?.slice('--file='.length)
+const DATA_BASENAME = fileArg
+  ? fileArg.endsWith('.json')
+    ? fileArg
+    : `wroomly_${fileArg}_listings.json`
+  : 'wroomly_a2_partner_listings.json'
+const DATA_FILE = fileURLToPath(new URL(`./seed-data/${DATA_BASENAME}`, import.meta.url))
+
+// The owning system account is derived from the data's sourceName so each
+// partner is isolated. Falls back to the A2 account for the legacy file.
+function ownerFor(sourceName) {
+  const name = sourceName || 'A2 Management'
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  return { email: `partner-${slug}@wroomly.app`, name }
+}
 
 // Fail loudly if migration 019 (partner enum value + inquiry_email) isn't applied.
 async function assertPartnerSchema(db) {
@@ -54,9 +74,11 @@ async function main() {
   const records = JSON.parse(await readFile(DATA_FILE, 'utf8'))
   console.log(`Loaded ${records.length} partner records from ${path.basename(DATA_FILE)}`)
 
-  const ownerId = await ensureSystemUser(db, { email: PARTNER_OWNER.email, name: PARTNER_OWNER.name })
+  // Every record in a file should share one sourceName; use the first.
+  const partnerOwner = ownerFor(records[0]?.sourceName)
+  const ownerId = await ensureSystemUser(db, { email: partnerOwner.email, name: partnerOwner.name })
   const placeholders = await ensurePlaceholders(db)
-  console.log(`Partner owner ready (${PARTNER_OWNER.email}); ${placeholders.length} placeholder images in storage.`)
+  console.log(`Partner: ${partnerOwner.name} (owner ${partnerOwner.email}); ${placeholders.length} placeholder images in storage.`)
   if (!HAS_MAPBOX) console.warn('⚠ NEXT_PUBLIC_MAPBOX_TOKEN not set — listings will load without map coordinates.')
 
   let created = 0

@@ -52,3 +52,7 @@ next-env.d.ts
 /.agents
 /.claude/skills
 /skills-lock.json
+
+# Scraped MichiganRental partner photos — reproducible via scripts/scrapeMichiganRental.mjs,
+# and uploaded to Supabase storage at import time. Kept out of git to avoid bloat.
+/public/michiganrental-photos/

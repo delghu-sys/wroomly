@@ -16,6 +16,9 @@
     "seed:import": "node --env-file=.env.local scripts/importSeed.mjs",
     "partners:photos": "node scripts/downloadA2Photos.mjs",
     "partners:import": "node --env-file=.env.local scripts/importPartners.mjs",
+    "partners:scrape:mr": "node scripts/scrapeMichiganRental.mjs",
+    "partners:import:mr": "node --env-file=.env.local scripts/importPartners.mjs --file=michiganrental",
+    "partners:teardown:mr": "node --env-file=.env.local scripts/teardownPartner.mjs --source-name=MichiganRental",
     "seed:teardown": "node --env-file=.env.local scripts/teardownSeed.mjs",
     "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs"
   },

@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-06-25T18:53:52.922Z",
+  "total": 112,
+  "matched": 110,
+  "enriched": 110,
+  "bedroomsConfirmed": 51,
+  "bathroomsConfirmed": 64,
+  "photosDownloaded": 1094,
+  "unmatched": [
+    "120 N State #2",
+    "407 E Kingsley #3"
+  ],
+  "fetchFailed": [],
+  "noPhotos": []
+}
