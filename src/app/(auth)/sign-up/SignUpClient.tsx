@@ -79,15 +79,22 @@ type ConsumerForm = z.infer<typeof consumerSchema>
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
-export default function SignUpClient() {
+export default function SignUpClient({
+  supplyOnly = false,
+}: {
+  supplyOnly?: boolean
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   // Read ?as=supplier (or consumer) from the URL so deep-links from the
   // landing page's "List your place" CTA skip the role-picker step the
   // user has effectively already answered. Invalid values just fall
   // through to the standard picker.
-  const initialRole: Role | null =
-    searchParams.get('as') === 'supplier'
+  // During the supply-only soft launch, force the supplier role — renters
+  // can't sign up yet, so the consumer path / role picker is removed entirely.
+  const initialRole: Role | null = supplyOnly
+    ? 'supplier'
+    : searchParams.get('as') === 'supplier'
       ? 'supplier'
       : searchParams.get('as') === 'consumer'
         ? 'consumer'
@@ -267,19 +274,21 @@ export default function SignUpClient() {
 
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
         <div className="w-full max-w-md">
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={spring}
-            onClick={() => {
-              setPendingRole(role)
-              setRole(null)
-            }}
-            className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink mb-7 transition-colors active:scale-[0.97]"
-          >
-            <ArrowLeft className="w-4 h-4" strokeWidth={1.75} />
-            Back to role selection
-          </motion.button>
+          {!supplyOnly && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={spring}
+              onClick={() => {
+                setPendingRole(role)
+                setRole(null)
+              }}
+              className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink mb-7 transition-colors active:scale-[0.97]"
+            >
+              <ArrowLeft className="w-4 h-4" strokeWidth={1.75} />
+              Back to role selection
+            </motion.button>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}

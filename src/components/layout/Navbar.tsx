@@ -22,9 +22,10 @@ import { PAYMENTS_ENABLED } from '@/lib/config'
 interface NavbarProps {
   user: User | null
   unreadCount?: number
+  supplyOnly?: boolean
 }
 
-export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
+export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -47,6 +48,12 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
   }, [])
 
   const transparent = hasDarkHero && !scrolled
+
+  // Supply-only soft launch: hide the renter content links (Browse / How it
+  // works) for anyone who isn't an exempt supplier/admin — they only lead to
+  // /coming-soon, so they read as broken on supplier-flow pages.
+  const hideRenterNav =
+    supplyOnly && user?.user_type !== 'supplier' && user?.user_type !== 'admin'
 
   async function signOut() {
     const supabase = createClient()
@@ -97,28 +104,30 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
         </Link>
 
         {/* Center links — desktop */}
-        <div className="hidden md:flex items-center gap-7">
-          <Link
-            href="/listings"
-            className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
-              transparent
-                ? 'text-white/70 hover:text-white'
-                : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            Browse
-          </Link>
-          <Link
-            href="/about"
-            className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
-              transparent
-                ? 'text-white/70 hover:text-white'
-                : 'text-ink-soft hover:text-ink'
-            }`}
-          >
-            How it works
-          </Link>
-        </div>
+        {!hideRenterNav && (
+          <div className="hidden md:flex items-center gap-7">
+            <Link
+              href="/listings"
+              className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
+                transparent
+                  ? 'text-white/70 hover:text-white'
+                  : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              Browse
+            </Link>
+            <Link
+              href="/about"
+              className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
+                transparent
+                  ? 'text-white/70 hover:text-white'
+                  : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              How it works
+            </Link>
+          </div>
+        )}
 
         {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -291,12 +300,16 @@ export function Navbar({ user, unreadCount = 0 }: NavbarProps) {
       {mobileOpen && (
         <div className="md:hidden border-t border-line bg-background/95 backdrop-blur-xl animate-fade-up">
           <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-            <MobileLink href="/listings" onClick={() => setMobileOpen(false)}>
-              Browse
-            </MobileLink>
-            <MobileLink href="/about" onClick={() => setMobileOpen(false)}>
-              How it works
-            </MobileLink>
+            {!hideRenterNav && (
+              <>
+                <MobileLink href="/listings" onClick={() => setMobileOpen(false)}>
+                  Browse
+                </MobileLink>
+                <MobileLink href="/about" onClick={() => setMobileOpen(false)}>
+                  How it works
+                </MobileLink>
+              </>
+            )}
 
             {user && (
               <>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import SignUpClient from './SignUpClient'
+import { SUPPLY_ONLY_MODE } from '@/lib/config'
 
 // The desired title doesn't fit the "%s | Wroomly" template — use `absolute`
 // to bypass the root template and render exactly this string.
@@ -32,7 +33,7 @@ export default function Page() {
   // prerendering while letting the role-picker hydrate from ?as=...
   return (
     <Suspense fallback={null}>
-      <SignUpClient />
+      <SignUpClient supplyOnly={SUPPLY_ONLY_MODE} />
     </Suspense>
   )
 }

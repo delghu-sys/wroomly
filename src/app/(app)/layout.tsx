@@ -3,6 +3,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { FooterGate } from '@/components/layout/FooterGate'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { UMICH_EMAIL_DOMAIN } from '@/lib/constants'
+import { SUPPLY_ONLY_MODE } from '@/lib/config'
 import type { User } from '@/types/database'
 
 export default async function AppLayout({
@@ -90,7 +91,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <Navbar user={profile} unreadCount={unreadCount} />
+      <Navbar user={profile} unreadCount={unreadCount} supplyOnly={SUPPLY_ONLY_MODE} />
       <main className="flex-1">
         <PageTransition>{children}</PageTransition>
       </main>
