@@ -442,3 +442,31 @@
     [data-motion-safe='false'] { transition: none !important; }
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Mobile scroll performance.
+
+   The biggest cause of scroll jank on phones is frosted glass: every element
+   with `backdrop-filter` forces the GPU to re-composite a blurred copy of
+   whatever is behind it on *every frame* while scrolling, and this site uses
+   `backdrop-blur-xl` (24px) on dozens of surfaces — including the listing cards
+   in scrolling grids. Blur cost scales with radius, so on small/touch screens
+   we drop the radius to a light frost (still looks glassy, ~16× cheaper) and
+   stop animating the large blurred mesh blobs. Desktop is untouched.
+
+   Top-level (unlayered) so these win over the Tailwind utility classes.
+   ─────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .backdrop-blur-xl,
+  .backdrop-blur-lg,
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: blur(6px) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  /* Animating a 120–140px blur is expensive; keep the blobs static on mobile. */
+  .animate-float,
+  .animate-float-slow {
+    animation: none !important;
+  }
+}
