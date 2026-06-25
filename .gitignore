@@ -56,3 +56,7 @@ next-env.d.ts
 # Scraped MichiganRental partner photos — reproducible via scripts/scrapeMichiganRental.mjs,
 # and uploaded to Supabase storage at import time. Kept out of git to avoid bloat.
 /public/michiganrental-photos/
+
+# Scraped CMB Management partner photos — reproducible via scripts/scrapeCMB.mjs,
+# and uploaded to Supabase storage at import time. Kept out of git to avoid bloat.
+/public/cmb-photos/

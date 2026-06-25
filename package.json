@@ -19,6 +19,9 @@
     "partners:scrape:mr": "node scripts/scrapeMichiganRental.mjs",
     "partners:import:mr": "node --env-file=.env.local scripts/importPartners.mjs --file=michiganrental",
     "partners:teardown:mr": "node --env-file=.env.local scripts/teardownPartner.mjs --source-name=MichiganRental",
+    "partners:scrape:cmb": "node --env-file=.env.local scripts/scrapeCMB.mjs",
+    "partners:import:cmb": "node --env-file=.env.local scripts/importPartners.mjs --file=cmb",
+    "partners:teardown:cmb": "node --env-file=.env.local scripts/teardownPartner.mjs --source-name=\"CMB Management\"",
     "seed:teardown": "node --env-file=.env.local scripts/teardownSeed.mjs",
     "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs"
   },

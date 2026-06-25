@@ -103,10 +103,15 @@ async function main() {
         .eq('address', address)
         .maybeSingle()
 
-      let lat = existing?.lat ?? null
-      let lng = existing?.lng ?? null
+      // A record may pre-supply coordinates (e.g. multiple listings sharing one
+      // building, geocoded once by the scraper) — skip Mapbox entirely then.
+      // geocodeAddress lets a record's dedup `address` differ from the real
+      // street address used for the lookup (e.g. address has a floor-plan
+      // suffix like "— Studio" that would confuse the geocoder).
+      let lat = r.lat ?? existing?.lat ?? null
+      let lng = r.lng ?? existing?.lng ?? null
       if ((lat == null || lng == null) && address) {
-        const c = await geocode(address, r.city)
+        const c = await geocode(r.geocodeAddress ?? address, r.city)
         if (c) {
           lat = c.lat
           lng = c.lng

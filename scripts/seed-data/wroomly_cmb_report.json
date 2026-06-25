@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-06-25T20:00:09.802Z",
+  "totalBuildings": 14,
+  "totalListingsCreated": 14,
+  "perBuilding": [
+    {
+      "building": "220 North First",
+      "address": "220 N 1st St, Ann Arbor, MI 48104",
+      "floorPlansFound": 2,
+      "available": 1,
+      "fullyLeased": 1,
+      "photos": 16,
+      "geocoded": true,
+      "listings": [
+        "Studio at 220 North First"
+      ]
+    },
+    {
+      "building": "820 McKinley",
+      "address": "820 McKinley Ave",
+      "floorPlansFound": 2,
+      "available": 1,
+      "fullyLeased": 1,
+      "photos": 12,
+      "geocoded": true,
+      "listings": [
+        "1 Bedrooms at 820 McKinley"
+      ]
+    },
+    {
+      "building": "824 McKinley",
+      "address": "824 McKinley, Ann Arbor, MI 48104",
+      "floorPlansFound": 2,
+      "available": 1,
+      "fullyLeased": 1,
+      "photos": 1,
+      "geocoded": true,
+      "listings": [
+        "1 Bedrooms at 824 McKinley"
+      ]
+    },
+    {
+      "building": "Eastwind Apartments",
+      "address": "2025 Huron Pkwy, Ann Arbor, MI 48104",
+      "floorPlansFound": 2,
+      "available": 2,
+      "fullyLeased": 0,
+      "photos": 14,
+      "geocoded": true,
+      "listings": [
+        "1 Bedrooms at Eastwind Apartments",
+        "2 Bedrooms at Eastwind Apartments"
+      ]
+    },
+    {
+      "building": "Miller Maple Townhomes",
+      "address": "2505 Miller Ave, Ann Arbor, MI 48103",
+      "floorPlansFound": 2,
+      "available": 1,
+      "fullyLeased": 1,
+      "photos": 9,
+      "geocoded": true,
+      "listings": [
+        "2 Bedroom at Miller Maple Townhomes"
+      ]
+    },
+    {
+      "building": "801 Miller",
+      "address": "801 Miller Ave, Ann Arbor, MI 48103",
+      "floorPlansFound": 1,
+      "available": 1,
+      "fullyLeased": 0,
+      "photos": 7,
+      "geocoded": true,
+      "listings": [
+        "2 Bedroom at 801 Miller"
+      ]
+    },
+    {
+      "building": "High Street Apartments",
+      "address": "545 N State St, Ann Arbor, MI 48104",
+      "floorPlansFound": 1,
+      "available": 0,
+      "fullyLeased": 1,
+      "photos": 8,
+      "geocoded": true,
+      "listings": []
+    },
+    {
+      "building": "712 West Huron",
+      "address": "712 W Huron St, Ann Arbor, MI 48103",
+      "floorPlansFound": 3,
+      "available": 2,
+      "fullyLeased": 1,
+      "photos": 14,
+      "geocoded": true,
+      "listings": [
+        "1 Bedroom at 712 West Huron",
+        "2 Bedroom at 712 West Huron"
+      ]
+    },
+    {
+      "building": "525 North Division",
+      "address": "525 N Division St, Ann Arbor, MI 48104",
+      "floorPlansFound": 1,
+      "available": 0,
+      "fullyLeased": 1,
+      "photos": 4,
+      "geocoded": true,
+      "listings": []
+    },
+    {
+      "building": "743 Miller",
+      "address": "743 Miller Ave, Ann Arbor, MI 48103",
+      "floorPlansFound": 1,
+      "available": 0,
+      "fullyLeased": 1,
+      "photos": 2,
+      "geocoded": true,
+      "listings": []
+    },
+    {
+      "building": "350 Thompson",
+      "address": "350 Thompson St, Ann Arbor, MI 48104",
+      "floorPlansFound": 4,
+      "available": 1,
+      "fullyLeased": 3,
+      "photos": 19,
+      "geocoded": true,
+      "listings": [
+        "Studios at 350 Thompson"
+      ]
+    },
+    {
+      "building": "914 Sylvan",
+      "address": "914 Sylvan Ave, Ann Arbor, MI 48104",
+      "floorPlansFound": 1,
+      "available": 0,
+      "fullyLeased": 1,
+      "photos": 6,
+      "geocoded": true,
+      "listings": []
+    },
+    {
+      "building": "Broadview Apartments",
+      "address": "1701 Broadview Lane, Ann Arbor, MI 48105",
+      "floorPlansFound": 2,
+      "available": 0,
+      "fullyLeased": 2,
+      "photos": 8,
+      "geocoded": true,
+      "listings": []
+    },
+    {
+      "building": "Parkside Apartments",
+      "address": "810 W. Huron St., Ann Arbor, MI 48103",
+      "floorPlansFound": 4,
+      "available": 4,
+      "fullyLeased": 0,
+      "photos": 15,
+      "geocoded": true,
+      "listings": [
+        "2 Bedroom w/ Balcony at Parkside Apartments",
+        "2 Bedroom w/ Balcony at Parkside Apartments",
+        "2 Bedroom w/ Balcony at Parkside Apartments",
+        "3 Bedroom Bi-Level W/ Balcony at Parkside Apartments"
+      ]
+    }
+  ],
+  "fetchFailed": [],
+  "excludedFromImport": {
+    "page": "https://annarborapartments.net/sublet/",
+    "reason": "Individual residents' personal sublet posts (their own name + personal email/phone) — not CMB's own inventory. Excluded to avoid misattribution and publishing private contact info without consent."
+  }
+}
