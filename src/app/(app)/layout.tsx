@@ -95,7 +95,7 @@ export default async function AppLayout({
       <main className="flex-1">
         <PageTransition>{children}</PageTransition>
       </main>
-      <FooterGate />
+      <FooterGate supplyOnly={SUPPLY_ONLY_MODE} userType={profile?.user_type ?? null} />
     </div>
   )
 }
