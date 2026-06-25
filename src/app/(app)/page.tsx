@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingWithDetails } from '@/types/database'
 import { formatCents, getListingImageUrl } from '@/lib/utils/listing'
@@ -8,6 +7,7 @@ import { HomeHero } from '@/components/home/HomeHero'
 import { CinematicMarquee } from '@/components/home/CinematicMarquee'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
 import { TiltCard } from '@/components/home/TiltCard'
+import { CardGallery } from '@/components/listings/CardGallery'
 import { MagneticButton } from '@/components/home/MagneticButton'
 import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 
@@ -119,12 +119,9 @@ export default async function HomePage() {
           {listings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {listings.map((listing, i) => {
-                const coverImage = listing.listing_images
-                  ?.sort((a, b) => a.display_order - b.display_order)
-                  .at(0)
-                const imageUrl = coverImage
-                  ? getListingImageUrl(coverImage.storage_path)
-                  : null
+                const imageUrls = [...(listing.listing_images ?? [])]
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map(img => getListingImageUrl(img.storage_path))
 
                 return (
                   <ScrollReveal key={listing.id} delay={0.05 * i}>
@@ -132,14 +129,8 @@ export default async function HomePage() {
                       <Link href={`/listings/${listing.id}`} className="block group">
                         <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden shadow-[0_2px_16px_oklch(0_0_0/0.05)] hover:shadow-[0_12px_40px_oklch(0_0_0/0.10)] transition-shadow duration-500">
                           <div className="relative aspect-[4/3] bg-[oklch(0.95_0.01_85)] overflow-hidden">
-                            {imageUrl ? (
-                              <Image
-                                src={imageUrl}
-                                alt={listing.title}
-                                fill
-                                className="object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                              />
+                            {imageUrls.length > 0 ? (
+                              <CardGallery images={imageUrls} alt={listing.title} />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
                                 <BedDouble className="w-8 h-8 text-ink-muted/30" />
