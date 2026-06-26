@@ -13,8 +13,10 @@ import { DateSeparator } from './DateSeparator'
 import { MessageInput } from './MessageInput'
 import { InquiryPinnedCard } from './InquiryPinnedCard'
 import { AcceptedSystemCard } from './AcceptedSystemCard'
+import { DealClosedSystemCard } from './DealClosedSystemCard'
 
 const DEAL_ACCEPTED_PREFIX = '::deal_accepted::'
+const DEAL_CLOSED_PREFIX = '::deal_closed::'
 const PAYMENT_REQUEST_PREFIX = '::payment_request::'
 const PAID_PREFIX = '::paid::'
 const BOOKED_BY_OTHER_PREFIX = '::booked_by_other::'
@@ -28,6 +30,7 @@ interface ConversationData {
     id: string
     title: string
     type: string
+    status: string
     price_per_month: number | null
     available_from: string | null
     available_to: string | null
@@ -293,6 +296,8 @@ export function ThreadView({
               }}
               isSupplier={isSupplier}
               supplierPayoutReady={supplierPayoutReady}
+              listingStatus={listing.status}
+              conversationId={conversation.id}
             />
           </div>
         )}
@@ -318,6 +323,18 @@ export function ThreadView({
                     defaultTitle={listing?.title}
                     defaultType={listing?.type}
                     otherContact={otherContact}
+                  />
+                </div>
+              )
+            }
+            if (msg.content.startsWith(DEAL_CLOSED_PREFIX)) {
+              return (
+                <div key={msg.id}>
+                  {showDate && <DateSeparator iso={msg.created_at} />}
+                  <DealClosedSystemCard
+                    rawContent={msg.content}
+                    createdAtIso={msg.created_at}
+                    isConsumer={isConsumer}
                   />
                 </div>
               )

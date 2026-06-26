@@ -144,6 +144,11 @@ export interface Listing {
     | null
   residence_name: string | null
   status: ListingStatus
+  // Set when a supplier marks the listing as taken from the chat. `closed_with`
+  // is the renter the deal closed with — they keep read access to the listing
+  // after it leaves 'active' (see migration 025). Null until a deal is closed.
+  closed_with: string | null
+  closed_at: string | null
   auto_review_decision: 'approve' | 'reject' | 'manual' | null
   auto_review_reason: string | null
   auto_review_flags: string[] | null

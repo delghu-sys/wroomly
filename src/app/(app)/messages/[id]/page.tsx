@@ -26,6 +26,7 @@ interface ConvoRow {
     id: string
     title: string
     type: string
+    status: string
     price_per_month: number | null
     available_from: string | null
     available_to: string | null
@@ -65,7 +66,7 @@ export default async function ConversationPage({
       .from('conversations')
       .select(`
         *,
-        listings(id, title, type, price_per_month, available_from, available_to, neighborhood, listing_images(storage_path, display_order)),
+        listings(id, title, type, status, price_per_month, available_from, available_to, neighborhood, listing_images(storage_path, display_order)),
         supplier:supplier_id(id, full_name, avatar_url, email, phone),
         consumer:consumer_id(id, full_name, avatar_url, email, phone)
       `)
@@ -171,6 +172,7 @@ export default async function ConversationPage({
           id: conv.listings.id,
           title: conv.listings.title,
           type: conv.listings.type,
+          status: conv.listings.status,
           price_per_month: conv.listings.price_per_month,
           available_from: conv.listings.available_from,
           available_to: conv.listings.available_to,

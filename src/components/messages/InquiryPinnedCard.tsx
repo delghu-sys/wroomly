@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
-import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
+import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2, PartyPopper, Bell } from 'lucide-react'
 import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import type { InquiryStatus } from '@/types/database'
 import { formatCents } from '@/lib/utils/listing'
+import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
 
 interface InquiryPinnedCardProps {
@@ -38,6 +39,13 @@ interface InquiryPinnedCardProps {
    * (no money flow) and legacy callers aren't broken.
    */
   supplierPayoutReady?: boolean
+  /**
+   * Current listing status. The supplier's "Mark as taken" action only
+   * shows while it's still 'active'; once closed it drops away.
+   */
+  listingStatus?: string
+  /** Conversation id — used by the renter's "nudge the owner" message. */
+  conversationId: string
 }
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
@@ -48,6 +56,8 @@ export function InquiryPinnedCard({
   listing,
   isSupplier,
   supplierPayoutReady = true,
+  listingStatus = 'active',
+  conversationId,
 }: InquiryPinnedCardProps) {
   const router = useRouter()
   // Sublet bookings move real money; require an active Stripe Connect
@@ -56,8 +66,62 @@ export function InquiryPinnedCard({
   const needsPayoutSetup = listing.type === 'sublet' && !supplierPayoutReady
   const [status, setStatus] = useState<InquiryStatus>(inquiry.status)
   const [loading, setLoading] = useState<'accept' | 'reject' | null>(null)
+  const [closing, setClosing] = useState(false)
+  const [nudged, setNudged] = useState(false)
   const [showBurst, setShowBurst] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const supabase = useMemo(() => createClient(), [])
+
+  const listingOpen = listingStatus === 'active'
+  const isSwap = listing.type === 'swap'
+
+  // Supplier-only: take the listing off the market and lock in this renter.
+  // The server flips the listing to rented/swapped, records `closed_with`,
+  // and auto-declines the other pending inquiries.
+  async function closeDeal() {
+    if (closing) return
+    setClosing(true)
+    try {
+      const res = await fetch(`/api/inquiries/${inquiry.id}/close-deal`, {
+        method: 'POST',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        toast.error(data.error ?? 'Could not mark as taken. Please try again.')
+        setClosing(false)
+        return
+      }
+      toast.success(
+        isSwap
+          ? 'Swap confirmed — listing is off the market.'
+          : 'Marked as taken — listing is off the market.'
+      )
+      router.refresh()
+      // Leave `closing` true; the refresh re-renders without the button.
+    } catch {
+      toast.error('Network error — please try again.')
+      setClosing(false)
+    }
+  }
+
+  // Renter-only: can't close the deal themselves (supplier decides), but
+  // can drop a one-tap message asking the owner to mark it taken.
+  async function nudgeOwner() {
+    if (nudged) return
+    setNudged(true)
+    const { error } = await supabase.from('messages').insert({
+      conversation_id: conversationId,
+      sender_id: inquiry.consumer_id,
+      content:
+        'Hey! I think we’ve got a deal — could you mark this place as taken on Wroomly so it comes off the market? 🙌',
+    })
+    if (error) {
+      toast.error('Could not send. Please try again.')
+      setNudged(false)
+      return
+    }
+    toast.success('Sent — asked the owner to confirm.')
+  }
 
   async function decide(next: 'accepted' | 'rejected') {
     if (loading) return
@@ -290,6 +354,81 @@ export function InquiryPinnedCard({
               )}
               {loading === 'reject' ? 'Declining…' : 'Decline'}
             </button>
+          </div>
+        )}
+
+        {/* ── Deal closure ─────────────────────────────────────────────
+            Supplier decides: only the owner can take the listing off the
+            market. Shows while the listing is still open, independent of
+            the accept/decline state above (a deal can close with or
+            without a formal accept). ── */}
+        {isSupplier && listingOpen && (
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={closeDeal}
+              disabled={closing}
+              className="
+                group relative inline-flex w-full items-center justify-center gap-2
+                h-11 px-5 rounded-full overflow-hidden
+                font-semibold text-sm tracking-tight
+                bg-[oklch(0.55_0.15_142)] text-white
+                shadow-[0_4px_18px_oklch(0.55_0.15_142/0.30)]
+                hover:shadow-[0_10px_28px_oklch(0.55_0.15_142/0.45)]
+                disabled:opacity-60 disabled:cursor-not-allowed
+                active:scale-[0.97] transition-all duration-300
+              "
+            >
+              {closing ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <PartyPopper className="w-4 h-4" strokeWidth={2} />
+              )}
+              {closing
+                ? 'Closing…'
+                : isSwap
+                  ? 'We made a swap — mark as taken'
+                  : 'We made a deal — mark as taken'}
+            </button>
+            <p className="text-[11.5px] text-ink-muted mt-2 leading-snug text-center">
+              Takes the listing off the market and declines other pending
+              inquiries. The renter keeps access to the details.
+            </p>
+          </div>
+        )}
+
+        {/* Renter can't close it, but can nudge the owner to confirm. */}
+        {!isSupplier && listingOpen && (
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={nudgeOwner}
+              disabled={nudged}
+              className="
+                inline-flex w-full items-center justify-center gap-2
+                h-10 px-4 rounded-full border border-line bg-white text-ink-soft
+                font-medium text-[13px]
+                hover:border-[oklch(0.55_0.15_142/0.40)] hover:text-[oklch(0.40_0.13_142)]
+                disabled:opacity-60 disabled:cursor-not-allowed
+                active:scale-[0.97] transition-all duration-300
+              "
+            >
+              <Bell className="w-3.5 h-3.5" strokeWidth={2} />
+              {nudged ? 'Owner notified' : 'Made a deal? Ask the owner to confirm'}
+            </button>
+          </div>
+        )}
+
+        {/* Listing already closed — quiet confirmation in the card. */}
+        {!listingOpen && (
+          <div className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-emerald-200/60 bg-emerald-50/50 px-4 py-2.5">
+            <CheckCircle2
+              className="w-4 h-4 text-[oklch(0.45_0.13_142)]"
+              strokeWidth={2.25}
+            />
+            <span className="text-[12.5px] font-medium text-[oklch(0.40_0.13_142)]">
+              {isSwap ? 'Swap complete' : 'This place has been taken'}
+            </span>
           </div>
         )}
       </div>
