@@ -108,6 +108,21 @@ export function HomeHero() {
               </Link>
             </motion.div>
 
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...spring, delay: 0.9 }}
+              className="mt-4 text-sm text-white/55"
+            >
+              Can&rsquo;t find it yet?{' '}
+              <Link
+                href="/match"
+                className="font-medium text-maize underline-offset-4 hover:underline"
+              >
+                Let our AI email you when it&rsquo;s posted →
+              </Link>
+            </motion.p>
+
             {/* Trust badges — live indicators */}
             <div className="mt-14 flex flex-wrap gap-3">
               {trustBadges.map(({ icon: Icon, label }, i) => (

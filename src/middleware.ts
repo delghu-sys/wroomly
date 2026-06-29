@@ -67,12 +67,6 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Wroomly Match APIs (chat, criteria, alerts, unsubscribe) are public and
-  // anonymous by design — token-gated where needed, no session involved.
-  if (pathname.startsWith('/api/match')) {
-    return supabaseResponse
-  }
-
   // The /suspended terminal page must be reachable even with a session —
   // otherwise suspended users hit a redirect loop.
   if (pathname === '/suspended') {
@@ -119,6 +113,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(COMING_SOON_PATH, request.url))
       }
     }
+  }
+
+  // Wroomly Match APIs (chat, criteria, alerts, unsubscribe) are public and
+  // anonymous — token-gated where needed, no session. Placed AFTER the
+  // supply-only gate so the chat stays blocked for renters during soft launch
+  // (the gate above already redirected non-exempt visitors), but skips the
+  // auth-required block below so it works anonymously once fully launched.
+  if (pathname.startsWith('/api/match')) {
+    return supabaseResponse
   }
 
   // Allow public and auth routes

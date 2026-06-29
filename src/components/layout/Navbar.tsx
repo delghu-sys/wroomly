@@ -126,6 +126,16 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
             >
               How it works
             </Link>
+            <Link
+              href="/match"
+              className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
+                transparent
+                  ? 'text-white/70 hover:text-white'
+                  : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              Get matched
+            </Link>
           </div>
         )}
 

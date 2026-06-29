@@ -37,14 +37,14 @@ const ALLOWED_PREFIXES = [
   '/claim-listing/', // claim a drafted listing
   '/api/waitlist',
   '/api/listing-imports', // supplier import APIs (do their own auth)
-  // Wroomly Match — renter demand-capture stays open during the soft launch
-  // (that's the whole point: collect what renters want before full launch).
-  '/match',
-  '/api/match',
   '/sitemap',
   '/robots',
   '/manifest',
 ]
+// NOTE: Wroomly Match (/match, /api/match) is intentionally NOT listed here —
+// the AI chat stays gated behind /coming-soon during SUPPLY_ONLY_MODE and only
+// goes live for renters at full launch. Exempt users (admin/supplier/bypass)
+// can still preview it.
 
 /**
  * True if a NON-exempt visitor is still allowed to load this path while
