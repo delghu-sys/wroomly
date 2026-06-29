@@ -76,6 +76,16 @@ export interface Database {
         Insert: Omit<AdminAction, 'id' | 'created_at'>
         Update: never
       }
+      match_alerts: {
+        Row: MatchAlert
+        Insert: Omit<MatchAlert, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<MatchAlert, 'id' | 'created_at'>>
+      }
+      match_alert_sends: {
+        Row: MatchAlertSend
+        Insert: Omit<MatchAlertSend, 'id' | 'emailed_at'>
+        Update: never
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -257,6 +267,60 @@ export interface Review {
   rating: number
   comment: string | null
   created_at: string
+}
+
+// ── Wroomly Match ──────────────────────────────────────────────────────────
+// A renter's AI-captured housing preference + opt-in email. Anonymous; all
+// access is via the manage_token, never a Supabase session. See migration 026.
+export type MatchAlertStatus = 'active' | 'paused' | 'unsubscribed'
+export type MatchFrequency = 'instant' | 'daily'
+export type MatchLeaseType = 'sublet' | 'full' | 'either'
+
+/**
+ * Structured housing-preference profile parsed from the Match chat. Field names
+ * and value spaces mirror the `listings` columns + existing enums
+ * (ANN_ARBOR_NEIGHBORHOODS, AMENITIES) so matching is a direct comparison.
+ * Prices are in whole dollars (converted to cents only when querying listings).
+ */
+export interface MatchCriteria {
+  budget_min: number | null
+  budget_max: number | null
+  bedrooms_min: number | null // 0 = studio
+  whole_unit: boolean | null // true = whole unit, false = a room in a shared unit
+  bathrooms_min: number | null
+  lease_type: MatchLeaseType | null
+  date_start: string | null // desired available_from (ISO date)
+  date_end: string | null // desired available_to (ISO date), for sublets
+  neighborhoods: string[]
+  furnished: boolean | null
+  amenities: string[]
+  pets_required: boolean | null
+  roommate_pref: string | null // optional free-text (e.g. "ok with roommates")
+  notes: string | null
+}
+
+export interface MatchAlert {
+  id: string
+  email: string
+  criteria: MatchCriteria
+  transcript: { role: 'user' | 'assistant'; content: string }[]
+  status: MatchAlertStatus
+  frequency: MatchFrequency
+  manage_token: string
+  confirmed_at: string | null
+  user_id: string | null
+  source: string | null
+  last_matched_at: string
+  created_at: string
+  updated_at: string
+}
+
+export interface MatchAlertSend {
+  id: string
+  alert_id: string
+  listing_id: string
+  score: number | null
+  emailed_at: string
 }
 
 export interface Report {

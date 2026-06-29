@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { reviewListing, type ListingForReview } from '@/lib/reviewers/listing-reviewer'
 import type { Listing, ListingImage, ListingAmenity, SwapPreference } from '@/types/database'
 import { getListingImageUrl as imageUrl } from '@/lib/utils/listing'
+import { dispatchInstantForListing } from '@/lib/match/dispatch'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -83,6 +84,12 @@ async function reviewOne(
       auto_reviewed_at: new Date().toISOString(),
     })
     .eq('id', listingId)
+
+  // Listing just went live → fire Wroomly Match alerts (fire-and-forget; the
+  // dispatcher self-guards on source='user' and never throws).
+  if (nextStatus === 'active') {
+    void dispatchInstantForListing(listingId)
+  }
 
   return { listingId, ...result, status: nextStatus }
 }

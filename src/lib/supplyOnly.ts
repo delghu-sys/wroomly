@@ -37,6 +37,10 @@ const ALLOWED_PREFIXES = [
   '/claim-listing/', // claim a drafted listing
   '/api/waitlist',
   '/api/listing-imports', // supplier import APIs (do their own auth)
+  // Wroomly Match — renter demand-capture stays open during the soft launch
+  // (that's the whole point: collect what renters want before full launch).
+  '/match',
+  '/api/match',
   '/sitemap',
   '/robots',
   '/manifest',

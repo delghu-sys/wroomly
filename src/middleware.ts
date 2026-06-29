@@ -38,6 +38,9 @@ const PUBLIC_PREFIXES = [
   '/guides/',
   '/import-listing',
   '/claim-listing/',
+  // Wroomly Match — public renter demand-capture (chat → email alert), no
+  // account needed. Covers /match and /match/manage.
+  '/match',
 ]
 
 export async function middleware(request: NextRequest) {
@@ -61,6 +64,12 @@ export async function middleware(request: NextRequest) {
   // Public renter-waitlist endpoint (supply-only). Validates its own input and
   // needs no session, so never gate it behind auth.
   if (pathname.startsWith('/api/waitlist')) {
+    return supabaseResponse
+  }
+
+  // Wroomly Match APIs (chat, criteria, alerts, unsubscribe) are public and
+  // anonymous by design — token-gated where needed, no session involved.
+  if (pathname.startsWith('/api/match')) {
     return supabaseResponse
   }
 

@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/saved-search-alerts",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/match-alerts",
+      "schedule": "0 15 * * *"
     }
   ]
 }
