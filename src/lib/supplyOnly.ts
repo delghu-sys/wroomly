@@ -41,6 +41,10 @@ const ALLOWED_PREFIXES = [
   '/robots',
   '/manifest',
 ]
+// NOTE: Wroomly Match (/match, /api/match) is intentionally NOT listed here —
+// the AI chat stays gated behind /coming-soon during SUPPLY_ONLY_MODE and only
+// goes live for renters at full launch. Exempt users (admin/supplier/bypass)
+// can still preview it.
 
 /**
  * True if a NON-exempt visitor is still allowed to load this path while

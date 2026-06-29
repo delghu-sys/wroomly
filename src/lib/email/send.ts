@@ -18,6 +18,9 @@ export async function sendEmail(opts: {
   html: string
   text?: string // plaintext fallback for clients that don't render HTML
   replyTo?: string
+  // Extra SMTP headers — e.g. List-Unsubscribe / List-Unsubscribe-Post for
+  // one-click unsubscribe on marketing-style sends (Wroomly Match alerts).
+  headers?: Record<string, string>
 }): Promise<{ ok: boolean; id?: string; error?: string }> {
   try {
     const result = await resend.emails.send({
@@ -27,6 +30,7 @@ export async function sendEmail(opts: {
       html: opts.html,
       text: opts.text,
       replyTo: opts.replyTo,
+      headers: opts.headers,
     })
 
     if (result.error) {

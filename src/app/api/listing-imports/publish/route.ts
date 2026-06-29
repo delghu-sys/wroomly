@@ -5,6 +5,7 @@ import { extractedListingDraftSchema, isPublishablePhotoPath } from '@/lib/listi
 import { copyImportFileToPublic } from '@/lib/listing-import/uploads'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
+import { dispatchInstantForListing } from '@/lib/match/dispatch'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -157,6 +158,10 @@ export async function POST(request: Request) {
     .from('listing_import_requests')
     .update({ listing_id: listingId })
     .eq('id', req.id)
+
+  // Published an imported listing → fire Wroomly Match alerts now that its
+  // photos + amenities are in place (fire-and-forget; guards source='user').
+  void dispatchInstantForListing(listingId)
 
   console.info('[listing-imports/publish] published', { requestId: req.id, listingId, userId: user.id })
   return NextResponse.json({ ok: true, listingId })

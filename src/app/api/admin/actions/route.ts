@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { dispatchInstantForListing } from '@/lib/match/dispatch'
 
 /**
  * POST /api/admin/actions
@@ -161,6 +162,11 @@ export async function POST(request: Request) {
     action: body.action === 'approve' ? 'approve_listing' : 'reject_listing',
     notes: body.notes ?? null,
   })
+
+  // Manually approving a listing makes it live → fire Wroomly Match alerts.
+  if (body.action === 'approve') {
+    void dispatchInstantForListing(body.listingId)
+  }
 
   return NextResponse.json({ ok: true })
 }

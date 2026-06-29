@@ -38,6 +38,9 @@ const PUBLIC_PREFIXES = [
   '/guides/',
   '/import-listing',
   '/claim-listing/',
+  // Wroomly Match — public renter demand-capture (chat → email alert), no
+  // account needed. Covers /match and /match/manage.
+  '/match',
 ]
 
 export async function middleware(request: NextRequest) {
@@ -110,6 +113,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(COMING_SOON_PATH, request.url))
       }
     }
+  }
+
+  // Wroomly Match APIs (chat, criteria, alerts, unsubscribe) are public and
+  // anonymous — token-gated where needed, no session. Placed AFTER the
+  // supply-only gate so the chat stays blocked for renters during soft launch
+  // (the gate above already redirected non-exempt visitors), but skips the
+  // auth-required block below so it works anonymously once fully launched.
+  if (pathname.startsWith('/api/match')) {
+    return supabaseResponse
   }
 
   // Allow public and auth routes
