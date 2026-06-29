@@ -114,7 +114,7 @@ export default async function ListingDetailPage({
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
-      users(id, full_name, avatar_url, university, created_at, bio, instagram_handle)
+      users:supplier_id(id, full_name, avatar_url, university, created_at, bio, instagram_handle)
     `)
     .eq('id', id)
     .single()

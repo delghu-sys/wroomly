@@ -23,6 +23,7 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser()
   let isSupplier = false
+  let isConsumer = false
   if (user) {
     const { data: profile } = await supabase
       .from('users')
@@ -31,6 +32,9 @@ export default async function HomePage() {
       .single()
     const t = (profile as { user_type?: string } | null)?.user_type
     isSupplier = t === 'supplier' || t === 'admin'
+    // A signed-in consumer can't list a place, so we hide every "list your
+    // place" prompt for them (it only leads to a dead end on their side).
+    isConsumer = t === 'consumer'
   }
 
   const { data: featuredListings } = await supabase
@@ -40,7 +44,7 @@ export default async function HomePage() {
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
-      users(id, full_name, avatar_url, university)
+      users:supplier_id(id, full_name, avatar_url, university)
     `)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
@@ -178,16 +182,33 @@ export default async function HomePage() {
           ) : (
             <div className="rounded-3xl border border-dashed border-line bg-surface/60 p-12 text-center">
               <p className="font-display text-2xl text-ink">No listings yet</p>
-              <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-                Listings are posted by verified U of M students. Check back soon — or
-                be the first to list your place.
-              </p>
-              <Link
-                href="/list-place"
-                className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
-              >
-                List your place <ArrowRight className="w-4 h-4" />
-              </Link>
+              {isConsumer ? (
+                <>
+                  <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
+                    New places get posted all the time. Set up a Match alert and
+                    we&rsquo;ll email you the moment something fits.
+                  </p>
+                  <Link
+                    href="/match"
+                    className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+                  >
+                    Get matched <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
+                    Listings are posted by students near campus. Check back soon — or
+                    be the first to list your place.
+                  </p>
+                  <Link
+                    href="/list-place"
+                    className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+                  >
+                    List your place <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </>
+              )}
             </div>
           )}
 
@@ -229,7 +250,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Slim supplier CTA — a marketplace needs supply ── */}
+      {/* ── Slim supplier CTA — a marketplace needs supply. Hidden for
+          signed-in consumers, who can't list a place. ── */}
+      {!isConsumer && (
       <section
         className="relative py-24 sm:py-28 overflow-hidden isolate"
         style={{ background: 'oklch(0.22 0.075 256)' }}
@@ -274,6 +297,7 @@ export default async function HomePage() {
           </ScrollReveal>
         </div>
       </section>
+      )}
     </div>
   )
 }
