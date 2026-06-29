@@ -16,9 +16,10 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
 const CONTACT_EMAIL = 'delghu@gmail.com'
 
 // CAN-SPAM requires a valid *physical* postal address in every commercial email
-// (an email address does NOT satisfy this). TODO(founder): replace with
-// Wroomly's real registered mailing address — a street address or USPS PO Box.
-const POSTAL_ADDRESS = 'Wroomly · Ann Arbor, MI 48104'
+// (an email address does NOT satisfy this). Overridable via env without a code
+// change; defaults to Wroomly's mailing address.
+const POSTAL_ADDRESS =
+  process.env.MATCH_POSTAL_ADDRESS ?? 'Wroomly · 2232 S Main St, Ann Arbor, MI 48103'
 
 const NAVY = '#0E2A47'
 const BLUE = '#2F6BFF'
