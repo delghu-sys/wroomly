@@ -12,8 +12,12 @@ import { getListingImageUrl } from '@/lib/utils/listing'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
 
-// CAN-SPAM requires a valid physical postal address in every commercial email.
-// TODO(founder): replace with Wroomly's real registered mailing address.
+// Reply/contact address shown in the footer of every Match email.
+const CONTACT_EMAIL = 'delghu@gmail.com'
+
+// CAN-SPAM requires a valid *physical* postal address in every commercial email
+// (an email address does NOT satisfy this). TODO(founder): replace with
+// Wroomly's real registered mailing address — a street address or USPS PO Box.
 const POSTAL_ADDRESS = 'Wroomly · Ann Arbor, MI 48104'
 
 const NAVY = '#0E2A47'
@@ -60,6 +64,9 @@ You're getting this because you asked Wroomly Match to watch for places matching
 <a href="${manageUrl(opts.token)}" style="color:${BLUE};text-decoration:underline;">Manage preferences</a>
 &nbsp;·&nbsp;
 <a href="${unsubscribeUrl(opts.token)}" style="color:${BLUE};text-decoration:underline;">Unsubscribe</a>
+</p>
+<p style="margin:0 0 6px;font-size:12px;line-height:1.5;color:#6b7686;">
+Questions? <a href="mailto:${CONTACT_EMAIL}" style="color:${BLUE};text-decoration:underline;">${CONTACT_EMAIL}</a>
 </p>
 <p style="margin:0;font-size:11px;line-height:1.5;color:#9aa3b2;">${escapeHtml(POSTAL_ADDRESS)}</p>
 </td></tr>
