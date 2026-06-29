@@ -10,6 +10,38 @@ Sentry.init({
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
 
+  // Drop noise thrown by browser extensions / injected scripts rather than our
+  // app. These land in Sentry because the global handler catches every uncaught
+  // error in the tab. Genuine Wroomly errors (frames in our bundle) still report.
+  ignoreErrors: [
+    // Seen from an extension recursively reading our JSON-LD structured data
+    // and calling .toLowerCase() on objects that have no "@context".
+    /\["@context"\]\.toLowerCase/,
+    // Common extension / cross-origin script noise.
+    "ResizeObserver loop limit exceeded",
+    "ResizeObserver loop completed with undelivered notifications",
+  ],
+  denyUrls: [
+    /^chrome-extension:\/\//,
+    /^moz-extension:\/\//,
+    /^safari-(web-)?extension:\/\//,
+  ],
+  beforeSend(event) {
+    // Last-resort guard: drop events whose only stack frame is anonymous
+    // "global code" with no reference to our app bundle — i.e. injected scripts.
+    const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? []
+    const touchesOurCode = frames.some(f => {
+      const file = f.filename ?? ""
+      return file.includes("/_next/") || file.startsWith("app:///_next") || file.includes("instrumentation-client")
+    })
+    const fromExtension = frames.some(f => /(chrome|moz|safari(-web)?)-extension:\/\//.test(f.filename ?? ""))
+    if (fromExtension) return null
+    // Only drop the @context signature when no frame is in our code.
+    const msg = event.exception?.values?.[0]?.value ?? ""
+    if (/\["@context"\]\.toLowerCase/.test(msg) && !touchesOurCode) return null
+    return event
+  },
+
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
   // Enable logs to be sent to Sentry
