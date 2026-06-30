@@ -27,8 +27,9 @@ test('reduced-motion users still see content (no blank state)', async ({ browser
   const context = await browser.newContext({ reducedMotion: 'reduce' })
   const page = await context.newPage()
   await page.goto('/')
-  // The hero copy renders inside TextScramble — under reduced motion it
-  // should render the final string immediately, not an empty span.
+  // The hero headline animates in via motion/react — under reduced motion the
+  // entrance is skipped so it should render the final string immediately, not
+  // an empty/blank heading.
   const heroText = await page.locator('h1, h2').first().textContent()
   expect(heroText?.trim().length ?? 0, 'reduced-motion heading should not be empty').toBeGreaterThan(0)
   await context.close()
