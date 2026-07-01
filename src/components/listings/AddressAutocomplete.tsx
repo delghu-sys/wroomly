@@ -70,11 +70,12 @@ export function AddressAutocomplete({
 
   // Debounced fetch
   useEffect(() => {
-    if (!value || value.trim().length < 3 || hasPick) {
-      setResults([])
-      return
-    }
+    const tooShortOrPicked = !value || value.trim().length < 3 || hasPick
     const handle = setTimeout(async () => {
+      if (tooShortOrPicked) {
+        setResults([])
+        return
+      }
       abortRef.current?.abort()
       const ctrl = new AbortController()
       abortRef.current = ctrl

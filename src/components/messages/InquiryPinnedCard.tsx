@@ -495,26 +495,26 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
 function ConfettiBurst() {
   // Compute particle layout once per mount — Math.random in render would
   // reshuffle on every re-render and cause hydration mismatches if it ever ran
-  // server-side.
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 14 }, (_, i) => {
-        const angle = (i / 14) * Math.PI * 2
-        const distance = 80 + Math.random() * 80
-        return {
-          id: i,
-          x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * distance,
-          rotate: (Math.random() - 0.5) * 720,
-          color:
-            i % 3 === 0
-              ? 'oklch(0.22 0.075 256)'
-              : i % 3 === 1
-                ? 'oklch(0.84 0.17 85)'
-                : 'oklch(0.55 0.15 142)',
-        }
-      }),
-    []
+  // server-side. A useState lazy initializer (not useMemo) is the
+  // React-sanctioned place for this: it's guaranteed to run exactly once,
+  // where useMemo is only an optimization with no such guarantee.
+  const [particles] = useState(() =>
+    Array.from({ length: 14 }, (_, i) => {
+      const angle = (i / 14) * Math.PI * 2
+      const distance = 80 + Math.random() * 80
+      return {
+        id: i,
+        x: Math.cos(angle) * distance,
+        y: Math.sin(angle) * distance,
+        rotate: (Math.random() - 0.5) * 720,
+        color:
+          i % 3 === 0
+            ? 'oklch(0.22 0.075 256)'
+            : i % 3 === 1
+              ? 'oklch(0.84 0.17 85)'
+              : 'oklch(0.55 0.15 142)',
+      }
+    })
   )
 
   return (

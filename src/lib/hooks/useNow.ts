@@ -1,6 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useRef, useSyncExternalStore } from 'react'
+
+// No live ticking needed — we only want one snapshot taken right after
+// mount, same as the original effect-based version.
+const noSubscription = () => () => {}
 
 /**
  * Returns `null` on the server and during the first client render, then
@@ -15,9 +19,13 @@ import { useEffect, useState } from 'react'
  *   return <span>{now ? relative(then, now) : format(then, 'MMM d')}</span>
  */
 export function useNow(): Date | null {
-  const [now, setNow] = useState<Date | null>(null)
-  useEffect(() => {
-    setNow(new Date())
-  }, [])
-  return now
+  // getSnapshot must return a referentially-stable value between calls (or
+  // React logs "getSnapshot should be cached" / re-renders in a loop) — cache
+  // the one timestamp we ever want, computed lazily on first post-mount read.
+  const cached = useRef<Date | null>(null)
+  return useSyncExternalStore(
+    noSubscription,
+    () => (cached.current ??= new Date()),
+    () => null,
+  )
 }
