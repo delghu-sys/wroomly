@@ -7,6 +7,13 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: "https://76f6956c17c7bd026e4fab9eaa4763f5@o4511417032310784.ingest.us.sentry.io/4511417035259904",
 
+  // Only report from production. Without this, every `next dev` run — ours or a
+  // contributor's — sends errors (including transient dev/Turbopack startup
+  // races) to the same Sentry project as real users, polluting alerts with
+  // non-issues. NODE_ENV is statically inlined by Next.js in the client bundle,
+  // so this works the same as it does server/edge-side.
+  enabled: process.env.NODE_ENV === "production",
+
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
 
