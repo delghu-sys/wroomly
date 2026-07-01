@@ -1,9 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { ArrowRight, CheckCircle2 } from 'lucide-react'
 
 const LS_KEY = 'wroomly_waitlist_joined'
+
+const noSubscription = () => () => {}
+function readJoinedFlag() {
+  try {
+    return !!localStorage.getItem(LS_KEY)
+  } catch {
+    return false
+  }
+}
 
 /**
  * Renter waitlist capture for the supply-only /coming-soon hero. Posts to the
@@ -15,13 +24,10 @@ export function WaitlistForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle')
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(LS_KEY)) setStatus('done')
-    } catch {
-      /* localStorage unavailable — ignore */
-    }
-  }, [])
+  // Reads localStorage (a browser-only external source) safely across
+  // server/client — SSR + first paint always see `false` (no window), then
+  // this resolves to the real flag right after hydration.
+  const alreadyJoined = useSyncExternalStore(noSubscription, readJoinedFlag, () => false)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -52,7 +58,7 @@ export function WaitlistForm() {
     }
   }
 
-  if (status === 'done') {
+  if (status === 'done' || alreadyJoined) {
     return (
       <div
         aria-live="polite"

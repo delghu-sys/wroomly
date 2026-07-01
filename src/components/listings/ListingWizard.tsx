@@ -554,7 +554,7 @@ export function ListingWizard({ userId }: { userId: string }) {
               <div className="space-y-4 border-t pt-4">
                 <h3 className="font-semibold text-gray-900">Swap preferences</h3>
                 <div className="space-y-2">
-                  <Label>Cities you'd swap with (comma-separated)</Label>
+                  <Label>Cities you&rsquo;d swap with (comma-separated)</Label>
                   <Input placeholder="Chicago, New York, Boston..." {...form.register('swap_cities')} />
                 </div>
                 <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -59,20 +59,20 @@ export function InquiryModal({
   const dialogRef = useFocusTrap<HTMLDivElement>(open)
 
   // Pre-compute particle layout once per mount so re-renders don't reshuffle.
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, i) => {
-        const angle = (i / 12) * Math.PI * 2
-        const dist = 90 + Math.random() * 60
-        return {
-          i,
-          x: Math.cos(angle) * dist,
-          y: Math.sin(angle) * dist,
-          color:
-            i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.22 0.075 256)',
-        }
-      }),
-    []
+  // A useState lazy initializer (not useMemo) is the React-sanctioned place
+  // for one-time impure setup like Math.random() — useMemo is only an
+  // optimization and isn't guaranteed to run exactly once.
+  const [particles] = useState(() =>
+    Array.from({ length: 12 }, (_, i) => {
+      const angle = (i / 12) * Math.PI * 2
+      const dist = 90 + Math.random() * 60
+      return {
+        i,
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist,
+        color: i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.22 0.075 256)',
+      }
+    })
   )
 
   const {
