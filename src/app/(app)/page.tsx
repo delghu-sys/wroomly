@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingWithDetails } from '@/types/database'
 import { HomeHero } from '@/components/home/HomeHero'
@@ -101,19 +101,36 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Lister CTA — secondary path ── */}
-      <section
-        aria-label="List your place"
-        className="bg-white border-y border-line px-6 py-11"
-      >
-        <div className="max-w-[40rem] mx-auto flex flex-col items-center text-center gap-3 min-[680px]:flex-row min-[680px]:items-center min-[680px]:justify-between min-[680px]:text-left min-[680px]:gap-0">
-          <div className="min-[680px]:flex-1 min-[680px]:pr-8">
-            <h3 className="font-display text-[1.1875rem] font-bold tracking-[-0.032em] text-ink leading-tight">
-              Subletting your place?
-            </h3>
-            <p className="text-[0.9rem] text-ink-muted leading-[1.6] mt-1">
-              List it free in 60 seconds — screenshot your existing post and our AI does the rest.
-            </p>
+      {/* ── Lister CTA — secondary path. Styled as a soft card sitting on the
+          same cream background as the listings section above (no hard
+          border-y banner seam), with the same navy/maize "AI" icon badge
+          used on /start-listing's import card, so it reads as part of the
+          same visual system instead of a bolted-on strip. ── */}
+      <section aria-label="List your place" className="bg-background px-6 pb-16 sm:pb-20">
+        <div
+          className="
+            max-w-[40rem] mx-auto rounded-[1.75rem] border border-line bg-white
+            shadow-[0_4px_28px_oklch(0.18_0.025_255/0.06)]
+            px-7 py-8 sm:px-9
+            flex flex-col items-center text-center gap-5
+            min-[680px]:flex-row min-[680px]:items-center min-[680px]:justify-between min-[680px]:text-left min-[680px]:gap-7
+          "
+        >
+          <div className="flex flex-col items-center gap-4 min-[680px]:flex-row min-[680px]:flex-1">
+            <span
+              className="shrink-0 inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-navy text-maize"
+              style={{ boxShadow: '0 6px 18px oklch(0.22 0.075 256 / 0.25)' }}
+            >
+              <Sparkles className="w-5 h-5" strokeWidth={2} />
+            </span>
+            <div>
+              <h3 className="font-display text-[1.1875rem] font-bold tracking-[-0.032em] text-ink leading-tight">
+                Subletting your place?
+              </h3>
+              <p className="text-[0.9rem] text-ink-muted leading-[1.6] mt-1">
+                List it free in 60 seconds — screenshot your existing post and our AI does the rest.
+              </p>
+            </div>
           </div>
           <Link
             href="/list-place"
