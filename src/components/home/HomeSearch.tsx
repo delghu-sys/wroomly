@@ -155,9 +155,9 @@ export function HomeSearch() {
           href="/listings"
           className="
             group inline-flex items-center gap-2 h-11 px-6 rounded-full
-            border border-white/25 bg-white/[0.07] text-white text-[0.9375rem] font-semibold
+            bg-maize text-navy text-[0.9375rem] font-bold
             transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-            hover:bg-white/[0.15] hover:border-white/45 hover:-translate-y-px
+            hover:-translate-y-px hover:shadow-[0_8px_28px_oklch(0.86_0.17_92/0.42)]
           "
         >
           Browse all listings
