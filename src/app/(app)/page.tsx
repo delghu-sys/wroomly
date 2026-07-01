@@ -44,7 +44,13 @@ export default async function HomePage() {
             </span>
             <Link
               href="/listings"
-              className="group inline-flex items-center gap-[0.3rem] text-[0.875rem] font-semibold text-navy hover:opacity-75 transition-opacity"
+              className="
+                group inline-flex items-center gap-1.5 h-9 px-4 rounded-full shrink-0
+                border border-line bg-white text-[0.8125rem] font-semibold text-navy
+                shadow-[0_1px_3px_oklch(0_0_0/0.05)]
+                transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+                hover:border-navy/30 hover:shadow-[0_4px_16px_oklch(0_0_0/0.10)] hover:-translate-y-px
+              "
             >
               See all
               <ArrowRight
@@ -69,6 +75,28 @@ export default async function HomePage() {
                 <BrandListingCard listing={listing} userId={user?.id ?? null} />
               </div>
             ))}
+          </div>
+
+          {/* Second, more prominent "see all" — right under the grid, for
+              anyone who scrolled past the header link above. */}
+          <div className="flex justify-center mt-8 px-[1.375rem]">
+            <Link
+              href="/listings"
+              className="
+                group inline-flex items-center gap-2 h-12 px-7 rounded-full
+                bg-navy text-white font-semibold text-[0.9375rem]
+                transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+                hover:-translate-y-px hover:shadow-[0_8px_28px_oklch(0.22_0.075_256/0.30)]
+              "
+            >
+              See all listings
+              <ArrowRight
+                size={15}
+                strokeWidth={2.5}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+                aria-hidden
+              />
+            </Link>
           </div>
         </section>
       )}

@@ -153,10 +153,20 @@ export function HomeSearch() {
       >
         <Link
           href="/listings"
-          className="inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-white/55 hover:text-white transition-colors"
+          className="
+            group inline-flex items-center gap-2 h-11 px-6 rounded-full
+            border border-white/25 bg-white/[0.07] text-white text-[0.9375rem] font-semibold
+            transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
+            hover:bg-white/[0.15] hover:border-white/45 hover:-translate-y-px
+          "
         >
           Browse all listings
-          <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
+          <ArrowRight
+            size={15}
+            strokeWidth={2.5}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+            aria-hidden
+          />
         </Link>
       </motion.div>
 
