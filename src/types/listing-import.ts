@@ -77,6 +77,11 @@ export interface ExtractedListingDraft {
   leaseType: LeaseTypeExtracted | null
 
   address: string | null
+  // Geocoded coordinates for `address`, set only when the user (or admin)
+  // picks a real suggestion from AddressAutocomplete — the AI never sets
+  // these. null means the address text hasn't been confirmed on the map yet.
+  lat: number | null
+  lng: number | null
   neighborhood: string | null
   city: string | null
   state: string | null

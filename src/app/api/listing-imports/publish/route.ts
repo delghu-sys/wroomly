@@ -102,6 +102,8 @@ export async function POST(request: Request) {
       description: draft.description,
       neighborhood: draft.neighborhood,
       address: draft.address,
+      lat: draft.lat,
+      lng: draft.lng,
       city: draft.city ?? 'Ann Arbor',
       state: draft.state ?? 'MI',
       price_per_month: draft.rentMonthly != null ? Math.round(draft.rentMonthly * 100) : null,

@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Loader2, AlertTriangle, Info, Upload, MapPin } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { mapSourceAttribution, type SourceLabel } from '@/lib/listing-import/normalize'
+import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
 
 interface ClaimReviewProps {
   token: string
@@ -46,7 +47,14 @@ const inputCls =
 
 export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
   const router = useRouter()
-  const [draft, setDraft] = useState<ExtractedListingDraft>(initial)
+  // Guard against older stored drafts (extracted before lat/lng existed on
+  // the type) — the AI never sets these anyway, so defaulting to null here
+  // is just making the type honest, not masking real data.
+  const [draft, setDraft] = useState<ExtractedListingDraft>({
+    ...initial,
+    lat: initial.lat ?? null,
+    lng: initial.lng ?? null,
+  })
   // Photos can grow at review time (essential for text-only imports).
   const [personalPhotos, setPersonalPhotos] = useState(initialPhotos)
   const [uploadingPhotos, setUploadingPhotos] = useState(false)
@@ -102,6 +110,12 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
   const attribution = useMemo(() => mapSourceAttribution(draft.sourceAttribution), [draft.sourceAttribution])
   const addressMissing = !draft.address || draft.address.trim().length === 0
+  // The AI never sets lat/lng — even when it extracted address TEXT, that
+  // text hasn't been confirmed against a real location until picked from
+  // the geocoding suggestions below. Covers both "field is empty" and "field
+  // has an AI-guessed/placeholder value" the same way.
+  const addressNotGeocoded =
+    !addressMissing && !(Number.isFinite(draft.lat) && Number.isFinite(draft.lng))
   const set = <K extends keyof ExtractedListingDraft>(k: K, v: ExtractedListingDraft[K]) =>
     setDraft(d => ({ ...d, [k]: v }))
 
@@ -159,10 +173,14 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           <span>Some details were enriched from the building or floor plan source you provided. Confirm they apply to your specific unit before publishing.</span>
         </div>
       )}
-      {addressMissing && (
+      {(addressMissing || addressNotGeocoded) && (
         <div className="rounded-2xl border border-[oklch(0.85_0.10_25)] bg-[oklch(0.97_0.04_25)] px-4 py-3 text-[13px] text-[oklch(0.45_0.18_25)] flex items-start gap-2">
           <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-          <span><strong>Street address required.</strong> The AI didn't detect your exact address — fill it in below so the map works for interested students.</span>
+          {addressMissing ? (
+            <span><strong>Street address required.</strong> The AI didn&rsquo;t detect your exact address — search for it below so the map works for interested students.</span>
+          ) : (
+            <span><strong>Confirm your exact address.</strong> Pick it from the suggestions below so it shows up correctly on the map — typed text alone isn&rsquo;t enough.</span>
+          )}
         </div>
       )}
 
@@ -174,18 +192,30 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         <textarea className={inputCls} rows={5} value={draft.description ?? ''} onChange={e => set('description', e.target.value || null)} />
       </Field>
 
-      {/* Address — required for the map; shown full-width, highlighted when empty */}
+      {/* Address — required for the map; search + pick a real suggestion so
+          it's geocoded, matching the manual listing wizard. Typing alone
+          (without picking) is never enough to publish — see addressNotGeocoded. */}
       <div>
         <span className={labelCls}>
           <span>Street address</span>
           <span className="text-[oklch(0.55_0.20_25)] text-[11px] font-bold uppercase tracking-[0.12em]">Required for map</span>
           {attribution.address && <Badge label={attribution.address as SourceLabel} />}
         </span>
-        <input
-          className={`${inputCls} ${addressMissing ? 'border-[oklch(0.80_0.12_25)] bg-[oklch(0.99_0.01_25)]' : ''}`}
-          placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
+        <AddressAutocomplete
           value={draft.address ?? ''}
-          onChange={e => set('address', e.target.value || null)}
+          hasPick={Number.isFinite(draft.lat) && Number.isFinite(draft.lng)}
+          onChange={v => {
+            set('address', v || null)
+            // Typing again invalidates whatever was previously picked/guessed.
+            set('lat', null)
+            set('lng', null)
+          }}
+          onPick={pick => {
+            set('address', pick.address)
+            set('lat', pick.lat)
+            set('lng', pick.lng)
+          }}
+          placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
         />
       </div>
 

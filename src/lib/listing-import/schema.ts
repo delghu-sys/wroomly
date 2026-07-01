@@ -134,6 +134,11 @@ export const extractedListingDraftSchema = z.object({
     .nullable(),
 
   address: z.string().nullable(),
+  // Not part of the AI's own JSON output (it never emits these) — `.catch(null)`
+  // so parsing the model's raw response still succeeds when the keys are
+  // absent. Populated later, client-side, when a real address is geocoded.
+  lat: z.number().nullable().catch(null),
+  lng: z.number().nullable().catch(null),
   neighborhood: z.string().nullable(),
   city: z.string().nullable(),
   state: z.string().nullable(),
