@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, useReducedMotion } from 'motion/react'
-import { MapPin, Calendar, DollarSign, Search } from 'lucide-react'
+import { MapPin, Calendar, DollarSign, Search, ArrowRight } from 'lucide-react'
 
 /**
  * Homepage hero search — the redesign's 3-field pill (Where / Dates / Budget),
@@ -143,6 +143,22 @@ export function HomeSearch() {
           </button>
         </div>
       </form>
+
+      {/* Browse everything, no filters — for people who don't want to search */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease, delay: 0.35 }}
+        className="mt-4 text-center"
+      >
+        <Link
+          href="/listings"
+          className="inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-white/55 hover:text-white transition-colors"
+        >
+          Browse all listings
+          <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
+        </Link>
+      </motion.div>
 
       {/* Quick filter chips */}
       <motion.nav
