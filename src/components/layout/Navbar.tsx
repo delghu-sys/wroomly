@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Menu, X } from 'lucide-react'
+import { MessageSquare, Menu, X, House } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
 import { PAYMENTS_ENABLED } from '@/lib/config'
 
@@ -117,14 +117,11 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
               Browse
             </Link>
             <Link
-              href="/about"
-              className={`underline-grow text-sm font-medium ease-smooth transition-colors ${
-                transparent
-                  ? 'text-white/70 hover:text-white'
-                  : 'text-ink-soft hover:text-ink'
-              }`}
+              href="/list-place"
+              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-maize text-navy text-[0.8125rem] font-bold ease-smooth transition-all hover:-translate-y-px hover:shadow-[0_6px_20px_oklch(0.86_0.17_92/0.42)]"
             >
-              How it works
+              <House className="w-3.5 h-3.5" strokeWidth={2.5} />
+              List your place
             </Link>
             <Link
               href="/match"
@@ -315,8 +312,11 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                 <MobileLink href="/listings" onClick={() => setMobileOpen(false)}>
                   Browse
                 </MobileLink>
-                <MobileLink href="/about" onClick={() => setMobileOpen(false)}>
-                  How it works
+                <MobileLink href="/match" onClick={() => setMobileOpen(false)}>
+                  Get matched
+                </MobileLink>
+                <MobileLink href="/list-place" onClick={() => setMobileOpen(false)}>
+                  List your place
                 </MobileLink>
               </>
             )}
