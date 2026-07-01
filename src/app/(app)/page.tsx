@@ -121,7 +121,7 @@ export default async function HomePage() {
               shrink-0 inline-flex items-center gap-[0.45rem] h-[2.875rem] px-6 rounded-full
               bg-navy text-white font-bold text-[0.9375rem] whitespace-nowrap
               transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-              hover:-translate-y-px hover:shadow-[0_6px_24px_oklch(0.22_0.075_256/0.28)]
+              hover:-translate-y-px hover:shadow-[0_6px_24px_oklch(0.22_0.075_256/0.28),0_0_18px_oklch(0.86_0.17_92/0.20)]
             "
           >
             List my place
