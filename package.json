@@ -23,7 +23,8 @@
     "partners:import:cmb": "node --env-file=.env.local scripts/importPartners.mjs --file=cmb",
     "partners:teardown:cmb": "node --env-file=.env.local scripts/teardownPartner.mjs --source-name=\"CMB Management\"",
     "seed:teardown": "node --env-file=.env.local scripts/teardownSeed.mjs",
-    "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs"
+    "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs",
+    "listings:backfill-geocode": "node --env-file=.env.local scripts/backfillListingGeocode.mjs --dry-run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",

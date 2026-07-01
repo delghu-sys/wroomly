@@ -45,8 +45,17 @@ export function validatePublishRequirements(
 
   if (!draft.listingType) missing.push('A listing type (room, studio, etc.)')
 
-  if (!draft.address || draft.address.trim().length === 0)
+  // Two-part check: text present, AND geocoded to real coordinates. A
+  // non-empty string alone isn't enough — the AI has been known to write a
+  // partial or placeholder value (e.g. "123 [Street unknown], Ann Arbor, MI")
+  // into `address`, which would satisfy a plain non-empty check while the
+  // listing still has no real location. Requiring lat/lng means the address
+  // was actually picked from a geocoding suggestion, not just typed/guessed.
+  if (!draft.address || draft.address.trim().length === 0) {
     missing.push('Street address — required for the map to work')
+  } else if (!Number.isFinite(draft.lat) || !Number.isFinite(draft.lng)) {
+    missing.push('Pick your exact address from the suggestions so it shows correctly on the map')
+  }
 
   if (ctx.confirmedPhotoCount < 1) missing.push('At least one photo')
 

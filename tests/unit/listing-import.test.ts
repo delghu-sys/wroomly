@@ -30,7 +30,9 @@ function draft(over: Partial<ExtractedListingDraft> = {}): ExtractedListingDraft
     availabilityNotes: null,
     listingType: 'ROOM',
     leaseType: 'SUBLET',
-    address: null,
+    address: '123 E William St, Ann Arbor, MI 48104',
+    lat: 42.2794,
+    lng: -83.7407,
     neighborhood: 'Central Campus',
     city: null,
     state: null,
@@ -189,6 +191,38 @@ test('publish: missing rent, photo, accuracy confirmation are reported', () => {
   assert.ok(r.missing.some(m => /rent/i.test(m)))
   assert.ok(r.missing.some(m => /photo/i.test(m)))
   assert.ok(r.missing.some(m => /accurate/i.test(m)))
+})
+
+test('publish: missing address entirely is blocked', () => {
+  const r = validatePublishRequirements(draft({ address: null, lat: null, lng: null }), {
+    ownerUserId: 'u1',
+    userConfirmedAccuracy: true,
+    enrichmentUsed: false,
+    userConfirmedEnrichment: false,
+    confirmedPhotoCount: 1,
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.missing.some(m => /street address/i.test(m)))
+})
+
+// Regression test for the incident where the AI wrote a placeholder like
+// "2650 [Street unknown], Ann Arbor, MI" into `address` — non-empty text
+// satisfied the old check, so the listing published with no real location.
+// lat/lng (only ever set by picking a real geocoding suggestion) must also
+// be present, not just address text.
+test('publish: address text without geocoded lat/lng is blocked (placeholder-address regression)', () => {
+  const r = validatePublishRequirements(
+    draft({ address: '2650 [Street unknown], Ann Arbor, MI', lat: null, lng: null }),
+    {
+      ownerUserId: 'u1',
+      userConfirmedAccuracy: true,
+      enrichmentUsed: false,
+      userConfirmedEnrichment: false,
+      confirmedPhotoCount: 1,
+    },
+  )
+  assert.equal(r.ok, false)
+  assert.ok(r.missing.some(m => /pick your exact address/i.test(m)))
 })
 
 test('publish: enrichment requires its own confirmation', () => {
