@@ -18,8 +18,9 @@ test.describe('Auth flow', () => {
     await page.getByLabel(/password/i).fill(user.password)
     await page.getByRole('button', { name: /sign in/i }).click()
 
-    // Lands on /dashboard for non-admin signups
-    await expect(page).toHaveURL(/\/(dashboard|listings|profile)/, { timeout: 15_000 })
+    // Sign-in redirects to `next` if present, else home — see
+    // "feat(auth): land on home page after sign-in instead of /dashboard".
+    await expect(page).toHaveURL(/\/(dashboard|listings|profile)?$/, { timeout: 15_000 })
   })
 
   test('shows generic error on wrong password (no enumeration)', async ({ page }) => {
