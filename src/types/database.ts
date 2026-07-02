@@ -299,10 +299,87 @@ export interface MatchCriteria {
   notes: string | null
 }
 
+// ── Weighted profile (Match v2) ─────────────────────────────────────────────
+// Produced by the concierge chat. Captures not just preferences but importance
+// weights (0–1 per attribute), ranked top-3 priorities, explicit dealbreakers,
+// and flexibility ranges — consumed by the scoring engine in lib/match/engine.
+
+/** Attribute keys that can carry a weight, appear in priorities, and show up
+ * in fit/miss reasons. Must stay in sync with the engine's scorers. */
+export type MatchAttr =
+  | 'budget'
+  | 'location'
+  | 'timing'
+  | 'space'
+  | 'furnished'
+  | 'pets'
+  | 'amenities'
+
+export type MatchFlexibility = 'rigid' | 'some' | 'flexible'
+export type CommuteMode = 'walk' | 'bike' | 'bus'
+
+/** A place the renter needs to be near, resolved to coordinates from the
+ * campus gazetteer (lib/match/profile.ts) so scoring can compute minutes. */
+export interface MatchAnchor {
+  name: string
+  lat: number
+  lng: number
+  max_minutes: number
+  mode: CommuteMode
+}
+
+export interface MatchProfile {
+  version: 2
+  budget: {
+    min: number | null // whole USD/month
+    max: number | null
+    stretch_max: number | null // absolute ceiling they'd pay for the right place
+    stretch_reason: string | null // what justifies the stretch
+  }
+  timing: {
+    move_in: string | null // ISO date
+    move_out: string | null
+    lease_type: MatchLeaseType | null
+    duration_months: number | null
+    flexibility: MatchFlexibility
+  }
+  space: {
+    whole_unit: boolean | null
+    bedrooms_min: number | null // 0 = studio
+    bathrooms_min: number | null
+    roommates_ok: boolean | null
+    gender_pref: string | null // renter-volunteered only
+  }
+  location: {
+    anchors: MatchAnchor[]
+    neighborhoods: string[]
+  }
+  lifestyle: {
+    tags: string[] // e.g. 'quiet', 'social', 'tidy', 'hosts-guests'
+    notes: string | null
+  }
+  amenities: {
+    required: string[] // missing any → hard cut
+    preferred: string[] // partial credit
+  }
+  furnished: boolean | null
+  pets_required: boolean | null
+  /** Top priorities, ranked most-important first (max 3). */
+  priorities: MatchAttr[]
+  /** Hard cuts. `attr` ties it to a scorer; description is the renter's words. */
+  dealbreakers: { attr: MatchAttr; description: string }[]
+  /** Importance weight 0–1 per attribute. Missing key = attribute unused. */
+  weights: Partial<Record<MatchAttr, number>>
+  /** The concierge's reflected-back summary the renter confirmed. */
+  summary: string | null
+}
+
 export interface MatchAlert {
   id: string
   email: string
-  criteria: MatchCriteria
+  criteria: MatchCriteria // v1, kept for rollback — new code reads `profile`
+  /** Weighted concierge profile; {} for legacy alerts (see profileFromLegacy). */
+  profile: MatchProfile | Record<string, never>
   transcript: { role: 'user' | 'assistant'; content: string }[]
   status: MatchAlertStatus
   frequency: MatchFrequency
@@ -315,11 +392,25 @@ export interface MatchAlert {
   updated_at: string
 }
 
+export type MatchFeedback = 'up' | 'down'
+
+/** One machine-readable scoring reason (both directions get recorded). */
+export interface MatchReason {
+  kind: 'fit' | 'miss'
+  attr: MatchAttr
+  detail: string
+}
+
 export interface MatchAlertSend {
   id: string
   alert_id: string
   listing_id: string
-  score: number | null
+  score: number | null // 0–100
+  reasons: MatchReason[]
+  note: string | null // LLM-written personal note that went in the email
+  digest_key: string | null // groups one ranked-digest email; null = instant
+  feedback: MatchFeedback | null
+  feedback_at: string | null
   emailed_at: string
 }
 

@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import type { MatchCriteria } from '@/types/database'
-import { EMPTY_CRITERIA } from '@/lib/match/criteria'
+import type { MatchProfile } from '@/types/database'
+import { ATTR_LABELS } from '@/lib/match/profile'
 
 /**
  * Wroomly Match — the renter-facing experience. Four states on one page (intro →
- * adaptive AI chat → confirm/email → done), ported from the design handoff. The
- * chat is driven by the LLM: each turn streams from /api/match/chat and decides
- * its own next question + quick-reply chips, so there's no hard-coded script.
+ * concierge chat → confirm/email → done). The chat is the concierge LLM,
+ * token-streamed from /api/match/chat; it decides its own next question and
+ * quick-reply chips, so there's no hard-coded script. The finished transcript is
+ * distilled into a weighted profile (ranked priorities, dealbreakers,
+ * flexibility) shown on the confirm screen.
  */
 
 type Screen = 'intro' | 'chat' | 'summary' | 'done'
@@ -39,7 +41,7 @@ export function MatchExperience() {
   const [finished, setFinished] = useState(false)
   const [input, setInput] = useState('')
 
-  const [criteria, setCriteria] = useState<MatchCriteria>(EMPTY_CRITERIA)
+  const [profile, setProfile] = useState<MatchProfile | null>(null)
   const [tags, setTags] = useState<string[]>([])
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -47,7 +49,8 @@ export function MatchExperience() {
 
   const messagesRef = useRef<HTMLDivElement>(null)
   const assistantCount = messages.filter(m => m.role === 'assistant').length
-  const pct = finished ? 100 : Math.min(15 + assistantCount * 17, 90)
+  // The concierge runs ~8–12 exchanges; creep toward 90% and land at 100.
+  const pct = finished ? 100 : Math.min(10 + assistantCount * 8, 90)
 
   const scrollDown = useCallback(() => {
     const el = messagesRef.current
@@ -61,6 +64,16 @@ export function MatchExperience() {
   /** Roles+content the API expects (drops UI ids). */
   function toHistory(msgs: UiMessage[]): { role: 'user' | 'assistant'; content: string }[] {
     return msgs.map(m => ({ role: m.role, content: m.content }))
+  }
+
+  /**
+   * The model is told plain-text-only, but **bold** still slips through —
+   * render it as <strong> instead of showing literal asterisks.
+   */
+  function renderAssistant(text: string): React.ReactNode {
+    const parts = text.split(/\*\*([^*]+)\*\*/g)
+    if (parts.length === 1) return text
+    return parts.map((p, i) => (i % 2 === 1 ? <strong key={i}>{p}</strong> : p))
   }
 
   /** Run one assistant turn: stream the message, then surface chips / finish. */
@@ -108,6 +121,9 @@ export function MatchExperience() {
             } catch {
               continue
             }
+            if (frame.t === 'error') {
+              throw new Error(frame.v ?? 'chat failed')
+            }
             if (frame.t === 'chunk' && frame.v) {
               if (!assistantId) {
                 assistantId = crypto.randomUUID()
@@ -151,7 +167,7 @@ export function MatchExperience() {
     [],
   )
 
-  /** Parse the finished conversation into structured criteria + tags. */
+  /** Distill the finished conversation into the weighted profile + tags. */
   const summarize = useCallback(async () => {
     try {
       const history = toHistory(messagesSnapshot())
@@ -161,8 +177,8 @@ export function MatchExperience() {
         body: JSON.stringify({ messages: history }),
       })
       if (res.ok) {
-        const data = (await res.json()) as { criteria: MatchCriteria; tags: string[] }
-        setCriteria(data.criteria)
+        const data = (await res.json()) as { profile: MatchProfile; tags: string[] }
+        setProfile(data.profile)
         setTags(data.tags)
       }
     } catch {
@@ -198,7 +214,7 @@ export function MatchExperience() {
     setSelected([])
     setFinished(false)
     setInput('')
-    setCriteria(EMPTY_CRITERIA)
+    setProfile(null)
     setTags([])
     void runTurn([])
   }
@@ -243,7 +259,7 @@ export function MatchExperience() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.trim(),
-          criteria,
+          profile,
           transcript: toHistory(messagesSnapshot()),
         }),
       })
@@ -290,7 +306,7 @@ export function MatchExperience() {
               m.role === 'assistant' ? (
                 <div className="msg-row ai" key={m.id}>
                   <div className="ai-av">W</div>
-                  <div className="bubble ai">{m.content}</div>
+                  <div className="bubble ai">{renderAssistant(m.content)}</div>
                 </div>
               ) : (
                 <div className="msg-row user" key={m.id}>
@@ -365,6 +381,19 @@ export function MatchExperience() {
               <p className="s-eyebrow">Your match brief</p>
               <h2 className="s-h2">Here&rsquo;s what I&rsquo;ll watch for</h2>
 
+              {profile?.summary && <p className="s-summary">{profile.summary}</p>}
+
+              {profile && profile.priorities.length > 0 && (
+                <div className="s-prios">
+                  {profile.priorities.map((p, i) => (
+                    <span className="s-prio" key={p}>
+                      <span className="s-prio-rank">{i + 1}</span>
+                      {ATTR_LABELS[p]}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div className="criteria-wrap">
                 {tags.length > 0 ? (
                   tags.map(t => (
@@ -381,10 +410,24 @@ export function MatchExperience() {
                 )}
               </div>
 
+              {profile && profile.dealbreakers.length > 0 && (
+                <div className="s-dealbreakers">
+                  {profile.dealbreakers.map(d => (
+                    <span className="s-db" key={d.attr + d.description}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                      {d.description}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <div className="s-divider" />
 
               <p className="s-ask">Where should we send matches?</p>
-              <p className="s-hint">We&rsquo;ll only email when something genuinely fits. No spam — ever.</p>
+              <p className="s-hint">
+                Ranked matches with an honest read on each — only when something genuinely
+                fits. You&rsquo;re also first in line when Wroomly opens to renters.
+              </p>
 
               <input
                 type="email"
@@ -494,11 +537,12 @@ function Intro({ onStart }: { onStart: () => void }) {
             AI-powered matching
           </div>
           <h1 className="intro-h1">
-            Tell us what you&rsquo;re looking for.<br />
-            <em>Get matches emailed to you.</em>
+            Talk to someone who<br />
+            <em>gets Ann Arbor housing.</em>
           </h1>
           <p className="intro-sub">
-            Chat with our AI for about 60 seconds — we&rsquo;ll email you the moment a matching place is posted. Free, always.
+            A few minutes with our housing concierge — it learns what actually matters to you,
+            then emails you ranked matches with an honest read on each. Free, always.
           </p>
           <button className="btn-start" onClick={onStart} aria-label="Start chatting with Wroomly Match">
             Start chatting <ArrowRight />

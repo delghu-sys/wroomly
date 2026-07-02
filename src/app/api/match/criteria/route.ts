@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { extractCriteria, type ChatTurnInput } from '@/lib/match/llm'
-import { humanizeCriteria } from '@/lib/match/criteria'
+import { extractProfile, type ChatTurnInput } from '@/lib/match/llm'
+import { humanizeProfile } from '@/lib/match/profile'
+import { allowMatchRequest, CRITERIA_LIMITS } from '@/lib/match/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -10,10 +11,10 @@ export const maxDuration = 30
 /**
  * POST /api/match/criteria
  *
- * Called once the chat is finished. Parses the full transcript into a strict,
- * normalized MatchCriteria and returns it alongside human-readable summary tags
- * for the confirm screen. No DB write yet — that happens on /api/match/alerts
- * after the renter confirms and gives their email.
+ * Called once the concierge chat finishes. Parses the full transcript into a
+ * normalized weighted MatchProfile and returns it with human-readable summary
+ * tags for the confirm screen. No DB write yet — that happens on
+ * /api/match/alerts after the renter confirms and gives their email.
  */
 const bodySchema = z.object({
   messages: z
@@ -24,7 +25,7 @@ const bodySchema = z.object({
       }),
     )
     .min(1)
-    .max(40),
+    .max(60),
 })
 
 export async function POST(request: Request) {
@@ -36,9 +37,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
+  // Public + anonymous LLM extraction — bound total cost with a global breaker.
+  if (!(await allowMatchRequest({ bucket: 'criteria' }, CRITERIA_LIMITS))) {
+    return NextResponse.json(
+      { error: 'We’re summarizing a lot of chats right now. Please try again in a bit.' },
+      { status: 429 },
+    )
+  }
+
   try {
-    const criteria = await extractCriteria(history)
-    return NextResponse.json({ criteria, tags: humanizeCriteria(criteria) })
+    const profile = await extractProfile(history)
+    return NextResponse.json({
+      profile,
+      tags: humanizeProfile(profile),
+      summary: profile.summary,
+    })
   } catch (err) {
     console.error('[match/criteria] extraction failed', err)
     return NextResponse.json(

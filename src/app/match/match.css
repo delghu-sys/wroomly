@@ -160,7 +160,13 @@
 .wm .summary-card { width: 100%; max-width: 28rem; background: white; border-radius: 1.5rem; border: 1.5px solid var(--line); padding: 2rem 1.75rem; box-shadow: 0 4px 40px oklch(0.18 0.025 255 / 0.06); animation: wm-fade-up 0.6s var(--ease) both 0.08s; }
 .wm .s-eyebrow { font-family: var(--font-display), sans-serif; font-size: 0.675rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--maize-deep); margin-bottom: 0.375rem; }
 .wm .s-h2 { font-family: var(--font-display), sans-serif; font-size: 1.4375rem; font-weight: 700; letter-spacing: -0.038em; color: var(--ink); margin-bottom: 1.25rem; line-height: 1.18; }
-.wm .criteria-wrap { display: flex; flex-wrap: wrap; gap: 0.4375rem; margin-bottom: 1.625rem; }
+.wm .s-summary { font-size: 0.9rem; line-height: 1.7; color: var(--ink-soft); margin-bottom: 1.125rem; }
+.wm .s-prios { display: flex; flex-wrap: wrap; gap: 0.4375rem; margin-bottom: 0.875rem; }
+.wm .s-prio { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.85rem 0.3rem 0.35rem; border-radius: 9999px; background: var(--navy); color: white; font-size: 0.8125rem; font-weight: 600; }
+.wm .s-prio-rank { width: 18px; height: 18px; border-radius: 9999px; background: var(--maize); color: var(--navy); font-size: 0.6875rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.wm .s-dealbreakers { display: flex; flex-wrap: wrap; gap: 0.4375rem; margin-bottom: 1.625rem; }
+.wm .s-db { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.8rem 0.3rem 0.6rem; border-radius: 9999px; background: oklch(0.97 0.02 25); border: 1px solid oklch(0.88 0.06 25); color: oklch(0.45 0.16 25); font-size: 0.8125rem; font-weight: 500; }
+.wm .criteria-wrap { display: flex; flex-wrap: wrap; gap: 0.4375rem; margin-bottom: 1.125rem; }
 .wm .c-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem 0.3rem 0.55rem; border-radius: 9999px; background: var(--maize-soft); border: 1px solid oklch(0.86 0.17 92 / 0.30); color: var(--navy); font-size: 0.8125rem; font-weight: 500; }
 .wm .c-dot { width: 4px; height: 4px; border-radius: 9999px; background: var(--maize-deep); }
 .wm .s-divider { height: 1px; background: var(--line); margin-bottom: 1.5rem; }
@@ -177,6 +183,25 @@
 .wm .s-back { margin-top: 1.125rem; text-align: center; font-size: 0.8125rem; color: var(--ink-muted); font-weight: 500; cursor: pointer; background: none; border: none; font-family: var(--font-body), sans-serif; text-decoration: underline; text-decoration-color: var(--line); transition: color 0.2s; }
 .wm .s-back:hover { color: var(--ink); }
 .wm .s-error { margin-top: 0.75rem; text-align: center; font-size: 0.8125rem; color: oklch(0.55 0.20 25); }
+
+/* Manage: importance sliders */
+.wm .w-sliders { display: flex; flex-direction: column; gap: 0.625rem; margin-top: 0.875rem; }
+.wm .w-row { display: grid; grid-template-columns: 6.5rem 1fr 3rem; align-items: center; gap: 0.75rem; }
+.wm .w-label { font-size: 0.8125rem; font-weight: 600; color: var(--ink); }
+.wm .w-val { font-size: 0.75rem; font-weight: 600; color: var(--ink-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.wm .w-row input[type='range'] { width: 100%; accent-color: var(--maize-deep); height: 4px; cursor: pointer; }
+
+/* Manage: sent-match history */
+.wm .h-list { display: flex; flex-direction: column; }
+.wm .h-row { padding: 0.875rem 0; border-bottom: 1px solid var(--line); }
+.wm .h-row:last-child { border-bottom: none; padding-bottom: 0; }
+.wm .h-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; }
+.wm .h-title { font-size: 0.9rem; font-weight: 600; color: var(--ink); text-decoration: none; line-height: 1.35; }
+.wm .h-title:hover { text-decoration: underline; }
+.wm .h-side { display: inline-flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.wm .h-thumb { font-size: 0.875rem; }
+.wm .h-score { display: inline-block; background: var(--navy); color: var(--maize); font-size: 0.6875rem; font-weight: 800; border-radius: 9999px; padding: 0.25rem 0.55rem; }
+.wm .h-note { margin-top: 0.4rem; font-size: 0.8125rem; line-height: 1.55; color: var(--ink-soft); }
 
 /* ── Done ── */
 .wm .done-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem 5rem; }

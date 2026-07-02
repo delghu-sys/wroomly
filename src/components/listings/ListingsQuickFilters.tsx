@@ -36,6 +36,9 @@ export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQui
   const removeFilter = useCallback((key: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.delete(key)
+    // Changing the result set invalidates the current page number — a user on
+    // page 6 who drops a filter would otherwise land on an out-of-range page.
+    params.delete('page')
     router.push(`${pathname}?${params.toString()}`)
   }, [pathname, searchParams, router])
 
@@ -43,11 +46,14 @@ export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQui
     router.push(pathname)
   }, [pathname, router])
 
+  // Only known filter keys become chips — currentFilters carries every raw
+  // query param, so pagination (?page=2) or junk params would otherwise render
+  // as mystery removable chips for filters the server never applied.
   const activeFilters = Object.entries(currentFilters)
-    .filter(([k, v]) => v && k !== 'sort' && k !== 'view')
+    .filter(([k, v]) => v && k in FILTER_LABELS)
     .map(([k, v]) => ({
       key: k,
-      label: FILTER_LABELS[k]?.(v!) ?? v!,
+      label: FILTER_LABELS[k](v!),
     }))
 
   return (
