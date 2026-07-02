@@ -44,6 +44,7 @@ export function MatchExperience() {
 
   const [profile, setProfile] = useState<MatchProfile | null>(null)
   const [tags, setTags] = useState<string[]>([])
+  const [extracting, setExtracting] = useState(false) // profile is being distilled in the background
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -150,8 +151,15 @@ export function MatchExperience() {
 
         if (endFinished) {
           setFinished(true)
-          // Let the closing message land, then summarize from the live snapshot.
-          setTimeout(() => void summarize(), 800)
+          // Kick off profile extraction NOW, but don't block the screen on it.
+          // The email screen renders fine without the profile (it fills in when
+          // ready) and the extraction usually finishes while the renter reads
+          // the summary and types — so the transition feels instant instead of
+          // stalling on a multi-second LLM call.
+          setExtracting(true)
+          profilePromise.current = extractProfileBg()
+          // Brief beat so the concierge's closing message lands, then move on.
+          setTimeout(() => setScreen('summary'), 700)
         } else {
           setChips(endChips)
           setMulti(endMulti)
@@ -163,13 +171,21 @@ export function MatchExperience() {
         setBusy(false)
       }
     },
-    // summarize is stable via useCallback below
+    // extractProfileBg is stable via useCallback below
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
 
-  /** Distill the finished conversation into the weighted profile + tags. */
-  const summarize = useCallback(async () => {
+  // Holds the in-flight profile extraction so the email submit can await it if
+  // the renter beats the model to the punch.
+  const profilePromise = useRef<Promise<MatchProfile | null> | null>(null)
+
+  /**
+   * Distill the finished conversation into the weighted profile + tags, in the
+   * background. Returns the profile so handleNotify can await it; never blocks
+   * the screen transition.
+   */
+  const extractProfileBg = useCallback(async (): Promise<MatchProfile | null> => {
     try {
       const history = toHistory(messagesSnapshot())
       const res = await fetch('/api/match/criteria', {
@@ -181,12 +197,14 @@ export function MatchExperience() {
         const data = (await res.json()) as { profile: MatchProfile; tags: string[] }
         setProfile(data.profile)
         setTags(data.tags)
+        return data.profile
       }
     } catch {
-      // Non-fatal — they can still give their email; we'll save whatever we have.
+      // Non-fatal — they can still give their email; we save whatever we have.
     } finally {
-      setScreen('summary')
+      setExtracting(false)
     }
+    return null
   }, [])
 
   // messages is closed-over staleness-prone inside async; keep a live snapshot.
@@ -222,6 +240,8 @@ export function MatchExperience() {
     setScreen('chat')
     setProfile(null)
     setTags([])
+    setExtracting(false)
+    profilePromise.current = null
     openWithGreeting()
   }
 
@@ -259,13 +279,20 @@ export function MatchExperience() {
     }
     setSubmitting(true)
     setError(null)
+    // The profile extraction runs in the background after the chat ends. If the
+    // renter submits before it lands, wait for it here so we save the real
+    // weighted profile rather than an empty one (usually already resolved).
+    let submitProfile = profile
+    if (!submitProfile && profilePromise.current) {
+      submitProfile = await profilePromise.current.catch(() => null)
+    }
     try {
       const res = await fetch('/api/match/alerts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email.trim(),
-          profile,
+          profile: submitProfile,
           transcript: toHistory(messagesSnapshot()),
         }),
       })
@@ -408,6 +435,11 @@ export function MatchExperience() {
                       {t}
                     </span>
                   ))
+                ) : extracting ? (
+                  <span className="c-tag c-tag-loading">
+                    <span className="c-dot" aria-hidden="true" />
+                    Putting your brief together…
+                  </span>
                 ) : (
                   <span className="c-tag">
                     <span className="c-dot" aria-hidden="true" />

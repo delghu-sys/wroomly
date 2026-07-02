@@ -169,6 +169,8 @@
 .wm .criteria-wrap { display: flex; flex-wrap: wrap; gap: 0.4375rem; margin-bottom: 1.125rem; }
 .wm .c-tag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem 0.3rem 0.55rem; border-radius: 9999px; background: var(--maize-soft); border: 1px solid oklch(0.86 0.17 92 / 0.30); color: var(--navy); font-size: 0.8125rem; font-weight: 500; }
 .wm .c-dot { width: 4px; height: 4px; border-radius: 9999px; background: var(--maize-deep); }
+.wm .c-tag-loading { color: var(--ink-soft); opacity: 0.85; }
+.wm .c-tag-loading .c-dot { animation: wm-pulse 1.3s ease-in-out infinite; }
 .wm .s-divider { height: 1px; background: var(--line); margin-bottom: 1.5rem; }
 .wm .s-ask { font-size: 0.9375rem; font-weight: 600; color: var(--ink); margin-bottom: 0.375rem; }
 .wm .s-hint { font-size: 0.8125rem; color: var(--ink-muted); line-height: 1.6; margin-bottom: 1rem; }
