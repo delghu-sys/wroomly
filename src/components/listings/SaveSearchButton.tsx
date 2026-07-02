@@ -39,7 +39,12 @@ export function SaveSearchButton({ currentFilters, authed }: SaveSearchButtonPro
   async function save() {
     if (saving) return
     if (!authed) {
-      router.push('/sign-in?next=/listings')
+      // Send them back to this exact filtered view after sign-in — losing the
+      // filters would defeat the point of saving the search.
+      const qs = new URLSearchParams(
+        Object.entries(currentFilters).filter(([, v]) => v) as [string, string][],
+      ).toString()
+      router.push(`/sign-in?next=${encodeURIComponent(`/listings${qs ? `?${qs}` : ''}`)}`)
       return
     }
     if (!hasFilters) {

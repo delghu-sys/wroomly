@@ -8,7 +8,10 @@ import {
   BYPASS_COOKIE,
 } from '@/lib/supplyOnly'
 
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon', '/start-listing']
+// /list-place is public: it's the "List your place" CTA target and does its own
+// auth routing (anon → the public /start-listing chooser; supplier → /listings/new).
+// Auth-walling it here would dead-end prospective suppliers on a sign-IN page.
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon', '/start-listing', '/list-place']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback
@@ -140,7 +143,8 @@ export async function middleware(request: NextRequest) {
   // Require auth for all other routes
   if (!user) {
     const redirectUrl = new URL('/sign-in', request.url)
-    redirectUrl.searchParams.set('next', pathname)
+    // Keep the query string so filters/state survive the sign-in round-trip.
+    redirectUrl.searchParams.set('next', pathname + request.nextUrl.search)
     return NextResponse.redirect(redirectUrl)
   }
 

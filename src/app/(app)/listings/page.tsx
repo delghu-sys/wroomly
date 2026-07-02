@@ -153,7 +153,7 @@ export default async function ListingsPage({
     new Set(((listings ?? []) as ListingWithDetails[]).map(l => l.supplier_id))
   )
 
-  const [favsRes, ratingsRes] = await Promise.all([
+  const [favsRes, ratingsRes, marketRes, hoodRes] = await Promise.all([
     authUser
       ? supabase
           .from('favorites')
@@ -166,7 +166,22 @@ export default async function ListingsPage({
           .select('reviewee_id, rating')
           .in('reviewee_id', supplierIds)
       : Promise.resolve({ data: [] as { reviewee_id: string; rating: number }[] }),
+    // Total active inventory (unfiltered) — the hero pill is a market stat,
+    // not the filtered result count, so a strict filter doesn't make it read
+    // "0 places available".
+    supabase.from('listings').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    // Distinct neighborhoods that actually appear in live listings — the filter
+    // options must match the data, not a static gazetteer that matches nothing.
+    supabase.from('listings').select('neighborhood').eq('status', 'active').not('neighborhood', 'is', null),
   ])
+  const marketTotal = (marketRes as { count?: number | null }).count ?? totalCount
+  const dataHoods = Array.from(
+    new Set(
+      ((hoodRes.data ?? []) as { neighborhood: string | null }[])
+        .map(h => h.neighborhood)
+        .filter((n): n is string => !!n && n.trim().length > 0),
+    ),
+  ).sort((a, b) => a.localeCompare(b))
 
   const favoriteIds = new Set<string>()
   for (const f of favsRes.data ?? []) favoriteIds.add(f.listing_id)
@@ -202,7 +217,11 @@ export default async function ListingsPage({
     }
   }).filter(m => Number.isFinite(m.lat) && Number.isFinite(m.lng))
 
-  const neighborhoods = ANN_ARBOR_NEIGHBORHOODS as unknown as string[]
+  // Prefer neighborhoods present in live listings; fall back to the gazetteer
+  // only if the data query somehow comes back empty.
+  const neighborhoods = dataHoods.length
+    ? dataHoods
+    : (ANN_ARBOR_NEIGHBORHOODS as unknown as string[])
   const residences = ANN_ARBOR_RESIDENCES as unknown as string[]
   const propertyTypes = PROPERTY_TYPES as unknown as { value: string; label: string }[]
 
@@ -210,7 +229,7 @@ export default async function ListingsPage({
     <div className="min-h-[100dvh]">
       {/* ── Atmospheric hero — dark navy, mesh, noise ── */}
       <BrowseHero
-        totalCount={totalCount}
+        totalCount={marketTotal}
         currentQuery={filters.q}
         filters={filters}
         view={view}

@@ -30,10 +30,12 @@ export default async function ListPlacePage() {
     data: { user: authUser },
   } = await supabase.auth.getUser()
 
-  // Unauthenticated → into the sign-up funnel with role pre-selected.
-  // The sign-up page reads `?as=supplier` to pre-toggle the role.
+  // Unauthenticated → the public "list your place" chooser. It offers the AI
+  // import (no account needed) or the manual path, which routes into the
+  // supplier sign-up funnel — a much softer landing than demanding an account
+  // before showing any value.
   if (!authUser) {
-    redirect('/sign-up?as=supplier&next=/listings/new')
+    redirect('/start-listing')
   }
 
   const { data: profile } = await supabase
