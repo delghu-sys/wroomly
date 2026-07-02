@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { reviewListing, type ListingForReview } from '@/lib/reviewers/listing-reviewer'
-import type { Listing, ListingImage, ListingAmenity, SwapPreference } from '@/types/database'
+import type { Listing, ListingImage, ListingAmenity } from '@/types/database'
 import { getListingImageUrl as imageUrl } from '@/lib/utils/listing'
 import { dispatchInstantForListing } from '@/lib/match/dispatch'
 
@@ -23,7 +23,6 @@ async function reviewOne(
       *,
       listing_images(*),
       listing_amenities(*),
-      swap_preferences(*),
       users:supplier_id(id, full_name, email)
     `)
     .eq('id', listingId)
@@ -34,7 +33,6 @@ async function reviewOne(
   const l = listing as Listing & {
     listing_images: ListingImage[]
     listing_amenities: ListingAmenity[]
-    swap_preferences: SwapPreference | null
   }
 
   if (l.status !== 'pending_review') {
@@ -60,7 +58,6 @@ async function reviewOne(
     pets_allowed: l.pets_allowed,
     utilities_included: l.utilities_included,
     amenities: l.listing_amenities.map(a => ({ amenity: a.amenity })),
-    swap_preferences: l.swap_preferences,
     image_urls: l.listing_images
       .sort((a, b) => a.display_order - b.display_order)
       .map(i => imageUrl(i.storage_path)),

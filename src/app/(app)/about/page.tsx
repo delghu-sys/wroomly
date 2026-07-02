@@ -42,7 +42,7 @@ export default function AboutPage() {
               </h1>
 
               <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-xl">
-                Wroomly is a verified marketplace for sublets and apartment swaps between
+                Wroomly is a verified marketplace for sublets between
                 University of Michigan students. Every listing is reviewed, every payment is
                 secured, and every conversation stays on-platform.
               </p>

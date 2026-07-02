@@ -7,7 +7,6 @@ import {
   MapPin,
   BedDouble,
   Bath,
-  ArrowLeftRight,
   Calendar,
   Star,
   Sofa,
@@ -76,13 +75,7 @@ export function BrandListingCard({
 
             {/* Type chip — top-left */}
             <div className="absolute top-3 left-3">
-              {listing.type === 'sublet' ? (
-                <BrandChip variant="ghost">Sublet</BrandChip>
-              ) : (
-                <BrandChip variant="primary" icon={ArrowLeftRight}>
-                  Swap
-                </BrandChip>
-              )}
+              <BrandChip variant="ghost">Sublet</BrandChip>
             </div>
 
             {/* Source provenance (seed or partner) — bottom-left. Plain chip
@@ -155,7 +148,7 @@ export function BrandListingCard({
 
             {/* Price + supplier */}
             <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-line">
-              {listing.type === 'sublet' && listing.price_per_month ? (
+              {listing.price_per_month ? (
                 <p className="font-display text-xl text-ink tracking-tight">
                   {formatCents(listing.price_per_month)}
                   <span className="font-sans font-normal text-ink-muted text-sm tracking-normal">
@@ -164,10 +157,7 @@ export function BrandListingCard({
                   </span>
                 </p>
               ) : (
-                <p className="font-display text-base text-[oklch(0.45_0.13_85)] flex items-center gap-1.5">
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                  Housing swap
-                </p>
+                <p className="font-display text-base text-ink-muted">Price TBD</p>
               )}
 
               <div className="flex items-center gap-1.5">

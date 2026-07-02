@@ -87,9 +87,9 @@ export default async function MyListingsPage() {
                   </Badge>
                 </div>
                 <p className="text-sm text-ink-muted">
-                  {listing.type === 'sublet' && listing.price_per_month
+                  {listing.price_per_month
                     ? <><span className="font-display text-ink">{formatCents(listing.price_per_month)}</span>/mo · </>
-                    : <><span className="font-display text-navy">Swap</span> · </>}
+                    : <><span className="font-display text-ink-muted">Price TBD</span> · </>}
                   {formatDateRange(listing.available_from, listing.available_to)}
                 </p>
               </div>

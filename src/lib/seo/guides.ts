@@ -117,48 +117,6 @@ export const GUIDES: Guide[] = [
     ],
   },
   {
-    slug: 'subletting-vs-housing-swaps',
-    title: 'Subletting vs. housing swaps: what U of M students should know',
-    description:
-      'Sublet or swap? A plain-English comparison for University of Michigan students weighing how to handle housing over the summer or a semester away.',
-    excerpt:
-      'Two ways to not pay for an empty room. Here\'s how subletting and housing swaps actually differ — and when each makes sense.',
-    updated: '2026-05-21',
-    readingMinutes: 4,
-    sections: [
-      {
-        heading: 'What a sublet is',
-        paragraphs: [
-          'A sublet is the standard move: you find someone to take over your place (or a room in it) for a set period and pay rent, usually directly to you, while you stay responsible to your landlord. Money changes hands one direction. It\'s the right call when you\'re leaving town and just want your rent covered.',
-        ],
-      },
-      {
-        heading: 'What a housing swap is',
-        paragraphs: [
-          'A housing swap is when two students trade places for a period — you take theirs, they take yours. Common when you\'re both going somewhere for the same stretch (say, one of you to a program in another city, the other coming the opposite way). Often no money changes hands, or just a small balancing payment if the places differ in value.',
-        ],
-      },
-      {
-        heading: 'When each makes sense',
-        paragraphs: [
-          'Sublet if you simply need your rent covered while you\'re gone — it\'s simpler and there\'s a much bigger pool of people looking. Swap if you specifically need housing somewhere else for the same window and can find a counterpart, which is rarer but can mean near-zero net cost.',
-        ],
-        bullets: [
-          'Sublet → you leave, someone covers your rent',
-          'Swap → two people trade places, often money-neutral',
-          'Sublets have far more supply and demand',
-          'Swaps are harder to match but can be cheaper',
-        ],
-      },
-      {
-        heading: 'The fine print is the same',
-        paragraphs: [
-          'Either way, your lease rules still apply, your landlord usually needs to approve, and you want it in writing. And either way, the safety advice holds: verify who you\'re dealing with and don\'t move money outside a system that protects both sides. Wroomly supports both sublets and swaps, with verification and escrow on the paid side.',
-        ],
-      },
-    ],
-  },
-  {
     slug: 'how-to-avoid-sublet-scams-ann-arbor',
     title: 'How to avoid sublet scams in Ann Arbor',
     description:

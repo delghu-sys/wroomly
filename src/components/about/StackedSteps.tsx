@@ -17,7 +17,7 @@ const STEPS: { icon: LucideIcon; n: string; title: string; body: string }[] = [
     icon: Search,
     n: '01',
     title: 'Browse or list',
-    body: 'Suppliers post a sublet or a swap in a few minutes. Consumers filter by neighborhood, dates, price, and amenities to find a place that fits.',
+    body: 'Suppliers post a sublet in a few minutes. Consumers filter by neighborhood, dates, price, and amenities to find a place that fits.',
   },
   {
     icon: MessageSquare,

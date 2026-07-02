@@ -23,7 +23,7 @@ const EFFECTIVE_DATE = 'May 12, 2026'
 const TOC: TocEntry[] = [
   { id: 's1', n: '1', title: 'Nature of the Service' },
   { id: 's2', n: '2', title: 'Eligibility & Accounts' },
-  { id: 's3', n: '3', title: 'Sublets, Swaps & Lease Compliance' },
+  { id: 's3', n: '3', title: 'Sublets & Lease Compliance' },
   { id: 's4', n: '4', title: 'Consumer Responsibilities' },
   { id: 's5', n: '5', title: 'Prohibited Conduct' },
   { id: 's6', n: '6', title: 'User Content; License to Wroomly' },
@@ -106,14 +106,14 @@ export default function TermsPage() {
               <p>
                 Wroomly is a neutral online venue that allows verified
                 university-affiliated users (&ldquo;<strong>Suppliers</strong>&rdquo;)
-                to list housing for sublet, swap, or short-term rental, and that
+                to list housing for sublet or short-term rental, and that
                 allows other university-affiliated users (&ldquo;
                 <strong>Consumers</strong>&rdquo;) to discover and inquire about
                 those listings.{' '}
                 <strong>
                   Wroomly is not a landlord, tenant, broker, real-estate agent,
                   property manager, leasing agent, or party to any rental,
-                  sublease, swap, license, or other arrangement between Users.
+                  sublease, license, or other arrangement between Users.
                 </strong>{' '}
                 Any agreement entered into between a Supplier and a Consumer is
                 a private agreement strictly between those Users, and Wroomly
@@ -146,7 +146,7 @@ export default function TermsPage() {
             </TermsSection>
 
             {/* §3 — CALLOUT */}
-            <TermsSection id="s3" n="3" title="Sublets, Swaps, and Lease Compliance — Supplier Representations & Assumption of Risk">
+            <TermsSection id="s3" n="3" title="Sublets and Lease Compliance — Supplier Representations & Assumption of Risk">
               <p>
                 If you post a Listing as a Supplier, you represent and warrant,
                 on each occasion you post or update a Listing and on each
@@ -155,12 +155,12 @@ export default function TermsPage() {
               <ol>
                 <li>
                   You have the full legal right, power, and authority to sublet,
-                  swap, assign, license, or otherwise grant occupancy of the
+                  assign, license, or otherwise grant occupancy of the
                   property described in the Listing for the dates, scope, and
                   terms you have published;
                 </li>
                 <li>
-                  Your sublet, swap, or rental of the property is permitted
+                  Your sublet or rental of the property is permitted
                   under your lease, deed, condominium documents, homeowners&rsquo;
                   association rules, mortgage, insurance policies, applicable
                   local zoning and short-term rental ordinances, and all other
@@ -189,7 +189,7 @@ export default function TermsPage() {
                   <strong>
                     Wroomly does not verify whether a Supplier&rsquo;s lease,
                     landlord, condominium association, mortgage, or local law
-                    permits the sublet or swap being offered, and Wroomly
+                    permits the sublet being offered, and Wroomly
                     assumes no responsibility whatsoever for doing so. Wroomly
                     expressly disclaims any and all liability arising from or
                     related to unauthorized subletting, assignment, or
@@ -208,7 +208,7 @@ export default function TermsPage() {
                   <strong>
                     By listing a property on Wroomly, Suppliers acknowledge and
                     agree that they have independently determined that their
-                    sublet, swap, or rental is permitted under all applicable
+                    sublet or rental is permitted under all applicable
                     agreements and laws, and that Wroomly bears no
                     responsibility or liability if it is not. Suppliers agree to
                     indemnify and hold harmless Wroomly for any claim, loss,
@@ -371,7 +371,7 @@ export default function TermsPage() {
                 enjoyment, or habitability. Wroomly does not warrant that any
                 listing is legal, permitted, available, accurate, or safe; that
                 any User is who they claim to be; that any Supplier holds the
-                right to sublet or swap; or that the Service will be
+                right to sublet; or that the Service will be
                 uninterrupted, secure, or error-free. You use the Service at
                 your own risk.
               </p>
@@ -409,10 +409,10 @@ export default function TermsPage() {
                 eviction proceedings, lease terminations, or other adverse
                 consequences suffered by any User arising from or related to
                 (a) a Supplier&rsquo;s failure to obtain authorization to
-                sublet, swap, or otherwise transfer occupancy of a property;
+                sublet or otherwise transfer occupancy of a property;
                 (b) a landlord&rsquo;s, property manager&rsquo;s, or condominium
                 association&rsquo;s decision to prohibit, cancel, or terminate
-                a sublet or swap; or (c) any violation of a lease, contract,
+                a sublet; or (c) any violation of a lease, contract,
                 ordinance, or law by any User.
               </p>
               <p>
@@ -437,7 +437,7 @@ export default function TermsPage() {
                 or warranty you make in them; (d) any agreement you enter into
                 with another User; (e) any claim by your landlord, property
                 manager, condominium association, co-tenant, neighbor, or
-                governmental authority that your sublet, swap, or listing was
+                governmental authority that your sublet or listing was
                 not permitted; and (f) your violation of any law or the rights
                 of any third party.
               </p>

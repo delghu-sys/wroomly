@@ -34,9 +34,8 @@ interface InquiryPinnedCardProps {
   isSupplier: boolean
   /**
    * Server-evaluated readiness of the supplier's Stripe Connect account.
-   * Sublet inquiries can't be accepted while this is false — there's
-   * nowhere for the rent to land. Defaults to `true` so swap inquiries
-   * (no money flow) and legacy callers aren't broken.
+   * Inquiries can't be accepted while this is false — there's nowhere for
+   * the rent to land. Defaults to `true` so legacy callers aren't broken.
    */
   supplierPayoutReady?: boolean
   /**
@@ -60,9 +59,8 @@ export function InquiryPinnedCard({
   conversationId,
 }: InquiryPinnedCardProps) {
   const router = useRouter()
-  // Sublet bookings move real money; require an active Stripe Connect
-  // account before letting the supplier accept. Swaps are exempt — no
-  // funds flow through Wroomly.
+  // Bookings move real money; require an active Stripe Connect account
+  // before letting the supplier accept.
   const needsPayoutSetup = listing.type === 'sublet' && !supplierPayoutReady
   const [status, setStatus] = useState<InquiryStatus>(inquiry.status)
   const [loading, setLoading] = useState<'accept' | 'reject' | null>(null)
@@ -73,11 +71,10 @@ export function InquiryPinnedCard({
   const supabase = useMemo(() => createClient(), [])
 
   const listingOpen = listingStatus === 'active'
-  const isSwap = listing.type === 'swap'
 
   // Supplier-only: take the listing off the market and lock in this renter.
-  // The server flips the listing to rented/swapped, records `closed_with`,
-  // and auto-declines the other pending inquiries.
+  // The server flips the listing to rented, records `closed_with`, and
+  // auto-declines the other pending inquiries.
   async function closeDeal() {
     if (closing) return
     setClosing(true)
@@ -91,11 +88,7 @@ export function InquiryPinnedCard({
         setClosing(false)
         return
       }
-      toast.success(
-        isSwap
-          ? 'Swap confirmed — listing is off the market.'
-          : 'Marked as taken — listing is off the market.'
-      )
+      toast.success('Marked as taken — listing is off the market.')
       router.refresh()
       // Leave `closing` true; the refresh re-renders without the button.
     } catch {
@@ -384,11 +377,7 @@ export function InquiryPinnedCard({
               ) : (
                 <PartyPopper className="w-4 h-4" strokeWidth={2} />
               )}
-              {closing
-                ? 'Closing…'
-                : isSwap
-                  ? 'We made a swap — mark as taken'
-                  : 'We made a deal — mark as taken'}
+              {closing ? 'Closing…' : 'We made a deal — mark as taken'}
             </button>
             <p className="text-[11.5px] text-ink-muted mt-2 leading-snug text-center">
               Takes the listing off the market and declines other pending
@@ -427,7 +416,7 @@ export function InquiryPinnedCard({
               strokeWidth={2.25}
             />
             <span className="text-[12.5px] font-medium text-[oklch(0.40_0.13_142)]">
-              {isSwap ? 'Swap complete' : 'This place has been taken'}
+              This place has been taken
             </span>
           </div>
         )}

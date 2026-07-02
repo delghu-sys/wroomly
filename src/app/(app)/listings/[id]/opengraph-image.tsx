@@ -39,10 +39,8 @@ export default async function Image({ params }: { params: { id: string } }) {
     if (data) {
       title = data.title ?? title
       neighborhood = data.neighborhood ?? null
-      if (data.type === 'sublet' && data.price_per_month) {
+      if (data.price_per_month) {
         priceLabel = `$${Math.round(data.price_per_month / 100).toLocaleString()}/mo`
-      } else if (data.type === 'swap') {
-        priceLabel = 'Housing swap'
       }
       bedroomsLabel =
         data.bedrooms === 0

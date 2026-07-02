@@ -63,9 +63,11 @@ type FormValues = z.infer<typeof schema>
 
 type StatusOption = { value: FormValues['status']; label: string; help: string }
 
+// 'swapped' isn't offered here — every listing is a sublet now, so it can
+// never be a meaningful choice for a supplier to make. Still a valid enum
+// value/label below in case a historical row ever needs to render one.
 const LIFECYCLE_OPTIONS: StatusOption[] = [
   { value: 'rented', label: 'Rented', help: 'Marked as rented out' },
-  { value: 'swapped', label: 'Swapped', help: 'Marked as swap complete' },
   { value: 'archived', label: 'Archived', help: 'Permanently hidden from listings' },
 ]
 

@@ -11,7 +11,7 @@ import { signInUiless } from './helpers/auth'
  */
 
 const PUBLIC_PAGES = [
-  { path: '/', heading: /room.*for|wroomly|home|swap|sublet/i },
+  { path: '/', heading: /room.*for|wroomly|home|sublet/i },
   { path: '/listings', heading: /browse|listings|find|home/i },
   { path: '/sign-in', heading: /sign in|welcome/i },
   { path: '/sign-up', heading: /sign up|join|create/i },

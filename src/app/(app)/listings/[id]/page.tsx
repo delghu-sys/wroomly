@@ -9,7 +9,7 @@ import { SupplierCard } from '@/components/listings/SupplierCard'
 import { BookingSidebar } from '@/components/listings/BookingSidebar'
 import { BrandChip } from '@/components/brand/BrandChip'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
-import { BedDouble, Bath, Maximize2, Calendar, ArrowLeftRight, MapPin } from 'lucide-react'
+import { BedDouble, Bath, Maximize2, Calendar, MapPin } from 'lucide-react'
 import { formatDateRange, getListingImageUrl } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
 import {
@@ -49,12 +49,11 @@ export async function generateMetadata({
           ? `${data.bedrooms}-bedroom`
           : 'Room'
 
-  const typeLabel = data.type === 'swap' ? 'housing swap' : 'sublet'
+  const typeLabel = 'sublet'
   const where = data.neighborhood ? `${data.neighborhood}, Ann Arbor` : 'Ann Arbor'
-  const priceLabel =
-    data.type === 'sublet' && data.price_per_month
-      ? ` — $${Math.round(data.price_per_month / 100).toLocaleString()}/mo`
-      : ''
+  const priceLabel = data.price_per_month
+    ? ` — $${Math.round(data.price_per_month / 100).toLocaleString()}/mo`
+    : ''
 
   // SEO: keyword-led, unique per listing — "{bedrooms} {type} near
   // {neighborhood}, Ann Arbor — $price/mo". Real fields, never hardcoded.
@@ -217,7 +216,6 @@ export default async function ListingDetailPage({
               id: l.id,
               title: l.title,
               description: l.description,
-              type: l.type,
               pricePerMonthCents: l.price_per_month,
               bedrooms: l.bedrooms,
               bathrooms: l.bathrooms,
@@ -293,13 +291,7 @@ export default async function ListingDetailPage({
             <ScrollReveal delay={0.1}>
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  {l.type === 'sublet' ? (
-                    <BrandChip variant="navy">Sublet</BrandChip>
-                  ) : (
-                    <BrandChip variant="primary" icon={ArrowLeftRight}>
-                      Housing Swap
-                    </BrandChip>
-                  )}
+                  <BrandChip variant="navy">Sublet</BrandChip>
                   {l.furnished && <BrandChip variant="ghost">Furnished</BrandChip>}
                   {l.utilities_included && (
                     <BrandChip variant="ghost">Utilities included</BrandChip>
@@ -413,38 +405,6 @@ export default async function ListingDetailPage({
                     Amenities
                   </h2>
                   <AmenityGrid amenities={amenities} />
-                </div>
-              </ScrollReveal>
-            )}
-
-            {/* Swap preferences */}
-            {l.type === 'swap' && l.swap_preferences && (
-              <ScrollReveal>
-                <div>
-                  <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
-                    Swap preferences
-                  </h2>
-                  <div className="rounded-3xl p-5 border border-[oklch(0.84_0.17_85/0.30)] bg-[oklch(0.84_0.17_85/0.06)] space-y-2">
-                    {l.swap_preferences.preferred_cities?.length > 0 && (
-                      <p className="text-sm text-ink-soft">
-                        <span className="font-medium text-ink">Looking to swap with:</span>{' '}
-                        {l.swap_preferences.preferred_cities.join(', ')}
-                      </p>
-                    )}
-                    {l.swap_preferences.preferred_from &&
-                      l.swap_preferences.preferred_to && (
-                        <p className="text-sm text-ink-soft">
-                          <span className="font-medium text-ink">Preferred dates:</span>{' '}
-                          {format(parseISO(l.swap_preferences.preferred_from), 'MMM d')} –{' '}
-                          {format(parseISO(l.swap_preferences.preferred_to), 'MMM d, yyyy')}
-                        </p>
-                      )}
-                    {l.swap_preferences.notes && (
-                      <p className="text-sm text-ink-soft leading-relaxed">
-                        {l.swap_preferences.notes}
-                      </p>
-                    )}
-                  </div>
                 </div>
               </ScrollReveal>
             )}

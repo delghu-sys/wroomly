@@ -1,17 +1,3 @@
-export const LISTING_TYPES = {
-  SUBLET: 'sublet',
-  SWAP: 'swap',
-} as const
-
-export const LISTING_STATUSES = {
-  DRAFT: 'draft',
-  PENDING_REVIEW: 'pending_review',
-  ACTIVE: 'active',
-  RENTED: 'rented',
-  SWAPPED: 'swapped',
-  ARCHIVED: 'archived',
-} as const
-
 export const USER_TYPES = {
   SUPPLIER: 'supplier',
   CONSUMER: 'consumer',

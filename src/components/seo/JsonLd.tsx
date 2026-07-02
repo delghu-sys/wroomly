@@ -81,7 +81,6 @@ export function listingJsonLd(opts: {
   id: string
   title: string
   description: string | null
-  type: string
   pricePerMonthCents: number | null
   bedrooms: number | null
   bathrooms: number | null
@@ -120,8 +119,7 @@ export function listingJsonLd(opts: {
   if (amenities.length) node.amenityFeature = amenities
   if (opts.imageUrls.length) node.image = opts.imageUrls.slice(0, 6)
 
-  // Only sublets have a monetary offer; swaps don't.
-  if (opts.type === 'sublet' && opts.pricePerMonthCents) {
+  if (opts.pricePerMonthCents) {
     node.potentialAction = undefined
     node.offers = {
       '@type': 'Offer',
@@ -157,7 +155,7 @@ export function siteJsonLd(): Record<string, unknown>[] {
       url: ORIGIN,
       logo: `${ORIGIN}/og-default.png`,
       description:
-        'Verified student housing marketplace for subletting and swapping near the University of Michigan in Ann Arbor.',
+        'Verified student housing marketplace for subletting near the University of Michigan in Ann Arbor.',
       areaServed: {
         '@type': 'City',
         name: 'Ann Arbor',

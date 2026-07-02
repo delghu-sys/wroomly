@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { Listing, ListingAmenity, SwapPreference } from '@/types/database'
+import type { Listing, ListingAmenity } from '@/types/database'
 
 // Lazy-init: the SDK constructor throws "Neither apiKey nor authenticator
 // provided" when ANTHROPIC_API_KEY is missing. Instantiating at module
@@ -48,7 +48,6 @@ export interface ListingForReview
     | 'utilities_included'
   > {
   amenities: Pick<ListingAmenity, 'amenity'>[]
-  swap_preferences: SwapPreference | null
   image_urls: string[]
 }
 
@@ -93,16 +92,9 @@ function buildUserMessage(l: ListingForReview): string {
   lines.push(
     `Bedrooms: ${l.bedrooms ?? '?'}, Bathrooms: ${l.bathrooms ?? '?'}, sq ft: ${l.sq_ft ?? '?'}`
   )
-  if (l.type === 'sublet') {
-    const price = l.price_per_month ? `$${(l.price_per_month / 100).toFixed(0)}/mo` : '(no price)'
-    const deposit = l.deposit_amount ? `$${(l.deposit_amount / 100).toFixed(0)}` : '(none)'
-    lines.push(`Price: ${price}, Deposit: ${deposit}`)
-  } else if (l.swap_preferences) {
-    lines.push(
-      `Swap with cities: ${l.swap_preferences.preferred_cities?.join(', ') ?? '(any)'}`
-    )
-    if (l.swap_preferences.notes) lines.push(`Swap notes: ${l.swap_preferences.notes}`)
-  }
+  const price = l.price_per_month ? `$${(l.price_per_month / 100).toFixed(0)}/mo` : '(no price)'
+  const deposit = l.deposit_amount ? `$${(l.deposit_amount / 100).toFixed(0)}` : '(none)'
+  lines.push(`Price: ${price}, Deposit: ${deposit}`)
   lines.push(`Available: ${l.available_from} to ${l.available_to}`)
   lines.push(
     `Furnished: ${l.furnished}, Pets: ${l.pets_allowed}, Utilities included: ${l.utilities_included}`

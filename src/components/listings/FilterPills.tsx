@@ -16,21 +16,14 @@ type Pill = {
   patch: (f: Record<string, string | undefined>) => Record<string, string | undefined>
 }
 
+// No "type" pill — every listing is a sublet, so a type filter can never
+// change the results. `type` is still cleared defensively in `patch` in case
+// a stray `?type=` param survives from an old link/bookmark.
 const pills: Pill[] = [
   {
     label: 'All',
     isActive: f => !f.type && f.furnished !== 'true' && f.pets !== 'true',
     patch: () => ({ type: undefined, furnished: undefined, pets: undefined }),
-  },
-  {
-    label: 'Sublets',
-    isActive: f => f.type === 'sublet',
-    patch: () => ({ type: 'sublet', furnished: undefined, pets: undefined }),
-  },
-  {
-    label: 'Swaps',
-    isActive: f => f.type === 'swap',
-    patch: () => ({ type: 'swap', furnished: undefined, pets: undefined }),
   },
   {
     label: 'Furnished',
