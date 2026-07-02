@@ -2,11 +2,7 @@
 
 import { motion } from 'motion/react'
 import Link from 'next/link'
-import {
-  CalendarBlank,
-  ShieldCheck,
-  ArrowsLeftRight as ArrowsLeftRightPh,
-} from '@phosphor-icons/react/dist/ssr'
+import { CalendarBlank, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
 import { PAYMENTS_ENABLED } from '@/lib/config'
@@ -77,7 +73,7 @@ export function BookingSidebar({
           {closed ? (
             <div className="rounded-2xl p-5 text-center bg-[oklch(0.97_0.04_25)] border border-[oklch(0.85_0.10_25)]">
               <p className="font-display text-xl text-ink leading-tight">
-                {listing.status === 'rented' ? 'This place has been rented' : 'This swap is complete'}
+                This place has been rented
               </p>
               <p className="text-sm text-ink-muted mt-1.5 leading-relaxed">
                 This listing is no longer available.
@@ -93,7 +89,7 @@ export function BookingSidebar({
           ) : (
             <>
               {/* Price block — display font */}
-              {listing.type === 'sublet' && listing.price_per_month && (
+              {listing.price_per_month && (
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted font-semibold mb-1.5">
                     From
@@ -135,18 +131,6 @@ export function BookingSidebar({
                       Send an inquiry to get connected.
                     </p>
                   )}
-                </div>
-              )}
-
-              {listing.type === 'swap' && (
-                <div className="rounded-2xl p-4 border border-[oklch(0.84_0.17_85/0.40)] bg-[oklch(0.84_0.17_85/0.08)]">
-                  <p className="font-display font-semibold text-[oklch(0.22_0.075_256)] flex items-center gap-2 text-lg tracking-tight">
-                    <ArrowsLeftRightPh size={16} weight="bold" />
-                    Housing swap
-                  </p>
-                  <p className="text-sm text-ink-soft mt-1 leading-relaxed">
-                    No money changes hands — you swap your place for theirs.
-                  </p>
                 </div>
               )}
 

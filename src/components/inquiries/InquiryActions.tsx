@@ -10,8 +10,8 @@ interface InquiryActionsProps {
   inquiryId: string
   consumerId: string
   listingId: string
-  /** `'sublet' | 'swap'`. Swaps don't move money so they're never gated on payout setup. */
-  listingType: 'sublet' | 'swap' | string
+  /** Always `'sublet'` in practice — payout gating only applies to that type. */
+  listingType: string
   /** Whether the supplier's Stripe Connect is fully active. */
   supplierPayoutReady: boolean
 }

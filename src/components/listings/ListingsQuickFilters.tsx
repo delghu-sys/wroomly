@@ -11,7 +11,7 @@ interface ListingsQuickFiltersProps {
 }
 
 const FILTER_LABELS: Record<string, (v: string) => string> = {
-  type: v => v === 'sublet' ? 'Sublet' : 'Swap',
+  type: () => 'Sublet',
   neighborhood: v => v,
   property_type: v => v.charAt(0).toUpperCase() + v.slice(1),
   residence_name: v => v,

@@ -9,7 +9,7 @@ import { BookOpen, ArrowRight, Clock } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Guides — Subletting at the University of Michigan',
   description:
-    'Student guides to subletting in Ann Arbor: how to sublet your UMich apartment, summer sublet tips, sublet vs. swap, avoiding scams, and security deposits.',
+    'Student guides to subletting in Ann Arbor: how to sublet your UMich apartment, summer sublet tips, avoiding scams, and security deposits.',
   alternates: { canonical: '/guides' },
   openGraph: {
     title: 'Guides — Subletting at the University of Michigan | Wroomly',
@@ -43,7 +43,7 @@ export default function GuidesIndexPage() {
           <span className="italic font-light text-navy">explained.</span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          Straight-talking guides to subletting and swapping housing in Ann
+          Straight-talking guides to subletting housing in Ann
           Arbor — written for U of M students, by people who get the drill.
         </p>
       </header>

@@ -129,35 +129,6 @@ export function ListingsFilters({
 
       <Separator className="bg-line/70" />
 
-      {/* Type */}
-      <div className="relative space-y-2">
-        <Label className={tinyLabel}>Listing type</Label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { value: '', label: 'Any' },
-            { value: 'sublet', label: 'Sublet' },
-            { value: 'swap', label: 'Swap' },
-          ].map(opt => {
-            const active = (currentFilters.type ?? '') === opt.value
-            return (
-              <button
-                key={opt.value}
-                onClick={() => updateFilter('type', opt.value || undefined)}
-                className={`text-sm py-2 px-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
-                  active
-                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
-                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
-                }`}
-              >
-                {opt.label}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      <Separator className="bg-line/70" />
-
       {/* Property type */}
       <div className="relative space-y-2">
         <Label className={tinyLabel}>Property type</Label>

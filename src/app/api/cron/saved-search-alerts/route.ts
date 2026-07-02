@@ -25,7 +25,7 @@ export const maxDuration = 60 // seconds — cron can be slow
  * public-internet caller can't spam the cron path.
  */
 const HUMAN_FILTER_SUMMARY: Record<string, (v: string) => string> = {
-  type: v => (v === 'sublet' ? 'Sublet' : 'Swap'),
+  type: () => 'Sublet',
   neighborhood: v => v,
   property_type: v => v,
   bedrooms: v => (v === '0' ? 'Studio' : `${v} bed`),

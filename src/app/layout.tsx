@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: '%s | Wroomly — UMich Student Sublets',
   },
   description:
-    'University of Michigan student sublets and housing swaps in Ann Arbor — verified @umich.edu students, escrow payments, no scams. Find a summer sublet near campus or list your place.',
+    'University of Michigan student sublets in Ann Arbor — verified @umich.edu students, escrow payments, no scams. Find a summer sublet near campus or list your place.',
   keywords: [
     'University of Michigan sublet',
     'UMich sublet',
@@ -48,7 +48,6 @@ export const metadata: Metadata = {
     'sublease Ann Arbor',
     'University of Michigan student housing',
     'Ann Arbor student housing',
-    'housing swap Ann Arbor',
   ],
   alternates: {
     canonical: '/',
@@ -63,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
     description:
-      'Verified UMich student sublets & housing swaps in Ann Arbor. @umich.edu-only, escrow payments.',
+      'Verified UMich student sublets in Ann Arbor. @umich.edu-only, escrow payments.',
     type: 'website',
     siteName: 'Wroomly',
     locale: 'en_US',
@@ -80,7 +79,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
     description:
-      'Verified UMich student sublets & housing swaps in Ann Arbor. @umich.edu-only, escrow payments.',
+      'Verified UMich student sublets in Ann Arbor. @umich.edu-only, escrow payments.',
     images: ['/og-default.png'],
   },
 }

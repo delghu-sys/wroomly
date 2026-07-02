@@ -112,8 +112,8 @@ export function InquiryForm({
     }
   }
 
-  // ── Existing inquiry: accepted (sublet) ──
-  if (existingInquiry?.status === 'accepted' && listing.type === 'sublet') {
+  // ── Existing inquiry: accepted ──
+  if (existingInquiry?.status === 'accepted') {
     if (hasPaid) {
       return (
         <div
@@ -187,34 +187,6 @@ export function InquiryForm({
               }
               variant={PAYMENTS_ENABLED ? 'outline' : 'default'}
             >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Open chat
-            </Button>
-          </Link>
-        )}
-      </div>
-    )
-  }
-
-  // ── Existing inquiry: accepted (swap) ──
-  if (existingInquiry?.status === 'accepted') {
-    return (
-      <div
-        className="rounded-2xl p-4 space-y-3 border"
-        style={{
-          background: 'oklch(0.55 0.15 142 / 0.10)',
-          borderColor: 'oklch(0.55 0.15 142 / 0.35)',
-        }}
-      >
-        <div>
-          <p className="font-display text-lg text-ink">Swap accepted</p>
-          <p className="text-sm text-ink-soft mt-0.5">
-            Coordinate the swap details in chat.
-          </p>
-        </div>
-        {conversationId && (
-          <Link href={`/messages/${conversationId}`} className="block">
-            <Button className="w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]">
               <MessageSquare className="w-4 h-4 mr-2" />
               Open chat
             </Button>

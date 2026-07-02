@@ -6,12 +6,11 @@ import { inquiryDeclinedEmail } from '@/lib/email/templates'
 /**
  * POST /api/inquiries/[id]/close-deal
  *
- * Supplier-only. Marks the listing behind this inquiry as taken — 'rented'
- * for sublets, 'swapped' for swaps — and records the renter the deal closed
- * with (`closed_with`) so they keep read access after the listing leaves
- * 'active' (RLS in migration 025; without it they'd 404 on the place they
- * just agreed to take, since payments are off and there's no transaction
- * row to fall back on).
+ * Supplier-only. Marks the listing behind this inquiry as 'rented' and
+ * records the renter the deal closed with (`closed_with`) so they keep read
+ * access after the listing leaves 'active' (RLS in migration 025; without it
+ * they'd 404 on the place they just agreed to take, since payments are off
+ * and there's no transaction row to fall back on).
  *
  * It also accepts the winning inquiry and auto-declines every other
  * still-pending inquiry on the same listing, emailing those renters so
@@ -77,7 +76,7 @@ export async function POST(
   }
 
   const service = createServiceClient()
-  const closedStatus = listing.type === 'swap' ? 'swapped' : 'rented'
+  const closedStatus = 'rented'
 
   // 1. Close the listing + record the matched renter. Concurrency-guarded
   //    on status = 'active' so two quick taps can't double-close it.
@@ -146,7 +145,6 @@ export async function POST(
     const payload = JSON.stringify({
       title: listing.title ?? '',
       listing_id: listing.id,
-      type: listing.type,
     })
     await service.from('messages').insert({
       conversation_id: convo.id,

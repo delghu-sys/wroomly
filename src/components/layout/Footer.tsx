@@ -50,7 +50,6 @@ export function Footer() {
             links={[
               { href: '/listings', label: 'All listings' },
               { href: '/listings?type=sublet', label: 'Sublets' },
-              { href: '/listings?type=swap', label: 'Housing swaps' },
               { href: '/guides', label: 'Guides & FAQ' },
             ]}
           />

@@ -26,7 +26,7 @@ import Image from 'next/image'
 import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
 import { monthToFromDate, monthToToDate } from '@/lib/utils/listing'
 
-const STEPS = ['Type', 'Details', 'Photos', 'Pricing', 'Review']
+const STEPS = ['Details', 'Photos', 'Pricing', 'Review']
 
 function formatMonthLabel(yyyymm: string | undefined): string {
   if (!yyyymm || !/^\d{4}-\d{2}$/.test(yyyymm)) return '—'
@@ -36,7 +36,7 @@ function formatMonthLabel(yyyymm: string | undefined): string {
 }
 
 const schema = z.object({
-  type: z.enum(['sublet', 'swap']),
+  type: z.literal('sublet'),
   title: z.string().min(5, 'Title must be at least 5 characters').max(100),
   description: z.string().min(30, 'Please write at least 30 characters').max(2000),
   neighborhood: z.string().min(1, 'Select a neighborhood'),
@@ -54,19 +54,13 @@ const schema = z.object({
   // Stored as "YYYY-MM" by the form; converted to a full date on submit.
   available_from: z.string().regex(/^\d{4}-\d{2}$/, 'Select a start month'),
   available_to: z.string().regex(/^\d{4}-\d{2}$/, 'Select an end month'),
-  price_per_month: z.coerce.number().min(1).optional(),
+  price_per_month: z.coerce.number().min(1, 'Monthly price is required'),
   deposit_amount: z.coerce.number().min(0).optional(),
   furnished: z.boolean().default(false),
   pets_allowed: z.boolean().default(false),
   utilities_included: z.boolean().default(false),
   amenities: z.array(z.string()).default([]),
-  // Swap-specific
-  swap_cities: z.string().optional(),
-  swap_notes: z.string().optional(),
-}).refine(data => {
-  if (data.type === 'sublet') return !!data.price_per_month
-  return true
-}, { message: 'Monthly price is required for sublets', path: ['price_per_month'] })
+})
 
 type FormValues = z.infer<typeof schema>
 
@@ -90,8 +84,6 @@ export function ListingWizard({ userId }: { userId: string }) {
       amenities: [],
     },
   })
-
-  const listingType = form.watch('type')
 
   function handlePhotoAdd(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -130,7 +122,7 @@ export function ListingWizard({ userId }: { userId: string }) {
         .from('listings')
         .insert({
           supplier_id: userId,
-          type: data.type,
+          type: 'sublet',
           title: data.title,
           description: data.description,
           neighborhood: data.neighborhood,
@@ -149,8 +141,8 @@ export function ListingWizard({ userId }: { userId: string }) {
           sq_ft: data.sq_ft ?? null,
           available_from: monthToFromDate(data.available_from),
           available_to: monthToToDate(data.available_to),
-          price_per_month: data.type === 'sublet' ? (data.price_per_month ?? 0) * 100 : null,
-          deposit_amount: data.type === 'sublet' && data.deposit_amount ? data.deposit_amount * 100 : null,
+          price_per_month: data.price_per_month * 100,
+          deposit_amount: data.deposit_amount ? data.deposit_amount * 100 : null,
           furnished: data.furnished,
           pets_allowed: data.pets_allowed,
           utilities_included: data.utilities_included,
@@ -187,17 +179,6 @@ export function ListingWizard({ userId }: { userId: string }) {
         )
       }
 
-      // 4. Swap preferences
-      if (data.type === 'swap') {
-        await supabase.from('swap_preferences').insert({
-          listing_id: listingId,
-          preferred_cities: data.swap_cities
-            ? data.swap_cities.split(',').map(c => c.trim()).filter(Boolean)
-            : [],
-          notes: data.swap_notes ?? null,
-        })
-      }
-
       // Fire-and-forget AI auto-review — the listing is submitted regardless
       fetch('/api/admin/auto-review', {
         method: 'POST',
@@ -216,10 +197,9 @@ export function ListingWizard({ userId }: { userId: string }) {
 
   async function validateStep(): Promise<boolean> {
     const fieldsByStep: (keyof FormValues)[][] = [
-      ['type'],
       ['title', 'description', 'neighborhood', 'address', 'lat', 'lng', 'property_type', 'residence_name', 'bedrooms', 'bathrooms', 'available_from', 'available_to'],
       [], // photos — no validation
-      listingType === 'sublet' ? ['price_per_month'] : [],
+      ['price_per_month'],
       [], // review
     ]
     const result = await form.trigger(fieldsByStep[step])
@@ -233,14 +213,12 @@ export function ListingWizard({ userId }: { userId: string }) {
 
   // Map fields back to the step they live on, so we can jump there on error
   const FIELD_TO_STEP: Partial<Record<keyof FormValues, number>> = {
-    type: 0,
-    title: 1, description: 1, neighborhood: 1, address: 1, lat: 1, lng: 1,
-    property_type: 1, residence_name: 1,
-    bedrooms: 1, bathrooms: 1, sq_ft: 1,
-    available_from: 1, available_to: 1,
-    furnished: 1, pets_allowed: 1, utilities_included: 1, amenities: 1,
-    swap_cities: 1, swap_notes: 1,
-    price_per_month: 3, deposit_amount: 3,
+    title: 0, description: 0, neighborhood: 0, address: 0, lat: 0, lng: 0,
+    property_type: 0, residence_name: 0,
+    bedrooms: 0, bathrooms: 0, sq_ft: 0,
+    available_from: 0, available_to: 0,
+    furnished: 0, pets_allowed: 0, utilities_included: 0, amenities: 0,
+    price_per_month: 2, deposit_amount: 2,
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -249,7 +227,7 @@ export function ListingWizard({ userId }: { userId: string }) {
     if (!firstField) return
     const msg = errors[firstField]?.message
       ?? `Please complete the "${String(firstField).replace(/_/g, ' ')}" field.`
-    const targetStep = FIELD_TO_STEP[firstField] ?? 1
+    const targetStep = FIELD_TO_STEP[firstField] ?? 0
     if (targetStep !== step) setStep(targetStep)
     toast.error(msg)
   }
@@ -287,41 +265,8 @@ export function ListingWizard({ userId }: { userId: string }) {
 
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <form onSubmit={(form.handleSubmit as any)(onSubmit, onError)} noValidate className="space-y-6">
-        {/* Step 0: Type */}
+        {/* Step 0: Details */}
         {step === 0 && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900">What type of listing is this?</h2>
-            <Controller
-              name="type"
-              control={form.control}
-              render={({ field }) => (
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { value: 'sublet', title: 'Sublet', desc: 'Rent your place to someone while you\'re away. You set the monthly price.' },
-                    { value: 'swap', title: 'Housing swap', desc: 'Exchange your place with someone from another city. No money changes hands.' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => field.onChange(opt.value)}
-                      className={`p-5 border-2 rounded-xl text-left transition-all ${
-                        field.value === opt.value
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <p className="font-semibold text-gray-900">{opt.title}</p>
-                      <p className="text-sm text-gray-500 mt-1">{opt.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            />
-          </div>
-        )}
-
-        {/* Step 1: Details */}
-        {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-lg font-semibold text-gray-900">Tell us about the place</h2>
 
@@ -550,24 +495,11 @@ export function ListingWizard({ userId }: { userId: string }) {
               </div>
             </div>
 
-            {listingType === 'swap' && (
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="font-semibold text-gray-900">Swap preferences</h3>
-                <div className="space-y-2">
-                  <Label>Cities you&rsquo;d swap with (comma-separated)</Label>
-                  <Input placeholder="Chicago, New York, Boston..." {...form.register('swap_cities')} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Additional notes (optional)</Label>
-                  <Textarea placeholder="Any other preferences about the swap..." rows={3} {...form.register('swap_notes')} />
-                </div>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Step 2: Photos */}
-        {step === 2 && (
+        {/* Step 1: Photos */}
+        {step === 1 && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-gray-900">Add photos</h2>
             <p className="text-sm text-gray-500">
@@ -612,79 +544,64 @@ export function ListingWizard({ userId }: { userId: string }) {
           </div>
         )}
 
-        {/* Step 3: Pricing */}
-        {step === 3 && (
+        {/* Step 2: Pricing */}
+        {step === 2 && (
           <div className="space-y-5">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {listingType === 'sublet' ? 'Set your price' : 'Swap details'}
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Set your price</h2>
 
-            {listingType === 'sublet' ? (
-              <>
-                <div className="space-y-2">
-                  <Label>Monthly rent ($)</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                    <Input
-                      type="number"
-                      className="pl-7"
-                      placeholder="1200"
-                      {...form.register('price_per_month')}
-                    />
-                  </div>
-                  {form.formState.errors.price_per_month && (
-                    <p className="text-sm text-red-600">{form.formState.errors.price_per_month.message}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    Wroomly charges a 5% platform fee on successful transactions.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Security deposit ($) — optional</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-                    <Input
-                      type="number"
-                      className="pl-7"
-                      placeholder="Same as 1 month's rent"
-                      {...form.register('deposit_amount')}
-                    />
-                  </div>
-                </div>
-
-                <div className="bg-amber-50 rounded-xl p-4 text-sm text-amber-800">
-                  <p className="font-medium mb-1">How payments work</p>
-                  <p>
-                    The consumer pays deposit + first month via Stripe. Funds are held in escrow and
-                    released to you on the move-in date. You&apos;ll receive the amount minus a 5% fee.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="bg-emerald-50 rounded-xl p-5 text-emerald-800">
-                <p className="font-semibold mb-2">Housing swap — no payment required</p>
-                <p className="text-sm">
-                  In a housing swap, both parties exchange their places for the agreed period.
-                  No money changes hands through the platform.
-                </p>
+            <div className="space-y-2">
+              <Label>Monthly rent ($)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                <Input
+                  type="number"
+                  className="pl-7"
+                  placeholder="1200"
+                  {...form.register('price_per_month')}
+                />
               </div>
-            )}
+              {form.formState.errors.price_per_month && (
+                <p className="text-sm text-red-600">{form.formState.errors.price_per_month.message}</p>
+              )}
+              <p className="text-xs text-gray-500">
+                Wroomly charges a 5% platform fee on successful transactions.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Security deposit ($) — optional</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                <Input
+                  type="number"
+                  className="pl-7"
+                  placeholder="Same as 1 month's rent"
+                  {...form.register('deposit_amount')}
+                />
+              </div>
+            </div>
+
+            <div className="bg-amber-50 rounded-xl p-4 text-sm text-amber-800">
+              <p className="font-medium mb-1">How payments work</p>
+              <p>
+                The consumer pays deposit + first month via Stripe. Funds are held in escrow and
+                released to you on the move-in date. You&apos;ll receive the amount minus a 5% fee.
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Step 4: Review */}
-        {step === 4 && (
+        {/* Step 3: Review */}
+        {step === 3 && (
           <div className="space-y-5">
             <h2 className="text-lg font-semibold text-gray-900">Review your listing</h2>
             <div className="bg-gray-50 rounded-xl p-5 space-y-3 text-sm">
               {[
-                { label: 'Type', value: form.watch('type') === 'sublet' ? 'Sublet' : 'Housing swap' },
                 { label: 'Title', value: form.watch('title') },
                 { label: 'Neighborhood', value: form.watch('neighborhood') },
                 { label: 'Bedrooms', value: form.watch('bedrooms') === 0 ? 'Studio' : `${form.watch('bedrooms')} bed` },
                 { label: 'Available', value: `${formatMonthLabel(form.watch('available_from'))} → ${formatMonthLabel(form.watch('available_to'))}` },
-                ...(listingType === 'sublet' ? [{ label: 'Price', value: `$${form.watch('price_per_month')}/mo` }] : []),
+                { label: 'Price', value: `$${form.watch('price_per_month')}/mo` },
                 { label: 'Photos', value: `${photos.length} photo${photos.length !== 1 ? 's' : ''}` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex items-start justify-between gap-4">

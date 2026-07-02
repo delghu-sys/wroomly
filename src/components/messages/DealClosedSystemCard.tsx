@@ -23,17 +23,14 @@ export function DealClosedSystemCard({
   isConsumer,
 }: DealClosedSystemCardProps) {
   const payloadStr = rawContent.slice('::deal_closed::'.length)
-  let data: { title?: string; listing_id?: string; type?: string } = {}
+  let data: { title?: string; listing_id?: string } = {}
   try {
     data = JSON.parse(payloadStr)
   } catch {}
 
-  const isSwap = data.type === 'swap'
-  const headline = isSwap ? 'Swap confirmed' : 'Deal confirmed'
+  const headline = 'Deal confirmed'
   const sub = isConsumer
-    ? isSwap
-      ? 'This swap is set — the listing is now off the market. You can still open it any time for the details.'
-      : 'This place is yours — the listing is now off the market. You can still open it any time for the details.'
+    ? 'This place is yours — the listing is now off the market. You can still open it any time for the details.'
     : 'You marked this place as taken. It’s off the market and other pending inquiries were declined.'
 
   return (

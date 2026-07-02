@@ -76,9 +76,9 @@ export default async function ApplicationsPage() {
                     </Link>
                     <p className="text-sm text-ink-muted mt-1">
                       {listing?.neighborhood} ·{' '}
-                      {listing?.type === 'sublet' && listing?.price_per_month
+                      {listing?.price_per_month
                         ? <span className="font-display text-ink">{formatCents(listing.price_per_month)}/mo</span>
-                        : <span className="font-display text-navy">Swap</span>}
+                        : <span className="font-display text-ink-muted">Price TBD</span>}
                     </p>
                     <p className="text-xs text-ink-muted mt-1.5">
                       Applied {format(parseISO(inq.created_at), 'MMM d, yyyy')}

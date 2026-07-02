@@ -1,5 +1,5 @@
 export type UserType = 'supplier' | 'consumer' | 'admin'
-export type ListingType = 'sublet' | 'swap'
+export type ListingType = 'sublet'
 export type ListingStatus = 'draft' | 'pending_review' | 'active' | 'rented' | 'swapped' | 'archived'
 export type InquiryStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
 export type TransactionType = 'deposit' | 'first_month' | 'monthly' | 'refund'

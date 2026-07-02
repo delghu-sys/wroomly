@@ -165,7 +165,7 @@ export default function SignUpClient({
           headline1="Make room for"
           headline2="connection."
           accentWords={['connection.']}
-          subhead="Join thousands of U of M students who sublet and swap housing through a verified, secure marketplace."
+          subhead="Join thousands of U of M students who sublet housing through a verified, secure marketplace."
           testimonials={TESTIMONIALS}
         />
 
@@ -298,7 +298,7 @@ export default function SignUpClient({
             </h2>
             <p className="text-ink-soft mt-3 leading-relaxed">
               {isSupplier
-                ? 'List your U of M housing for sublet or swap.'
+                ? 'List your U of M housing for sublet.'
                 : 'Find housing near the University of Michigan.'}
             </p>
           </motion.div>

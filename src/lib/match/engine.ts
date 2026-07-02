@@ -17,7 +17,7 @@ import type { MatchCriteria } from '@/types/database'
 /** Subset of a listing the engine compares against. Prices in cents. */
 export interface MatchableListing {
   id: string
-  type: string // 'sublet' | 'swap'
+  type: string
   title: string
   price_per_month: number | null // cents
   bedrooms: number | null
@@ -79,7 +79,7 @@ export function scoreListing(
   const reasons: string[] = []
 
   // Wroomly Match is for renters looking for a place — only rentable sublet
-  // supply is relevant. Swaps need something to swap, so they never match.
+  // supply is relevant.
   if (listing.type !== 'sublet') return NO_MATCH
 
   let weight = 0
