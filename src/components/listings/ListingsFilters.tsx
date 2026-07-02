@@ -98,7 +98,7 @@ export function ListingsFilters({
     'text-[10px] uppercase tracking-[0.15em] text-ink-muted font-semibold'
 
   return (
-    <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl border border-white/60 p-5 space-y-5 sticky top-20 shadow-[0_2px_16px_oklch(0_0_0/0.04)]">
+    <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl border border-white/60 p-5 space-y-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto shadow-[0_2px_16px_oklch(0_0_0/0.04)]">
       {/* Soft inner highlight for glass refraction */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl"
