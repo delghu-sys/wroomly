@@ -157,6 +157,27 @@ class ControlLineFilter {
 }
 
 /**
+ * Mark the newest turn as a prompt-cache breakpoint so the whole prefix (system
+ * + every prior turn) is written once and read back at ~0.1x on the next turn.
+ * The system prompt alone is ~1.1k tokens — under Sonnet 4.6's 2048-token cache
+ * floor — so this is a silent no-op for the first few turns and only starts
+ * paying off once the conversation prefix crosses the floor. Never a
+ * correctness risk: an uncacheable prefix just isn't cached.
+ */
+function withConversationCache(
+  messages: Anthropic.MessageParam[],
+): Anthropic.MessageParam[] {
+  const last = messages[messages.length - 1]
+  if (!last || typeof last.content !== 'string') return messages
+  const out = messages.slice()
+  out[out.length - 1] = {
+    role: last.role,
+    content: [{ type: 'text', text: last.content, cache_control: { type: 'ephemeral' } }],
+  }
+  return out
+}
+
+/**
  * One concierge turn, streamed. Prose tokens flow through onText as the model
  * generates them; resolves with the parsed control (chips / finished) once the
  * turn completes.
@@ -165,17 +186,26 @@ export async function streamChatTurn(
   history: ChatTurnInput[],
   onText: (chunk: string) => void,
 ): Promise<ChatControl> {
-  const messages: Anthropic.MessageParam[] =
+  const mapped: Anthropic.MessageParam[] =
     history.length === 0
       ? [{ role: 'user', content: '(The renter just opened the chat. Greet them briefly and ask your first question.)' }]
       : history.map(m => ({ role: m.role, content: m.content }))
+
+  // The client renders a hardcoded opening greeting (an assistant turn) with no
+  // preceding user message — so the model isn't paying a round-trip for turn
+  // zero. The API requires the first message to be 'user', so prepend a
+  // synthetic opener; the model still sees its greeting as context and picks up
+  // the thread.
+  if (mapped[0]?.role === 'assistant') {
+    mapped.unshift({ role: 'user', content: '(The renter just opened the chat.)' })
+  }
 
   const filter = new ControlLineFilter(onText)
   const stream = getAnthropic().messages.stream({
     model: CHAT_MODEL,
     max_tokens: 700,
     system: CHAT_SYSTEM,
-    messages,
+    messages: withConversationCache(mapped),
   })
 
   for await (const event of stream) {
