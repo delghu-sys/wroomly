@@ -36,7 +36,9 @@ export async function POST(request: Request) {
     // No body — keep default 'onboard'.
   }
 
-  const { data: profile } = await supabase
+  // Service role — own row, but stripe_account_id is unreadable by
+  // authenticated after 029.
+  const { data: profile } = await createServiceClient()
     .from('users')
     .select('stripe_account_id, user_type')
     .eq('id', user.id)

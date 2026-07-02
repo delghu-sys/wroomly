@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { stripe, calculateFees } from '@/lib/stripe'
 import { PAYMENTS_ENABLED } from '@/lib/config'
 
@@ -70,7 +70,9 @@ export async function POST(request: Request) {
     )
   }
 
-  const { data: listing } = await supabase
+  // Service role: the join reads the supplier's stripe_account_id, unreadable
+  // by authenticated after 029 (route is auth- + accepted-inquiry-gated above).
+  const { data: listing } = await createServiceClient()
     .from('listings')
     .select('*, users:supplier_id(stripe_account_id)')
     .eq('id', listing_id)
@@ -107,8 +109,9 @@ export async function POST(request: Request) {
 
   const { platformFee, totalChargeCents } = calculateFees(rentCents)
 
-  // Get or create Stripe customer for the consumer.
-  const { data: profile } = await supabase
+  // Get or create Stripe customer for the consumer. Service role — own row,
+  // but stripe_customer_id/email are unreadable by authenticated after 029.
+  const { data: profile } = await createServiceClient()
     .from('users')
     .select('stripe_customer_id, email')
     .eq('id', user.id)

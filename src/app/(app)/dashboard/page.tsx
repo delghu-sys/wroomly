@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Home, MessageSquare, Search, Star, Plus, ArrowRight, CheckCircle2 } from 'lucide-react'
@@ -19,7 +19,9 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/sign-in')
 
-  const { data: profileData } = await supabase
+  // Own profile via the service role — `select('*')` includes stripe_account_id
+  // (used below for the payout banner) which authenticated can't read after 029.
+  const { data: profileData } = await createServiceClient()
     .from('users')
     .select('*')
     .eq('id', user.id)

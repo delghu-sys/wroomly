@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { DollarSign, Clock, CheckCircle2, Wallet } from 'lucide-react'
 import { formatCents } from '@/lib/utils/listing'
@@ -22,7 +22,9 @@ export default async function PayoutsPage() {
   if (!user) redirect('/sign-in')
 
   const [profileRes, transactionsRes] = await Promise.all([
-    supabase
+    // stripe_account_id is no longer readable by authenticated (029); own row
+    // via the service role.
+    createServiceClient()
       .from('users')
       .select('user_type, stripe_account_id')
       .eq('id', user.id)
