@@ -1,22 +1,22 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { nextChatTurn, type ChatTurnInput } from '@/lib/match/llm'
+import { streamChatTurn, type ChatTurnInput } from '@/lib/match/llm'
+import { allowMatchRequest, CHAT_LIMITS } from '@/lib/match/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-export const maxDuration = 30
+export const maxDuration = 60
 
 /**
  * POST /api/match/chat
  *
- * Drives one adaptive turn of the Wroomly Match interview. Body is the running
- * transcript; we ask the LLM for the next message + chips, then stream the
- * message text to the client as NDJSON so it renders progressively (matching the
- * design's typing feel), followed by a final control frame with chips + the
- * `finished` flag.
+ * One turn of the concierge interview, TRUE-streamed: prose tokens are
+ * forwarded to the client the moment the model emits them (no buffer-then-
+ * dribble), followed by a final control frame with quick-reply chips + the
+ * `finished` flag parsed from the model's control line.
  *
- * Public + anonymous on purpose (no account needed). It only talks to the LLM —
- * no DB writes happen here, so there's nothing to authorize.
+ * Public + anonymous on purpose (no account needed). It only talks to the
+ * LLM — no DB writes happen here, so there's nothing to authorize.
  *
  * Frames (newline-delimited JSON):
  *   {"t":"chunk","v":"Hey "}
@@ -30,7 +30,7 @@ const bodySchema = z.object({
         content: z.string().min(1).max(2000),
       }),
     )
-    .max(40),
+    .max(60),
 })
 
 export async function POST(request: Request) {
@@ -42,14 +42,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
 
-  let turn
-  try {
-    turn = await nextChatTurn(history)
-  } catch (err) {
-    console.error('[match/chat] turn failed', err)
+  // Public + anonymous LLM call — refuse before hitting Anthropic once the
+  // global circuit-breaker trips, so this can't be scripted into a big bill.
+  if (!(await allowMatchRequest({ bucket: 'chat' }, CHAT_LIMITS))) {
     return NextResponse.json(
-      { error: 'The assistant is unavailable right now. Please try again.' },
-      { status: 503 },
+      { error: 'The concierge is busy right now. Please try again in a bit.' },
+      { status: 429 },
     )
   }
 
@@ -58,23 +56,19 @@ export async function POST(request: Request) {
     async start(controller) {
       const send = (obj: unknown) =>
         controller.enqueue(encoder.encode(JSON.stringify(obj) + '\n'))
-
-      // Stream the message word-by-word for a natural typing reveal.
-      const words = turn.message.split(/(\s+)/) // keep the whitespace tokens
-      for (const w of words) {
-        if (!w) continue
-        send({ t: 'chunk', v: w })
-        // Small jitter so it reads like typing, capped so it never drags.
-        await new Promise(r => setTimeout(r, 18))
+      try {
+        const control = await streamChatTurn(history, chunk =>
+          send({ t: 'chunk', v: chunk }),
+        )
+        send({ t: 'end', ...control })
+      } catch (err) {
+        console.error('[match/chat] turn failed', err)
+        // The client treats a missing 'end' frame after an error frame as a
+        // retryable failure.
+        send({ t: 'error', v: 'The concierge is unavailable right now. Please try again.' })
+      } finally {
+        controller.close()
       }
-
-      send({
-        t: 'end',
-        chips: turn.chips,
-        multi: turn.multi,
-        finished: turn.finished,
-      })
-      controller.close()
     },
   })
 

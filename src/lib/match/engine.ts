@@ -1,17 +1,27 @@
-import type { MatchCriteria } from '@/types/database'
+import type {
+  MatchAttr,
+  MatchProfile,
+  MatchReason,
+} from '@/types/database'
 
 /**
- * Wroomly Match — the scoring engine.
+ * Wroomly Match v2 — the weighted scoring engine.
  *
- * Pure and dependency-free on purpose: the only import is a type (elided at
- * runtime), so this file runs directly under `node --test` with no path-alias or
- * module resolution. Everything it needs is passed in as plain data.
+ * Pure and dependency-free on purpose: the only imports are types (elided at
+ * runtime), so this file runs directly under `node --test` with no path-alias
+ * or module resolution. Everything it needs is passed in as plain data.
  *
- * Model: each criterion the renter specified is a HARD filter (a listing that
- * fails any one is not a match at all). Among the listings that clear every
- * filter, a soft 0–1 score ranks fit quality — dominated by how comfortably the
- * price sits inside the budget. Only matches at or above MATCH_THRESHOLD get
- * emailed.
+ * Model: scoring, not filtering.
+ *   1. Dealbreakers (and intrinsically-hard conditions like a missing required
+ *      amenity or a price beyond the stretch ceiling) are hard cuts.
+ *   2. Every other attribute earns a 0–1 fraction, weighted by the renter's
+ *      stated importance (profile.weights) with a multiplier for their ranked
+ *      top-3 priorities.
+ *   3. Flexibility is honored: a price in the (max, stretch_max] band takes a
+ *      penalty that SHRINKS when the renter's top priorities score strongly —
+ *      slightly over budget can still match when everything else is right.
+ *   4. Output is a 0–100 score plus machine-readable fit/miss reasons that
+ *      feed the personal email notes and the manage page.
  */
 
 /** Subset of a listing the engine compares against. Prices in cents. */
@@ -25,6 +35,8 @@ export interface MatchableListing {
   available_from: string // ISO date (YYYY-MM-DD)
   available_to: string // ISO date
   neighborhood: string | null
+  lat: number | null
+  lng: number | null
   furnished: boolean
   pets_allowed: boolean
   amenities: string[]
@@ -32,15 +44,27 @@ export interface MatchableListing {
 
 export interface MatchResult {
   pass: boolean
-  score: number // 0–1
-  reasons: string[]
+  score: number // 0–100, integer
+  fits: MatchReason[]
+  misses: MatchReason[]
 }
 
-/** Listings priced up to 8% over the stated max still surface (just ranked lower). */
-const PRICE_TOLERANCE = 0.08
-export const MATCH_THRESHOLD = 0.6
+/** Minimum 0–100 score to email the match. */
+export const MATCH_THRESHOLD = 62
 
-const NO_MATCH: MatchResult = { pass: false, score: 0, reasons: [] }
+/** Priority-rank weight multipliers (most-important first). */
+const PRIORITY_BOOST = [1.5, 1.3, 1.15]
+
+/** Effective travel speed by mode, meters/minute, including a 1.3× route
+ * factor baked in (straight-line distance × 1.3 ≈ street distance). */
+const MODE_SPEED: Record<string, number> = { walk: 80, bike: 240, bus: 130 }
+
+/** An attribute fraction only counts as a "fit" reason at or above this. */
+const FIT_BAR = 0.65
+
+const NO_MATCH: MatchResult = { pass: false, score: 0, fits: [], misses: [] }
+
+// ── Small pure helpers ──────────────────────────────────────────────────────
 
 const MONTHS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -51,135 +75,342 @@ function fmtMoney(dollars: number): string {
   return '$' + Math.round(dollars).toLocaleString('en-US')
 }
 
-/** Format an ISO date as "Jun 1" without pulling in date-fns. */
 function fmtDate(iso: string): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso)
   if (!m) return iso
-  const month = MONTHS[parseInt(m[2], 10) - 1] ?? ''
-  return `${month} ${parseInt(m[3], 10)}`
+  return `${MONTHS[parseInt(m[2], 10) - 1] ?? ''} ${parseInt(m[3], 10)}`
 }
 
-function fmtRange(from: string, to: string): string {
-  return `${fmtDate(from)}–${fmtDate(to)}`
+const DAY_MS = 86_400_000
+
+function days(iso: string): number {
+  const t = Date.parse(iso)
+  return Number.isNaN(t) ? NaN : t / DAY_MS
 }
 
-function bedroomLabel(n: number): string {
-  return n === 0 ? 'studio' : `${n}-bed`
+/** Straight-line distance in meters between two lat/lng points. */
+export function haversineMeters(
+  lat1: number, lng1: number, lat2: number, lng2: number,
+): number {
+  const R = 6_371_000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
 }
+
+/** Estimated door-to-door minutes from a listing to an anchor by mode. */
+export function commuteMinutes(
+  meters: number,
+  mode: string,
+): number {
+  const speed = MODE_SPEED[mode] ?? MODE_SPEED.walk
+  return meters / speed
+}
+
+// ── Per-attribute scoring ───────────────────────────────────────────────────
+// Each scorer returns null when the profile doesn't engage that attribute,
+// otherwise a 0–1 fraction, a short human detail, and whether the failure is
+// intrinsically a hard cut (independent of the dealbreakers list).
+
+interface AttrScore {
+  fraction: number
+  detail: string
+  hardFail?: boolean
+}
+
+function scoreBudget(
+  l: MatchableListing,
+  p: MatchProfile,
+  priorityStrength: number,
+): AttrScore | null {
+  const { min, max, stretch_max } = p.budget
+  if (min == null && max == null) return null
+  if (l.price_per_month == null)
+    return { fraction: 0, detail: 'no price listed' }
+  const dollars = l.price_per_month / 100
+
+  // Absolute ceiling: explicit stretch when given, else 8% grace over max.
+  const ceiling = max != null ? Math.max(stretch_max ?? 0, max * 1.08) : null
+  if (max != null && ceiling != null && dollars > ceiling) {
+    return {
+      fraction: 0,
+      hardFail: true,
+      detail: `${fmtMoney(dollars)}/mo is over your ${fmtMoney(ceiling)} ceiling`,
+    }
+  }
+
+  if (max == null || dollars <= max) {
+    // Suspiciously far below range often means a different kind of place.
+    if (min != null && min > 0 && dollars < min * 0.85) {
+      return { fraction: 0.3, detail: `${fmtMoney(dollars)}/mo — well below your range` }
+    }
+    return { fraction: 1, detail: `${fmtMoney(dollars)}/mo — inside your budget` }
+  }
+
+  // Stretch band (max, ceiling]: base penalty tapers with how deep into the
+  // band the price sits, then shrinks when top priorities score strongly.
+  const depth = (dollars - max) / (ceiling! - max) // 0..1
+  const base = 1 - depth * 0.6
+  const fraction = base + (1 - base) * Math.min(Math.max(priorityStrength, 0), 1) * 0.8
+  return {
+    fraction,
+    detail: `${fmtMoney(dollars)}/mo — over your ${fmtMoney(max)} budget but within your stretch`,
+  }
+}
+
+function scoreLocation(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  const { anchors, neighborhoods } = p.location
+  if (anchors.length === 0 && neighborhoods.length === 0) return null
+
+  let best: AttrScore | null = null
+
+  // Anchor commutes (needs listing coordinates).
+  if (l.lat != null && l.lng != null) {
+    for (const a of anchors) {
+      const mins = commuteMinutes(haversineMeters(l.lat, l.lng, a.lat, a.lng), a.mode)
+      const rounded = Math.max(1, Math.round(mins))
+      let fraction: number
+      if (mins <= a.max_minutes) fraction = 1
+      else if (mins >= a.max_minutes * 1.6) fraction = 0
+      else fraction = 1 - (mins - a.max_minutes) / (a.max_minutes * 0.6)
+      const detail =
+        fraction > 0
+          ? `≈${rounded} min ${a.mode} to ${a.name}`
+          : `≈${rounded} min ${a.mode} to ${a.name} — past your ${a.max_minutes}-min limit`
+      if (!best || fraction > best.fraction) best = { fraction, detail }
+    }
+  }
+
+  // Neighborhood membership.
+  if (neighborhoods.length > 0) {
+    const inList = l.neighborhood != null && neighborhoods.includes(l.neighborhood)
+    const nScore: AttrScore = inList
+      ? { fraction: 1, detail: `in ${l.neighborhood}` }
+      : {
+          fraction: 0,
+          detail: l.neighborhood
+            ? `in ${l.neighborhood}, outside your preferred areas`
+            : 'neighborhood unknown',
+        }
+    if (!best || nScore.fraction > best.fraction) best = nScore
+  }
+
+  return (
+    best ?? { fraction: 0, detail: 'location could not be compared' }
+  )
+}
+
+function scoreTiming(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  const { move_in, move_out, duration_months, flexibility } = p.timing
+  if (!move_in) return null
+
+  const start = days(move_in)
+  const inferredEnd =
+    move_out ??
+    (duration_months != null
+      ? new Date(Date.parse(move_in) + duration_months * 30 * DAY_MS)
+          .toISOString()
+          .slice(0, 10)
+      : move_in)
+  const end = days(inferredEnd)
+  const availFrom = days(l.available_from)
+  const availTo = days(l.available_to)
+  if ([start, end, availFrom, availTo].some(Number.isNaN))
+    return { fraction: 0, detail: 'dates could not be compared' }
+
+  const overlap = Math.min(end, availTo) - Math.max(start, availFrom)
+  const span = Math.max(end - start, 1)
+  const ratio = Math.max(0, Math.min(overlap / span, 1))
+
+  // No overlap at all is useless regardless of flexibility; a rigid renter
+  // also needs the window essentially covered.
+  if (ratio <= 0) {
+    return {
+      fraction: 0,
+      hardFail: true,
+      detail: `available ${fmtDate(l.available_from)} – ${fmtDate(l.available_to)}, outside your window`,
+    }
+  }
+  if (flexibility === 'rigid' && ratio < 0.85) {
+    return {
+      fraction: ratio,
+      hardFail: true,
+      detail: `only covers part of your dates (available ${fmtDate(l.available_from)} – ${fmtDate(l.available_to)})`,
+    }
+  }
+
+  return {
+    fraction: ratio,
+    detail:
+      ratio >= 0.999
+        ? `covers your ${fmtDate(move_in)} – ${fmtDate(inferredEnd)} window`
+        : `covers most of your dates (available ${fmtDate(l.available_from)} – ${fmtDate(l.available_to)})`,
+  }
+}
+
+function scoreSpace(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  const { bedrooms_min, bathrooms_min } = p.space
+  if (bedrooms_min == null && (bathrooms_min == null || bathrooms_min <= 0))
+    return null
+
+  const parts: number[] = []
+  const bits: string[] = []
+
+  if (bedrooms_min != null) {
+    const ok = l.bedrooms != null && l.bedrooms >= bedrooms_min
+    parts.push(ok ? 1 : 0)
+    bits.push(
+      l.bedrooms == null
+        ? 'bedrooms unlisted'
+        : l.bedrooms === 0
+          ? 'studio'
+          : `${l.bedrooms} bed`,
+    )
+  }
+  if (bathrooms_min != null && bathrooms_min > 0) {
+    const ok = l.bathrooms != null && l.bathrooms >= bathrooms_min
+    parts.push(ok ? 1 : 0.5) // a bath short is a caveat, not a disqualifier
+    if (l.bathrooms != null) bits.push(`${l.bathrooms} bath`)
+  }
+
+  const fraction = parts.reduce((a, b) => a + b, 0) / parts.length
+  return {
+    fraction,
+    detail:
+      fraction >= 1
+        ? bits.join(', ')
+        : `${bits.join(', ')} — smaller than you wanted`,
+  }
+}
+
+function scoreFurnished(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  if (p.furnished !== true) return null
+  return l.furnished
+    ? { fraction: 1, detail: 'furnished' }
+    : { fraction: 0, detail: 'not furnished' }
+}
+
+function scorePets(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  if (p.pets_required !== true) return null
+  return l.pets_allowed
+    ? { fraction: 1, detail: 'pet-friendly' }
+    : { fraction: 0, detail: 'no pets allowed' }
+}
+
+function scoreAmenities(l: MatchableListing, p: MatchProfile): AttrScore | null {
+  const { required, preferred } = p.amenities
+  if (required.length === 0 && preferred.length === 0) return null
+  const have = new Set(l.amenities)
+
+  const missingRequired = required.filter(a => !have.has(a))
+  if (missingRequired.length > 0) {
+    return {
+      fraction: 0,
+      hardFail: true, // "required" means required
+      detail: `missing ${missingRequired.join(', ').toLowerCase()}`,
+    }
+  }
+
+  const gotPreferred = preferred.filter(a => have.has(a))
+  const prefCoverage =
+    preferred.length > 0 ? gotPreferred.length / preferred.length : 1
+  // All required present anchors the fraction; preferred coverage fills it out.
+  const fraction = required.length > 0 ? 0.6 + prefCoverage * 0.4 : prefCoverage
+
+  const gotAll = [...required, ...gotPreferred]
+  const missedPref = preferred.filter(a => !have.has(a))
+  const detail =
+    gotAll.length > 0
+      ? `has ${gotAll.join(', ').toLowerCase()}` +
+        (missedPref.length > 0 ? ` (no ${missedPref.join(', ').toLowerCase()})` : '')
+      : `no ${missedPref.join(', ').toLowerCase()}`
+  return { fraction, detail }
+}
+
+// ── Main entry ──────────────────────────────────────────────────────────────
+
+type Scorer = (l: MatchableListing, p: MatchProfile) => AttrScore | null
+
+const SCORERS: [MatchAttr, Scorer][] = [
+  ['location', scoreLocation],
+  ['timing', scoreTiming],
+  ['space', scoreSpace],
+  ['furnished', scoreFurnished],
+  ['pets', scorePets],
+  ['amenities', scoreAmenities],
+]
 
 /**
- * Score a single listing against a renter's criteria. Returns whether it passes
- * the hard filters, a 0–1 fit score, and human reason fragments for the email's
- * "why it matched" line.
+ * Score one listing against a weighted profile. Returns pass/fail, a 0–100
+ * score, and machine-readable fit/miss reasons for the email + manage page.
  */
 export function scoreListing(
   listing: MatchableListing,
-  c: MatchCriteria,
+  p: MatchProfile,
 ): MatchResult {
-  const reasons: string[] = []
-
-  // Wroomly Match is for renters looking for a place — only rentable sublet
-  // supply is relevant.
+  // Only rentable sublet supply is relevant to renters.
   if (listing.type !== 'sublet') return NO_MATCH
 
-  let weight = 0
-  let earned = 0
+  const dealbreakerAttrs = new Set(p.dealbreakers.map(d => d.attr))
+  const results = new Map<MatchAttr, AttrScore>()
+  const fits: MatchReason[] = []
+  const misses: MatchReason[] = []
 
-  // ── Budget: hard cap (with tolerance) + soft closeness ──
-  if (c.budget_max != null || c.budget_min != null) {
-    const price = listing.price_per_month
-    if (price == null) return NO_MATCH // can't budget-match a priceless sublet
-    const dollars = price / 100
-    if (c.budget_max != null && dollars > c.budget_max * (1 + PRICE_TOLERANCE))
-      return NO_MATCH
-    if (c.budget_min != null && c.budget_min > 0 && dollars < c.budget_min * 0.85)
-      return NO_MATCH
+  // Pass 1: everything except budget (budget needs the others' strength).
+  for (const [attr, scorer] of SCORERS) {
+    const r = scorer(listing, p)
+    if (r) results.set(attr, r)
+  }
 
-    weight += 0.4
-    let closeness = 1
-    if (c.budget_max != null && dollars > c.budget_max) {
-      // In the tolerance band above max → taper the score.
-      const over = (dollars - c.budget_max) / (c.budget_max * PRICE_TOLERANCE)
-      closeness = 1 - Math.min(over, 1) * 0.5
+  // Priority strength drives the budget-stretch forgiveness: how well is this
+  // listing delivering on what the renter said matters most?
+  const strengthAttrs = (
+    p.priorities.filter(a => a !== 'budget') as MatchAttr[]
+  ).filter(a => results.has(a))
+  const pool = strengthAttrs.length > 0 ? strengthAttrs : [...results.keys()]
+  const priorityStrength =
+    pool.length > 0
+      ? pool.reduce((sum, a) => sum + results.get(a)!.fraction, 0) / pool.length
+      : 0
+
+  const budget = scoreBudget(listing, p, priorityStrength)
+  if (budget) results.set('budget', budget)
+
+  // Hard cuts: intrinsic hard failures, plus any dealbreaker attribute that
+  // scored poorly (the renter said it's non-negotiable).
+  for (const [attr, r] of results) {
+    const dealbreakerFail = dealbreakerAttrs.has(attr) && r.fraction < 0.35
+    if (r.hardFail || dealbreakerFail) {
+      misses.push({ kind: 'miss', attr, detail: r.detail })
+      return { pass: false, score: 0, fits: [], misses }
     }
-    earned += 0.4 * closeness
-    reasons.push(`${fmtMoney(dollars)}/mo`)
   }
 
-  // ── Bedrooms ──
-  if (c.bedrooms_min != null) {
-    if (listing.bedrooms != null && listing.bedrooms < c.bedrooms_min)
-      return NO_MATCH
-    weight += 0.15
-    earned += 0.15
-    if (listing.bedrooms != null) reasons.push(bedroomLabel(listing.bedrooms))
+  // Weighted 0–100 score with priority boosts.
+  let totalWeight = 0
+  let earned = 0
+  for (const [attr, r] of results) {
+    const baseWeight = p.weights[attr]
+    if (baseWeight == null || baseWeight <= 0) continue
+    const rank = p.priorities.indexOf(attr)
+    const weight = baseWeight * (rank >= 0 ? PRIORITY_BOOST[rank] ?? 1 : 1)
+    totalWeight += weight
+    earned += weight * r.fraction
+
+    const reason: MatchReason = {
+      kind: r.fraction >= FIT_BAR ? 'fit' : 'miss',
+      attr,
+      detail: r.detail,
+    }
+    ;(reason.kind === 'fit' ? fits : misses).push(reason)
   }
 
-  // ── Bathrooms ──
-  if (c.bathrooms_min != null && c.bathrooms_min > 0) {
-    if (listing.bathrooms != null && listing.bathrooms < c.bathrooms_min)
-      return NO_MATCH
-    weight += 0.05
-    earned += 0.05
-  }
+  if (totalWeight <= 0) return NO_MATCH
 
-  // ── Dates: listing availability window must overlap the desired window ──
-  if (c.date_start) {
-    const desiredStart = c.date_start
-    const desiredEnd = c.date_end ?? c.date_start
-    const overlaps =
-      listing.available_from <= desiredEnd && listing.available_to >= desiredStart
-    if (!overlaps) return NO_MATCH
-    weight += 0.2
-    earned += 0.2
-    reasons.push(`available ${fmtRange(listing.available_from, listing.available_to)}`)
-  }
-
-  // ── Location ──
-  if (c.neighborhoods.length > 0) {
-    if (!listing.neighborhood || !c.neighborhoods.includes(listing.neighborhood))
-      return NO_MATCH
-    weight += 0.2
-    earned += 0.2
-    reasons.push(`in ${listing.neighborhood}`)
-  }
-
-  // ── Furnished ──
-  if (c.furnished === true) {
-    if (!listing.furnished) return NO_MATCH
-    weight += 0.05
-    earned += 0.05
-    reasons.push('furnished')
-  }
-
-  // ── Pets ──
-  if (c.pets_required === true) {
-    if (!listing.pets_allowed) return NO_MATCH
-    weight += 0.05
-    earned += 0.05
-    reasons.push('pet-friendly')
-  }
-
-  // ── Amenities (all required must be present) ──
-  if (c.amenities.length > 0) {
-    const have = new Set(listing.amenities)
-    const missing = c.amenities.filter(a => !have.has(a))
-    if (missing.length > 0) return NO_MATCH
-    weight += 0.1
-    earned += 0.1
-    reasons.push(c.amenities.join(', ').toLowerCase())
-  }
-
-  // No criteria specified at all → nothing meaningful to match on.
-  const score = weight > 0 ? earned / weight : 0
-  return { pass: score >= MATCH_THRESHOLD, score, reasons }
-}
-
-/**
- * Compose the reason fragments into one "why it matched" sentence for the email.
- * e.g. ["$950/mo", "2-bed", "available Jun 1–Aug 20", "in Kerrytown"] →
- * "$950/mo · 2-bed · available Jun 1–Aug 20 · in Kerrytown".
- */
-export function matchReasonLine(reasons: string[]): string {
-  return reasons.join(' · ')
+  const score = Math.round((earned / totalWeight) * 100)
+  return { pass: score >= MATCH_THRESHOLD, score, fits, misses }
 }

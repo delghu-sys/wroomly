@@ -1,8 +1,8 @@
 import 'server-only'
 import { createServiceClient } from '@/lib/supabase/server'
 import { generateManageToken } from '@/lib/match/token'
-import { normalizeCriteria } from '@/lib/match/criteria'
-import type { MatchAlert, MatchCriteria, MatchFrequency } from '@/types/database'
+import { normalizeProfile } from '@/lib/match/profile'
+import type { MatchAlert, MatchFrequency, MatchProfile } from '@/types/database'
 
 /**
  * Service-layer helpers for match_alerts. All access uses the service-role
@@ -15,7 +15,7 @@ type Transcript = MatchAlert['transcript']
 
 export interface CreateAlertInput {
   email: string
-  criteria: MatchCriteria
+  profile: MatchProfile
   transcript: Transcript
   frequency?: MatchFrequency
   source?: string
@@ -25,14 +25,15 @@ export interface CreateAlertInput {
 /**
  * Create a new alert, or update the existing one for this email (one active
  * alert per address). Re-running the chat with the same email overwrites the
- * old criteria and re-activates it. Returns the row + whether it was new.
+ * old profile and re-activates it. Returns the row + whether it was new.
+ * The legacy `criteria` column is left untouched (rollback path only).
  */
 export async function createOrUpdateAlert(
   input: CreateAlertInput,
 ): Promise<{ alert: MatchAlert; isNew: boolean }> {
   const service = createServiceClient()
   const email = input.email.trim()
-  const criteria = normalizeCriteria(input.criteria)
+  const profile = normalizeProfile(input.profile)
   const now = new Date().toISOString()
 
   const { data: existing } = await service
@@ -45,7 +46,7 @@ export async function createOrUpdateAlert(
     const { data: updated } = await service
       .from('match_alerts')
       .update({
-        criteria,
+        profile,
         transcript: input.transcript,
         status: 'active',
         // Honor a re-stated frequency, else keep theirs.
@@ -62,7 +63,7 @@ export async function createOrUpdateAlert(
     .from('match_alerts')
     .insert({
       email,
-      criteria,
+      profile,
       transcript: input.transcript,
       status: 'active',
       frequency: input.frequency ?? 'instant',
@@ -97,11 +98,11 @@ export async function getAlertByToken(
 
 export async function updateAlertByToken(
   token: string,
-  patch: Partial<Pick<MatchAlert, 'criteria' | 'frequency' | 'status'>>,
+  patch: Partial<Pick<MatchAlert, 'profile' | 'frequency' | 'status'>>,
 ): Promise<MatchAlert | null> {
   const service = createServiceClient()
   const clean: Record<string, unknown> = {}
-  if (patch.criteria !== undefined) clean.criteria = normalizeCriteria(patch.criteria)
+  if (patch.profile !== undefined) clean.profile = normalizeProfile(patch.profile)
   if (patch.frequency !== undefined) clean.frequency = patch.frequency
   if (patch.status !== undefined) clean.status = patch.status
 

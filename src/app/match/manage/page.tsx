@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import '../match.css'
 import { getAlertByToken } from '@/lib/match/alerts'
-import { humanizeCriteria } from '@/lib/match/criteria'
-import { MatchManage } from './MatchManage'
+import { humanizeProfile, resolveProfile } from '@/lib/match/profile'
+import { createServiceClient } from '@/lib/supabase/server'
+import { MatchManage, type SentMatch } from './MatchManage'
 
 export const metadata: Metadata = {
   title: 'Manage your Wroomly Match alerts',
@@ -48,11 +49,46 @@ export default async function ManagePage({
     )
   }
 
+  const profile = resolveProfile(alert.profile, alert.criteria)
+
+  // Recent matches we've emailed (newest first) + their thumbs state, so the
+  // renter can see what the engine picked and why.
+  const service = createServiceClient()
+  const { data: sends } = await service
+    .from('match_alert_sends')
+    .select('id, listing_id, score, note, feedback, emailed_at, listings:listing_id ( title )')
+    .eq('alert_id', alert.id)
+    .order('emailed_at', { ascending: false })
+    .limit(10)
+
+  const history: SentMatch[] = ((sends ?? []) as unknown as {
+    id: string
+    listing_id: string
+    score: number | null
+    note: string | null
+    feedback: 'up' | 'down' | null
+    emailed_at: string
+    listings: { title: string } | { title: string }[] | null
+  }[]).map(s => {
+    const l = Array.isArray(s.listings) ? s.listings[0] : s.listings
+    return {
+      id: s.id,
+      listingId: s.listing_id,
+      title: l?.title ?? 'Listing',
+      score: s.score != null ? Math.round(s.score) : null,
+      note: s.note,
+      feedback: s.feedback,
+      emailedAt: s.emailed_at,
+    }
+  })
+
   return (
     <MatchManage
       token={alert.manage_token}
       email={alert.email}
-      tags={humanizeCriteria(alert.criteria)}
+      profile={profile}
+      tags={humanizeProfile(profile)}
+      history={history}
       initialStatus={alert.status}
       initialFrequency={alert.frequency}
       justUnsubscribed={unsubscribed === '1'}

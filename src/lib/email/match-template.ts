@@ -42,6 +42,10 @@ export function unsubscribeUrl(token: string): string {
   return `${APP_URL}/api/match/unsubscribe?token=${encodeURIComponent(token)}`
 }
 
+export function feedbackUrl(token: string, sendId: string, v: 'up' | 'down'): string {
+  return `${APP_URL}/api/match/feedback?token=${encodeURIComponent(token)}&send=${encodeURIComponent(sendId)}&v=${v}`
+}
+
 function shell(opts: {
   preheader: string
   bodyHtml: string
@@ -83,10 +87,15 @@ export interface MatchEmailListing {
   available_from: string | null
   available_to: string | null
   first_image_path: string | null
-  reason: string
+  /** 0–100 engine score, shown as the match badge. */
+  score: number
+  /** The LLM-written personal note (why it fits, one honest caveat, timing). */
+  note: string
+  /** Send-row id powering the thumbs feedback links. */
+  send_id: string
 }
 
-function listingCard(l: MatchEmailListing): string {
+function listingCard(l: MatchEmailListing, token: string, rank: number | null): string {
   const price = l.price_per_month
     ? `$${(l.price_per_month / 100).toLocaleString()}/mo`
     : ''
@@ -99,19 +108,38 @@ function listingCard(l: MatchEmailListing): string {
     .join(' · ')
   const img = l.first_image_path ? getListingImageUrl(l.first_image_path) : null
 
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-bottom:16px;border:1px solid #e7ebf2;border-radius:16px;overflow:hidden;">
-${img ? `<tr><td><img src="${img}" alt="" width="560" style="display:block;width:100%;max-height:220px;object-fit:cover;" /></td></tr>` : ''}
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-bottom:18px;border:1px solid #e7ebf2;border-radius:16px;overflow:hidden;">
+${img ? `<tr><td style="position:relative;"><img src="${img}" alt="" width="560" style="display:block;width:100%;max-height:220px;object-fit:cover;" /></td></tr>` : ''}
 <tr><td style="padding:16px 18px;">
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+<td style="vertical-align:top;">
+${rank != null ? `<p style="margin:0 0 4px;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#b8860b;">#${rank} pick</p>` : ''}
 <p style="margin:0 0 6px;font-size:16px;font-weight:700;color:${NAVY};letter-spacing:-0.01em;line-height:1.25;">${escapeHtml(l.title)}</p>
 <p style="margin:0 0 10px;font-size:13px;color:#6b7686;">${escapeHtml(meta)}</p>
-<p style="margin:0 0 14px;font-size:12.5px;color:#2f6bff;background:#eef3ff;border-radius:8px;padding:7px 10px;line-height:1.4;">
-✨ Why it matched: ${escapeHtml(l.reason)}</p>
+</td>
+<td style="vertical-align:top;text-align:right;width:72px;">
+<span style="display:inline-block;background:${NAVY};color:${MAIZE};font-size:13px;font-weight:800;border-radius:999px;padding:7px 12px;">${l.score}%</span>
+</td>
+</tr></table>
+<p style="margin:0 0 14px;font-size:13.5px;color:#37455a;background:#f6f8fc;border-left:3px solid ${MAIZE};border-radius:0 10px 10px 0;padding:10px 12px;line-height:1.55;">${escapeHtml(l.note)}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+<td>
 <a href="${APP_URL}/listings/${l.id}" style="display:inline-block;background:${MAIZE};color:${NAVY};font-size:13px;font-weight:700;text-decoration:none;padding:10px 18px;border-radius:999px;">View this place →</a>
+</td>
+<td style="text-align:right;font-size:12px;color:#6b7686;white-space:nowrap;">
+<a href="${feedbackUrl(token, l.send_id, 'up')}" style="display:inline-block;text-decoration:none;border:1px solid #e7ebf2;border-radius:999px;padding:8px 12px;color:${NAVY};font-size:13px;margin-right:6px;">👍</a>
+<a href="${feedbackUrl(token, l.send_id, 'down')}" style="display:inline-block;text-decoration:none;border:1px solid #e7ebf2;border-radius:999px;padding:8px 12px;color:${NAVY};font-size:13px;">👎</a>
+</td>
+</tr></table>
 </td></tr></table>`
 }
 
 /** Sent immediately on opt-in (single opt-in). Confirms the alert is live. */
-export function matchWelcomeEmail(opts: { tags: string[]; token: string }) {
+export function matchWelcomeEmail(opts: {
+  tags: string[]
+  summary?: string | null
+  token: string
+}) {
   const tagsHtml = opts.tags.length
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr><td>${opts.tags
         .map(
@@ -121,64 +149,70 @@ export function matchWelcomeEmail(opts: { tags: string[]; token: string }) {
         .join('')}</td></tr></table>`
     : ''
 
+  const summaryHtml = opts.summary
+    ? `<p style="margin:0 0 18px;font-size:13.5px;color:#37455a;background:#f6f8fc;border-left:3px solid ${MAIZE};border-radius:0 10px 10px 0;padding:10px 12px;line-height:1.55;">${escapeHtml(opts.summary)}</p>`
+    : ''
+
   const body = `
     <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#b8860b;">You're all set</p>
     <h1 style="margin:0 0 16px;font-size:24px;line-height:1.2;letter-spacing:-0.02em;color:${NAVY};font-weight:700;">
       We'll watch for your place.
     </h1>
     <p style="margin:0 0 18px;font-size:14px;color:#4a5666;line-height:1.55;">
-      The moment a Wroomly listing matches what you're looking for, you'll get an email — usually before it spreads anywhere else. Here's what we're watching for:
+      The moment a Wroomly listing scores well against your profile, you'll get a personal note on why it fits — usually before it spreads anywhere else. Here's what we heard:
     </p>
+    ${summaryHtml}
     ${tagsHtml}
     <p style="margin:0;font-size:13px;color:#6b7686;line-height:1.5;">
-      Need to tweak anything? <a href="${manageUrl(opts.token)}" style="color:${BLUE};text-decoration:underline;">Update your preferences</a> any time.
+      You're also first in line for Wroomly's renter launch. Need to tweak anything?
+      <a href="${manageUrl(opts.token)}" style="color:${BLUE};text-decoration:underline;">Update your preferences</a> any time.
     </p>
   `
 
   return {
     subject: `You're on the list — we'll email you when a match drops`,
     html: shell({
-      preheader: `Wroomly Match is now watching for places that fit your search.`,
+      preheader: `Wroomly Match is now watching for places that fit your profile.`,
       bodyHtml: body,
       token: opts.token,
     }),
   }
 }
 
-/** A new-match alert — one listing or a digest of several. */
+/** A match email — one scored listing, or a ranked digest of the top few. */
 export function matchAlertEmail(opts: {
-  listings: MatchEmailListing[]
+  listings: MatchEmailListing[] // ranked best-first
+  subject: string
   token: string
 }) {
   const count = opts.listings.length
-  const cardsHtml = opts.listings.map(listingCard).join('')
+  const cardsHtml = opts.listings
+    .map((l, i) => listingCard(l, opts.token, count > 1 ? i + 1 : null))
+    .join('')
 
   const heading =
-    count === 1
-      ? `A new place matched your search.`
-      : `${count} new places matched your search.`
+    count === 1 ? `This one fits your profile.` : `Your top ${count}, ranked.`
+  const eyebrow = count === 1 ? 'New match' : 'Your matches'
 
   const body = `
-    <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#b8860b;">New match</p>
+    <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#b8860b;">${eyebrow}</p>
     <h1 style="margin:0 0 18px;font-size:23px;line-height:1.2;letter-spacing:-0.02em;color:${NAVY};font-weight:700;">
       ${heading}
     </h1>
     ${cardsHtml}
     <p style="margin:20px 0 0;font-size:13px;color:#6b7686;line-height:1.5;">
-      The fastest reply usually wins — send an inquiry if it's a fit.
+      Good Ann Arbor places move in days — the fastest inquiry usually wins.
+      The 👍 / 👎 buttons teach your matches to get sharper.
     </p>
   `
 
   return {
-    subject:
-      count === 1
-        ? `A new place just matched your search`
-        : `${count} new places matched your search`,
+    subject: opts.subject,
     html: shell({
       preheader:
         count === 1
-          ? `A new Wroomly listing fits what you're looking for.`
-          : `${count} new Wroomly listings fit what you're looking for.`,
+          ? `A Wroomly listing scored ${opts.listings[0].score}% against your profile.`
+          : `${count} Wroomly listings scored well against your profile — ranked for you.`,
       bodyHtml: body,
       token: opts.token,
     }),

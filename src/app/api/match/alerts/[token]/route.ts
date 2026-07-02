@@ -1,23 +1,24 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAlertByToken, updateAlertByToken } from '@/lib/match/alerts'
-import { humanizeCriteria, normalizeCriteria } from '@/lib/match/criteria'
+import { humanizeProfile, normalizeProfile, resolveProfile } from '@/lib/match/profile'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
  * GET  /api/match/alerts/[token]  — fetch the alert behind a manage token.
- * PATCH /api/match/alerts/[token] — edit criteria, change frequency, pause /
- *                                   resume, or unsubscribe.
+ * PATCH /api/match/alerts/[token] — edit the weighted profile, change
+ *                                   frequency, pause / resume, or unsubscribe.
  *
  * The token is the sole credential (no login). We never expose other alerts.
  */
 function publicView(alert: NonNullable<Awaited<ReturnType<typeof getAlertByToken>>>) {
+  const profile = resolveProfile(alert.profile, alert.criteria)
   return {
     email: alert.email,
-    criteria: alert.criteria,
-    tags: humanizeCriteria(alert.criteria),
+    profile,
+    tags: humanizeProfile(profile),
     status: alert.status,
     frequency: alert.frequency,
   }
@@ -34,7 +35,7 @@ export async function GET(
 }
 
 const patchSchema = z.object({
-  criteria: z.unknown().optional(),
+  profile: z.unknown().optional(),
   frequency: z.enum(['instant', 'daily']).optional(),
   status: z.enum(['active', 'paused', 'unsubscribed']).optional(),
 })
@@ -53,7 +54,7 @@ export async function PATCH(
   }
 
   const updated = await updateAlertByToken(token, {
-    ...(body.criteria !== undefined ? { criteria: normalizeCriteria(body.criteria) } : {}),
+    ...(body.profile !== undefined ? { profile: normalizeProfile(body.profile) } : {}),
     ...(body.frequency !== undefined ? { frequency: body.frequency } : {}),
     ...(body.status !== undefined ? { status: body.status } : {}),
   })
