@@ -86,7 +86,9 @@ export default async function ListingsPage({
     query = query.eq('type', filters.type)
   }
   if (filters.neighborhood) {
-    query = query.eq('neighborhood', filters.neighborhood)
+    // Multi-select: comma-joined neighborhoods → match any of them.
+    const hoods = filters.neighborhood.split(',').filter(Boolean)
+    if (hoods.length) query = query.in('neighborhood', hoods)
   }
   if (filters.property_type) {
     query = query.eq('property_type', filters.property_type)
@@ -101,7 +103,9 @@ export default async function ListingsPage({
     query = query.lte('price_per_month', parseInt(filters.max_price) * 100)
   }
   if (filters.bedrooms) {
-    query = query.eq('bedrooms', parseInt(filters.bedrooms))
+    // Multi-select: comma-joined bedroom counts → match any of them.
+    const beds = filters.bedrooms.split(',').map(n => parseInt(n)).filter(n => Number.isInteger(n))
+    if (beds.length) query = query.in('bedrooms', beds)
   }
   if (filters.available_from) {
     query = query.lte('available_from', filters.available_from)

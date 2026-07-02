@@ -57,7 +57,9 @@ export function ListingsFilters({
   const updateFilters = useCallback(
     (patch: Record<string, string | undefined>) => {
       const params = new URLSearchParams()
-      const merged = { ...currentFilters, ...patch }
+      // Changing any filter resets pagination — a user on page 6 who narrows
+      // the results would otherwise land on an out-of-range page.
+      const merged = { ...currentFilters, ...patch, page: undefined }
       for (const [k, v] of Object.entries(merged)) {
         if (v) params.set(k, v)
       }
@@ -70,6 +72,23 @@ export function ListingsFilters({
     (key: string, value: string | undefined) => updateFilters({ [key]: value }),
     [updateFilters]
   )
+
+  // Multi-select filters store their picks as a comma-joined value.
+  const multiValues = useCallback(
+    (key: string) => (currentFilters[key] ?? '').split(',').map(s => s.trim()).filter(Boolean),
+    [currentFilters]
+  )
+  const toggleMulti = useCallback(
+    (key: string, value: string) => {
+      const cur = multiValues(key)
+      const next = cur.includes(value) ? cur.filter(v => v !== value) : [...cur, value]
+      updateFilter(key, next.length ? next.join(',') : undefined)
+    },
+    [multiValues, updateFilter]
+  )
+
+  const selectedNeighborhoods = multiValues('neighborhood')
+  const selectedBedrooms = multiValues('bedrooms')
 
   const clearAll = () => router.push(pathname)
 
@@ -176,23 +195,40 @@ export function ListingsFilters({
 
       <Separator className="bg-line/70" />
 
-      {/* Neighborhood */}
+      {/* Neighborhood (multi-select) */}
       <div className="relative space-y-2">
-        <Label className={tinyLabel}>Neighborhood</Label>
-        <Select
-          value={currentFilters.neighborhood ?? ''}
-          onValueChange={v => updateFilter('neighborhood', v || undefined)}
-        >
-          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
-            <SelectValue placeholder="Any neighborhood" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">Any neighborhood</SelectItem>
-            {neighborhoods.map(n => (
-              <SelectItem key={n} value={n}>{n}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center justify-between">
+          <Label className={tinyLabel}>Neighborhood</Label>
+          {selectedNeighborhoods.length > 0 && (
+            <button
+              type="button"
+              onClick={() => updateFilter('neighborhood', undefined)}
+              className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {neighborhoods.map(n => {
+            const active = selectedNeighborhoods.includes(n)
+            return (
+              <button
+                key={n}
+                type="button"
+                aria-pressed={active}
+                onClick={() => toggleMulti('neighborhood', n)}
+                className={`text-sm px-3 py-1.5 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
+                  active
+                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
+                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
+                }`}
+              >
+                {n}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <Separator className="bg-line/70" />
@@ -256,7 +292,7 @@ export function ListingsFilters({
 
       <Separator className="bg-line/70" />
 
-      {/* Bedrooms */}
+      {/* Bedrooms (multi-select) */}
       <div className="relative space-y-2">
         <Label className={tinyLabel}>Bedrooms</Label>
         <div className="grid grid-cols-3 gap-1.5">
@@ -268,11 +304,19 @@ export function ListingsFilters({
             { value: '3', label: '3' },
             { value: '4', label: '4' },
           ].map(opt => {
-            const active = (currentFilters.bedrooms ?? '') === opt.value
+            const active =
+              opt.value === ''
+                ? selectedBedrooms.length === 0
+                : selectedBedrooms.includes(opt.value)
             return (
               <button
                 key={opt.value}
-                onClick={() => updateFilter('bedrooms', opt.value || undefined)}
+                aria-pressed={active}
+                onClick={() =>
+                  opt.value === ''
+                    ? updateFilter('bedrooms', undefined)
+                    : toggleMulti('bedrooms', opt.value)
+                }
                 className={`text-sm py-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
                     ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
