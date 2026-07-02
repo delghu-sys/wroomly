@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { AdminUserActions } from '@/components/admin/AdminUserActions'
@@ -28,8 +28,11 @@ export default async function AdminUsersPage({
     .single()
   if ((me as { user_type?: string } | null)?.user_type !== 'admin') redirect('/dashboard')
 
+  // Admin console lists + searches users by email — unreadable by authenticated
+  // after 029, so this admin-gated query runs under the service role.
+  const service = createServiceClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query: any = supabase
+  let query: any = service
     .from('users')
     .select('*')
     .order('created_at', { ascending: false })

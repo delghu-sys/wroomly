@@ -40,7 +40,7 @@ export default async function ListPlacePage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('user_type, email')
+    .select('user_type')
     .eq('id', authUser.id)
     .single()
 
@@ -49,8 +49,9 @@ export default async function ListPlacePage() {
     redirect('/listings/new')
   }
 
-  // Consumer signed in — show the explanatory screen.
-  const email = (profile as { email?: string } | null)?.email ?? authUser.email ?? ''
+  // Consumer signed in — show the explanatory screen. Email comes from the auth
+  // session, not the users table (authenticated can't read it after 029).
+  const email = authUser.email ?? ''
 
   return (
     <div className="min-h-[calc(100dvh-4rem)] flex items-center justify-center px-4 sm:px-6 py-12">

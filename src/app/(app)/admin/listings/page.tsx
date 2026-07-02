@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { AdminListingActions } from '@/components/admin/AdminListingActions'
 import { AdminAutoReviewSweep } from '@/components/admin/AdminAutoReviewSweep'
 import { Badge } from '@/components/ui/badge'
@@ -31,7 +31,9 @@ export default async function AdminListingsPage({
   const { data: profileData } = await supabase.from('users').select('user_type').eq('id', user.id).single()
   if ((profileData as { user_type?: string } | null)?.user_type !== 'admin') redirect('/dashboard')
 
-  const { data: listingsData } = await supabase
+  // The supplier join pulls email (for the admin review queue), unreadable by
+  // authenticated after 029 — this admin-gated query runs under the service role.
+  const { data: listingsData } = await createServiceClient()
     .from('listings')
     .select(`
       *,

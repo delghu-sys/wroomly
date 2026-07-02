@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { FooterGate } from '@/components/layout/FooterGate'
 import { PageTransition } from '@/components/layout/PageTransition'
@@ -20,7 +20,11 @@ export default async function AppLayout({
   let unreadCount = 0
 
   if (authUser) {
-    const profileRes = await supabase
+    // Own profile via the service role: `select('*')` now includes columns the
+    // authenticated role can no longer read (email/phone/stripe_*) after
+    // migration 029, so an authenticated `*` read would be denied. This is the
+    // user's own row on their own request, so service-role is safe here.
+    const profileRes = await createServiceClient()
       .from('users')
       .select('*')
       .eq('id', authUser.id)
@@ -45,7 +49,10 @@ export default async function AppLayout({
 
       const effectiveType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
 
-      const upsertRes = await supabase
+      // Service-role: the returning `select('*')` includes email/stripe_* which
+      // the authenticated role can no longer read (029). Own row, verified
+      // session email — safe.
+      const upsertRes = await createServiceClient()
         .from('users')
         .upsert(
           {

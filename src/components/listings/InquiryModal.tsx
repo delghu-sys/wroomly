@@ -111,16 +111,18 @@ export function InquiryModal({
     // interest on an honest waitlist (seed_inquiry) instead of opening a fake
     // "message sent to landlord" chat thread. No conversation, no email.
     if (listing.source === 'seed') {
-      const { data: profile } = await supabase
-        .from('users')
-        .select('full_name, email')
-        .eq('id', authUserId)
-        .maybeSingle()
+      // full_name is still readable by authenticated; the inquirer's own email
+      // comes from the auth session, not the users table (029 revoked the
+      // column from the client-facing grant).
+      const [{ data: profile }, { data: authData }] = await Promise.all([
+        supabase.from('users').select('full_name').eq('id', authUserId).maybeSingle(),
+        supabase.auth.getUser(),
+      ])
       const { error: seedErr } = await supabase.from('seed_inquiry').insert({
         listing_id: listing.id,
         user_id: authUserId,
         name: profile?.full_name ?? 'Wroomly user',
-        email: profile?.email ?? '',
+        email: authData.user?.email ?? '',
         message: data.message,
       })
       if (seedErr) {

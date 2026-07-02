@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { InquiryActions } from '@/components/inquiries/InquiryActions'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -23,7 +23,9 @@ export default async function InquiriesPage() {
   // Profile + listing-ids in parallel; we can't kick off Connect yet
   // because it depends on stripe_account_id from the profile row.
   const [profileRes, listingsRes] = await Promise.all([
-    supabase
+    // stripe_account_id is no longer readable by authenticated (029); own row
+    // via the service role.
+    createServiceClient()
       .from('users')
       .select('user_type, stripe_account_id')
       .eq('id', user.id)

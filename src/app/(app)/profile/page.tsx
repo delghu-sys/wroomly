@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 import { ChangePasswordCard } from '@/components/profile/ChangePasswordCard'
 import type { User, UserPhoto } from '@/types/database'
@@ -13,8 +13,10 @@ export default async function ProfilePage() {
   if (!user) redirect('/sign-in')
 
   // Profile + photos are independent — fan out so we save a round trip.
+  // Own profile via the service role: the settings form needs phone (and shows
+  // the account email), which authenticated can't read via `*` after 029.
   const [profileRes, photosRes] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user.id).single(),
+    createServiceClient().from('users').select('*').eq('id', user.id).single(),
     supabase
       .from('user_photos')
       .select('*')

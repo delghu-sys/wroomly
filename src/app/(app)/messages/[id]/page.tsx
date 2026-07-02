@@ -33,8 +33,11 @@ interface ConvoRow {
     neighborhood: string | null
     listing_images: { storage_path: string; display_order: number }[] | null
   } | null
-  supplier: { id: string; full_name: string | null; avatar_url: string | null; email: string | null; phone: string | null } | null
-  consumer: { id: string; full_name: string | null; avatar_url: string | null; email: string | null; phone: string | null } | null
+  // email/phone are NOT joined here — authenticated can't read them (029). The
+  // counterpart's contact is fetched separately via the service role, only
+  // after the membership + acceptance checks pass (see below).
+  supplier: { id: string; full_name: string | null; avatar_url: string | null } | null
+  consumer: { id: string; full_name: string | null; avatar_url: string | null } | null
 }
 
 interface InquiryRow {
@@ -67,8 +70,8 @@ export default async function ConversationPage({
       .select(`
         *,
         listings(id, title, type, status, price_per_month, available_from, available_to, neighborhood, listing_images(storage_path, display_order)),
-        supplier:supplier_id(id, full_name, avatar_url, email, phone),
-        consumer:consumer_id(id, full_name, avatar_url, email, phone)
+        supplier:supplier_id(id, full_name, avatar_url),
+        consumer:consumer_id(id, full_name, avatar_url)
       `)
       .eq('id', id)
       .single(),
@@ -131,7 +134,9 @@ export default async function ConversationPage({
   // supplier can always accept (it's just a match).
   let supplierPayoutReady = true
   if (PAYMENTS_ENABLED) {
-    const { data: supplierProfile } = await supabase
+    // Supplier's stripe_account_id (a counterpart's column) — unreadable by
+    // authenticated after 029. Membership was verified above; service role.
+    const { data: supplierProfile } = await createServiceClient()
       .from('users')
       .select('stripe_account_id')
       .eq('id', conv.supplier_id)
@@ -147,14 +152,23 @@ export default async function ConversationPage({
   // Only computed when payments are off + the inquiry is accepted.
   const viewerIsSupplier = conv.supplier_id === user.id
   const otherParty = viewerIsSupplier ? conv.consumer : conv.supplier
-  const otherContact =
-    !PAYMENTS_ENABLED && inquiry?.status === 'accepted' && otherParty
-      ? {
-          name: otherParty.full_name,
-          email: otherParty.email,
-          phone: otherParty.phone,
-        }
-      : null
+  // Participant-gated counterpart contact read: only after membership is
+  // verified (line above), the inquiry is accepted, and payments are off do we
+  // reveal the other party's email/phone — and only then via the service role,
+  // never off the client-facing users grant.
+  let otherContact: { name: string | null; email: string | null; phone: string | null } | null = null
+  if (!PAYMENTS_ENABLED && inquiry?.status === 'accepted' && otherParty) {
+    const { data: contact } = await createServiceClient()
+      .from('users')
+      .select('email, phone')
+      .eq('id', otherParty.id)
+      .single()
+    otherContact = {
+      name: otherParty.full_name,
+      email: contact?.email ?? null,
+      phone: contact?.phone ?? null,
+    }
+  }
 
   // Shape listing for ThreadView
   const firstImage = conv.listings?.listing_images

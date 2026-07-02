@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { PAYMENTS_ENABLED } from '@/lib/config'
 import type Stripe from 'stripe'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { stripe, calculateFees, PLATFORM_FEE_PERCENT } from '@/lib/stripe'
 
 const schema = z.object({
@@ -70,8 +70,10 @@ export async function POST(request: Request) {
     )
   }
 
-  // Fetch listing + supplier's Connect account in one round-trip.
-  const { data: listing } = await supabase
+  // Fetch listing + supplier's Connect account in one round-trip. Service role
+  // because the join reads the supplier's stripe_account_id, which authenticated
+  // can't read after 029 (route is already auth-gated above).
+  const { data: listing } = await createServiceClient()
     .from('listings')
     .select(`
       id,
@@ -149,8 +151,9 @@ export async function POST(request: Request) {
   const releaseDate = inquiry.move_in_date ?? listing.available_from
 
   try {
-    // Get or create Stripe customer for the consumer.
-    const { data: profile } = await supabase
+    // Get or create Stripe customer for the consumer. Service role — own row,
+    // but stripe_customer_id/email are unreadable by authenticated after 029.
+    const { data: profile } = await createServiceClient()
       .from('users')
       .select('stripe_customer_id, email')
       .eq('id', user.id)
