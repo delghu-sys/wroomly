@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { MatchProfile } from '@/types/database'
 import { ATTR_LABELS } from '@/lib/match/profile'
+import { GREETING_TEXT, GREETING_CHIPS } from '@/lib/match/greeting'
 
 /**
  * Wroomly Match — the renter-facing experience. Four states on one page (intro →
@@ -197,26 +198,31 @@ export function MatchExperience() {
     return liveMessages.current
   }
 
-  function startChat() {
-    setScreen('chat')
-    setMessages([])
-    setChips([])
+  /**
+   * Open the chat on the deterministic greeting with no model call — the renter
+   * sees the first question instantly instead of waiting ~5s for turn zero. The
+   * greeting is a real assistant message in the transcript, so the model picks
+   * up the thread when the renter answers.
+   */
+  function openWithGreeting() {
+    setMessages([{ id: crypto.randomUUID(), role: 'assistant', content: GREETING_TEXT }])
+    setChips(GREETING_CHIPS)
+    setMulti(false)
     setSelected([])
     setFinished(false)
     setInput('')
-    void runTurn([])
+  }
+
+  function startChat() {
+    setScreen('chat')
+    openWithGreeting()
   }
 
   function resetChat() {
     setScreen('chat')
-    setMessages([])
-    setChips([])
-    setSelected([])
-    setFinished(false)
-    setInput('')
     setProfile(null)
     setTags([])
-    void runTurn([])
+    openWithGreeting()
   }
 
   function sendUser(text: string) {

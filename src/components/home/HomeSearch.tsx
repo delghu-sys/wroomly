@@ -24,7 +24,7 @@ const ease = [0.22, 1, 0.36, 1] as const
 const CHIPS: { label: string; href: string }[] = [
   { label: 'Near Central Campus', href: '/listings?neighborhood=Central+Campus' },
   { label: 'Summer sublet', href: '/listings?type=sublet' },
-  { label: 'Under $1,000', href: '/listings?max_price=1000' },
+  { label: 'Under $1,300', href: '/listings?max_price=1300' },
   { label: 'Furnished', href: '/listings?furnished=true' },
 ]
 

@@ -22,7 +22,7 @@ interface QuickFilterChipsProps {
  * These are the "I just want to browse" entry points for students who
  * won't open a sidebar. Each chip is a multi-key preset (e.g. "Near
  * campus" sets `neighborhood=Central Campus,South University,…` and
- * "Under $1000" sets `max_price=1000`). Tapping again clears that
+ * "Under $1300" sets `max_price=1300`). Tapping again clears that
  * preset's keys.
  *
  * Renders horizontally scrollable on mobile so 6+ chips don't wrap into
@@ -40,11 +40,11 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
   const presets = useMemo(
     () => [
       {
-        id: 'under-1000',
-        label: 'Under $1000',
+        id: 'under-1300',
+        label: 'Under $1300',
         icon: DollarSign,
-        isActive: () => currentFilters.max_price === '1000',
-        apply: { max_price: '1000' },
+        isActive: () => currentFilters.max_price === '1300',
+        apply: { max_price: '1300' },
         clear: ['max_price'],
       },
       {
