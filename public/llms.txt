@@ -1,0 +1,34 @@
+# Wroomly
+
+> Wroomly is a sublet and student-housing marketplace built exclusively for verified University of Michigan students in Ann Arbor. Every account is confirmed with an @umich.edu email before a user can list a place or contact a host, so listings and inquiries come only from real U-M students. Wroomly focuses on summer and term-time sublets near campus, with guides on subletting safely, avoiding scams, and getting security deposits back under Michigan law.
+
+## About
+
+- Audience: University of Michigan students subletting or finding a place in Ann Arbor
+- Coverage: Ann Arbor neighborhoods around Central, North, and Medical campuses
+- Verification: @umich.edu email required for every account
+- Cost: listing a place is free; browsing is free
+
+## Guides
+
+- [How to sublet your apartment at the University of Michigan](https://wroomly.app/guides/how-to-sublet-your-apartment-at-university-of-michigan): Step-by-step on pricing, landlord approval, and finding a subletter as a U-M student.
+- [Summer sublets in Ann Arbor: a student's guide](https://wroomly.app/guides/summer-sublets-in-ann-arbor-student-guide): How the Ann Arbor summer sublet market works, timing, and typical rents near campus.
+- [How to avoid sublet scams in Ann Arbor](https://wroomly.app/guides/how-to-avoid-sublet-scams-ann-arbor): Red flags, safe payment practices, and how to verify a listing is real.
+- [Security deposits for Ann Arbor sublets: what to know](https://wroomly.app/guides/security-deposits-ann-arbor-sublets): Michigan deposit law, the 30-day return rule, and documenting move-in/move-out.
+
+## Neighborhoods
+
+- [Central Campus](https://wroomly.app/ann-arbor/central-campus)
+- [North Campus](https://wroomly.app/ann-arbor/north-campus)
+- [South University](https://wroomly.app/ann-arbor/south-university)
+- [Kerrytown](https://wroomly.app/ann-arbor/kerrytown)
+- [Old West Side](https://wroomly.app/ann-arbor/old-west-side)
+- [Burns Park](https://wroomly.app/ann-arbor/burns-park)
+- [Downtown](https://wroomly.app/ann-arbor/downtown)
+
+## Key pages
+
+- [Browse listings](https://wroomly.app/listings): Current sublets and rooms available near U-M.
+- [All guides](https://wroomly.app/guides): Every Wroomly guide plus a frequently-asked-questions section.
+- [About Wroomly](https://wroomly.app/about): What Wroomly is and who it's for.
+- [Sitemap](https://wroomly.app/sitemap.xml)

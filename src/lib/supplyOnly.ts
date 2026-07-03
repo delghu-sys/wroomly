@@ -29,6 +29,13 @@ const ALLOWED_EXACT = new Set<string>([
   // Supplier "list your place" landing + chooser.
   '/list-place',
   '/start-listing',
+  // Content-marketing surface — kept crawlable during supply-only so search /
+  // AI engines keep indexing and citing our SEO content through the pre-launch
+  // window. These pages don't expose the renter product (no inventory browsing
+  // or booking), so showing them to everyone is safe. The actual product — the
+  // home page, /listings, and Wroomly Match — stays gated.
+  '/about',
+  '/llms.txt',
 ])
 
 const ALLOWED_PREFIXES = [
@@ -40,6 +47,11 @@ const ALLOWED_PREFIXES = [
   '/sitemap',
   '/robots',
   '/manifest',
+  // Content-marketing surface (see note in ALLOWED_EXACT). Guides, Ann Arbor
+  // neighborhood pages, and building pages stay crawlable during supply-only.
+  '/guides',
+  '/ann-arbor',
+  '/buildings',
 ]
 // NOTE: Wroomly Match (/match, /api/match) is intentionally NOT listed here —
 // the AI chat stays gated behind /coming-soon during SUPPLY_ONLY_MODE and only
