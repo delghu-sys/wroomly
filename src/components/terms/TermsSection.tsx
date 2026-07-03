@@ -36,7 +36,7 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
         [&_ul>li]:before:bg-[oklch(0.84_0.17_85)]
         [&_ol>li]:text-ink-soft [&_ol>li]:leading-relaxed [&_ol>li]:pl-1
         [&_ol>li::marker]:text-[oklch(0.45_0.13_85)] [&_ol>li::marker]:font-semibold
-        [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:hover:underline
+        [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:underline
       "
     >
       {/* Watermark section number — kept under 10% so it reads as

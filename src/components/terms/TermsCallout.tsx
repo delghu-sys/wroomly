@@ -13,7 +13,7 @@ interface TermsCalloutProps {
  */
 export function TermsCallout({ title, children }: TermsCalloutProps) {
   return (
-    <aside
+    <div
       className="
         not-prose relative my-6
         rounded-3xl overflow-hidden
@@ -59,6 +59,6 @@ export function TermsCallout({ title, children }: TermsCalloutProps) {
           </div>
         </div>
       </div>
-    </aside>
+    </div>
   )
 }

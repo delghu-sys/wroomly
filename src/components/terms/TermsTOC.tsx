@@ -71,7 +71,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
   return (
     <>
       {/* ── Desktop: sticky sidebar ── */}
-      <nav className="hidden lg:block sticky top-24 self-start max-h-[calc(100dvh-7rem)] overflow-y-auto pr-2">
+      <nav aria-label="On this page" className="hidden lg:block sticky top-24 self-start max-h-[calc(100dvh-7rem)] overflow-y-auto pr-2">
         <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted font-semibold mb-3 pl-3">
           On this page
         </p>

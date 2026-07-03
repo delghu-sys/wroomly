@@ -39,7 +39,14 @@ export function CardGallery({ images, alt }: { images: string[]; alt: string }) 
       <div
         ref={ref}
         onScroll={onScroll}
-        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden"
+        // When there's more than one photo the strip is a horizontally
+        // scrollable region — make it keyboard-focusable and named so it isn't
+        // a pointer-only control (WCAG 2.1.1 / scrollable-region-focusable).
+        // Arrow keys scroll a focused overflow container natively.
+        tabIndex={multi ? 0 : undefined}
+        role={multi ? 'group' : undefined}
+        aria-label={multi ? `${alt} — ${images.length} photos, use arrow keys` : undefined}
+        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[oklch(0.84_0.17_85/0.60)]"
         style={{ scrollbarWidth: 'none' }}
       >
         {images.map((src, i) => (

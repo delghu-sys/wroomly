@@ -107,9 +107,11 @@ export function BrandListingCard({
           {/* Content */}
           <div className="p-5">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display text-[17px] leading-snug text-ink line-clamp-1 group-hover:text-[oklch(0.45_0.13_85)] transition-colors duration-300">
+              {/* h2: each card is a top-level item under the page h1 (home /
+                  browse grids have no intervening h2), so h3 skipped a level. */}
+              <h2 className="font-display text-[17px] leading-snug text-ink line-clamp-1 group-hover:text-[oklch(0.45_0.13_85)] transition-colors duration-300">
                 {listing.title}
-              </h3>
+              </h2>
               {supplierRating && (
                 <span className="inline-flex items-center gap-0.5 text-xs text-ink shrink-0 mt-0.5">
                   <Star className="w-3 h-3 fill-[oklch(0.84_0.17_85)] stroke-[oklch(0.84_0.17_85)]" />

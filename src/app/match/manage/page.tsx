@@ -26,7 +26,7 @@ export default async function ManagePage({
           <nav className="navbar navbar-light">
             <Link href="/" className="logo" aria-label="Wroomly home">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="Wroomly" width={26} height={26} />
+              <img src="/logo.png" alt="" width={26} height={26} />
               <span className="logo-word logo-dark">wroomly</span>
             </Link>
           </nav>

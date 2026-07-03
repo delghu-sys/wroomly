@@ -218,8 +218,8 @@ export default async function StartListingPage() {
               wroomly
             </span>
           </div>
-          <p className="text-white/[0.36] text-xs">
-            <a href="https://wroomly.app" className="hover:text-white/60 transition">
+          <p className="text-white/70 text-xs">
+            <a href="https://wroomly.app" className="underline underline-offset-2 hover:text-white transition">
               wroomly.app
             </a>{' '}
             · © {new Date().getFullYear()} Wroomly · Not affiliated with the

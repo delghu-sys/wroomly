@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
 import type { ListingImage } from '@/types/database'
 import { getListingImageUrl } from '@/lib/utils/listing'
-import { ChevronLeft, ChevronRight, BedDouble, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, BedDouble, X, Expand } from 'lucide-react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
 
 interface BrandedGalleryProps {
@@ -56,22 +56,14 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
   return (
     <>
       <div className="space-y-3">
-        {/* Main image with crossfade. Wrapped as a `role="button"` so
-            keyboard users can open the lightbox with Enter/Space — the
-            nested prev/next chevrons are still real <button>s, so we
-            avoid the invalid-HTML nested-button pattern. */}
+        {/* Main image. A plain container (mouse click opens the lightbox as a
+            progressive enhancement) — it is NOT a button, because it holds the
+            prev/next chevron <button>s and an interactive control must not nest
+            focusable controls. Keyboard/AT users open the lightbox via the
+            dedicated "Open full-size photos" button rendered below. */}
         <div
-          role="button"
-          tabIndex={0}
-          aria-label="Open photo lightbox"
-          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.22_0.075_256)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.50)]"
+          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[oklch(0.22_0.075_256)] cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)]"
           onClick={() => setLightboxOpen(true)}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              setLightboxOpen(true)
-            }
-          }}
         >
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.div
@@ -104,6 +96,20 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             }}
             aria-hidden
           />
+
+          {/* Keyboard/AT path into the lightbox (replaces the old role=button
+              container, which nested the chevron buttons). */}
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation()
+              setLightboxOpen(true)
+            }}
+            aria-label="Open full-size photos"
+            className="absolute right-4 top-4 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-[0_4px_12px_oklch(0_0_0/0.20)] transition-all duration-300 active:scale-[0.92] hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.50)]"
+          >
+            <Expand className="w-4 h-4" />
+          </button>
 
           {images.length > 1 && (
             <>
