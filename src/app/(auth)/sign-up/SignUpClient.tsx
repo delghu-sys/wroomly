@@ -17,34 +17,10 @@ import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
 import { AuthDivider } from '@/components/auth/AuthDivider'
 import { RoleSelectorCards, type Role } from '@/components/auth/RoleSelectorCards'
 import { RoleContinueCta } from '@/components/auth/RoleContinueCta'
-import type { Testimonial } from '@/components/auth/RotatingTestimonial'
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      'Found a sublet for my summer internship in three days. Way better than scrolling Facebook groups and texting strangers.',
-    name: 'Alex T.',
-    university: 'U of M, Class of ’25',
-    initials: 'AT',
-    rating: 5,
-  },
-  {
-    quote:
-      'Listed my apartment for fall semester and had two verified inquiries within 48 hours. Payment cleared the day I handed over the keys.',
-    name: 'Priya R.',
-    university: 'U of M, Class of ’26',
-    initials: 'PR',
-    rating: 5,
-  },
-  {
-    quote:
-      'Wroomly is the only place I trust for sublets. Verified emails, real students, no DM weirdness — exactly what student housing should be.',
-    name: 'Marcus W.',
-    university: 'U of M, Class of ’24',
-    initials: 'MW',
-    rating: 5,
-  },
-]
+// NOTE: no testimonials on auth panels until real ones exist — see the note
+// in SignInClient.tsx. Real match stories (with permission) go back in via
+// the panel's `testimonials` prop.
 
 const termsAgreement = z.literal(true, {
   message: 'You must agree to the Terms of Service to continue',
@@ -165,8 +141,7 @@ export default function SignUpClient({
           headline1="Make room for"
           headline2="connection."
           accentWords={['connection.']}
-          subhead="Join thousands of U of M students who sublet housing through a verified, secure marketplace."
-          testimonials={TESTIMONIALS}
+          subhead="Sublet housing through a marketplace built just for U of M students — every account verified with an @umich.edu email."
         />
 
         <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
@@ -260,7 +235,6 @@ export default function SignUpClient({
             ? 'Going abroad or interning? Sublet your apartment to a verified student in a few minutes.'
             : 'Browse verified listings from U of M students. Real students, private messaging, no surprises.'
         }
-        testimonials={TESTIMONIALS}
       />
 
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">

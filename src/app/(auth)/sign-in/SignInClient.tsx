@@ -14,26 +14,12 @@ import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
 import { AuthDivider } from '@/components/auth/AuthDivider'
-import type { Testimonial } from '@/components/auth/RotatingTestimonial'
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote:
-      'Found a sublet for my summer internship in three days. Way better than scrolling Facebook groups and texting strangers.',
-    name: 'Alex T.',
-    university: 'U of M, Class of ’25',
-    initials: 'AT',
-    rating: 5,
-  },
-  {
-    quote:
-      'Listed my apartment for fall semester and had two verified inquiries within 48 hours. Payment cleared the day I handed over the keys.',
-    name: 'Priya R.',
-    university: 'U of M, Class of ’26',
-    initials: 'PR',
-    rating: 5,
-  },
-]
+// NOTE: no testimonials on auth panels until real ones exist. Placeholder
+// quotes with invented names undercut the verification trust story — the
+// panel's trust badges carry the structural claims instead. When real match
+// stories land (with permission), pass them via the panel's `testimonials`
+// prop (RotatingTestimonial is kept for exactly that).
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -86,7 +72,6 @@ function SignInForm() {
         headline2="wolverine."
         accentWords={['wolverine.']}
         subhead="Make room for connection — sign in to manage your listings, check messages, and stay on top of your housing."
-        testimonials={TESTIMONIALS}
       />
 
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
