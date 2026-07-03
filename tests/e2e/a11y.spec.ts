@@ -13,11 +13,21 @@ test('listings page is keyboard navigable', async ({ page }) => {
   await page.waitForLoadState('networkidle')
 
   // Tab a few times; we should never get stuck on a hidden element.
+  // NOTE: don't use `offsetParent === null` as the hidden check — the skip
+  // link becomes position:fixed when focused, and fixed elements always have
+  // a null offsetParent (false positive on a correctly visible element).
   for (let i = 0; i < 6; i++) {
     await page.keyboard.press('Tab')
     const focused = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null
-      return el ? { tag: el.tagName, hidden: el.offsetParent === null } : null
+      if (!el) return null
+      const rect = el.getBoundingClientRect()
+      const style = getComputedStyle(el)
+      const hidden =
+        (rect.width === 0 && rect.height === 0) ||
+        style.visibility === 'hidden' ||
+        style.display === 'none'
+      return { tag: el.tagName, hidden }
     })
     expect(focused?.hidden, `Tab ${i + 1}: focus landed on a hidden element`).toBeFalsy()
   }

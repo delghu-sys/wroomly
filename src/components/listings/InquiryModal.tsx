@@ -16,9 +16,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { formatCents } from '@/lib/utils/listing'
 import { FeeNote } from '@/components/brand/FeeNote'
+import { track } from '@/lib/track'
 
 const schema = z.object({
-  message: z.string().min(20, 'Please write at least 20 characters'),
+  message: z
+    .string()
+    .min(20, 'Please write at least 20 characters')
+    .max(2000, 'Please keep it under 2,000 characters'),
   move_in_date: z.string().optional(),
   move_out_date: z.string().optional(),
 })
@@ -232,6 +236,7 @@ export function InquiryModal({
     }).catch(() => {})
 
     // Success phase — show in-modal confirmation, then close + navigate
+    track('inquiry_sent')
     setPhase('success')
     setTimeout(() => {
       onClose()
@@ -353,6 +358,7 @@ export function InquiryModal({
                       </Label>
                       <Textarea
                         rows={5}
+                        maxLength={2000}
                         placeholder="A few sentences about you — your school, dates, why this place is a good fit."
                         {...register('message')}
                         className="rounded-2xl border-line focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.18)] focus-visible:border-[oklch(0.45_0.13_85)] text-[14px]"

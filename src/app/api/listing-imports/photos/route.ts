@@ -1,17 +1,26 @@
 import { NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
-import { uploadImportImages, UploadError } from '@/lib/listing-import/uploads'
+import { UPLOAD_LIMITS } from '@/lib/listing-import/schema'
+import { verifyUploadedPaths, signImportUrls, UploadError } from '@/lib/listing-import/uploads'
 
 export const runtime = 'nodejs'
-export const maxDuration = 30
+
+const bodySchema = z.object({
+  token: z.string().min(1),
+  paths: z.array(z.string().min(1).max(300)).min(1).max(UPLOAD_LIMITS.maxFiles),
+})
 
 /**
  * POST /api/listing-imports/photos
- * Lets the authenticated claimer add real housing photos at review time —
- * essential for text-only imports (which arrive with zero photos but still
- * need ≥1 to publish). Multipart: token + photos[]. Appends to the request's
- * personal_image_paths and returns the new {path,url}s for the picker.
+ *
+ * Phase 2 of the review-time photo upload (phase 1: ./upload-urls mints
+ * signed targets, the browser PUTs straight to storage). Verifies the
+ * claimed paths against the bucket (existence, prefix, images-only, size),
+ * appends them to the draft, and returns fresh signed READ urls for the
+ * picker. Essential for text-only imports, which arrive with zero photos
+ * but still need ≥1 to publish.
  */
 export async function POST(request: Request) {
   const supabase = await createClient()
@@ -20,33 +29,18 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Please sign in first.' }, { status: 401 })
 
-  let form: FormData
+  let body: z.infer<typeof bodySchema>
   try {
-    form = await request.formData()
+    body = bodySchema.parse(await request.json())
   } catch {
     return NextResponse.json({ error: 'Invalid upload.' }, { status: 400 })
-  }
-  const token = form.get('token')
-  if (typeof token !== 'string' || !token) {
-    return NextResponse.json({ error: 'Missing token.' }, { status: 400 })
-  }
-  const files = form.getAll('photos').filter((f): f is File => f instanceof File)
-  if (files.length === 0) {
-    return NextResponse.json({ error: 'No photos provided.' }, { status: 400 })
-  }
-  // Review-time uploads become listing photos — images only, not PDFs.
-  if (files.some(f => f.type === 'application/pdf')) {
-    return NextResponse.json(
-      { error: 'Listing photos must be images (JPG, PNG, or WebP), not PDFs.' },
-      { status: 400 },
-    )
   }
 
   const service = createServiceClient()
   const { data: req } = await service
     .from('listing_import_requests')
     .select('id, status, claim_token_expires_at, claimed_by_user_id, listing_id, personal_image_paths')
-    .eq('claim_token_hash', hashClaimToken(token))
+    .eq('claim_token_hash', hashClaimToken(body.token))
     .maybeSingle()
 
   if (!req || req.status !== 'completed')
@@ -58,15 +52,22 @@ export async function POST(request: Request) {
   if (req.claimed_by_user_id !== user.id)
     return NextResponse.json({ error: 'You don’t have access to this draft.' }, { status: 403 })
 
-  let uploaded
+  // Never trust the client's paths — verify against storage. Images only:
+  // these become public listing photos.
+  const existing = new Set(req.personal_image_paths ?? [])
+  const fresh = body.paths.filter(p => !existing.has(p))
+  let verified: string[]
   try {
-    uploaded = await uploadImportImages(files, { requestId: req.id, kind: 'personal' })
+    verified = await verifyUploadedPaths(req.id, fresh, 'personal', { imagesOnly: true })
   } catch (err) {
-    const message = err instanceof UploadError ? err.message : 'Upload failed. Please try again.'
+    const message = err instanceof UploadError ? err.message : 'Could not verify the photos.'
     return NextResponse.json({ error: message }, { status: 400 })
   }
+  if (verified.length === 0) {
+    return NextResponse.json({ error: 'No new photos found.' }, { status: 400 })
+  }
 
-  const nextPaths = [...(req.personal_image_paths ?? []), ...uploaded.map(u => u.path)]
+  const nextPaths = [...(req.personal_image_paths ?? []), ...verified]
   const { error } = await service
     .from('listing_import_requests')
     .update({ personal_image_paths: nextPaths })
@@ -76,5 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Could not save photos.' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, photos: uploaded })
+  const signed = await signImportUrls(verified)
+  const photos = verified.map(path => ({ path, url: signed[path] ?? '' }))
+  return NextResponse.json({ ok: true, photos })
 }

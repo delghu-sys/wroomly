@@ -64,6 +64,13 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Sentry browser tunnel (next.config tunnelRoute). Auth-gating this
+  // redirects error envelopes from logged-out visitors to /sign-in → 405,
+  // silently losing every anonymous client-side error. Must stay public.
+  if (pathname === '/monitoring') {
+    return supabaseResponse
+  }
+
   // AI Listing Importer API. /api/listing-imports (create) is intentionally
   // public — a visitor without an account submits here. The claim/publish
   // sub-routes enforce their own auth, so let them through the middleware
@@ -75,6 +82,12 @@ export async function middleware(request: NextRequest) {
   // Public renter-waitlist endpoint (supply-only). Validates its own input and
   // needs no session, so never gate it behind auth.
   if (pathname.startsWith('/api/waitlist')) {
+    return supabaseResponse
+  }
+
+  // Anonymous funnel-event sink (allowlisted names, fire-and-forget). Must
+  // work for logged-out visitors — that's the whole funnel.
+  if (pathname === '/api/events') {
     return supabaseResponse
   }
 
@@ -197,6 +210,9 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // `_vercel` MUST be excluded or the auth gate below redirects
+    // /_vercel/insights/script.js to /sign-in and Web Analytics records
+    // nothing (Vercel's documented matcher requirement).
+    '/((?!_next/static|_next/image|_vercel|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

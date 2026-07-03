@@ -16,6 +16,8 @@ const bodySchema = z.object({
   confirmedPhotoPaths: z.array(z.string()).default([]),
   userConfirmedAccuracy: z.boolean(),
   userConfirmedEnrichment: z.boolean().default(false),
+  // Listing intentionally has no end date (month-to-month / flexible).
+  openEnded: z.boolean().default(false),
 })
 
 function derivePetsAllowed(petPolicy: string | null): boolean {
@@ -63,8 +65,22 @@ export async function POST(request: Request) {
       { error: 'This listing was already published.', listingId: req.listing_id },
       { status: 409 },
     )
-  if (req.claimed_by_user_id !== user.id)
+  // Auto-claim when unclaimed: the review page's claim call is fire-and-forget,
+  // so a fast publisher (or a dropped claim request) must not dead-end on 403.
+  // Holding the raw token from the email IS the claim credential.
+  if (req.claimed_by_user_id == null) {
+    const { error: claimErr } = await service
+      .from('listing_import_requests')
+      .update({ claimed_by_user_id: user.id, claimed_at: new Date().toISOString() })
+      .eq('id', req.id)
+      .is('claimed_by_user_id', null)
+    if (claimErr) {
+      console.error('[listing-imports/publish] auto-claim failed', claimErr)
+      return NextResponse.json({ error: 'Could not claim the draft.' }, { status: 500 })
+    }
+  } else if (req.claimed_by_user_id !== user.id) {
     return NextResponse.json({ error: 'You don’t have access to this draft.' }, { status: 403 })
+  }
 
   // PDFs are AI source material, never listing photos — drop any that slip in.
   const confirmedPhotoPaths = body.confirmedPhotoPaths.filter(isPublishablePhotoPath)
@@ -84,6 +100,7 @@ export async function POST(request: Request) {
     enrichmentUsed,
     userConfirmedEnrichment: body.userConfirmedEnrichment,
     confirmedPhotoCount: confirmedPhotoPaths.length,
+    openEnded: body.openEnded,
   })
   if (!check.ok) {
     return NextResponse.json(
@@ -109,7 +126,7 @@ export async function POST(request: Request) {
       price_per_month: draft.rentMonthly != null ? Math.round(draft.rentMonthly * 100) : null,
       deposit_amount: draft.depositAmount != null ? Math.round(draft.depositAmount * 100) : null,
       available_from: draft.availableFrom,
-      available_to: draft.availableTo,
+      available_to: body.openEnded ? null : draft.availableTo,
       bedrooms: draft.bedrooms != null ? Math.round(draft.bedrooms) : null,
       bathrooms: draft.bathrooms,
       furnished: draft.furnished ?? false,
@@ -126,6 +143,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Could not publish the listing.' }, { status: 500 })
   }
   const listingId = listing.id as string
+
+  // Atomic double-publish guard: link the request to the listing only if no
+  // other concurrent publish beat us to it. A double-tap / retry race would
+  // otherwise create two live listings from one draft.
+  const { data: linked } = await service
+    .from('listing_import_requests')
+    .update({ listing_id: listingId })
+    .eq('id', req.id)
+    .is('listing_id', null)
+    .select('id')
+  if (!linked || linked.length === 0) {
+    // Lost the race — remove our duplicate and return the winner.
+    await service.from('listings').delete().eq('id', listingId)
+    const { data: winner } = await service
+      .from('listing_import_requests')
+      .select('listing_id')
+      .eq('id', req.id)
+      .single()
+    return NextResponse.json(
+      { error: 'This listing was already published.', listingId: winner?.listing_id ?? null },
+      { status: 409 },
+    )
+  }
 
   // Confirmed photos live in the PRIVATE imports bucket. Copy each chosen
   // photo into the PUBLIC listing-images bucket (same path) so the live
@@ -155,11 +195,8 @@ export async function POST(request: Request) {
     )
   }
 
-  // Link the request to the published listing (prevents re-publish).
-  await service
-    .from('listing_import_requests')
-    .update({ listing_id: listingId })
-    .eq('id', req.id)
+  // (The request → listing link happened atomically above, right after the
+  // insert, so a concurrent publish can never produce two live listings.)
 
   // Published an imported listing → fire Wroomly Match alerts now that its
   // photos + amenities are in place (fire-and-forget; guards source='user').

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import { importInputSchema } from '@/lib/listing-import/schema'
-import { uploadImportImages, UploadError } from '@/lib/listing-import/uploads'
+import { importFinishSchema, importInputSchema } from '@/lib/listing-import/schema'
+import { verifyUploadedPaths, signImportUrls, UploadError } from '@/lib/listing-import/uploads'
 import { extractListingDraft } from '@/lib/ai/listing-importer'
 import { sendEmail } from '@/lib/email/send'
 import { importReviewAdminEmail } from '@/lib/email/templates'
@@ -9,93 +9,122 @@ import { getAdminEmails } from '@/lib/listing-import/admins'
 import type { ListingImportInput } from '@/types/listing-import'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60 // AI extraction can take a few seconds
+export const maxDuration = 60 // AI extraction can take a while on many photos
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
-const RATE_LIMIT_PER_HOUR = 5
-// Global circuit-breaker on the unauthenticated AI-import endpoint. The
-// per-email limit is bypassable by rotating the email field, so this bounds
-// total Anthropic + storage cost from any source. Deliberately NOT per-IP:
-// UMich students share the campus NAT, so an IP limit would lock out everyone
-// on campus wifi at once. Set generously above expected legit volume.
-const GLOBAL_RATE_LIMIT_PER_HOUR = 60
+// A pending row must be finished within this window (upload targets are
+// minted alongside it and expire on the same scale).
+const PENDING_MAX_AGE_MS = 2 * 60 * 60 * 1000
 
-function str(v: FormDataEntryValue | null): string | undefined {
-  if (typeof v !== 'string') return undefined
-  const t = v.trim()
-  return t.length ? t : undefined
-}
-
+/**
+ * POST /api/listing-imports
+ *
+ * Phase 2 of the two-phase import (see ./upload-urls for phase 1): the
+ * browser has already PUT its files straight into the private bucket; this
+ * endpoint receives JSON — scalars + the storage paths — verifies every path
+ * against storage (existence, prefix, size, type), then runs the AI
+ * extraction and hands the draft to admin review.
+ *
+ * Rate limiting happens at /upload-urls (row creation). This endpoint is
+ * single-shot per row via an atomic pending → processing transition, so it
+ * can't be replayed to multiply AI cost.
+ */
 export async function POST(request: Request) {
-  let form: FormData
+  let raw: unknown
   try {
-    form = await request.formData()
+    raw = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid form submission.' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
   }
 
-  const personalFiles = form.getAll('personalImages').filter((f): f is File => f instanceof File)
-  const buildingFiles = form.getAll('buildingImages').filter((f): f is File => f instanceof File)
-
-  // Validate scalar fields + cross-field rules.
-  const parsed = importInputSchema.safeParse({
-    email: str(form.get('email')) ?? '',
-    personalSourceUrl: str(form.get('personalSourceUrl')),
-    personalPastedText: str(form.get('personalPastedText')),
-    personalImageCount: personalFiles.length,
-    buildingSourceUrl: str(form.get('buildingSourceUrl')),
-    buildingPastedText: str(form.get('buildingPastedText')),
-    buildingImageCount: buildingFiles.length,
-    buildingName: str(form.get('buildingName')),
-    floorPlanName: str(form.get('floorPlanName')),
-    consentConfirmed: form.get('consentConfirmed') === 'true',
-    buildingEnrichmentConsent: form.get('buildingEnrichmentConsent') === 'true',
-  })
-
-  if (!parsed.success) {
+  const parsedFinish = importFinishSchema.safeParse(raw)
+  if (!parsedFinish.success) {
     const fieldErrors: Record<string, string> = {}
-    for (const issue of parsed.error.issues) {
+    for (const issue of parsedFinish.error.issues) {
       const key = String(issue.path[0] ?? 'form')
       if (!fieldErrors[key]) fieldErrors[key] = issue.message
     }
     return NextResponse.json({ error: 'Please fix the form.', fieldErrors }, { status: 400 })
   }
-  const input = parsed.data
+  const input = parsedFinish.data
+
+  // Re-run the cross-field rules (consent, "text OR images", enrichment
+  // consent) through the canonical input schema so the two-phase flow can't
+  // skip them.
+  const crossCheck = importInputSchema.safeParse({
+    email: input.email,
+    personalSourceUrl: input.personalSourceUrl,
+    personalPastedText: input.personalPastedText,
+    personalImageCount: input.personalPaths.length,
+    buildingSourceUrl: input.buildingSourceUrl,
+    buildingPastedText: input.buildingPastedText,
+    buildingImageCount: input.buildingPaths.length,
+    buildingName: input.buildingName,
+    floorPlanName: input.floorPlanName,
+    consentConfirmed: input.consentConfirmed,
+    buildingEnrichmentConsent: input.buildingEnrichmentConsent,
+  })
+  if (!crossCheck.success) {
+    const fieldErrors: Record<string, string> = {}
+    for (const issue of crossCheck.error.issues) {
+      const key = String(issue.path[0] ?? 'form')
+      if (!fieldErrors[key]) fieldErrors[key] = issue.message
+    }
+    return NextResponse.json({ error: 'Please fix the form.', fieldErrors }, { status: 400 })
+  }
 
   const service = createServiceClient()
 
-  // Lightweight rate limit: cap imports per email per hour.
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
-  const { count } = await service
+  // The row must exist, belong to this email, still be pending, and be fresh.
+  const { data: req } = await service
     .from('listing_import_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('email', input.email)
-    .gte('created_at', oneHourAgo)
-  if ((count ?? 0) >= RATE_LIMIT_PER_HOUR) {
-    return NextResponse.json(
-      { error: 'Too many imports from this email. Please try again later.' },
-      { status: 429 },
-    )
+    .select('id, email, status, created_at')
+    .eq('id', input.requestId)
+    .maybeSingle()
+  if (!req || req.email !== input.email || req.status !== 'pending') {
+    return NextResponse.json({ error: 'This import session is no longer valid. Please start again.' }, { status: 409 })
+  }
+  if (Date.now() - new Date(req.created_at).getTime() > PENDING_MAX_AGE_MS) {
+    await service
+      .from('listing_import_requests')
+      .update({ status: 'failed', error_message: 'Import session expired.' })
+      .eq('id', req.id)
+    return NextResponse.json({ error: 'This import session expired. Please start again.' }, { status: 410 })
   }
 
-  // Global circuit-breaker — caps total AI-extraction cost across all callers
-  // (the per-email cap above is bypassable by rotating the email field).
-  const { count: globalCount } = await service
+  // Atomic single-shot gate: only one caller can move pending → processing.
+  const { data: transitioned } = await service
     .from('listing_import_requests')
-    .select('id', { count: 'exact', head: true })
-    .gte('created_at', oneHourAgo)
-  if ((globalCount ?? 0) >= GLOBAL_RATE_LIMIT_PER_HOUR) {
-    return NextResponse.json(
-      { error: 'We’re processing a lot of imports right now. Please try again in a little while.' },
-      { status: 429 },
-    )
+    .update({ status: 'processing' })
+    .eq('id', req.id)
+    .eq('status', 'pending')
+    .select('id')
+  if (!transitioned || transitioned.length === 0) {
+    return NextResponse.json({ error: 'This import is already being processed.' }, { status: 409 })
   }
 
-  // 1. Create the request row (pending) to get an id for upload paths.
-  const { data: created, error: insertErr } = await service
+  const fail = async (message: string, httpStatus: number) => {
+    await service
+      .from('listing_import_requests')
+      .update({ status: 'failed', error_message: message })
+      .eq('id', req.id)
+    return NextResponse.json({ error: message }, { status: httpStatus })
+  }
+
+  // Verify the claimed storage paths against what's actually in the bucket.
+  let personalPaths: string[], buildingPaths: string[]
+  try {
+    personalPaths = await verifyUploadedPaths(req.id, input.personalPaths, 'personal')
+    buildingPaths = await verifyUploadedPaths(req.id, input.buildingPaths, 'building')
+  } catch (err) {
+    const message = err instanceof UploadError ? err.message : 'Could not verify the uploaded files.'
+    return fail(message, 400)
+  }
+
+  // Persist the source fields now that they're validated.
+  const { error: updateErr } = await service
     .from('listing_import_requests')
-    .insert({
-      email: input.email,
+    .update({
       personal_source_url: input.personalSourceUrl ?? null,
       personal_pasted_text: input.personalPastedText ?? null,
       building_source_url: input.buildingSourceUrl ?? null,
@@ -104,97 +133,70 @@ export async function POST(request: Request) {
       floor_plan_name: input.floorPlanName ?? null,
       consent_confirmed: input.consentConfirmed,
       building_enrichment_consent: input.buildingEnrichmentConsent,
-      status: 'pending',
+      personal_image_paths: personalPaths,
+      building_image_paths: buildingPaths,
     })
-    .select('id')
-    .single()
-
-  if (insertErr || !created) {
-    console.error('[listing-imports] insert failed', insertErr)
-    return NextResponse.json({ error: 'Could not start the import. Please try again.' }, { status: 500 })
-  }
-  const requestId = created.id as string
-  console.info('[listing-imports] request created', { requestId, email: input.email })
-
-  // 2. Upload images.
-  let personalImages, buildingImages
-  try {
-    await service.from('listing_import_requests').update({ status: 'processing' }).eq('id', requestId)
-    personalImages = await uploadImportImages(personalFiles, { requestId, kind: 'personal' })
-    buildingImages = await uploadImportImages(buildingFiles, { requestId, kind: 'building' })
-    console.info('[listing-imports] uploaded', {
-      requestId,
-      personal: personalImages.length,
-      building: buildingImages.length,
-    })
-  } catch (err) {
-    const message = err instanceof UploadError ? err.message : 'Upload failed. Please try again.'
-    await service
-      .from('listing_import_requests')
-      .update({ status: 'failed', error_message: message })
-      .eq('id', requestId)
-    return NextResponse.json({ error: message }, { status: 400 })
+    .eq('id', req.id)
+  if (updateErr) {
+    console.error('[listing-imports] persist inputs failed', updateErr)
+    return fail('Could not save the import. Please try again.', 500)
   }
 
-  // 3. Run AI extraction.
-  console.info('[listing-imports] AI extraction started', { requestId })
+  // Fresh signed READ urls for the AI call (private bucket).
+  const signed = await signImportUrls([...personalPaths, ...buildingPaths])
+  const missingSigned = [...personalPaths, ...buildingPaths].filter(p => !signed[p])
+  if (missingSigned.length > 0) {
+    console.error('[listing-imports] signing failed for', missingSigned)
+    return fail('Could not read the uploaded files. Please try again.', 500)
+  }
+
+  console.info('[listing-imports] AI extraction started', { requestId: req.id })
   const aiInput: ListingImportInput = {
     email: input.email,
     personalSourceUrl: input.personalSourceUrl,
     personalPastedText: input.personalPastedText,
-    personalImageUrls: personalImages.map(i => i.url),
+    personalImageUrls: personalPaths.map(p => signed[p]),
     buildingSourceUrl: input.buildingSourceUrl,
     buildingPastedText: input.buildingPastedText,
-    buildingImageUrls: buildingImages.map(i => i.url),
+    buildingImageUrls: buildingPaths.map(p => signed[p]),
     buildingName: input.buildingName,
     floorPlanName: input.floorPlanName,
   }
 
   const extraction = await extractListingDraft(aiInput)
   if (!extraction.ok) {
-    await service
-      .from('listing_import_requests')
-      .update({ status: 'failed', error_message: extraction.error })
-      .eq('id', requestId)
-    return NextResponse.json({ error: extraction.error }, { status: 502 })
+    return fail(extraction.error, 502)
   }
   console.info('[listing-imports] AI extraction completed', {
-    requestId,
+    requestId: req.id,
     confidence: extraction.draft.confidence.overall,
     conflicts: extraction.draft.conflictsBetweenSources.length,
   })
 
-  // 4. Persist the draft and hold for admin review. No claim token + no
-  //    user email yet — those happen only after an admin approves.
+  // Hold for admin review. No claim token + no user email yet — those happen
+  // only after an admin approves.
   const { error: finalizeErr } = await service
     .from('listing_import_requests')
-    .update({
-      status: 'awaiting_admin_review',
-      extracted_data: extraction.draft,
-      personal_image_paths: personalImages.map(i => i.path),
-      building_image_paths: buildingImages.map(i => i.path),
-    })
-    .eq('id', requestId)
-
+    .update({ status: 'awaiting_admin_review', extracted_data: extraction.draft })
+    .eq('id', req.id)
   if (finalizeErr) {
     console.error('[listing-imports] finalize failed', finalizeErr)
-    return NextResponse.json({ error: 'Could not save the draft. Please try again.' }, { status: 500 })
+    return fail('Could not save the draft. Please try again.', 500)
   }
-  console.info('[listing-imports] draft created, awaiting admin review', { requestId })
+  console.info('[listing-imports] draft created, awaiting admin review', { requestId: req.id })
 
-  // 5. Notify admins to review. The submitter's claim email is sent only
-  //    after an admin approves (see /api/admin/import-review). Best-effort.
+  // Notify admins to review (best-effort).
   const adminEmails = await getAdminEmails()
   if (adminEmails.length > 0) {
     const { subject, html } = importReviewAdminEmail({
-      reviewUrl: `${APP_URL}/admin/import-review/${requestId}`,
+      reviewUrl: `${APP_URL}/admin/import-review/${req.id}`,
       submitterEmail: input.email,
       listingTitle: extraction.draft.title,
     })
     await sendEmail({ to: adminEmails, subject, html })
-    console.info('[listing-imports] admin review email sent', { requestId, recipients: adminEmails.length })
+    console.info('[listing-imports] admin review email sent', { requestId: req.id, recipients: adminEmails.length })
   } else {
-    console.error('[listing-imports] no admin recipients — review email not sent', { requestId })
+    console.error('[listing-imports] no admin recipients — review email not sent', { requestId: req.id })
   }
 
   return NextResponse.json({ ok: true })

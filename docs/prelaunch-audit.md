@@ -4,6 +4,38 @@ Ranked by impact on the two conversion events that matter: **a listing gets
 created** and **a search completes → inquiry sent**. Each finding has a fix
 status tracked in this doc as the branch progresses.
 
+## STATUS (end of hardening pass — same day)
+
+Every item below is **FIXED on this branch** except where noted. Verified:
+tsc clean · lint 0 errors · build green · unit 50/50 · e2e 29/30 (the one
+red is item 18's detector — goes green when migration 032 is applied).
+The import happy path was proven END-TO-END against a production build:
+signed target → direct browser-style storage PUT → server path verification
+→ real AI extraction (21s) → awaiting_admin_review, with replay 409.
+
+**Two additional live-production bugs discovered during verification:**
+
+### 17. 🔴 (NEW) Sentry browser tunnel auth-gated — anonymous client errors never reported
+The middleware auth-gates `/monitoring` (the Sentry tunnelRoute), so error
+envelopes from logged-out visitors were redirected to /sign-in and dropped.
+Client-side errors from anonymous users — most launch traffic — have never
+reached Sentry. **Fixed**: `/monitoring` early-return + supply-only allow.
+
+### 18. 🔴 (NEW) Profile editing broken in production since migration 029
+The users-update policy (008) enforces trust-column immutability via WITH
+CHECK subqueries that SELECT `email`/`stripe_customer_id`/`stripe_account_id`
+as the calling role — exactly the columns 029 revoked. Every profile update
+(bio, name, phone, avatar) fails with "permission denied". Confirmed live
+with a throwaway user; caught by tests/e2e/security.spec.ts. **Fix ready:
+`supabase/migrations/032_users_update_column_grants.sql` — PASTE ASAP**
+(no code deploy needed; column-level UPDATE grants replace the subqueries).
+
+**Founder actions required (dashboard-only):**
+1. Paste migration **032** (fixes live profile editing — do this first)
+2. Paste migration **031** (analytics_events — funnel instrumentation)
+3. Migration 030 (signup_source) if not yet pasted
+4. Merge this branch → deploy (upload fix, tunnel fix, everything else)
+
 ## P0 — Conversion-blocking (launch-gating)
 
 ### 1. 🔴 Import uploads >4.5MB die at Vercel's edge — the flagship flow is broken for real phone photos

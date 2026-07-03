@@ -33,11 +33,25 @@ export function validatePublishRequirements(
   if (!ctx.ownerUserId) missing.push('You must be signed in and own this listing.')
 
   if (!draft.title || draft.title.trim().length === 0) missing.push('A title')
+  else if (draft.title.length > 140) missing.push('A shorter title (140 characters max)')
   if (!draft.description || draft.description.trim().length === 0)
     missing.push('A description')
+  else if (draft.description.length > 10_000)
+    missing.push('A shorter description (10,000 characters max)')
 
+  // Sanity bounds, not just presence: unbounded numbers reach the DB as
+  // cents (×100) and a 10-digit "rent" overflows the integer column into a
+  // 500 — reject with a human message instead.
   if (!(typeof draft.rentMonthly === 'number' && draft.rentMonthly > 0))
     missing.push('Monthly rent')
+  else if (draft.rentMonthly > 50_000)
+    missing.push('A realistic monthly rent (under $50,000)')
+  if (draft.depositAmount != null && (draft.depositAmount < 0 || draft.depositAmount > 50_000))
+    missing.push('A realistic deposit (between $0 and $50,000)')
+  if (draft.bedrooms != null && (draft.bedrooms < 0 || draft.bedrooms > 20))
+    missing.push('A realistic bedroom count (0–20)')
+  if (draft.bathrooms != null && (draft.bathrooms < 0 || draft.bathrooms > 20))
+    missing.push('A realistic bathroom count (0–20)')
 
   if (!draft.availableFrom) missing.push('An availability start date')
   if (!ctx.openEnded && !draft.availableTo)

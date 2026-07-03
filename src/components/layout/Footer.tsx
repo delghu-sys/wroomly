@@ -108,12 +108,14 @@ function FooterCol({
       <ul className="space-y-2.5">
         {links.map(l => (
           <li key={l.href + l.label}>
+            {/* inline-block + py-1 lifts the tap target to ~32px without
+                changing the visual rhythm (mobile thumb accuracy). */}
             {l.external ? (
-              <a href={l.href} className="text-sm text-white/70 hover:text-white ease-smooth transition-colors">
+              <a href={l.href} className="inline-block py-1 -my-1 text-sm text-white/70 hover:text-white ease-smooth transition-colors">
                 {l.label}
               </a>
             ) : (
-              <Link href={l.href} className="text-sm text-white/70 hover:text-white ease-smooth transition-colors">
+              <Link href={l.href} className="inline-block py-1 -my-1 text-sm text-white/70 hover:text-white ease-smooth transition-colors">
                 {l.label}
               </Link>
             )}

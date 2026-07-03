@@ -282,3 +282,55 @@ test('input schema: accepts a valid minimal submission', () => {
   })
   assert.equal(r.success, true)
 })
+
+// ── Hardening pass (prelaunch-audit items 8 + 10) ──
+
+const okCtx = {
+  ownerUserId: 'u1',
+  userConfirmedAccuracy: true,
+  enrichmentUsed: false,
+  userConfirmedEnrichment: false,
+  confirmedPhotoCount: 1,
+}
+
+test('publish: absurd numbers are blocked (int-overflow guard)', () => {
+  const r = validatePublishRequirements(
+    draft({ rentMonthly: 1_000_000_000, depositAmount: 999_999, bedrooms: 25, bathrooms: -1 }),
+    okCtx,
+  )
+  assert.equal(r.ok, false)
+  assert.ok(r.missing.some(m => /realistic monthly rent/i.test(m)))
+  assert.ok(r.missing.some(m => /realistic deposit/i.test(m)))
+  assert.ok(r.missing.some(m => /bedroom count/i.test(m)))
+  assert.ok(r.missing.some(m => /bathroom count/i.test(m)))
+})
+
+test('publish: overlong title/description are blocked', () => {
+  const r = validatePublishRequirements(
+    draft({ title: 'x'.repeat(141), description: 'y'.repeat(10_001) }),
+    okCtx,
+  )
+  assert.equal(r.ok, false)
+  assert.ok(r.missing.some(m => /shorter title/i.test(m)))
+  assert.ok(r.missing.some(m => /shorter description/i.test(m)))
+})
+
+test('publish: sane bounds still pass', () => {
+  const r = validatePublishRequirements(
+    draft({ rentMonthly: 49_999, depositAmount: 0, bedrooms: 0, bathrooms: 20 }),
+    okCtx,
+  )
+  assert.equal(r.ok, true)
+})
+
+test('publish: open-ended sublet passes without an end date', () => {
+  const blocked = validatePublishRequirements(draft({ availableTo: null }), okCtx)
+  assert.equal(blocked.ok, false)
+  assert.ok(blocked.missing.some(m => /end date/i.test(m)))
+
+  const allowed = validatePublishRequirements(draft({ availableTo: null }), {
+    ...okCtx,
+    openEnded: true,
+  })
+  assert.equal(allowed.ok, true)
+})

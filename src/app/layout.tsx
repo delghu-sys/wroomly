@@ -101,8 +101,11 @@ export default function RootLayout({
         <Toaster position="top-right" richColors />
         {/* Cookieless pageview counts (traffic by page/referrer). Product
             funnel metrics come from the DB via `npm run metrics`, not from
-            here. Requires Analytics enabled once in the Vercel dashboard. */}
-        <Analytics />
+            here. Requires Analytics enabled once in the Vercel dashboard.
+            Rendered only on Vercel builds: locally /_vercel/insights/* does
+            not exist, so the script 404s into console noise that breaks the
+            "loads cleanly" smoke suite. */}
+        {process.env.VERCEL ? <Analytics /> : null}
       </body>
     </html>
   )

@@ -7,7 +7,21 @@ import { toast } from 'sonner'
 import { Loader2, AlertTriangle, Info, Upload, MapPin } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { mapSourceAttribution, type SourceLabel } from '@/lib/listing-import/normalize'
+import { compressImageFile, uploadToSignedTargets } from '@/lib/listing-import/client-upload'
 import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
+import { track } from '@/lib/track'
+
+/**
+ * Extract the stable storage path from a Supabase signed URL
+ * (…/object/sign/<bucket>/<path>?token=…). Signed URLs are re-minted with a
+ * new signature on every page load, so identity comparisons MUST use the
+ * path — comparing full URLs silently never matches (the old default-photo-
+ * selection bug, prelaunch-audit item 3).
+ */
+function pathFromSignedUrl(url: string): string | null {
+  const m = url.match(/\/object\/sign\/[^/]+\/([^?]+)/)
+  return m ? decodeURIComponent(m[1]) : null
+}
 
 interface ClaimReviewProps {
   token: string
@@ -58,17 +72,25 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
   // Photos can grow at review time (essential for text-only imports).
   const [personalPhotos, setPersonalPhotos] = useState(initialPhotos)
   const [uploadingPhotos, setUploadingPhotos] = useState(false)
-  const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(
+  // Selection tracked by storage PATH (stable), never by signed URL (whose
+  // signature changes every page load — see pathFromSignedUrl above).
+  const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(() => {
     // Default-select personal photos the AI thinks are housing photos.
-    new Set(
+    const aiApproved = new Set(
       initial.photos
         .filter(p => p.sourceType === 'USER_UPLOADED_PERSONAL' && p.isLikelyHousingPhoto && !p.shouldRequireUserConfirmationBeforePublish)
-        .map(p => p.sourceUrl)
-        .filter(url => initialPhotos.some(pp => pp.url === url)),
-    ),
-  )
+        .map(p => pathFromSignedUrl(p.sourceUrl))
+        .filter((p): p is string => !!p),
+    )
+    const preselected = initialPhotos.filter(pp => aiApproved.has(pp.path)).map(pp => pp.path)
+    // If the AI flagged nothing (or paths didn't line up), default to ALL
+    // personal photos — an all-selected picker converts better than an
+    // all-dimmed one, and the user can still untick.
+    return new Set(preselected.length > 0 ? preselected : initialPhotos.map(pp => pp.path))
+  })
   const [confirmAccuracy, setConfirmAccuracy] = useState(false)
   const [confirmEnrichment, setConfirmEnrichment] = useState(false)
+  const [openEnded, setOpenEnded] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [missing, setMissing] = useState<string[]>([])
 
@@ -76,10 +98,30 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
     if (files.length === 0 || uploadingPhotos) return
     setUploadingPhotos(true)
     try {
-      const fd = new FormData()
-      fd.append('token', token)
-      files.forEach(f => fd.append('photos', f))
-      const res = await fetch('/api/listing-imports/photos', { method: 'POST', body: fd })
+      // Compress in the browser, then upload straight to storage via signed
+      // targets — files never pass through the API (Vercel ~4.5MB body cap).
+      const compressed = await Promise.all(files.map(compressImageFile))
+      const urlRes = await fetch('/api/listing-imports/photos/upload-urls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          files: compressed.map(f => ({ mimeType: f.type, sizeBytes: f.size })),
+        }),
+      })
+      const urlJson = await urlRes.json()
+      if (!urlRes.ok || !urlJson.ok) {
+        toast.error(urlJson.error ?? 'Could not upload photos.')
+        return
+      }
+      const targets: { path: string; token: string }[] = urlJson.targets
+      await uploadToSignedTargets(compressed, targets)
+
+      const res = await fetch('/api/listing-imports/photos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, paths: targets.map(t => t.path) }),
+      })
       const json = await res.json()
       if (!res.ok || !json.ok) {
         toast.error(json.error ?? 'Could not upload photos.')
@@ -89,7 +131,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
       setPersonalPhotos(prev => [...prev, ...added])
       setSelectedPhotos(prev => {
         const next = new Set(prev)
-        added.forEach(p => next.add(p.url))
+        added.forEach(p => next.add(p.path))
         return next
       })
     } catch {
@@ -99,13 +141,23 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
     }
   }
 
-  // Associate the draft with this account on mount (idempotent).
+  // Associate the draft with this account on mount (idempotent). Publish also
+  // auto-claims server-side, so a slow/failed claim here is never a dead end —
+  // but a *conflict* (someone else claimed it) is surfaced immediately.
   useEffect(() => {
+    track('claim_viewed')
     fetch('/api/listing-imports/claim', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
-    }).catch(() => {})
+    })
+      .then(async res => {
+        if (res.status === 409) {
+          const json = await res.json().catch(() => null)
+          toast.error(json?.error ?? 'This draft has already been claimed.')
+        }
+      })
+      .catch(() => {})
   }, [token])
 
   const attribution = useMemo(() => mapSourceAttribution(draft.sourceAttribution), [draft.sourceAttribution])
@@ -119,11 +171,11 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
   const set = <K extends keyof ExtractedListingDraft>(k: K, v: ExtractedListingDraft[K]) =>
     setDraft(d => ({ ...d, [k]: v }))
 
-  function togglePhoto(url: string) {
+  function togglePhoto(path: string) {
     setSelectedPhotos(prev => {
       const next = new Set(prev)
-      if (next.has(url)) next.delete(url)
-      else next.add(url)
+      if (next.has(path)) next.delete(path)
+      else next.add(path)
       return next
     })
   }
@@ -132,7 +184,8 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
     if (publishing) return
     setMissing([])
     setPublishing(true)
-    const confirmedPhotoPaths = personalPhotos.filter(p => selectedPhotos.has(p.url)).map(p => p.path)
+    track('publish_attempted')
+    const confirmedPhotoPaths = personalPhotos.filter(p => selectedPhotos.has(p.path)).map(p => p.path)
     try {
       const res = await fetch('/api/listing-imports/publish', {
         method: 'POST',
@@ -143,19 +196,23 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           confirmedPhotoPaths,
           userConfirmedAccuracy: confirmAccuracy,
           userConfirmedEnrichment: confirmEnrichment,
+          openEnded,
         }),
       })
       const json = await res.json()
       if (!res.ok || !json.ok) {
         if (json.missing) setMissing(json.missing)
         toast.error(json.error ?? 'Could not publish.')
+        track('publish_failed', { status: res.status, missing: json.missing?.length ?? 0 })
         setPublishing(false)
         return
       }
+      track('publish_succeeded')
       toast.success('Listing published!')
       router.push(`/listings/${json.listingId}`)
     } catch {
       toast.error('Could not publish. Try again.')
+      track('publish_failed', { status: 0, missing: 0 })
       setPublishing(false)
     }
   }
@@ -186,10 +243,10 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
       {/* Core editable fields */}
       <Field label="Title" badge={attribution.title}>
-        <input className={inputCls} value={draft.title ?? ''} onChange={e => set('title', e.target.value || null)} />
+        <input className={inputCls} maxLength={140} value={draft.title ?? ''} onChange={e => set('title', e.target.value || null)} />
       </Field>
       <Field label="Description" badge={attribution.description}>
-        <textarea className={inputCls} rows={5} value={draft.description ?? ''} onChange={e => set('description', e.target.value || null)} />
+        <textarea className={inputCls} rows={5} maxLength={10000} value={draft.description ?? ''} onChange={e => set('description', e.target.value || null)} />
       </Field>
 
       {/* Address — required for the map; search + pick a real suggestion so
@@ -221,16 +278,34 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
       <div className="grid sm:grid-cols-2 gap-4">
         <Field label="Monthly rent (USD)" badge={attribution.rentMonthly}>
-          <input type="number" className={inputCls} value={draft.rentMonthly ?? ''} onChange={e => set('rentMonthly', e.target.value ? Number(e.target.value) : null)} />
+          <input type="number" min={1} max={50000} className={inputCls} value={draft.rentMonthly ?? ''} onChange={e => set('rentMonthly', e.target.value ? Number(e.target.value) : null)} />
         </Field>
         <Field label="Deposit (USD)" badge={attribution.depositAmount}>
-          <input type="number" className={inputCls} value={draft.depositAmount ?? ''} onChange={e => set('depositAmount', e.target.value ? Number(e.target.value) : null)} />
+          <input type="number" min={0} max={50000} className={inputCls} value={draft.depositAmount ?? ''} onChange={e => set('depositAmount', e.target.value ? Number(e.target.value) : null)} />
         </Field>
         <Field label="Available from" badge={attribution.availableFrom}>
           <input type="date" className={inputCls} value={draft.availableFrom ?? ''} onChange={e => set('availableFrom', e.target.value || null)} />
         </Field>
         <Field label="Available to" badge={attribution.availableTo}>
-          <input type="date" className={inputCls} value={draft.availableTo ?? ''} onChange={e => set('availableTo', e.target.value || null)} />
+          <input
+            type="date"
+            className={`${inputCls} ${openEnded ? 'opacity-50' : ''}`}
+            disabled={openEnded}
+            value={openEnded ? '' : (draft.availableTo ?? '')}
+            onChange={e => set('availableTo', e.target.value || null)}
+          />
+          <label className="mt-1.5 flex items-center gap-2 text-[12.5px] text-ink-soft cursor-pointer">
+            <input
+              type="checkbox"
+              className="h-3.5 w-3.5 accent-[oklch(0.45_0.13_85)]"
+              checked={openEnded}
+              onChange={e => {
+                setOpenEnded(e.target.checked)
+                if (e.target.checked) set('availableTo', null)
+              }}
+            />
+            No end date (open-ended / month-to-month)
+          </label>
         </Field>
         <Field label="Neighborhood" badge={attribution.neighborhood}>
           <input className={inputCls} value={draft.neighborhood ?? ''} onChange={e => set('neighborhood', e.target.value || null)} />
@@ -246,10 +321,10 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           </select>
         </Field>
         <Field label="Bedrooms" badge={attribution.bedrooms}>
-          <input type="number" className={inputCls} value={draft.bedrooms ?? ''} onChange={e => set('bedrooms', e.target.value ? Number(e.target.value) : null)} />
+          <input type="number" min={0} max={20} className={inputCls} value={draft.bedrooms ?? ''} onChange={e => set('bedrooms', e.target.value ? Number(e.target.value) : null)} />
         </Field>
         <Field label="Bathrooms" badge={attribution.bathrooms}>
-          <input type="number" step="0.5" className={inputCls} value={draft.bathrooms ?? ''} onChange={e => set('bathrooms', e.target.value ? Number(e.target.value) : null)} />
+          <input type="number" step="0.5" min={0} max={20} className={inputCls} value={draft.bathrooms ?? ''} onChange={e => set('bathrooms', e.target.value ? Number(e.target.value) : null)} />
         </Field>
         <Field label="Building name" badge={attribution.buildingName}>
           <input className={inputCls} value={draft.buildingName ?? ''} onChange={e => set('buildingName', e.target.value || null)} />
@@ -306,9 +381,9 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {personalPhotos.map(p => {
-              const on = selectedPhotos.has(p.url)
+              const on = selectedPhotos.has(p.path)
               return (
-                <button key={p.path} type="button" onClick={() => togglePhoto(p.url)}
+                <button key={p.path} type="button" onClick={() => togglePhoto(p.path)}
                   className={`relative aspect-square rounded-xl overflow-hidden border-2 transition ${on ? 'border-[oklch(0.45_0.13_85)]' : 'border-transparent opacity-60'}`}>
                   <Image src={p.url} alt="" fill className="object-cover" sizes="120px" />
                   {on && <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[oklch(0.45_0.13_85)] text-white text-[11px] flex items-center justify-center">✓</span>}
