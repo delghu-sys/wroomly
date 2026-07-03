@@ -56,7 +56,11 @@ test.describe('RLS lockdown', () => {
   test('can still edit bio (non-trust column)', async () => {
     const { access_token } = await signInAsTestUser(user)
     const newBio = `e2e-bio-${Date.now()}`
-    const res = await fetch(`${SUPA_URL}/rest/v1/users?id=eq.${user.id}`, {
+    // `?select=bio` is required with return=representation: without it
+    // PostgREST returns ALL columns, and 029's column-level grants deny
+    // SELECT on email/phone/stripe ids — the update would succeed but the
+    // representation 403s (exactly how this test caught the live 032 bug).
+    const res = await fetch(`${SUPA_URL}/rest/v1/users?id=eq.${user.id}&select=bio`, {
       method: 'PATCH',
       headers: {
         apikey: ANON,
