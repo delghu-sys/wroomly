@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { ShieldCheck, ChatCircleDots, CreditCard } from '@phosphor-icons/react/dist/ssr'
+import { ShieldCheck, ChatCircleDots, Tag } from '@phosphor-icons/react/dist/ssr'
 import { LogoMark } from '@/components/brand/Logo'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
@@ -27,7 +27,7 @@ const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 const TRUST_ITEMS = [
   { Icon: ShieldCheck, text: 'Verified email accounts' },
   { Icon: ChatCircleDots, text: 'Private in-app messaging' },
-  { Icon: CreditCard, text: 'Escrowed secure payments' },
+  { Icon: Tag, text: 'Free to list & browse' },
 ] as const
 
 /**

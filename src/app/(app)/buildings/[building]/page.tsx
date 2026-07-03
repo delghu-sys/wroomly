@@ -22,7 +22,7 @@ export async function generateMetadata({
   if (!b) return { title: 'Building not found' }
 
   const title = `Sublets at ${b.name} — University of Michigan Housing, Ann Arbor`
-  const description = `Looking to sublet at ${b.name} in Ann Arbor? Find verified University of Michigan student sublets at ${b.name} on Wroomly — @umich.edu-verified, escrow payments.`
+  const description = `Looking to sublet at ${b.name} in Ann Arbor? Find verified University of Michigan student sublets at ${b.name} on Wroomly — every account @umich.edu-verified.`
   return {
     title,
     description,

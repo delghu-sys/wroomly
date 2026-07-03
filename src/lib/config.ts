@@ -14,12 +14,14 @@
 export const PAYMENTS_ENABLED = false
 
 /**
- * SUPPLY_ONLY_MODE — soft-launch gate. When on, renter-facing browse pages
- * (home, /listings, listing detail, public profiles, and the /guides,
- * /ann-arbor, /buildings content pages) show the /coming-soon landing + renter
- * waitlist to anyone who isn't a logged-in supplier/admin. Supplier flows
- * (signup, import-listing, claim-listing, listing management, dashboard) stay
- * fully open. Toggle with the SUPPLY_ONLY_MODE env var; OFF by default.
+ * SUPPLY_ONLY_MODE — soft-launch gate. When on, renter-facing product pages
+ * (home, /listings, listing detail, public profiles, Wroomly Match) show the
+ * /coming-soon landing + renter waitlist to anyone who isn't a logged-in
+ * supplier/admin. Supplier flows (signup, import-listing, claim-listing,
+ * listing management, dashboard) stay fully open, and the content-marketing
+ * surface (/guides, /ann-arbor, /buildings, /about, llms.txt) stays crawlable
+ * so search + AI engines keep indexing it — see src/lib/supplyOnly.ts.
+ * Toggle with the SUPPLY_ONLY_MODE env var; OFF by default.
  * Full launch = unset the env var (or set it to anything but 'true') + redeploy.
  */
 export const SUPPLY_ONLY_MODE = process.env.SUPPLY_ONLY_MODE === 'true'

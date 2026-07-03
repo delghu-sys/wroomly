@@ -38,7 +38,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      'Wroomly is the only place I trust for sublets. Verified emails, escrowed rent, no DM weirdness — exactly what student housing should be.',
+      'Wroomly is the only place I trust for sublets. Verified emails, real students, no DM weirdness — exactly what student housing should be.',
     name: 'Marcus W.',
     university: 'U of M, Class of ’24',
     initials: 'MW',
@@ -258,7 +258,7 @@ export default function SignUpClient({
         subhead={
           isSupplier
             ? 'Going abroad or interning? Sublet your apartment to a verified student in a few minutes.'
-            : 'Browse verified listings from U of M students. Secure payments, private messaging, no surprises.'
+            : 'Browse verified listings from U of M students. Real students, private messaging, no surprises.'
         }
         testimonials={TESTIMONIALS}
       />

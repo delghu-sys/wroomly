@@ -31,7 +31,7 @@ const SUPPLIER_ROUTES = ['/my-listings', '/listings/new', '/inquiries', '/payout
 // /sign-in — which is exactly why /sitemap.xml was being read as an HTML
 // login page in Search Console, and would have made every neighborhood /
 // building / guide page invisible to search.
-const PUBLIC_FILES = ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest']
+const PUBLIC_FILES = ['/sitemap.xml', '/robots.txt', '/manifest.webmanifest', '/llms.txt']
 // /import-listing + /claim-listing/ are public entry points for the AI
 // Listing Importer (a visitor may not have an account yet). The claim page
 // validates the token server-side; the claim/publish APIs do their own auth.

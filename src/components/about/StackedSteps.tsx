@@ -6,7 +6,7 @@ import {
   Search,
   MessageSquare,
   ShieldCheck,
-  CreditCard,
+  FileText,
   KeyRound,
   BadgeCheck,
   type LucideIcon,
@@ -32,10 +32,10 @@ const STEPS: { icon: LucideIcon; n: string; title: string; body: string }[] = [
     body: 'Submit a quick application with your U-M info. Suppliers review and accept the candidate they want.',
   },
   {
-    icon: CreditCard,
+    icon: FileText,
     n: '04',
-    title: 'Pay & hold',
-    body: 'Rent and deposit run through secure payments. Funds aren’t released until both sides confirm move-in is good.',
+    title: 'Agree in writing',
+    body: 'Put the sublease in writing — dates, rent, deposit terms, utilities. You arrange payment directly with the other student, by a method with a paper trail.',
   },
   {
     icon: KeyRound,

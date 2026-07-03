@@ -7,6 +7,7 @@ import {
   JsonLd,
   articleJsonLd,
   breadcrumbJsonLd,
+  faqJsonLd,
 } from '@/components/seo/JsonLd'
 import { Clock, ArrowRight, Check } from 'lucide-react'
 
@@ -56,6 +57,7 @@ export default async function GuidePage({
             description: g.description,
             datePublished: g.updated,
           }),
+          faqJsonLd(g.faqs),
           breadcrumbJsonLd([
             { name: 'Home', path: '/' },
             { name: 'Guides', path: '/guides' },
@@ -120,6 +122,26 @@ export default async function GuidePage({
             </section>
           ))}
         </div>
+
+        {/* FAQ — mirrors the FAQPage JSON-LD above so the visible content
+            matches the structured data (a Google requirement). */}
+        <section className="mt-12 pt-8 border-t border-line">
+          <h2 className="font-display text-2xl tracking-tight text-ink mb-6">
+            Frequently asked questions
+          </h2>
+          <div className="space-y-6">
+            {g.faqs.map((f, i) => (
+              <div key={i}>
+                <h3 className="font-display text-lg text-ink tracking-tight">
+                  {f.question}
+                </h3>
+                <p className="mt-1.5 text-[15px] text-ink-soft leading-relaxed">
+                  {f.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       </article>
 
       {/* CTA */}

@@ -8,19 +8,19 @@ export const FAQS: { question: string; answer: string }[] = [
       'Wroomly is for University of Michigan students. Every account is verified with an @umich.edu email address before you can list a place or send an inquiry, so you know everyone on the platform is a real U of M student.',
   },
   {
-    question: 'How does Wroomly keep payments safe?',
+    question: 'How does Wroomly keep sublets safe?',
     answer:
-      'Payments run through Stripe. When you book a sublet, your first month plus any deposit is collected through Wroomly and routed to the host through Stripe Connect — there is no wiring cash to a stranger. The host only gets connected to payouts after verifying their identity with Stripe.',
+      'Every Wroomly account is verified with an @umich.edu email, so listings and inquiries come from real University of Michigan students — not anonymous strangers. From there, Wroomly pushes both sides toward the safe path: see the place live, put the agreement in writing, and never pay by wire, gift card, or crypto.',
   },
   {
     question: 'What does Wroomly cost?',
     answer:
-      'Listing your place is free. When a booking happens, the renter pays a 5% service fee plus card processing on top of the rent. The host receives the full rent they listed. There are no monthly fees and no cost to browse.',
+      'Wroomly is free. Listing your place is free, browsing is free, and there are no service fees or monthly charges. Rent and any deposit are arranged directly between you and the other student.',
   },
   {
-    question: 'Does Wroomly handle every month of rent?',
+    question: 'Does Wroomly handle rent payments?',
     answer:
-      'Wroomly collects the first month plus deposit at booking. After that, you arrange the remaining monthly rent directly with your host. This keeps the first, riskiest payment protected while letting you settle into a normal landlord-tenant rhythm afterward.',
+      'No. Wroomly connects verified U of M students and you arrange rent and any deposit directly with the other person. Use a traceable payment method, get the terms in writing before money moves, and never pay by wire, gift card, or crypto.',
   },
   {
     question: 'How do I get my security deposit back?',

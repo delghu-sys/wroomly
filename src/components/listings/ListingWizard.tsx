@@ -6,6 +6,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
+import { PAYMENTS_ENABLED } from '@/lib/config'
 import {
   AMENITIES,
   ANN_ARBOR_NEIGHBORHOODS,
@@ -583,10 +584,18 @@ export function ListingWizard({ userId }: { userId: string }) {
 
             <div className="bg-amber-50 rounded-xl p-4 text-sm text-amber-800">
               <p className="font-medium mb-1">How payments work</p>
-              <p>
-                The consumer pays deposit + first month via Stripe. Funds are held in escrow and
-                released to you on the move-in date. You&apos;ll receive the amount minus a 5% fee.
-              </p>
+              {PAYMENTS_ENABLED ? (
+                <p>
+                  The consumer pays deposit + first month via Stripe. Funds are held in escrow and
+                  released to you on the move-in date. You&apos;ll receive the amount minus a 5% fee.
+                </p>
+              ) : (
+                <p>
+                  Wroomly connects you with a verified U-M student — once you accept an inquiry,
+                  you arrange rent and any deposit directly with them. Listing is free and Wroomly
+                  takes no fee.
+                </p>
+              )}
             </div>
           </div>
         )}

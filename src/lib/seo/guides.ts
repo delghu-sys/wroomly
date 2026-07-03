@@ -17,6 +17,10 @@ export interface Guide {
   updated: string // ISO date for lastModified + display
   readingMinutes: number
   sections: GuideSection[]
+  // Per-guide Q&As, rendered at the end of the article and marked up as
+  // FAQPage JSON-LD — the format AI answer engines extract most readily.
+  // Answers are plain text, ideally 40–60 words, self-contained.
+  faqs: { question: string; answer: string }[]
 }
 
 export const GUIDES: Guide[] = [
@@ -27,7 +31,7 @@ export const GUIDES: Guide[] = [
       'A step-by-step guide for UMich students subletting their Ann Arbor apartment — checking your lease, setting a price, finding a verified subletter, and getting paid safely.',
     excerpt:
       "Leaving for the summer, a co-op, or study abroad? Here's how to sublet your Ann Arbor place without losing money or breaking your lease.",
-    updated: '2026-05-21',
+    updated: '2026-07-03',
     readingMinutes: 6,
     sections: [
       {
@@ -60,8 +64,8 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Vet your subletter — and get paid safely',
         paragraphs: [
-          "The riskiest part of subletting is handing your place (and collecting money) from someone you've never met. This is exactly why Wroomly verifies every user with an @umich.edu email and runs payments through escrow: the subletter pays first month plus deposit through the platform, the money routes to you through Stripe, and nobody's wiring cash to a stranger.",
-          "Whatever platform you use, never take a deposit by gift card, crypto, or a wire to an account you can't verify — those are the classic scam patterns. A real subletter will happily pay through a system that protects them too.",
+          "The riskiest part of subletting is handing your place to (and collecting money from) someone you've never met. This is exactly why Wroomly verifies every user with an @umich.edu email: the person messaging you is a real U of M student with a name attached, not an anonymous account. Meet them, or at least do a video call, before anything is signed.",
+          "When money moves, keep it traceable. Collect rent and any deposit by a method with a paper trail, and never take payment by gift card, crypto, or a wire from an account you can't verify — those are the classic scam patterns. A real subletter will happily pay in a way that protects them too.",
         ],
       },
       {
@@ -69,6 +73,28 @@ export const GUIDES: Guide[] = [
         paragraphs: [
           'Even a simple written sublease agreement — dates, rent, deposit terms, who pays utilities, condition of the place — saves enormous headaches. It protects both of you if something goes sideways, and most landlords want a copy anyway. Take timestamped move-in photos so the deposit return is a non-issue at the end.',
         ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Do I need my landlord's permission to sublet in Ann Arbor?",
+        answer:
+          'Usually, yes. Most Ann Arbor leases allow subletting but require written landlord approval, and some charge a small re-let fee. A few prohibit it outright. Read your lease, email your leasing office for the sublet policy, and keep the written approval before you list your place.',
+      },
+      {
+        question: 'How much should I charge for a summer sublet at UMich?',
+        answer:
+          'Price at or slightly below what you pay in rent. Summer sublets in Ann Arbor go for less than the academic-year rate because supply outstrips demand from May through August. Furnished rooms close to Central Campus hold their value best; holding out for full rent usually means an empty room.',
+      },
+      {
+        question: 'How do I find a subletter I can trust?',
+        answer:
+          'Use a platform that verifies identity — every Wroomly account is confirmed with an @umich.edu email, so inquiries come from real U of M students. Meet or video-call before signing, put the agreement in writing, and only accept payment by a traceable method, never wire, gift card, or crypto.',
+      },
+      {
+        question: 'Do I need a written sublease agreement?',
+        answer:
+          'Yes. Even a simple one-page agreement covering dates, rent, deposit terms, utilities, and the condition of the place protects both sides, and most landlords want a copy. Pair it with timestamped move-in photos so the deposit return is straightforward at the end.',
       },
     ],
   },
@@ -79,7 +105,7 @@ export const GUIDES: Guide[] = [
       'Everything UMich students need to know about finding or filling a summer sublet in Ann Arbor — timing, pricing, neighborhoods, and how to avoid getting scammed.',
     excerpt:
       'When to start looking, what summer rent really costs, and the neighborhoods worth targeting for a May–August sublet.',
-    updated: '2026-05-21',
+    updated: '2026-07-03',
     readingMinutes: 5,
     sections: [
       {
@@ -111,8 +137,30 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Stay safe',
         paragraphs: [
-          'Summer is peak scam season for student housing — fake listings, "landlords" who need a deposit wired before you can see the place, prices too good to be true. Stick to platforms that verify identity and hold payments in escrow. On Wroomly every user is @umich.edu-verified and money moves through Stripe, so a sublet can\'t turn into a wire-transfer-to-nowhere.',
+          'Summer is peak scam season for student housing — fake listings, "landlords" who need a deposit wired before you can see the place, prices too good to be true. Stick to platforms that verify identity. On Wroomly every user is @umich.edu-verified, so the person you\'re talking to is a real U of M student — and never pay anyone by wire, gift card, or crypto, no matter where you found the listing.',
         ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'When should I start looking for a summer sublet in Ann Arbor?',
+        answer:
+          'Start searching between February and April for a May move-in. Listings appear steadily through spring, with the biggest wave at the end of winter semester. Waiting until May still works, but the best-located and best-priced places are usually taken by then.',
+      },
+      {
+        question: 'How much does a summer sublet cost in Ann Arbor?',
+        answer:
+          'Noticeably less than the academic-year rate for the same unit — the person subletting mostly wants to stop paying for an empty room. Furnished places near Central Campus and South University hold value best; unfurnished rooms or places farther from campus go for meaningfully less.',
+      },
+      {
+        question: 'Which Ann Arbor neighborhoods are best for a summer sublet?',
+        answer:
+          'Central Campus and South University put you closest to everything but cost the most and fill fastest. Kerrytown and the Old West Side trade a few minutes of walking for quieter, cheaper stays. North Campus is ideal for summer research in engineering, music, or art.',
+      },
+      {
+        question: 'Are Ann Arbor summer sublets safe?',
+        answer:
+          'They can be, if you verify who you\'re dealing with. Use a platform that confirms identity — Wroomly verifies every account with an @umich.edu email — see the place in person or over live video, get the agreement in writing, and never pay by wire, gift card, or crypto.',
       },
     ],
   },
@@ -123,7 +171,7 @@ export const GUIDES: Guide[] = [
       'The common student housing scams in Ann Arbor and the exact red flags to watch for — so your UMich sublet search doesn\'t cost you a deposit.',
     excerpt:
       'Wired a deposit and never heard back? Here are the scam patterns that hit Ann Arbor students every year, and how to dodge them.',
-    updated: '2026-05-21',
+    updated: '2026-07-03',
     readingMinutes: 5,
     sections: [
       {
@@ -150,8 +198,8 @@ export const GUIDES: Guide[] = [
       {
         heading: 'How to protect yourself',
         paragraphs: [
-          'See the place — in person or at least over a live video call where they walk you through it. Verify the person is actually a student. Never pay with anything irreversible; a credit card or an escrow platform gives you recourse, a wire does not. And get the agreement in writing before any money moves.',
-          'This is the whole reason Wroomly exists in the shape it does: every user is verified with an @umich.edu email, and payments run through Stripe escrow — the deposit and first month are held and routed through the platform, so there\'s no "wire me and trust me" step to get burned on.',
+          'See the place — in person or at least over a live video call where they walk you through it. Verify the person is actually a student. Never pay with anything irreversible; a credit card gives you recourse, a wire does not. And get the agreement in writing before any money moves.',
+          'This is the whole reason Wroomly exists in the shape it does: every user is verified with an @umich.edu email before they can list a place or send an inquiry. A scammer with a fake listing can\'t hide behind an anonymous profile — the person on the other end is a real, named U of M student.',
         ],
       },
       {
@@ -159,6 +207,23 @@ export const GUIDES: Guide[] = [
         paragraphs: [
           'Stop sending money immediately. If you paid by credit card, call your bank about a chargeback. Report the listing to wherever you found it and to the FTC. And tell other students — scammers reuse the same listings across Facebook groups and GroupMe every season.',
         ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'What are the red flags of a sublet scam?',
+        answer:
+          'The classic tells: a deposit demanded before you can see the place, payment by wire, gift card, crypto, or Zelle to a stranger, a price far below comparable listings, a "landlord" who is out of town and can\'t show it, pressure to decide immediately, and photos that fail a reverse image search.',
+      },
+      {
+        question: 'How can I verify a sublet listing in Ann Arbor is real?',
+        answer:
+          'See the place in person or on a live video call where the person walks you through it. Reverse-image-search the photos. Verify the lister is a real student — on Wroomly, every account is confirmed with an @umich.edu email. Never move money before the agreement is in writing.',
+      },
+      {
+        question: 'What should I do if I got scammed on a sublet?',
+        answer:
+          'Stop sending money immediately. If you paid by credit card, call your bank and ask about a chargeback. Report the listing to the platform where you found it and to the FTC at reportfraud.ftc.gov. Warn other students — scammers reuse the same fake listings every season.',
       },
     ],
   },
@@ -169,7 +234,7 @@ export const GUIDES: Guide[] = [
       'How security deposits work for sublets in Ann Arbor, Michigan — what\'s normal, your rights under Michigan law, and how to actually get yours back.',
     excerpt:
       'How much is normal, what Michigan law says, and the move-in photos that get your deposit back without a fight.',
-    updated: '2026-05-21',
+    updated: '2026-07-03',
     readingMinutes: 5,
     sections: [
       {
@@ -200,8 +265,25 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Deposits on Wroomly',
         paragraphs: [
-          'When a listing on Wroomly includes a deposit, it\'s collected through Stripe at booking alongside first month\'s rent, so there\'s a clear record of exactly what was paid and when. That paper trail is half the battle when it\'s time to get your deposit back.',
+          'Listings on Wroomly state the deposit up front, and because every account is @umich.edu-verified, you know exactly who is holding your money. Pay the deposit by a traceable method and keep the written terms — that paper trail is half the battle when it\'s time to get your deposit back.',
         ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'How much is a security deposit for an Ann Arbor sublet?',
+        answer:
+          'Around one month\'s rent is typical, and plenty of summer sublets ask for less or none — especially room sublets where the original tenant stays on the lease. Under Michigan law, a residential security deposit generally can\'t exceed one and a half months\' rent.',
+      },
+      {
+        question: 'When does a landlord have to return a security deposit in Michigan?',
+        answer:
+          'Within 30 days of the lease ending, a Michigan landlord must return the deposit or send an itemized list of damages. In a sublet, whoever holds your deposit takes on that obligation — so get the amount, what it covers, and the return terms in writing before you pay.',
+      },
+      {
+        question: 'How do I make sure I get my deposit back?',
+        answer:
+          'Document everything. Take timestamped photos and a quick video of every room the day you move in, note existing damage in writing, and repeat the photos at move-out. Combined with written deposit terms, that evidence turns a deposit dispute into a non-event.',
       },
     ],
   },

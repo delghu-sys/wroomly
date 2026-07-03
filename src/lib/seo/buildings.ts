@@ -44,6 +44,6 @@ export function getBuilding(slug: string): BuildingContent | undefined {
 export function buildingIntro(name: string): string[] {
   return [
     `${name} is one of the named student apartment communities University of Michigan students search for when they're looking to sublet near campus in Ann Arbor. If someone's leaving ${name} for the summer, a semester abroad, or an internship, this is where their sublet shows up on Wroomly.`,
-    `Every listing below is posted by a verified @umich.edu student and paid for through Wroomly's escrow — so you're not wiring a deposit to a stranger off a Facebook group. If there are no live listings at ${name} right now, save a search and we'll email you the moment one posts.`,
+    `Every listing below is posted by a verified @umich.edu student — so you're not wiring a deposit to a stranger off a Facebook group. If there are no live listings at ${name} right now, save a search and we'll email you the moment one posts.`,
   ]
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ShieldCheck, CreditCard, MessageSquare } from 'lucide-react'
+import { ShieldCheck, BadgeDollarSign, MessageSquare } from 'lucide-react'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
 import { LiveBadge } from '@/components/brand/LiveBadge'
@@ -12,11 +12,11 @@ import { TrustBento } from '@/components/about/TrustBento'
 export const metadata: Metadata = {
   title: 'How It Works',
   description:
-    'See how Wroomly handles verification, secure payments, and in-app messaging for U of M student housing.',
+    'See how Wroomly handles verification, reviewed listings, and in-app messaging for U of M student housing.',
   openGraph: {
     title: 'How It Works | Wroomly',
     description:
-      'See how Wroomly handles verification, secure payments, and in-app messaging for U of M student housing.',
+      'See how Wroomly handles verification, reviewed listings, and in-app messaging for U of M student housing.',
     images: ['/og-default.png'],
   },
 }
@@ -43,8 +43,8 @@ export default function AboutPage() {
 
               <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-xl">
                 Wroomly is a verified marketplace for sublets between
-                University of Michigan students. Every listing is reviewed, every payment is
-                secured, and every conversation stays on-platform.
+                University of Michigan students. Every account is verified, every
+                listing is reviewed, and every conversation stays on-platform.
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
@@ -55,10 +55,10 @@ export default function AboutPage() {
                   @umich.edu verified
                 </LiveBadge>
                 <LiveBadge
-                  icon={<CreditCard className="w-3.5 h-3.5" strokeWidth={1.75} />}
+                  icon={<BadgeDollarSign className="w-3.5 h-3.5" strokeWidth={1.75} />}
                   delay={0.82}
                 >
-                  Escrowed payments
+                  Free to use
                 </LiveBadge>
                 <LiveBadge
                   icon={<MessageSquare className="w-3.5 h-3.5" strokeWidth={1.75} />}
@@ -161,7 +161,7 @@ export default function AboutPage() {
               </h2>
               <p className="mt-5 text-ink-soft leading-relaxed max-w-[55ch]">
                 We&rsquo;re a small platform on purpose — verified accounts, reviewed
-                listings, and payments that never go off-platform.
+                listings, and conversations that never go off-platform.
               </p>
             </div>
           </ScrollReveal>

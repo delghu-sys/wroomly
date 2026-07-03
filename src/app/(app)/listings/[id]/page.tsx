@@ -71,7 +71,7 @@ export async function generateMetadata({
         })}`
       : 'flexible dates'
 
-  const description = `${bedroomLabel} ${typeLabel} in ${where}, available ${dateRange}. Listed by a verified University of Michigan student on Wroomly — secure escrow payment, no scams.`
+  const description = `${bedroomLabel} ${typeLabel} in ${where}, available ${dateRange}. Listed by a verified University of Michigan student on Wroomly — @umich.edu-verified, no scams.`
 
   return {
     title: seoTitle,
