@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/server'
+import { ATTRIBUTION_COOKIE, sanitizeSource } from '@/lib/attribution'
 
 export const runtime = 'nodejs'
 
@@ -22,8 +24,18 @@ export async function POST(request: Request) {
   }
 
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
-  const source =
+  let source =
     typeof body.source === 'string' ? body.source.slice(0, 120) : null
+
+  // Enrich with the first-touch attribution cookie (?ref=/?utm_source= —
+  // see src/lib/attribution.ts) so waitlist signups credit the flyer/rep
+  // that brought the visitor, not just the page they submitted from.
+  const attr = sanitizeSource(
+    (await cookies()).get(ATTRIBUTION_COOKIE)?.value ?? null
+  )
+  if (attr) {
+    source = (source ? `${source} ref:${attr}` : `ref:${attr}`).slice(0, 120)
+  }
 
   if (!email || email.length > 320 || !EMAIL_RE.test(email)) {
     return NextResponse.json(

@@ -755,9 +755,9 @@ Sections 4–8 prescribe what Wroomly *is doing*. This section cross-references 
 
 ### Open decisions blocking the plan (ranked by impact)
 
-1. **Definition of "match."** Blocks the north star and every §10 target. Recommend: inquiry accepted + contact exchanged, evented in code. *(Decide Week 1.)*
-2. **Analytics: PostHog vs. GA4.** Blocks all funnel measurement. Recommend PostHog (free tier, funnels + session replay, no cookie-banner complexity beyond current). *(Decide Week 1.)*
-3. **Email provider: Resend vs. Customer.io.** Blocks the §6 retention spine. Recommend Resend. *(Decide Week 3.)*
+1. ~~**Definition of "match."**~~ **RESOLVED (2026-07-03, Week 1):** match = **deal closure** — the lister marks the listing taken with a specific renter (`listings.closed_with`/`closed_at`, migration 025, already built). Stronger than the original accepted-inquiry recommendation; accepted inquiries remain the leading indicator ("contact exchanged"). Counted by `npm run metrics`.
+2. ~~**Analytics: PostHog vs. GA4.**~~ **RESOLVED (2026-07-03, Week 1):** neither — first-party. The full liquidity funnel is derivable from the database (`npm run metrics`: matches, liquidity ratio, funnel rates, sources via migration 030 first-touch attribution) + Vercel Analytics for cookieless pageviews. Zero new accounts, zero cookie complexity. PostHog remains an option later if session replay is wanted.
+3. ~~**Email provider: Resend vs. Customer.io.**~~ **RESOLVED (already de facto):** Resend was found wired in the codebase (`src/lib/resend.ts` + templates: inquiry received/accepted/declined, Match alerts). The §6 spine is mostly live; remaining gaps are the welcome + draft-reminder flows (Weeks 3–4).
 4. **Launch go-dates.** Supply-only flip (July) and full-launch date (pre-move-in August) — both founder calls; every §9 week number keys off them.
 5. **Fall time budget.** §10 assumes ~5 hrs/wk (8–10 in Feb–Mar). If classes make that unrealistic, reps must carry more and targets adjust — say so early.
 6. **Privacy-policy escrow edit + sublease-template review** — the two lawyer-gated items (docs/legal-checklist.md); template also gates idea #98.

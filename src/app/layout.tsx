@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Syne, Instrument_Sans, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@vercel/analytics/next'
 import { JsonLd, siteJsonLd } from '@/components/seo/JsonLd'
 
 const body = Instrument_Sans({
@@ -98,6 +99,10 @@ export default function RootLayout({
         <JsonLd data={siteJsonLd()} />
         {children}
         <Toaster position="top-right" richColors />
+        {/* Cookieless pageview counts (traffic by page/referrer). Product
+            funnel metrics come from the DB via `npm run metrics`, not from
+            here. Requires Analytics enabled once in the Vercel dashboard. */}
+        <Analytics />
       </body>
     </html>
   )

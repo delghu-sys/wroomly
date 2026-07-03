@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { ATTRIBUTION_COOKIE, sanitizeSource } from '@/lib/attribution'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -80,14 +82,34 @@ export async function GET(request: Request) {
     .maybeSingle()
 
   if (!existing) {
-    await supabase.from('users').insert({
+    // First-touch acquisition source, set by the middleware when the visitor
+    // originally landed with ?ref=/?utm_source= (see src/lib/attribution.ts).
+    // Recorded once, at account creation — the liquidity dashboard's
+    // "signups by source" splits on this.
+    const cookieStore = await cookies()
+    const signupSource = sanitizeSource(
+      cookieStore.get(ATTRIBUTION_COOKIE)?.value ?? null
+    )
+
+    const row = {
       id: data.user.id,
       email: data.user.email!,
       full_name: googleName,
       university: meta.university ?? null,
       user_type: effectiveType,
       is_verified: true,
-    })
+    }
+
+    // Deploy-order safety: if this code ships before migration 030 is
+    // applied, inserting signup_source would fail on the missing column and
+    // break every new signup. Attribution is never worth that — retry bare.
+    const { error: insertError } = await supabase
+      .from('users')
+      .insert({ ...row, signup_source: signupSource })
+    if (insertError) {
+      console.warn('[callback] insert with signup_source failed, retrying bare:', insertError.message)
+      await supabase.from('users').insert(row)
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`)

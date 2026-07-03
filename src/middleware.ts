@@ -7,6 +7,7 @@ import {
   COMING_SOON_PATH,
   BYPASS_COOKIE,
 } from '@/lib/supplyOnly'
+import { withAttribution } from '@/lib/attribution'
 
 // /list-place is public: it's the "List your place" CTA target and does its own
 // auth routing (anon → the public /start-listing chooser; supplier → /listings/new).
@@ -49,6 +50,13 @@ const PUBLIC_PREFIXES = [
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user, supabase: sessionClient } = await updateSession(request)
   const pathname = request.nextUrl.pathname
+
+  // First-touch acquisition attribution (?ref= / ?utm_source= → 30-day
+  // cookie; /callback copies it to users.signup_source). Set on the shared
+  // response here so every path that returns it carries the cookie; the
+  // supply-only redirect below is wrapped separately so flyer/rep links
+  // aren't lost at the /coming-soon gate.
+  withAttribution(request, supabaseResponse)
 
   // Stripe webhook validates its own signature; don't burn an auth lookup
   // or the cookie roundtrip on every event delivery.
@@ -113,7 +121,10 @@ export async function middleware(request: NextRequest) {
         exempt = t === 'admin' || t === 'supplier'
       }
       if (!exempt && !isSupplyOnlyAllowedPath(pathname)) {
-        return NextResponse.redirect(new URL(COMING_SOON_PATH, request.url))
+        return withAttribution(
+          request,
+          NextResponse.redirect(new URL(COMING_SOON_PATH, request.url))
+        )
       }
     }
   }
