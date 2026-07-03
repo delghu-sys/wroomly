@@ -39,6 +39,7 @@ export async function generateMetadata({
   return {
     title: name,
     description,
+    alternates: { canonical: `/users/${id}` },
     openGraph: {
       title: `${name} | Wroomly`,
       description,
