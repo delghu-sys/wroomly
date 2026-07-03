@@ -85,7 +85,7 @@ export default function PrivacyPage() {
             [&_h2]:font-display [&_h2]:text-2xl [&_h2]:tracking-tight [&_h2]:text-ink [&_h2]:leading-tight [&_h2]:mt-2
             [&_p]:text-ink-soft [&_p]:leading-relaxed [&_p]:max-w-[65ch]
             [&_strong]:font-semibold [&_strong]:text-[oklch(0.32_0.10_85)]
-            [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:hover:underline
+            [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:underline
             [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:max-w-[65ch]
             [&_ul>li]:text-ink-soft [&_ul>li]:leading-relaxed
             [&_ul>li::marker]:text-[oklch(0.45_0.13_85)]

@@ -8,9 +8,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-// In-app notFound() (e.g. a removed listing) renders inside the (app) layout,
-// which already provides <main id="main-content"> — so no landmark here, or the
-// document would have two main landmarks.
-export default function NotFound() {
-  return <NotFoundContent />
+// Global unmatched URLs render this at the root (no (app) layout, so no <main>
+// above it) — supply the main landmark here.
+export default function GlobalNotFound() {
+  return (
+    <main id="main-content">
+      <NotFoundContent />
+    </main>
+  )
 }

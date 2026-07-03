@@ -84,7 +84,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
           : 'bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-[0_1px_3px_oklch(0_0_0/0.04)] supports-[backdrop-filter]:bg-background/60'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <nav aria-label="Main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link
           href="/"

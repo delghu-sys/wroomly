@@ -83,7 +83,7 @@ export default function TermsPage() {
           <article className="space-y-14 sm:space-y-16">
             {/* Preamble */}
             <section className="relative max-w-[68ch]">
-              <p className="text-[14.5px] text-ink-soft leading-relaxed [&_strong]:font-semibold [&_strong]:text-[oklch(0.32_0.10_85)] [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:hover:underline">
+              <p className="text-[14.5px] text-ink-soft leading-relaxed [&_strong]:font-semibold [&_strong]:text-[oklch(0.32_0.10_85)] [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:underline">
                 These Terms of Service (the &ldquo;<strong>Terms</strong>&rdquo;)
                 form a binding agreement between you (&ldquo;
                 <strong>you</strong>,&rdquo; &ldquo;<strong>your</strong>,&rdquo;

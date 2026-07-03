@@ -534,8 +534,9 @@ export function MatchExperience() {
 function Logo({ white = false }: { white?: boolean }) {
   return (
     <Link href="/" className="logo" aria-label="Wroomly home">
+      {/* Decorative — the link's aria-label + visible "wroomly" text name it. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/logo.png" alt="Wroomly" width={26} height={26} />
+      <img src="/logo.png" alt="" width={26} height={26} />
       <span className={`logo-word ${white ? 'logo-white' : 'logo-dark'}`}>wroomly</span>
     </Link>
   )

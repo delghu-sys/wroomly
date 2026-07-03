@@ -101,7 +101,10 @@ function FooterCol({
 }) {
   return (
     <div>
-      <h4 className="text-xs uppercase tracking-[0.15em] font-semibold text-maize mb-4">{title}</h4>
+      {/* h2: footer columns are top-level sections of the footer landmark.
+          h4 skipped from the page's h1/h2 content and broke heading order on
+          nearly every page. Level is semantic; size stays via the classes. */}
+      <h2 className="text-xs uppercase tracking-[0.15em] font-semibold text-maize mb-4">{title}</h2>
       <ul className="space-y-2.5">
         {links.map(l => (
           <li key={l.href + l.label}>

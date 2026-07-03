@@ -67,7 +67,11 @@
   --surface: oklch(1 0 0);
   --ink: oklch(0.18 0.025 255);
   --ink-soft: oklch(0.36 0.02 255);
-  --ink-muted: oklch(0.55 0.015 255);
+  /* 0.55 measured ~4.4:1 on the cream/white surfaces — under WCAG AA 4.5:1 for
+     the small muted text (prices, meta, 10px eyebrow labels). 0.47 clears it
+     even on the tinted off-white panels (booking sidebar, import form). Only
+     ever affects text on light backgrounds, so it strictly improves contrast. */
+  --ink-muted: oklch(0.47 0.015 255);
   --line: oklch(0.91 0.01 90);
   --maize: oklch(0.86 0.17 92);
   --maize-soft: oklch(0.96 0.05 92);

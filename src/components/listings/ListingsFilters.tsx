@@ -115,7 +115,7 @@ export function ListingsFilters({
               className="text-[oklch(0.45_0.13_85)]"
             />
           </div>
-          <h3 className="font-display text-base text-ink tracking-tight">Filters</h3>
+          <h2 className="font-display text-base text-ink tracking-tight">Filters</h2>
         </div>
         {hasFilters && (
           <button
@@ -134,7 +134,7 @@ export function ListingsFilters({
           value={currentFilters.sort ?? 'newest'}
           onValueChange={v => updateFilter('sort', !v || v === 'newest' ? undefined : v)}
         >
-          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+          <SelectTrigger aria-label="Sort listings" className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Newest first" />
           </SelectTrigger>
           <SelectContent>
@@ -160,7 +160,7 @@ export function ListingsFilters({
             })
           }
         >
-          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+          <SelectTrigger aria-label="Property type" className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
@@ -180,7 +180,7 @@ export function ListingsFilters({
             value={currentFilters.residence_name ?? ''}
             onValueChange={v => updateFilter('residence_name', v || undefined)}
           >
-            <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+            <SelectTrigger aria-label="Residence or complex" className="h-10 rounded-xl border-line bg-white/80">
               <SelectValue placeholder="Any residence" />
             </SelectTrigger>
             <SelectContent>
@@ -251,7 +251,7 @@ export function ListingsFilters({
           value={availableFromCurrent}
           onValueChange={v => updateFilter('available_from', v || undefined)}
         >
-          <SelectTrigger className="h-10 rounded-xl border-line bg-white/80">
+          <SelectTrigger aria-label="Available from month" className="h-10 rounded-xl border-line bg-white/80">
             <SelectValue placeholder="Any month" />
           </SelectTrigger>
           <SelectContent>
@@ -276,6 +276,7 @@ export function ListingsFilters({
           <Input
             type="number"
             placeholder="Min"
+            aria-label="Minimum monthly price"
             defaultValue={currentFilters.min_price}
             onBlur={e => updateFilter('min_price', e.target.value || undefined)}
             className="h-10 rounded-xl border-line bg-white/80"
@@ -283,6 +284,7 @@ export function ListingsFilters({
           <Input
             type="number"
             placeholder="Max"
+            aria-label="Maximum monthly price"
             defaultValue={currentFilters.max_price}
             onBlur={e => updateFilter('max_price', e.target.value || undefined)}
             className="h-10 rounded-xl border-line bg-white/80"
