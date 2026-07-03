@@ -118,6 +118,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
             onKeyDown={onKeyDown}
             placeholder="Type a message…"
             rows={1}
+            maxLength={5000}
             disabled={disabled || sending}
             className="
               w-full resize-none rounded-3xl

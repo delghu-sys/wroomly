@@ -13,6 +13,12 @@ Sentry.init({
   // Sentry project as real users, polluting alerts with non-issues.
   enabled: process.env.NODE_ENV === "production",
 
+  // Client-disconnect noise: "Error: aborted" fires when a browser drops the
+  // connection mid-response (navigation away, flaky mobile network). Nothing
+  // is wrong server-side; without this filter it lands as level:fatal and
+  // buries real errors (prelaunch-audit item 6).
+  ignoreErrors: [/^Error: aborted$/, "aborted", "ECONNRESET"],
+
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,
 

@@ -43,6 +43,8 @@ const ALLOWED_PREFIXES = [
   '/import-listing', // public AI-import entry point for suppliers
   '/claim-listing/', // claim a drafted listing
   '/api/waitlist',
+  '/api/events', // anonymous funnel events — coming-soon visitors count too
+  '/monitoring', // Sentry browser tunnel — anonymous errors must report
   '/api/listing-imports', // supplier import APIs (do their own auth)
   '/sitemap',
   '/robots',

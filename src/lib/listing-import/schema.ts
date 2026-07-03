@@ -16,6 +16,51 @@ export function isPublishablePhotoPath(path: string): boolean {
 
 export const MAX_PASTED_TEXT = 20_000 // chars — generous, prevents abuse
 
+// ── Direct-to-storage upload handshake ──
+// Files never travel through our API routes (Vercel caps request bodies at
+// ~4.5MB — two phone photos would 413). Instead the client asks
+// /api/listing-imports/upload-urls for signed upload targets, PUTs each file
+// straight to the private storage bucket, then finishes the import with the
+// storage paths. This schema validates the handshake request.
+export const uploadRequestSchema = z.object({
+  email: z.string().trim().email('Enter a valid email address.'),
+  files: z
+    .array(
+      z.object({
+        kind: z.enum(['personal', 'building']),
+        mimeType: z.enum(UPLOAD_LIMITS.acceptedMimeTypes),
+        sizeBytes: z.number().int().positive(),
+      }),
+    )
+    // Empty is allowed — a text-only import still opens a session here.
+    .max(UPLOAD_LIMITS.maxFiles * 2)
+    .superRefine((files, ctx) => {
+      for (const kind of ['personal', 'building'] as const) {
+        if (files.filter(f => f.kind === kind).length > UPLOAD_LIMITS.maxFiles) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Upload at most ${UPLOAD_LIMITS.maxFiles} ${kind} files.`,
+          })
+        }
+      }
+      for (const f of files) {
+        const limit =
+          f.mimeType === 'application/pdf'
+            ? UPLOAD_LIMITS.maxPdfBytesPerFile
+            : UPLOAD_LIMITS.maxBytesPerFile
+        if (f.sizeBytes > limit) {
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              f.mimeType === 'application/pdf'
+                ? 'Each PDF must be 25MB or smaller.'
+                : 'Each image must be 8MB or smaller.',
+          })
+        }
+      }
+    }),
+})
+
 // ── Import request input (post-parse: the API normalizes FormData to this) ──
 // File *contents* are validated separately during multipart parsing; here we
 // validate the scalar fields + the cross-field rules.
@@ -108,6 +153,27 @@ export const importInputSchema = z
   })
 
 export type ImportInput = z.infer<typeof importInputSchema>
+
+// ── Finish payload (JSON) for the two-phase import ──
+// The client sends the storage paths it uploaded to (returned by
+// /upload-urls); the server verifies every path actually exists in storage
+// under this request's prefix before trusting it.
+export const importFinishSchema = z.object({
+  requestId: z.string().uuid(),
+  email: z.string().trim().email('Enter a valid email address.'),
+  personalSourceUrl: z.string().trim().url('Enter a valid link.').optional().or(z.literal('').transform(() => undefined)),
+  personalPastedText: z.string().trim().max(MAX_PASTED_TEXT, 'That text is too long.').optional().or(z.literal('').transform(() => undefined)),
+  personalPaths: z.array(z.string().min(1).max(300)).max(UPLOAD_LIMITS.maxFiles).default([]),
+  buildingSourceUrl: z.string().trim().url('Enter a valid building/floor plan link.').optional().or(z.literal('').transform(() => undefined)),
+  buildingPastedText: z.string().trim().max(MAX_PASTED_TEXT, 'That text is too long.').optional().or(z.literal('').transform(() => undefined)),
+  buildingPaths: z.array(z.string().min(1).max(300)).max(UPLOAD_LIMITS.maxFiles).default([]),
+  buildingName: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
+  floorPlanName: z.string().trim().max(120).optional().or(z.literal('').transform(() => undefined)),
+  consentConfirmed: z.boolean(),
+  buildingEnrichmentConsent: z.boolean().default(false),
+})
+
+export type ImportFinishInput = z.infer<typeof importFinishSchema>
 
 // ── Strict AI output schema. Validates the model's JSON before we trust it. ──
 const nullableNum = z.number().nullable()

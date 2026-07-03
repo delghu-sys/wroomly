@@ -72,13 +72,24 @@ async function allUsers() {
   }
 }
 
-const [users, listings, inquiries, waitlist, alerts, authTotal] = await Promise.all([
+// analytics_events lands with migration 031 — treat as optional.
+async function allEvents() {
+  try {
+    return await all('analytics_events', 'id, name, created_at')
+  } catch {
+    console.warn('⚠ analytics_events missing — apply migration 031 for the funnel section\n')
+    return []
+  }
+}
+
+const [users, listings, inquiries, waitlist, alerts, authTotal, events] = await Promise.all([
   allUsers(),
   all('listings', 'id, created_at, status, closed_at, supplier_id'),
   all('inquiries', 'id, created_at, status, listing_id'),
   all('renter_waitlist', 'id, created_at, source'),
   all('match_alerts', 'id, created_at, status, source'),
   authUserCount(),
+  allEvents(),
 ])
 
 const inWindow = r => r.created_at >= since
@@ -119,6 +130,16 @@ const medianDtF = daysToFirst.length
 
 const pct = (a, b) => (b ? `${Math.round((100 * a) / b)}%` : '—')
 
+// ── Funnel events (migration 031) ──
+const evCount = name => events.filter(e => e.name === name && inWindow(e)).length
+const funnelLine = events.length
+  ? [
+      `import: started ${evCount('import_started')} → uploaded ${evCount('import_upload_done')} → succeeded ${evCount('import_succeeded')} (failed ${evCount('import_failed')})`,
+      `    claim: viewed ${evCount('claim_viewed')} → publish attempted ${evCount('publish_attempted')} → succeeded ${evCount('publish_succeeded')} (failed ${evCount('publish_failed')})`,
+      `    inquiries sent (client event): ${evCount('inquiry_sent')}`,
+    ].join('\n')
+  : '(no events yet — apply migration 031 + deploy)'
+
 console.log(`
 WROOMLY LIQUIDITY DASHBOARD — ${new Date().toISOString().slice(0, 10)}  (window: last ${windowDays}d)
 ${'─'.repeat(72)}
@@ -138,6 +159,9 @@ DEMAND
       by source:         ${bySource(waitlist)}
     match alerts:        window ${alerts.filter(inWindow).length} · total ${alerts.length} (active: ${activeAlerts.length})
       by source:         ${bySource(alerts)}
+
+FUNNEL (window)
+    ${funnelLine}
 
 ACCOUNTS
     signups (verified):  window ${users.filter(inWindow).length} · total ${users.length}

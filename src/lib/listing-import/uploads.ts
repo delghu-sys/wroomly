@@ -83,6 +83,103 @@ export async function uploadImportImages(
   return out
 }
 
+export interface SignedUploadTarget {
+  path: string
+  token: string
+}
+
+/**
+ * Mint signed UPLOAD urls so the browser can PUT files straight into the
+ * private imports bucket — bypassing our API routes entirely (Vercel caps
+ * request bodies at ~4.5MB, which two phone photos exceed). The token is
+ * single-use and scoped to exactly one server-generated path, so the client
+ * can never write outside imports/<requestId>/<kind>/.
+ */
+export async function createSignedUploadTargets(
+  requestId: string,
+  files: { kind: 'personal' | 'building'; mimeType: string }[],
+): Promise<SignedUploadTarget[]> {
+  const service = createServiceClient()
+  const out: SignedUploadTarget[] = []
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i]
+    const ext = EXT_BY_MIME[f.mimeType] ?? 'jpg'
+    const path = `imports/${requestId}/${f.kind}/${Date.now()}-${i}.${ext}`
+    const { data, error } = await service.storage
+      .from(IMPORTS_BUCKET)
+      .createSignedUploadUrl(path)
+    if (error || !data?.token) {
+      console.error('[listing-import upload-urls] mint failed', { path, error: error?.message })
+      throw new UploadError('Could not prepare the upload. Please try again.')
+    }
+    out.push({ path, token: data.token })
+  }
+  return out
+}
+
+/**
+ * Verify client-claimed storage paths after a direct upload: every path must
+ * live under this request's prefix for the given kind, actually exist in the
+ * bucket, and respect the size/type limits. Returns the verified paths
+ * (order preserved). Never trusts the client's word for any of it.
+ */
+export async function verifyUploadedPaths(
+  requestId: string,
+  paths: string[],
+  kind: 'personal' | 'building',
+  opts: { imagesOnly?: boolean } = {},
+): Promise<string[]> {
+  if (paths.length === 0) return []
+  if (paths.length > UPLOAD_LIMITS.maxFiles) {
+    throw new UploadError(`Too many files — upload at most ${UPLOAD_LIMITS.maxFiles}.`)
+  }
+  const prefix = `imports/${requestId}/${kind}/`
+  for (const p of paths) {
+    if (!p.startsWith(prefix) || p.includes('..')) {
+      throw new UploadError('Invalid file reference.')
+    }
+  }
+
+  const service = createServiceClient()
+  // list() takes the folder path (no trailing slash) and returns direct children.
+  const { data: entries, error } = await service.storage
+    .from(IMPORTS_BUCKET)
+    .list(prefix.slice(0, -1), { limit: 100 })
+  if (error) {
+    console.error('[listing-import verify] list failed', { prefix, error: error.message })
+    throw new UploadError('Could not verify the uploaded files. Please try again.')
+  }
+  const byName = new Map(
+    (entries ?? []).map(e => [e.name, e.metadata as { size?: number; mimetype?: string } | null]),
+  )
+
+  for (const p of paths) {
+    const name = p.slice(prefix.length)
+    const meta = byName.get(name)
+    if (meta === undefined) {
+      throw new UploadError('An uploaded file is missing — please re-upload and try again.')
+    }
+    const mime = meta?.mimetype ?? ''
+    const size = meta?.size ?? 0
+    if (!(UPLOAD_LIMITS.acceptedMimeTypes as readonly string[]).includes(mime)) {
+      throw new UploadError('Only JPG, PNG, WebP images, or PDF files are allowed.')
+    }
+    if (opts.imagesOnly && mime === 'application/pdf') {
+      throw new UploadError('Listing photos must be images (JPG, PNG, or WebP), not PDFs.')
+    }
+    const limit =
+      mime === 'application/pdf' ? UPLOAD_LIMITS.maxPdfBytesPerFile : UPLOAD_LIMITS.maxBytesPerFile
+    if (size <= 0 || size > limit) {
+      throw new UploadError(
+        mime === 'application/pdf'
+          ? 'Each PDF must be 25MB or smaller.'
+          : 'Each image must be 8MB or smaller.',
+      )
+    }
+  }
+  return paths
+}
+
 /**
  * Mint short-lived signed URLs for a set of private import paths, returned as
  * a { path → signedUrl } map. Used by the admin-review and claim pages (which
