@@ -192,6 +192,17 @@
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  /* Word-by-word hero reveal (WordReveal component). CSS on purpose:
+     hero headlines are LCP elements, and JS-gated entrances leave them
+     invisible until hydration (~7s on a slow phone). `both` keeps words
+     hidden through their per-word animation-delay, then visible forever. */
+  @keyframes word-rise {
+    from { opacity: 0; transform: translateY(0.6em); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-word-rise {
+    animation: word-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -429,6 +440,7 @@
     .animate-gradient,
     .animate-orbit,
     .animate-ping-soft,
+    .animate-word-rise,
     .shimmer,
     .stagger-reveal > * {
       animation: none !important;

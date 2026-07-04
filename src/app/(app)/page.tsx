@@ -70,9 +70,11 @@ export default async function HomePage() {
               min-[800px]:grid min-[800px]:grid-cols-4 min-[800px]:gap-4 min-[800px]:px-8 min-[800px]:overflow-visible
             "
           >
-            {listings.map(listing => (
+            {listings.map((listing, i) => (
               <div key={listing.id} className="w-[230px] shrink-0 snap-start min-[800px]:w-auto">
-                <BrandListingCard listing={listing} userId={user?.id ?? null} />
+                {/* First card's cover is the homepage LCP on mobile —
+                    preload it instead of queuing behind the JS. */}
+                <BrandListingCard listing={listing} userId={user?.id ?? null} priorityImage={i === 0} />
               </div>
             ))}
           </div>

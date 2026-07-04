@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion, useReducedMotion } from 'motion/react'
 import { MapPin, Calendar, DollarSign, Search, ArrowRight } from 'lucide-react'
 
 /**
@@ -18,7 +17,6 @@ import { MapPin, Calendar, DollarSign, Search, ArrowRight } from 'lucide-react'
  *   Budget → max_price (whole dollars)
  */
 
-const ease = [0.22, 1, 0.36, 1] as const
 
 // Quick chips → the exact filters /listings understands.
 const CHIPS: { label: string; href: string }[] = [
@@ -30,7 +28,6 @@ const CHIPS: { label: string; href: string }[] = [
 
 export function HomeSearch() {
   const router = useRouter()
-  const reduce = useReducedMotion()
   const [location, setLocation] = useState('')
   const [date, setDate] = useState('')
   const [budget, setBudget] = useState('')
@@ -56,13 +53,11 @@ export function HomeSearch() {
   const inputCls =
     'w-full bg-transparent border-none outline-none text-ink text-[0.9375rem] min-[680px]:text-[0.875rem] font-medium placeholder:text-ink-muted placeholder:font-normal'
 
+  // CSS entrance, not motion: the search placeholder is the homepage LCP
+  // element — a motion entrance kept the whole search bar invisible until
+  // hydration (~7s on a throttled phone). CSS paints at first render.
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7, ease, delay: 0.3 }}
-      className="w-full max-w-[44rem]"
-    >
+    <div className="animate-fade-up w-full max-w-[44rem]" style={{ animationDelay: '0.3s' }}>
       <form
         onSubmit={submit}
         role="search"
@@ -145,12 +140,7 @@ export function HomeSearch() {
       </form>
 
       {/* Browse everything, no filters — for people who don't want to search */}
-      <motion.div
-        initial={reduce ? false : { opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease, delay: 0.35 }}
-        className="mt-4 text-center"
-      >
+      <div className="animate-fade-up mt-4 text-center" style={{ animationDelay: '0.35s' }}>
         <Link
           href="/listings"
           className="
@@ -168,15 +158,13 @@ export function HomeSearch() {
             aria-hidden
           />
         </Link>
-      </motion.div>
+      </div>
 
       {/* Quick filter chips */}
-      <motion.nav
-        initial={reduce ? false : { opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease, delay: 0.4 }}
+      <nav
         aria-label="Quick filters"
-        className="mt-[1.375rem] flex flex-wrap justify-center gap-2"
+        className="animate-fade-up mt-[1.375rem] flex flex-wrap justify-center gap-2"
+        style={{ animationDelay: '0.4s' }}
       >
         {CHIPS.map(c => (
           <Link
@@ -192,7 +180,7 @@ export function HomeSearch() {
             {c.label}
           </Link>
         ))}
-      </motion.nav>
-    </motion.div>
+      </nav>
+    </div>
   )
 }

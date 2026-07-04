@@ -55,6 +55,9 @@ export function ListingsGrid({
             userId={userId}
             isFavorited={favoriteIds.has(listing.id)}
             supplierRating={ratingBySupplier[listing.supplier_id]}
+            // First two cards are the mobile LCP candidates — preload their
+            // covers so they don't queue behind the JS on a throttled pipe.
+            priorityImage={i < 2}
           />
         )
         return i < ANIMATED_COUNT ? (

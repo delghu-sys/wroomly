@@ -54,10 +54,12 @@ Sentry.init({
     return event
   },
 
-  // Sample client traces instead of tracing every interaction — span
-  // creation + beacon sends on each navigation add measurable main-thread
-  // work on mobile. 15% is plenty at this traffic level.
-  tracesSampleRate: 0.15,
+  // Client tracing fully off: the tracing machinery is also excluded from
+  // the browser bundle via bundleSizeOptimizations.excludeTracing in
+  // next.config (it dominated a 424KB chunk costing ~1s of eval per page on
+  // mobile). Server-side traces still cover API/DB performance; the client
+  // only reports errors.
+  tracesSampleRate: 0,
   // Enable logs to be sent to Sentry
   enableLogs: true,
 
