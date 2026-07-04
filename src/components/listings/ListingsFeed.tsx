@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ListingWithDetails } from '@/types/database'
@@ -60,14 +60,17 @@ export function ListingsFeed({ listings, favoriteIds, userId, nextPageHref }: Li
     <div
       ref={containerRef}
       data-testid="listings-feed"
-      className="h-[calc(100dvh-4rem)] overflow-y-auto snap-y snap-mandatory overscroll-contain scroll-mt-16 [&::-webkit-scrollbar]:hidden"
+      // svh, not dvh: iOS resizes dvh as the URL bar collapses mid-scroll,
+      // which re-lays-out every snap card WHILE scrolling — visible stutter.
+      // svh stays constant for the whole gesture.
+      className="h-[calc(100svh-4rem)] overflow-y-auto snap-y snap-mandatory overscroll-contain scroll-mt-16 [&::-webkit-scrollbar]:hidden"
       style={{ scrollbarWidth: 'none' }}
     >
-      {listings.map(l => (
-        <FeedCard key={l.id} listing={l} isFavorited={favs.has(l.id)} userId={userId} />
+      {listings.map((l, i) => (
+        <FeedCard key={l.id} listing={l} index={i} isFavorited={favs.has(l.id)} userId={userId} />
       ))}
       {nextPageHref && (
-        <div className="h-[calc(100dvh-4rem)] snap-start flex items-center justify-center">
+        <div className="h-[calc(100svh-4rem)] snap-start flex items-center justify-center">
           <Link
             href={nextPageHref}
             className="inline-flex items-center gap-2 h-12 px-8 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition"
@@ -82,13 +85,39 @@ export function ListingsFeed({ listings, favoriteIds, userId, nextPageHref }: Li
 
 function FeedCard({
   listing,
+  index,
   isFavorited,
   userId,
 }: {
   listing: ListingWithDetails
+  index: number
   isFavorited: boolean
   userId: string | null
 }) {
+  // Media virtualization: 24 full-viewport cards × several images each is
+  // too much decode + compositor memory for a phone. Each card mounts its
+  // media only once it comes within ~1.5 screens of the viewport (first two
+  // cards mount immediately for instant first paint). Once mounted it stays
+  // — decoded images are cheap to keep, re-mounting would re-jank.
+  const sectionRef = useRef<HTMLElement>(null)
+  const [nearby, setNearby] = useState(index < 2)
+  useEffect(() => {
+    if (nearby) return
+    const el = sectionRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setNearby(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '150% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [nearby])
+
   const imageUrls = [...(listing.listing_images ?? [])]
     .sort((a, b) => a.display_order - b.display_order)
     .map(img => getListingImageUrl(img.storage_path))
@@ -97,12 +126,13 @@ function FeedCard({
 
   return (
     <section
+      ref={sectionRef}
       aria-label={listing.title}
-      className="h-[calc(100dvh-4rem)] snap-start relative flex items-stretch justify-center bg-[oklch(0.16_0.04_256)]"
+      className="h-[calc(100svh-4rem)] snap-start relative flex items-stretch justify-center bg-[oklch(0.16_0.04_256)]"
     >
       {/* Media column — full-bleed on mobile, phone-width centered on desktop */}
       <div className="relative w-full sm:max-w-[480px] sm:my-4 sm:rounded-3xl overflow-hidden bg-[oklch(0.22_0.075_256)]">
-        {videoUrl ? (
+        {!nearby ? null : videoUrl ? (
           <FeedVideo src={videoUrl} poster={imageUrls[0]} />
         ) : imageUrls.length > 1 ? (
           <div className="absolute inset-0 group">
@@ -113,7 +143,8 @@ function FeedCard({
             src={imageUrls[0]}
             alt={listing.title}
             fill
-            quality={90}
+            quality={75}
+            priority={index === 0}
             className="object-cover"
             sizes="(max-width: 640px) 100vw, 480px"
           />

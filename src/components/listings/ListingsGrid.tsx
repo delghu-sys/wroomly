@@ -11,6 +11,11 @@ interface ListingsGridProps {
   ratingBySupplier: Record<string, { avg: number; count: number }>
 }
 
+// Only the above-the-fold cards get the staggered spring entrance. Running
+// it on all 24 meant 24 concurrent springs at page load — measurable
+// main-thread cost on phones for cards nobody can see yet.
+const ANIMATED_COUNT = 6
+
 const grid = {
   initial: {},
   animate: {
@@ -43,16 +48,31 @@ export function ListingsGrid({
       animate="animate"
       className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5"
     >
-      {listings.map(listing => (
-        <motion.div key={listing.id} variants={item} className="h-full">
+      {listings.map((listing, i) => {
+        const card = (
           <BrandListingCard
             listing={listing}
             userId={userId}
             isFavorited={favoriteIds.has(listing.id)}
             supplierRating={ratingBySupplier[listing.supplier_id]}
           />
-        </motion.div>
-      ))}
+        )
+        return i < ANIMATED_COUNT ? (
+          <motion.div key={listing.id} variants={item} className="h-full">
+            {card}
+          </motion.div>
+        ) : (
+          // content-visibility lets the browser skip layout + paint for
+          // offscreen cards entirely — long grids scroll like short ones.
+          // The intrinsic-size placeholder keeps the scrollbar honest.
+          <div
+            key={listing.id}
+            className="h-full [content-visibility:auto] [contain-intrinsic-size:auto_430px]"
+          >
+            {card}
+          </div>
+        )
+      })}
     </motion.div>
   )
 }

@@ -461,11 +461,21 @@
    Top-level (unlayered) so these win over the Tailwind utility classes.
    ─────────────────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  /* Zero, not "less": listing cards, chips, and filter panels sit on the
+     plain page background, so their frost is visually undetectable — but the
+     GPU still recomposites every one of them per scrolled frame. Kill it.
+     Surfaces that genuinely float OVER scrolling content (navbar, sheets)
+     opt back in with .mobile-frost below. */
   .backdrop-blur-xl,
   .backdrop-blur-lg,
-  .backdrop-blur-md {
-    -webkit-backdrop-filter: blur(6px) !important;
-    backdrop-filter: blur(6px) !important;
+  .backdrop-blur-md,
+  .backdrop-blur {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .mobile-frost {
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
   }
 
   /* Animating a 120–140px blur is expensive; keep the blobs static on mobile. */
