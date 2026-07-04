@@ -17,6 +17,26 @@ export function formatDateRange(from: string, to: string): string {
   return fromStr === toStr ? fromStr : `${fromStr} – ${toStr}`
 }
 
+/**
+ * "New" = published within the last 72 hours. One shared definition so the
+ * card badge, feed badge, and Just-listed strip can never disagree
+ * (docs/social-share-audit.md item 3 — honest cues only).
+ */
+export const NEW_LISTING_WINDOW_MS = 72 * 60 * 60 * 1000
+
+export function isNewListing(createdAt: string, now: Date = new Date()): boolean {
+  const created = new Date(createdAt).getTime()
+  if (!Number.isFinite(created)) return false
+  return now.getTime() - created <= NEW_LISTING_WINDOW_MS && created <= now.getTime()
+}
+
+/** ISO cutoff for the "Just listed" query — anything created after this is
+ * within the New window. Lives here (not inline in the server component)
+ * so the React-compiler purity lint doesn't flag Date.now in render. */
+export function justListedCutoffISO(): string {
+  return new Date(Date.now() - NEW_LISTING_WINDOW_MS).toISOString()
+}
+
 // "YYYY-MM" → "YYYY-MM-01"
 export function monthToFromDate(yyyymm: string): string {
   return `${yyyymm}-01`
@@ -41,4 +61,10 @@ export function dateToMonth(yyyymmdd: string | null | undefined): string {
 
 export function getListingImageUrl(storagePath: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/listing-images/${storagePath}`
+}
+
+// Walkthrough videos live in the same public bucket (migration 033), so the
+// URL shape is identical — a separate helper keeps call sites self-documenting.
+export function getListingVideoUrl(storagePath: string): string {
+  return getListingImageUrl(storagePath)
 }

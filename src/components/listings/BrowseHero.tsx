@@ -12,7 +12,7 @@ interface BrowseHeroProps {
   totalCount: number
   currentQuery?: string
   filters: Record<string, string | undefined>
-  view: 'grid' | 'map'
+  view: 'grid' | 'feed' | 'map'
 }
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }

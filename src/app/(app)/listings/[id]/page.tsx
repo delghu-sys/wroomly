@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { ListingWithDetails } from '@/types/database'
 import { BrandedGallery } from '@/components/listings/BrandedGallery'
 import { ListingMap } from '@/components/listings/ListingMap'
@@ -9,7 +9,9 @@ import { SupplierCard } from '@/components/listings/SupplierCard'
 import { BookingSidebar } from '@/components/listings/BookingSidebar'
 import { BrandChip } from '@/components/brand/BrandChip'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
-import { BedDouble, Bath, Maximize2, Calendar, MapPin } from 'lucide-react'
+import { ShareListing } from '@/components/listings/ShareListing'
+import { ViewPing } from '@/components/listings/ViewPing'
+import { BedDouble, Bath, Maximize2, Calendar, MapPin, Eye, Heart } from 'lucide-react'
 import { formatDateRange, getListingImageUrl } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
 import {
@@ -134,11 +136,28 @@ export default async function ListingDetailPage({
 
   // Fan-out the independent queries: supplier rating + auth lookup don't
   // depend on each other, so run them in parallel. Saves one round-trip.
-  const [{ data: supplierReviews }, { data: { user: authUser } }] =
-    await Promise.all([
-      supabase.from('reviews').select('rating').eq('reviewee_id', l.supplier_id),
-      supabase.auth.getUser(),
-    ])
+  // Activity cues (docs/social-share-audit.md item 3) ride along: real save
+  // count from favorites and real view count from listing_viewed events —
+  // both need the service role (favorites RLS is per-user; analytics_events
+  // is service-only). Failure-tolerant: a missing table just yields null → 0.
+  const service = createServiceClient()
+  const [
+    { data: supplierReviews },
+    { data: { user: authUser } },
+    { count: saveCountRaw },
+    { count: viewCountRaw },
+  ] = await Promise.all([
+    supabase.from('reviews').select('rating').eq('reviewee_id', l.supplier_id),
+    supabase.auth.getUser(),
+    service.from('favorites').select('id', { count: 'exact', head: true }).eq('listing_id', id),
+    service
+      .from('analytics_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('name', 'listing_viewed')
+      .eq('props->>listingId', id),
+  ])
+  const saveCount = saveCountRaw ?? 0
+  const viewCount = viewCountRaw ?? 0
 
   const supplierReviewCount = supplierReviews?.length ?? 0
   const supplierRatingAvg =
@@ -290,13 +309,25 @@ export default async function ListingDetailPage({
             {/* Title + badges */}
             <ScrollReveal delay={0.1}>
               <div>
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <BrandChip variant="navy">Sublet</BrandChip>
-                  {l.furnished && <BrandChip variant="ghost">Furnished</BrandChip>}
-                  {l.utilities_included && (
-                    <BrandChip variant="ghost">Utilities included</BrandChip>
-                  )}
-                  {l.pets_allowed && <BrandChip variant="ghost">Pets OK</BrandChip>}
+                <ViewPing listingId={l.id} />
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <BrandChip variant="navy">Sublet</BrandChip>
+                    {l.furnished && <BrandChip variant="ghost">Furnished</BrandChip>}
+                    {l.utilities_included && (
+                      <BrandChip variant="ghost">Utilities included</BrandChip>
+                    )}
+                    {l.pets_allowed && <BrandChip variant="ghost">Pets OK</BrandChip>}
+                  </div>
+                  <ShareListing
+                    listingId={l.id}
+                    title={l.title}
+                    priceLabel={
+                      l.price_per_month
+                        ? `$${Math.round(l.price_per_month / 100).toLocaleString()}/mo`
+                        : null
+                    }
+                  />
                 </div>
 
                 <h1 className="font-display text-[clamp(2rem,4vw,3.25rem)] tracking-tight text-ink leading-[1.05]">
@@ -306,6 +337,25 @@ export default async function ListingDetailPage({
                   <p className="mt-3 text-ink-muted flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-[oklch(0.45_0.13_85)]" strokeWidth={1.75} />
                     {l.neighborhood}, {l.city}, {l.state}
+                  </p>
+                )}
+                {/* Honest activity cues — real counts only, hidden until they
+                    reach 3 so a fresh listing never shows a sad zero and the
+                    numbers are never fabricated (audit item 3). */}
+                {(viewCount >= 3 || saveCount >= 3) && (
+                  <p className="mt-2 flex items-center gap-4 text-[13px] text-ink-muted">
+                    {viewCount >= 3 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Eye className="w-3.5 h-3.5" strokeWidth={1.75} />
+                        {viewCount.toLocaleString()} student{viewCount === 1 ? '' : 's'} viewed
+                      </span>
+                    )}
+                    {saveCount >= 3 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <Heart className="w-3.5 h-3.5" strokeWidth={1.75} />
+                        Saved by {saveCount.toLocaleString()}
+                      </span>
+                    )}
                   </p>
                 )}
                 {/* Source provenance (seed or partner) — honest attribution + link. */}
