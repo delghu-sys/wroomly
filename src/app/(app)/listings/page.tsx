@@ -226,6 +226,16 @@ export default async function ListingsPage({
         ).toString()}`
       : null
 
+  // Feed has its own scroll container with overscroll-contain (so the snap
+  // scroll doesn't fight the outer page) — which also means the Grid/Map
+  // toggle in the hero above becomes unreachable once inside it. The feed
+  // needs its own exit link back to the same filters, minus view=feed.
+  const gridHref = `/listings?${new URLSearchParams(
+    Object.entries(filters).filter(
+      (kv): kv is [string, string] => kv[0] !== 'view' && typeof kv[1] === 'string' && kv[1].length > 0,
+    ),
+  ).toString()}`
+
   const mapListings: MapListing[] = typedListings.map(l => {
     const firstImage = l.listing_images?.[0]
     const image_url = firstImage ? getListingImageUrl(firstImage.storage_path) : null
@@ -319,6 +329,7 @@ export default async function ListingsPage({
                   favoriteIds={Array.from(favoriteIds)}
                   userId={authUser?.id ?? null}
                   nextPageHref={feedNextHref}
+                  exitHref={gridHref}
                 />
               </div>
             ) : (

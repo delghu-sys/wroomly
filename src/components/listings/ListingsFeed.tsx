@@ -15,13 +15,18 @@ import { FavoriteButton } from './FavoriteButton'
 import { CardGallery } from './CardGallery'
 import { ShareListing } from './ShareListing'
 import { track } from '@/lib/track'
-import { BedDouble, Calendar, MapPin, ArrowRight } from 'lucide-react'
+import { BedDouble, Calendar, MapPin, ArrowRight, LayoutGrid } from 'lucide-react'
 
 interface ListingsFeedProps {
   listings: ListingWithDetails[]
   favoriteIds: string[]
   userId: string | null
   nextPageHref?: string | null
+  /** Back to Grid, same filters minus view=feed. The feed's own scroll
+   * container uses overscroll-contain so its snap scroll doesn't fight the
+   * outer page — which also traps scroll input, making the Grid/Map toggle
+   * in the hero above unreachable. This is the feed's own way out. */
+  exitHref: string
 }
 
 /**
@@ -32,7 +37,7 @@ interface ListingsFeedProps {
  * on screen (IntersectionObserver, pause off-screen); everything degrades
  * to photos → single image → branded placeholder.
  */
-export function ListingsFeed({ listings, favoriteIds, userId, nextPageHref }: ListingsFeedProps) {
+export function ListingsFeed({ listings, favoriteIds, userId, nextPageHref, exitHref }: ListingsFeedProps) {
   const favs = new Set(favoriteIds)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -66,6 +71,25 @@ export function ListingsFeed({ listings, favoriteIds, userId, nextPageHref }: Li
       className="h-[calc(100svh-4rem)] overflow-y-auto snap-y snap-mandatory overscroll-contain scroll-mt-16 [&::-webkit-scrollbar]:hidden"
       style={{ scrollbarWidth: 'none' }}
     >
+      {/* Pinned exit — position:fixed, not absolute/sticky. Verified: an
+          absolutely-positioned child of this overflow-y-auto container
+          scrolls away with the content (its containing block is the
+          scrolled canvas, not the viewport); sticky would stay put but
+          adds real layout height, offsetting every snap card below it.
+          Fixed is the only option that stays on screen for free — no
+          transform/filter/perspective ancestor exists here to give it a
+          different containing block. This is the feed's own way out,
+          since overscroll-contain traps scroll input and the Grid/Map
+          toggle in the hero above becomes unreachable once inside. */}
+      <Link
+        href={exitHref}
+        aria-label="Exit feed, back to grid view"
+        className="fixed top-20 left-4 z-30 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-[oklch(0.14_0.03_256/0.75)] backdrop-blur border border-white/15 text-white text-[13px] font-medium hover:bg-[oklch(0.14_0.03_256/0.9)] transition active:scale-[0.97]"
+      >
+        <LayoutGrid className="w-3.5 h-3.5" strokeWidth={2} />
+        Grid
+      </Link>
+
       {listings.map((l, i) => (
         <FeedCard key={l.id} listing={l} index={i} isFavorited={favs.has(l.id)} userId={userId} />
       ))}
