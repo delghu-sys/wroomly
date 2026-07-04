@@ -20,6 +20,11 @@ const EVENT_NAMES = [
   'publish_succeeded',
   'publish_failed',
   'inquiry_sent',
+  // Social/share (feature/social-share)
+  'share_opened',
+  'share_completed',
+  'listing_viewed',
+  'feed_viewed',
 ] as const
 
 const bodySchema = z.object({

@@ -9,6 +9,8 @@ import { ListingsQuickFilters } from '@/components/listings/ListingsQuickFilters
 import { MobileFilterSheet } from '@/components/listings/MobileFilterSheet'
 import { BrowseHero } from '@/components/listings/BrowseHero'
 import { ListingsGrid } from '@/components/listings/ListingsGrid'
+import { ListingsFeed } from '@/components/listings/ListingsFeed'
+import { JustListedStrip } from '@/components/listings/JustListedStrip'
 import { ListingsPagination } from '@/components/listings/ListingsPagination'
 import { EmptyListings } from '@/components/listings/EmptyListings'
 import {
@@ -16,7 +18,7 @@ import {
   ANN_ARBOR_RESIDENCES,
   PROPERTY_TYPES,
 } from '@/lib/constants'
-import { getListingImageUrl } from '@/lib/utils/listing'
+import { getListingImageUrl, justListedCutoffISO } from '@/lib/utils/listing'
 
 export const metadata: Metadata = {
   title: 'Browse University of Michigan Sublets in Ann Arbor',
@@ -153,7 +155,7 @@ export default async function ListingsPage({
     new Set(((listings ?? []) as ListingWithDetails[]).map(l => l.supplier_id))
   )
 
-  const [favsRes, ratingsRes, marketRes, hoodRes] = await Promise.all([
+  const [favsRes, ratingsRes, marketRes, hoodRes, justListedRes] = await Promise.all([
     authUser
       ? supabase
           .from('favorites')
@@ -173,6 +175,15 @@ export default async function ListingsPage({
     // Distinct neighborhoods that actually appear in live listings — the filter
     // options must match the data, not a static gazetteer that matches nothing.
     supabase.from('listings').select('neighborhood').eq('status', 'active').not('neighborhood', 'is', null),
+    // "Just listed" strip: newest actives from the last 72h ONLY — the strip
+    // hides itself under 3 results rather than padding with old inventory.
+    supabase
+      .from('listings')
+      .select('*, listing_images(*)')
+      .eq('status', 'active')
+      .gte('created_at', justListedCutoffISO())
+      .order('created_at', { ascending: false })
+      .limit(6),
   ])
   const marketTotal = (marketRes as { count?: number | null }).count ?? totalCount
   const dataHoods = Array.from(
@@ -200,8 +211,20 @@ export default async function ListingsPage({
     }
   }
 
-  const view: 'grid' | 'map' = filters.view === 'map' ? 'map' : 'grid'
+  const view: 'grid' | 'feed' | 'map' =
+    filters.view === 'map' ? 'map' : filters.view === 'feed' ? 'feed' : 'grid'
   const typedListings = (listings ?? []) as ListingWithDetails[]
+  const justListed = (justListedRes.data ?? []) as ListingWithDetails[]
+
+  // Feed pagination: a "keep browsing" card at the end of the snap stack.
+  const feedNextHref =
+    page < totalPages
+      ? `/listings?${new URLSearchParams(
+          Object.entries({ ...filters, page: String(page + 1), view: 'feed' }).filter(
+            (kv): kv is [string, string] => typeof kv[1] === 'string' && kv[1].length > 0,
+          ),
+        ).toString()}`
+      : null
 
   const mapListings: MapListing[] = typedListings.map(l => {
     const firstImage = l.listing_images?.[0]
@@ -289,8 +312,18 @@ export default async function ListingsPage({
                   </p>
                 )}
               </div>
+            ) : view === 'feed' ? (
+              <div className="animate-fade-in -mx-4 sm:mx-0">
+                <ListingsFeed
+                  listings={typedListings}
+                  favoriteIds={Array.from(favoriteIds)}
+                  userId={authUser?.id ?? null}
+                  nextPageHref={feedNextHref}
+                />
+              </div>
             ) : (
               <>
+                {page === 1 && <JustListedStrip listings={justListed} />}
                 <ListingsGrid
                   listings={typedListings}
                   userId={authUser?.id ?? null}

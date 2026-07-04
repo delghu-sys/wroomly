@@ -16,6 +16,7 @@ import {
   formatCents,
   formatDateRange,
   getListingImageUrl,
+  isNewListing,
 } from '@/lib/utils/listing'
 import { FavoriteButton } from './FavoriteButton'
 import { CardGallery } from './CardGallery'
@@ -73,9 +74,14 @@ export function BrandListingCard({
               isFavorited={isFavorited}
             />
 
-            {/* Type chip — top-left */}
-            <div className="absolute top-3 left-3">
+            {/* Type chip — top-left (+ honest "New" for ≤72h listings) */}
+            <div className="absolute top-3 left-3 flex items-center gap-1.5">
               <BrandChip variant="ghost">Sublet</BrandChip>
+              {isNewListing(listing.created_at) && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.08em] bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]">
+                  New
+                </span>
+              )}
             </div>
 
             {/* Source provenance (seed or partner) — bottom-left. Plain chip
