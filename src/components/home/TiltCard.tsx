@@ -1,15 +1,40 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useSyncExternalStore } from 'react'
 import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react'
+
+// Reactive `(pointer: fine)` media query. Server snapshot is `false`, so SSR
+// + first client paint both render the cheap non-tilt path — no hydration
+// mismatch, and touch devices never construct the motion machinery at all.
+function subscribeFinePointer(cb: () => void) {
+  const m = window.matchMedia('(pointer: fine)')
+  m.addEventListener('change', cb)
+  return () => m.removeEventListener('change', cb)
+}
+function useFinePointer(): boolean {
+  return useSyncExternalStore(
+    subscribeFinePointer,
+    () => window.matchMedia('(pointer: fine)').matches,
+    () => false,
+  )
+}
 
 interface TiltCardProps {
   children: React.ReactNode
   className?: string
 }
 
+/**
+ * Pointer-tracked parallax tilt. Desktop-only by design: on touch devices
+ * there's no hover to track, but the motion wrapper still cost a spring
+ * system + a 3D-perspective composite layer PER CARD (24 on the browse
+ * grid) — real scroll jank on phones for an effect that can never trigger.
+ * Touch gets a plain div; pointer:fine gets the full effect.
+ */
 export function TiltCard({ children, className }: TiltCardProps) {
   const prefersReducedMotion = useReducedMotion()
+  const finePointer = useFinePointer()
+
   const ref = useRef<HTMLDivElement>(null)
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -42,6 +67,10 @@ export function TiltCard({ children, className }: TiltCardProps) {
     rotateY.set(0)
     setIsHovered(false)
   }, [rotateX, rotateY])
+
+  if (!finePointer) {
+    return <div className={`relative ${className || ''}`}>{children}</div>
+  }
 
   return (
     <motion.div

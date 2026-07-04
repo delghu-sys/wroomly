@@ -81,7 +81,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
       className={`sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         transparent
           ? 'bg-transparent border-b border-transparent'
-          : 'bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-[0_1px_3px_oklch(0_0_0/0.04)] supports-[backdrop-filter]:bg-background/60'
+          : 'mobile-frost bg-background/90 sm:bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-[0_1px_3px_oklch(0_0_0/0.04)] sm:supports-[backdrop-filter]:bg-background/60'
       }`}
     >
       <nav aria-label="Main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
@@ -305,7 +305,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-line bg-background/95 backdrop-blur-xl animate-fade-up">
+        <div className="md:hidden border-t border-line bg-background/95 mobile-frost backdrop-blur-xl animate-fade-up">
           <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
             {!hideRenterNav && (
               <>

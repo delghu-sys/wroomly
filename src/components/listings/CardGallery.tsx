@@ -55,7 +55,9 @@ export function CardGallery({ images, alt }: { images: string[]; alt: string }) 
               src={src}
               alt={i === 0 ? alt : ''}
               fill
-              quality={90}
+              // q75 is visually indistinguishable at card sizes and cuts
+              // bytes ~35% vs q90 — phones decode + scroll these in bulk.
+              quality={75}
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               loading={i === 0 ? undefined : 'lazy'}

@@ -14,8 +14,13 @@ Sentry.init({
   // so this works the same as it does server/edge-side.
   enabled: process.env.NODE_ENV === "production",
 
-  // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+  // NO session replay: with replaysOnErrorSampleRate > 0 the Replay
+  // integration continuously records the DOM (MutationObserver + snapshot
+  // buffering) on EVERY session so it can upload the last minute when an
+  // error hits. On mid-range phones that recording competes with scrolling
+  // and makes the whole app feel sluggish — the single biggest mobile
+  // jank source found in the 2026-07 perf pass. Error reporting stays.
+  integrations: [],
 
   // Drop noise thrown by browser extensions / injected scripts rather than our
   // app. These land in Sentry because the global handler catches every uncaught
@@ -49,18 +54,12 @@ Sentry.init({
     return event
   },
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  // Sample client traces instead of tracing every interaction — span
+  // creation + beacon sends on each navigation add measurable main-thread
+  // work on mobile. 15% is plenty at this traffic level.
+  tracesSampleRate: 0.15,
   // Enable logs to be sent to Sentry
   enableLogs: true,
-
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
-
-  // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
 
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
