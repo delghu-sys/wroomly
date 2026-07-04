@@ -11,7 +11,17 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
  * avoid navigating; swiping the strip never fires a click, and tapping a photo
  * still opens the listing.
  */
-export function CardGallery({ images, alt }: { images: string[]; alt: string }) {
+export function CardGallery({
+  images,
+  alt,
+  priority = false,
+}: {
+  images: string[]
+  alt: string
+  /** Mark the first photo as the page's LCP candidate (above-fold cards
+   * only) — preloads it instead of letting it queue behind the JS. */
+  priority?: boolean
+}) {
   const ref = useRef<HTMLDivElement>(null)
   const [idx, setIdx] = useState(0)
 
@@ -58,6 +68,7 @@ export function CardGallery({ images, alt }: { images: string[]; alt: string }) 
               // q75 is visually indistinguishable at card sizes and cuts
               // bytes ~35% vs q90 — phones decode + scroll these in bulk.
               quality={75}
+              priority={priority && i === 0}
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               loading={i === 0 ? undefined : 'lazy'}

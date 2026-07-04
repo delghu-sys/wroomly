@@ -24,9 +24,30 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const map = useRef<any>(null)
   const [loadFailed, setLoadFailed] = useState(false)
+  // Mapbox is 460KB gz / ~1.7MB of script — evaluating it on page load cost
+  // ~2s of main-thread time on a mid-range phone (Lighthouse TBT 2,450ms on
+  // the detail page) for a map that sits below the fold. The dynamic import
+  // below only helps if it doesn't fire on mount, so gate it: load only when
+  // the map container scrolls within ~500px of the viewport.
+  const [shouldLoad, setShouldLoad] = useState(false)
+  useEffect(() => {
+    const el = mapContainer.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '500px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   useEffect(() => {
-    if (!MAPBOX_TOKEN || !mapContainer.current || map.current) return
+    if (!shouldLoad || !MAPBOX_TOKEN || !mapContainer.current || map.current) return
 
     let cancelled = false
 
@@ -87,7 +108,7 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
         map.current = null
       }
     }
-  }, [lat, lng])
+  }, [shouldLoad, lat, lng])
 
   // Placeholder fallback — token missing OR Mapbox blew up at runtime.
   if (!MAPBOX_TOKEN || loadFailed) {

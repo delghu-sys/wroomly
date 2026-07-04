@@ -301,13 +301,15 @@ export default async function ListingDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           {/* Left: main content */}
           <div className="lg:col-span-2 space-y-10">
-            {/* Hero gallery */}
-            <ScrollReveal>
+            {/* Hero gallery — CSS entrance, NOT ScrollReveal: this is the
+                page's LCP element, and a motion-gated entrance renders it
+                invisible until the bundle hydrates (~7s on a slow phone). */}
+            <div className="animate-fade-up">
               <BrandedGallery images={sortedImages} title={l.title} />
-            </ScrollReveal>
+            </div>
 
-            {/* Title + badges */}
-            <ScrollReveal delay={0.1}>
+            {/* Title + badges — same: above the fold, must not wait for JS. */}
+            <div className="animate-fade-up" style={{ animationDelay: '0.1s' }}>
               <div>
                 <ViewPing listingId={l.id} />
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
@@ -377,7 +379,7 @@ export default async function ListingDetailPage({
                   </p>
                 )}
               </div>
-            </ScrollReveal>
+            </div>
 
             {/* Key details — 4 stat tiles */}
             <ScrollReveal delay={0.15}>

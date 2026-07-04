@@ -1,7 +1,3 @@
-'use client'
-
-import { motion } from 'motion/react'
-
 interface WordRevealProps {
   text: string
   /** Render each word in this class — supports italic accent words */
@@ -15,11 +11,15 @@ interface WordRevealProps {
 }
 
 /**
- * Staggered word-by-word reveal with spring physics.
+ * Staggered word-by-word reveal — pure CSS, no client JS.
  *
- * Mirrors the homepage hero animation style — words rise and fade in
- * with a per-word delay. Use `accentWords` to mark words that should
- * render in italic light-weight maize, matching the brand pattern.
+ * This intentionally does NOT use motion/react: hero headlines are the
+ * page's LCP element, and a motion entrance server-renders as opacity:0,
+ * leaving the hero INVISIBLE until the whole bundle hydrates — ~7s on a
+ * throttled phone (Lighthouse mobile, 2026-07 perf pass 2). CSS animations
+ * start the moment styles parse, so the reveal plays at ~FCP instead.
+ * Reduced-motion users get static text via the global reduced-motion rules
+ * (animation:none leaves the element at its natural, visible state).
  *
  * Wrap inside the desired heading element from the parent (h1/h2/etc).
  */
@@ -39,21 +39,16 @@ export function WordReveal({
         const clean = word.toLowerCase().replace(/[.,!?]/g, '')
         const isAccent = accentSet.has(clean)
         return (
-          <motion.span
+          <span
             key={`${word}-${i}`}
-            initial={{ opacity: 0, y: '0.6em' }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              type: 'spring',
-              stiffness: 100,
-              damping: 20,
-              delay: delay + i * stagger,
+            className={`inline-block animate-word-rise ${isAccent ? 'italic font-light text-[oklch(0.84_0.17_85)]' : ''}`}
+            style={{
+              animationDelay: `${delay + i * stagger}s`,
+              marginRight: i < words.length - 1 ? '0.25em' : 0,
             }}
-            className={`inline-block ${isAccent ? 'italic font-light text-[oklch(0.84_0.17_85)]' : ''}`}
-            style={{ marginRight: i < words.length - 1 ? '0.25em' : 0 }}
           >
             {word}
-          </motion.span>
+          </span>
         )
       })}
     </span>

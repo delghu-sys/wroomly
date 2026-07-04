@@ -25,9 +25,14 @@ export function AtmosphericBackground({
       {/* Base color */}
       <div className="absolute inset-0 -z-10" style={{ background: base }} aria-hidden />
 
-      {/* Noise overlay */}
+      {/* Noise overlay — desktop only. At 3.5% opacity it's imperceptible on
+          a phone screen, but it costs real money there: mix-blend-overlay
+          forces an extra compositing pass over the giant blurred mesh blobs
+          (seconds of raster on a throttled CPU), and Chrome counts the
+          full-viewport image background as the page's LCP element — home's
+          "7.6s LCP" was literally this invisible layer finishing its paint. */}
       <div
-        className="absolute inset-0 -z-10 pointer-events-none opacity-[0.035] mix-blend-overlay"
+        className="hidden sm:block absolute inset-0 -z-10 pointer-events-none opacity-[0.035] mix-blend-overlay"
         style={{
           backgroundImage: `url("${NOISE_SVG}")`,
           backgroundRepeat: 'repeat',
@@ -36,21 +41,25 @@ export function AtmosphericBackground({
         aria-hidden
       />
 
-      {/* Mesh gradients — three blobs, position varies by variant */}
+      {/* Mesh gradients — three blobs, position varies by variant.
+          Mobile gets half-size blobs with half the blur radius: raster cost
+          of a gaussian blur scales with area × radius, and the full-size
+          blobs took seconds to paint on a throttled phone CPU. Halving both
+          keeps the visual proportions on a small screen. */}
       {variant === 'hero' && (
         <>
           <div
-            className="absolute top-[-10%] left-[5%] w-[700px] h-[700px] rounded-full blur-[140px] opacity-30 -z-10 animate-float-slow"
+            className="absolute top-[-10%] left-[5%] w-[350px] h-[350px] sm:w-[700px] sm:h-[700px] rounded-full blur-[70px] sm:blur-[140px] opacity-30 -z-10 animate-float-slow"
             style={{ background: 'oklch(0.22 0.06 265)' }}
             aria-hidden
           />
           <div
-            className="absolute bottom-[5%] right-[10%] w-[500px] h-[500px] rounded-full blur-[120px] opacity-15 -z-10 animate-float"
+            className="absolute bottom-[5%] right-[10%] w-[250px] h-[250px] sm:w-[500px] sm:h-[500px] rounded-full blur-[60px] sm:blur-[120px] opacity-15 -z-10 animate-float"
             style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
             aria-hidden
           />
           <div
-            className="absolute top-[40%] right-[30%] w-[300px] h-[300px] rounded-full blur-[100px] opacity-10 -z-10"
+            className="absolute top-[40%] right-[30%] w-[150px] h-[150px] sm:w-[300px] sm:h-[300px] rounded-full blur-[50px] sm:blur-[100px] opacity-10 -z-10"
             style={{ background: 'oklch(0.50 0.10 280)' }}
             aria-hidden
           />

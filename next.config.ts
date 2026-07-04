@@ -40,6 +40,22 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
+  compiler: {
+    // Sentry's bundleSizeOptimizations only take effect under webpack — this
+    // project builds with Turbopack, so set the SDK's magic flags directly.
+    // Strips tracing + replay machinery from the CLIENT bundle (we use
+    // errors only client-side; tracesSampleRate is 0 there). The Sentry-
+    // heavy shared chunk cost ~1s of script evaluation per page on a
+    // mid-range phone before this. `define` is client-only; server tracing
+    // is untouched.
+    define: {
+      __SENTRY_TRACING__: false,
+      __SENTRY_DEBUG__: false,
+      __RRWEB_EXCLUDE_IFRAME__: true,
+      __RRWEB_EXCLUDE_SHADOW_DOM__: true,
+      __SENTRY_EXCLUDE_REPLAY_WORKER__: true,
+    },
+  },
   images: {
     qualities: [75, 90],
     remotePatterns: [
@@ -93,5 +109,18 @@ export default withSentryConfig(nextConfig, {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       removeDebugLogging: true,
     },
+  },
+
+  // Strip tracing + replay machinery from the CLIENT bundle. The Sentry SDK
+  // dominated a 424KB shared chunk costing ~1s of script evaluation per page
+  // on a mid-range phone (4.2s on the listing detail page, Lighthouse
+  // mobile). Client-side we only use error reporting: replay was removed in
+  // the first mobile perf pass and client tracesSampleRate is now 0. Server
+  // tracing is unaffected (these flags only shape the browser build).
+  bundleSizeOptimizations: {
+    excludeTracing: true,
+    excludeReplayIframe: true,
+    excludeReplayShadowDom: true,
+    excludeReplayWorker: true,
   },
 });

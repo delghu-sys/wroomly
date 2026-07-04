@@ -28,6 +28,8 @@ interface BrandListingCardProps {
   isFavorited?: boolean
   userId?: string | null
   supplierRating?: { avg: number; count: number }
+  /** Above-the-fold card: preload its cover photo as the LCP candidate. */
+  priorityImage?: boolean
 }
 
 /**
@@ -39,6 +41,7 @@ export function BrandListingCard({
   isFavorited = false,
   userId = null,
   supplierRating,
+  priorityImage = false,
 }: BrandListingCardProps) {
   const imageUrls = [...listing.listing_images]
     .sort((a, b) => a.display_order - b.display_order)
@@ -61,7 +64,7 @@ export function BrandListingCard({
           {/* Swipeable image gallery — browse all photos without opening */}
           <div className="relative aspect-[4/3] bg-[oklch(0.95_0.01_85)] overflow-hidden">
             {imageUrls.length > 0 ? (
-              <CardGallery images={imageUrls} alt={listing.title} />
+              <CardGallery images={imageUrls} alt={listing.title} priority={priorityImage} />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-[oklch(0.95_0.01_85)]">
                 <BedDouble className="w-10 h-10 text-ink-muted/30" />
