@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Menu, X, House } from 'lucide-react'
+import { MessageSquare, Menu, X, House, Heart } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
 import { PAYMENTS_ENABLED } from '@/lib/config'
 
@@ -140,12 +140,32 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
         <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
             <>
+              {/* Saved listings — a heart in the nav mirrors the heart on every
+                  card, so "save" and "see saved" are equally discoverable.
+                  Visible to every signed-in user: anyone can favorite, so the
+                  destination can't be renter-only. */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={nav('/favorites')}
+                aria-label="Saved listings"
+                title="Saved listings"
+                className={`rounded-full ease-smooth transition-colors ${
+                  transparent
+                    ? 'text-white/70 hover:text-white hover:bg-white/10'
+                    : 'hover:bg-navy-soft'
+                }`}
+              >
+                <Heart className="w-[18px] h-[18px]" />
+              </Button>
+
               {/* Messages */}
               <div className="relative">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={nav('/messages')}
+                  aria-label="Messages"
                   className={`rounded-full ease-smooth transition-colors ${
                     transparent
                       ? 'text-white/70 hover:text-white hover:bg-white/10'
@@ -213,11 +233,12 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                         )}
                       </>
                     )}
+                    {/* Saved listings for everyone — any user can favorite. */}
+                    <DropdownMenuItem onClick={nav('/favorites')} className="rounded-lg">
+                      Saved listings
+                    </DropdownMenuItem>
                     {user.user_type === 'consumer' && (
                       <>
-                        <DropdownMenuItem onClick={nav('/favorites')} className="rounded-lg">
-                          Saved listings
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={nav('/saved-searches')} className="rounded-lg">
                           Saved searches
                         </DropdownMenuItem>
@@ -349,11 +370,12 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                     </MobileLink>
                   </>
                 )}
+                {/* Saved listings for everyone — any user can favorite. */}
+                <MobileLink href="/favorites" onClick={() => setMobileOpen(false)}>
+                  Saved listings
+                </MobileLink>
                 {user.user_type === 'consumer' && (
                   <>
-                    <MobileLink href="/favorites" onClick={() => setMobileOpen(false)}>
-                      Saved listings
-                    </MobileLink>
                     <MobileLink href="/saved-searches" onClick={() => setMobileOpen(false)}>
                       Saved searches
                     </MobileLink>

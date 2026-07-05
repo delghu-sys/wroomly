@@ -58,7 +58,11 @@ export function FavoriteButton({ listingId, userId, isFavorited }: FavoriteButto
         setFavorited(prev)
         toast.error('Could not save listing')
       } else {
-        toast.success('Saved to favorites')
+        // Offer a jump to the saved list right at save time — closes the loop
+        // so people learn where their favorites live without hunting for it.
+        toast.success('Saved to favorites', {
+          action: { label: 'View saved', onClick: () => router.push('/favorites') },
+        })
       }
     }
 
