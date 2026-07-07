@@ -1,0 +1,29 @@
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 034_drop_postgis.sql
+--
+-- Fixes the Security Advisor CRITICAL `rls_disabled_in_public` on
+-- public.spatial_ref_sys (the 2026-07-06 "Action required" email).
+--
+-- Root cause: migration 001 enabled PostGIS "for geo queries (optional)" but
+-- the app never used it — no geometry/geography columns exist anywhere, and
+-- all distance math is plain JS haversine over listings.lat/lng
+-- (src/lib/neighborhoods-geo.ts, src/lib/match/engine.ts). PostGIS ships the
+-- public.spatial_ref_sys reference table, which is owned by the extension, so
+-- 022's `enable row level security` on it fails with "must be owner" on
+-- hosted Supabase — the advisor critical stayed open. Live probe 2026-07-08
+-- confirmed anon can SELECT and DELETE on it via the REST API.
+--
+-- Dropping the unused extension removes the table (and the st_estimatedextent
+-- functions 022 partially revoked) — eliminating the finding at the root
+-- instead of patching around an ownership wall.
+--
+-- Verified before writing this: zero PostGIS-dependent objects (no geometry/
+-- geography columns, no ST_* calls in schema or app code), so the plain DROP
+-- succeeds; if anything DID depend on it, this statement errors and changes
+-- nothing (run it alone, without cascade).
+drop extension if exists postgis;
+
+-- If (and only if) the drop fails with an ownership/permission error on your
+-- project, run this fallback instead and tell the advisor thread — it blocks
+-- all API access to the table even though RLS can't be enabled on it:
+--   revoke all on table public.spatial_ref_sys from anon, authenticated;
