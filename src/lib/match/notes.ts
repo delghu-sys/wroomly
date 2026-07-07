@@ -15,7 +15,9 @@ import type { MatchProfile, MatchReason } from '@/types/database'
  * the same reasons.
  */
 
-const NOTES_MODEL = 'claude-sonnet-4-6'
+// This copy is the single most personal thing a renter reads from Wroomly —
+// worth the strongest available model even though volume is low.
+const NOTES_MODEL = 'claude-opus-4-8'
 
 let _anthropic: Anthropic | null = null
 function getAnthropic(): Anthropic {

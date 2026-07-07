@@ -9,7 +9,7 @@ import { test, expect } from '@playwright/test'
  */
 
 async function jsonLdTypes(html: string): Promise<string[]> {
-  const blocks = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)]
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
   const types: string[] = []
   for (const [, raw] of blocks) {
     const data = JSON.parse(raw) // throws → test fails on malformed JSON-LD

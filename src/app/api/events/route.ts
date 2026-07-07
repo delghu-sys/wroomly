@@ -24,6 +24,11 @@ const EVENT_NAMES = [
   'share_opened',
   'share_completed',
   'listing_viewed',
+  // Wroomly Match funnel (feature/match-world-class)
+  'match_chat_started',
+  'match_chat_finished',
+  'match_alert_created',
+  'match_feedback_given',
 ] as const
 
 const bodySchema = z.object({

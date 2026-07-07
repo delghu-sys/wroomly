@@ -22,8 +22,11 @@ import type { MatchProfile } from '@/types/database'
  * call time, never at module load.
  */
 
-const CHAT_MODEL = 'claude-sonnet-4-6'
-const EXTRACT_MODEL = 'claude-sonnet-4-6'
+// CHAT stays on Sonnet for streamed, low-latency conversation. EXTRACT runs
+// once per finished chat and its accuracy (weights, priorities, dealbreakers)
+// drives every downstream match, so it gets the strongest available reasoning.
+const CHAT_MODEL = 'claude-sonnet-5'
+const EXTRACT_MODEL = 'claude-opus-4-8'
 
 let _anthropic: Anthropic | null = null
 function getAnthropic(): Anthropic {

@@ -102,6 +102,15 @@ export async function GET(request: Request) {
     .update({ feedback, feedback_at: new Date().toISOString() })
     .eq('id', send.id)
 
+  // Funnel event — the email click has no client JS to call src/lib/track.ts,
+  // so record it directly in the same shape /api/events writes. Best-effort.
+  void service
+    .from('analytics_events')
+    .insert({ name: 'match_feedback_given', props: { v: feedback } })
+    .then(({ error }) => {
+      if (error) console.warn('[match/feedback] event insert failed:', error.message)
+    })
+
   // Nudge the profile weights from this send's recorded fit/miss reasons.
   try {
     const profile = resolveProfile(alert.profile, alert.criteria)
