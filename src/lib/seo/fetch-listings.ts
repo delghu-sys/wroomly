@@ -36,3 +36,26 @@ export async function fetchActiveListings(
   const { data } = await q
   return (data ?? []) as unknown as ListingWithDetails[]
 }
+
+export interface RentSampleRow {
+  price_per_month: number | null // cents
+  bedrooms: number | null
+  neighborhood: string | null
+  furnished: boolean
+}
+
+/**
+ * Minimal price sample of every active listing, for the live rent-prices
+ * guide. Only aggregate stats are ever rendered from this — no listing
+ * details — so the tiny select keeps it cheap.
+ */
+export async function fetchRentSample(): Promise<RentSampleRow[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('listings')
+    .select('price_per_month, bedrooms, neighborhood, furnished')
+    .eq('status', 'active')
+    .not('price_per_month', 'is', null)
+    .limit(1000)
+  return (data ?? []) as RentSampleRow[]
+}

@@ -12,7 +12,7 @@ import { withAttribution } from '@/lib/attribution'
 // /list-place is public: it's the "List your place" CTA target and does its own
 // auth routing (anon → the public /start-listing chooser; supplier → /listings/new).
 // Auth-walling it here would dead-end prospective suppliers on a sign-IN page.
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/coming-soon', '/start-listing', '/list-place']
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/guides', '/buildings', '/coming-soon', '/start-listing', '/list-place']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback

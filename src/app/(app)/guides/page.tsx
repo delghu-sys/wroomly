@@ -48,8 +48,29 @@ export default function GuidesIndexPage() {
         </p>
       </header>
 
+      {/* Live-data page — its own route (computes medians from active
+          listings at request time), so it's not part of GUIDES. */}
+      <Link
+        href="/guides/ann-arbor-rent-prices"
+        className="group mt-10 block rounded-3xl border border-line bg-[oklch(0.22_0.075_256)] p-6 sm:p-7 hover:-translate-y-0.5 transition-all duration-300"
+      >
+        <p className="text-[10px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-bold">
+          Live data
+        </p>
+        <h2 className="mt-2 font-display text-2xl tracking-tight text-white leading-snug">
+          What Ann Arbor sublets actually cost right now
+        </h2>
+        <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
+          Median asking rents by bedroom count and neighborhood — computed from
+          the active verified listings on Wroomly, not last year&rsquo;s survey.
+        </p>
+        <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-[oklch(0.84_0.17_85)] font-medium group-hover:gap-2 transition-all">
+          See the numbers <ArrowRight className="w-3.5 h-3.5" />
+        </span>
+      </Link>
+
       {/* Guide cards */}
-      <div className="mt-10 grid sm:grid-cols-2 gap-5">
+      <div className="mt-6 grid sm:grid-cols-2 gap-5">
         {GUIDES.map(g => (
           <Link
             key={g.slug}

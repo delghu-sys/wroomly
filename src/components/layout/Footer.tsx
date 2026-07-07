@@ -50,7 +50,9 @@ export function Footer() {
             links={[
               { href: '/listings', label: 'All listings' },
               { href: '/listings?type=sublet', label: 'Sublets' },
+              { href: '/buildings', label: 'By building' },
               { href: '/guides', label: 'Guides & FAQ' },
+              { href: '/guides/ann-arbor-rent-prices', label: 'Rent prices (live)' },
             ]}
           />
           <FooterCol

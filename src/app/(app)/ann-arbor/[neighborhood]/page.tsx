@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { NEIGHBORHOOD_CONTENT, getNeighborhood } from '@/lib/seo/neighborhoods'
+import { BUILDINGS } from '@/lib/seo/buildings'
 import { fetchActiveListings } from '@/lib/seo/fetch-listings'
 import { BrandListingCard } from '@/components/listings/BrandListingCard'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
@@ -136,6 +137,27 @@ export default async function NeighborhoodPage({
           </div>
         )}
       </section>
+
+      {/* Buildings located in this neighborhood — cross-links the two
+          landing-page families so link equity flows both ways. */}
+      {BUILDINGS.some(b => b.neighborhoodSlug === n.slug) && (
+        <section className="mt-14 pt-8 border-t border-line">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-ink-muted font-semibold mb-4">
+            Student buildings in {n.name}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {BUILDINGS.filter(b => b.neighborhoodSlug === n.slug).map(b => (
+              <Link
+                key={b.slug}
+                href={`/buildings/${b.slug}`}
+                className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+              >
+                {b.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Internal links to other neighborhoods */}
       <section className="mt-14 pt-8 border-t border-line">
