@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { MatchProfile } from '@/types/database'
 import { ATTR_LABELS } from '@/lib/match/profile'
 import { GREETING_TEXT, GREETING_CHIPS } from '@/lib/match/greeting'
+import { track } from '@/lib/track'
 
 /**
  * Wroomly Match — the renter-facing experience. Four states on one page (intro →
@@ -150,6 +151,7 @@ export function MatchExperience() {
         setTyping(false)
 
         if (endFinished) {
+          track('match_chat_finished', { turns: history.length })
           setFinished(true)
           // Kick off profile extraction NOW, but don't block the screen on it.
           // The email screen renders fine without the profile (it fills in when
@@ -232,6 +234,7 @@ export function MatchExperience() {
   }
 
   function startChat() {
+    track('match_chat_started')
     setScreen('chat')
     openWithGreeting()
   }
@@ -303,6 +306,7 @@ export function MatchExperience() {
         return
       }
       if (Array.isArray(data.tags) && data.tags.length) setTags(data.tags)
+      track('match_alert_created')
       setScreen('done')
     } catch {
       setError('Network error — please try again.')
