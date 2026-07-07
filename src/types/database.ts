@@ -140,9 +140,6 @@ export interface Listing {
   bedrooms: number | null
   bathrooms: number | null
   sq_ft: number | null
-  // Optional walkthrough video (migration 033) — optional in the type so
-  // rows fetched before the migration is applied still typecheck.
-  video_path?: string | null
   furnished: boolean
   pets_allowed: boolean
   utilities_included: boolean

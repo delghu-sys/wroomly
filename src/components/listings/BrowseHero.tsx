@@ -9,7 +9,7 @@ interface BrowseHeroProps {
   totalCount: number
   currentQuery?: string
   filters: Record<string, string | undefined>
-  view: 'grid' | 'feed' | 'map'
+  view: 'grid' | 'map'
 }
 
 /**

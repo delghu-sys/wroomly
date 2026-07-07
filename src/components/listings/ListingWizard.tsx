@@ -70,8 +70,6 @@ export function ListingWizard({ userId }: { userId: string }) {
   const [step, setStep] = useState(0)
   const [photos, setPhotos] = useState<File[]>([])
   const [photoURLs, setPhotoURLs] = useState<string[]>([])
-  // Optional walkthrough video (audit item 2) — one per listing, ≤50MB.
-  const [video, setVideo] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
@@ -172,27 +170,6 @@ export function ListingWizard({ userId }: { userId: string }) {
             storage_path: path,
             display_order: i,
           })
-        }
-      }
-
-      // 2b. Optional walkthrough video — same bucket, owner's folder (the
-      // 016 ownership policy covers it). Non-fatal: the listing publishes
-      // fine without it, and pre-migration-033 the column update just no-ops
-      // into a logged warning.
-      if (video) {
-        const vext = video.name.split('.').pop() || 'mp4'
-        const vpath = `${userId}/${listingId}/walkthrough.${vext}`
-        const { error: vUpErr } = await supabase.storage
-          .from('listing-images')
-          .upload(vpath, video, { upsert: true, contentType: video.type })
-        if (!vUpErr) {
-          const { error: vColErr } = await supabase
-            .from('listings')
-            .update({ video_path: vpath })
-            .eq('id', listingId)
-          if (vColErr) console.warn('[wizard] video_path update failed:', vColErr.message)
-        } else {
-          toast.warning('Your video didn’t upload — the listing was still created.')
         }
       }
 
@@ -565,48 +542,6 @@ export function ListingWizard({ userId }: { userId: string }) {
                 ))}
               </div>
             )}
-
-            {/* Optional walkthrough video — shows in the feed browse mode */}
-            <div className="pt-2">
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                Video walkthrough <span className="text-gray-400 font-normal">(optional)</span>
-              </p>
-              <p className="text-xs text-gray-400 mb-2">
-                A quick phone video of the place (≤60s works best). Plays in the swipeable feed.
-              </p>
-              {video ? (
-                <div className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2.5 text-sm">
-                  <span className="truncate text-gray-700">{video.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setVideo(null)}
-                    aria-label="Remove video"
-                    className="ml-2 w-6 h-6 shrink-0 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <label className="block border-2 border-dashed border-gray-300 rounded-xl p-4 text-center cursor-pointer hover:border-blue-400 transition-colors">
-                  <p className="text-sm text-gray-600">Click to add a video</p>
-                  <p className="text-xs text-gray-400 mt-0.5">MP4, WebM, MOV — max 50MB</p>
-                  <input
-                    type="file"
-                    accept="video/mp4,video/webm,video/quicktime"
-                    className="hidden"
-                    onChange={e => {
-                      const f = e.target.files?.[0]
-                      if (!f) return
-                      if (f.size > 50 * 1024 * 1024) {
-                        toast.error('Video must be 50MB or smaller.')
-                        return
-                      }
-                      setVideo(f)
-                    }}
-                  />
-                </label>
-              )}
-            </div>
           </div>
         )}
 

@@ -35,6 +35,11 @@ touches the prod DB until you approve the merge.
   (allowlist extended).
 
 ### 2. Feed browse mode + video
+> **REMOVED 2026-07-07** — the feed browse mode and the video-walkthrough
+> uploader it was built for were taken out at the founder's request. Story
+> share (item 1) and activity cues (item 3) remain. The inert `listings.
+> video_path` column (migration 033) was left in place — nullable, unused,
+> zero rows — rather than run a destructive drop on prod.
 - **`view=feed`** third mode on /listings (same filters/query, newest-first):
   `ListingsFeed` client component — vertical scroll-snap, one listing per
   viewport, big media, overlay: price/beds/dates/neighborhood, actions:

@@ -5,7 +5,6 @@ import { createClient } from '@supabase/supabase-js'
  * Social/shareable features (docs/social-share-audit.md):
  *  - story-image route renders a real PNG for an active listing and degrades
  *    (not 500s) for unknown ids
- *  - feed browse mode renders, snaps, and is reachable from the toggle
  *  - share button present on the listing detail page
  *  - activity counts are honest: no "viewed/saved" line below the threshold
  */
@@ -47,25 +46,6 @@ test('story image: unknown id degrades to the branded fallback, never a 500', as
   )
   expect(res.status()).toBe(200)
   expect(res.headers()['content-type']).toContain('image/png')
-})
-
-test('feed mode renders one-per-viewport snap cards', async ({ page }) => {
-  await page.goto('/listings?view=feed')
-  const feed = page.getByTestId('listings-feed')
-  await expect(feed).toBeVisible()
-  // Snap container + at least one full-height card section.
-  await expect(feed).toHaveClass(/snap-y/)
-  const firstCard = feed.locator('section').first()
-  await expect(firstCard).toBeVisible()
-  const box = await firstCard.boundingBox()
-  expect((box?.height ?? 0)).toBeGreaterThan(400) // full-viewport-ish, not a grid card
-})
-
-test('feed is reachable from the browse toggle', async ({ page }) => {
-  await page.goto('/listings')
-  await page.getByRole('button', { name: 'Feed' }).click()
-  await expect(page).toHaveURL(/view=feed/)
-  await expect(page.getByTestId('listings-feed')).toBeVisible()
 })
 
 test('detail page has the share action', async ({ page }) => {
