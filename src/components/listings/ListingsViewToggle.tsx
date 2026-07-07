@@ -2,9 +2,9 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { motion } from 'motion/react'
-import { LayoutGrid, Map, GalleryVerticalEnd } from 'lucide-react'
+import { LayoutGrid, Map } from 'lucide-react'
 
-export type BrowseView = 'grid' | 'feed' | 'map'
+export type BrowseView = 'grid' | 'map'
 
 export function ListingsViewToggle({ view }: { view: BrowseView }) {
   const router = useRouter()
@@ -23,10 +23,10 @@ export function ListingsViewToggle({ view }: { view: BrowseView }) {
 
   return (
     <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.05] backdrop-blur border border-white/[0.07] shrink-0">
-      {(['grid', 'feed', 'map'] as const).map(opt => {
+      {(['grid', 'map'] as const).map(opt => {
         const active = view === opt
-        const Icon = opt === 'grid' ? LayoutGrid : opt === 'feed' ? GalleryVerticalEnd : Map
-        const label = opt === 'grid' ? 'Grid' : opt === 'feed' ? 'Feed' : 'Map'
+        const Icon = opt === 'grid' ? LayoutGrid : Map
+        const label = opt === 'grid' ? 'Grid' : 'Map'
         return (
           <button
             key={opt}

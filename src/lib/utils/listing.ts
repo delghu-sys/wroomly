@@ -62,9 +62,3 @@ export function dateToMonth(yyyymmdd: string | null | undefined): string {
 export function getListingImageUrl(storagePath: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/listing-images/${storagePath}`
 }
-
-// Walkthrough videos live in the same public bucket (migration 033), so the
-// URL shape is identical — a separate helper keeps call sites self-documenting.
-export function getListingVideoUrl(storagePath: string): string {
-  return getListingImageUrl(storagePath)
-}

@@ -9,7 +9,6 @@ import { ListingsQuickFilters } from '@/components/listings/ListingsQuickFilters
 import { MobileFilterSheet } from '@/components/listings/MobileFilterSheet'
 import { BrowseHero } from '@/components/listings/BrowseHero'
 import { ListingsGrid } from '@/components/listings/ListingsGrid'
-import { ListingsFeed } from '@/components/listings/ListingsFeed'
 import { JustListedStrip } from '@/components/listings/JustListedStrip'
 import { ListingsPagination } from '@/components/listings/ListingsPagination'
 import { EmptyListings } from '@/components/listings/EmptyListings'
@@ -211,30 +210,9 @@ export default async function ListingsPage({
     }
   }
 
-  const view: 'grid' | 'feed' | 'map' =
-    filters.view === 'map' ? 'map' : filters.view === 'feed' ? 'feed' : 'grid'
+  const view: 'grid' | 'map' = filters.view === 'map' ? 'map' : 'grid'
   const typedListings = (listings ?? []) as ListingWithDetails[]
   const justListed = (justListedRes.data ?? []) as ListingWithDetails[]
-
-  // Feed pagination: a "keep browsing" card at the end of the snap stack.
-  const feedNextHref =
-    page < totalPages
-      ? `/listings?${new URLSearchParams(
-          Object.entries({ ...filters, page: String(page + 1), view: 'feed' }).filter(
-            (kv): kv is [string, string] => typeof kv[1] === 'string' && kv[1].length > 0,
-          ),
-        ).toString()}`
-      : null
-
-  // Feed has its own scroll container with overscroll-contain (so the snap
-  // scroll doesn't fight the outer page) — which also means the Grid/Map
-  // toggle in the hero above becomes unreachable once inside it. The feed
-  // needs its own exit link back to the same filters, minus view=feed.
-  const gridHref = `/listings?${new URLSearchParams(
-    Object.entries(filters).filter(
-      (kv): kv is [string, string] => kv[0] !== 'view' && typeof kv[1] === 'string' && kv[1].length > 0,
-    ),
-  ).toString()}`
 
   const mapListings: MapListing[] = typedListings.map(l => {
     const firstImage = l.listing_images?.[0]
@@ -321,16 +299,6 @@ export default async function ListingsPage({
                     {mapListings.length} of {typedListings.length} listings have map coordinates
                   </p>
                 )}
-              </div>
-            ) : view === 'feed' ? (
-              <div className="animate-fade-in -mx-4 sm:mx-0">
-                <ListingsFeed
-                  listings={typedListings}
-                  favoriteIds={Array.from(favoriteIds)}
-                  userId={authUser?.id ?? null}
-                  nextPageHref={feedNextHref}
-                  exitHref={gridHref}
-                />
               </div>
             ) : (
               <>

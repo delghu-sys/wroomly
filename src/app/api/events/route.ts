@@ -24,7 +24,6 @@ const EVENT_NAMES = [
   'share_opened',
   'share_completed',
   'listing_viewed',
-  'feed_viewed',
 ] as const
 
 const bodySchema = z.object({
