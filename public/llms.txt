@@ -1,6 +1,6 @@
 # Wroomly
 
-> Wroomly is a sublet and student-housing marketplace built exclusively for verified University of Michigan students in Ann Arbor. Every account is confirmed with an @umich.edu email before a user can list a place or contact a host, so listings and inquiries come only from real U-M students. Wroomly focuses on summer and term-time sublets near campus, with guides on subletting safely, avoiding scams, and getting security deposits back under Michigan law.
+> Wroomly is a sublet and student-housing marketplace built exclusively for verified University of Michigan students in Ann Arbor. Every account is confirmed with an @umich.edu email before a user can list a place or contact a host, so listings and inquiries come only from real U-M students. Wroomly focuses on summer and term-time sublets near campus, with building-by-building landing pages, live rent-price data computed from active listings, and guides on subletting safely, avoiding scams, and Michigan deposit law.
 
 ## About
 
@@ -9,12 +9,46 @@
 - Verification: @umich.edu email required for every account
 - Cost: listing a place is free; browsing is free
 
+## Live data
+
+- [Ann Arbor rent prices for students](https://wroomly.app/guides/ann-arbor-rent-prices): Median asking rents by bedroom count and neighborhood, computed live from active verified student sublet listings — recomputed on every visit, with sample sizes shown.
+
 ## Guides
 
 - [How to sublet your apartment at the University of Michigan](https://wroomly.app/guides/how-to-sublet-your-apartment-at-university-of-michigan): Step-by-step on pricing, landlord approval, and finding a subletter as a U-M student.
 - [Summer sublets in Ann Arbor: a student's guide](https://wroomly.app/guides/summer-sublets-in-ann-arbor-student-guide): How the Ann Arbor summer sublet market works, timing, and typical rents near campus.
 - [How to avoid sublet scams in Ann Arbor](https://wroomly.app/guides/how-to-avoid-sublet-scams-ann-arbor): Red flags, safe payment practices, and how to verify a listing is real.
-- [Security deposits for Ann Arbor sublets: what to know](https://wroomly.app/guides/security-deposits-ann-arbor-sublets): Michigan deposit law, the 30-day return rule, and documenting move-in/move-out.
+- [Security deposits for Ann Arbor sublets](https://wroomly.app/guides/security-deposits-ann-arbor-sublets): Michigan deposit law, the 30-day return rule, and documenting move-in/move-out.
+- [The best Ann Arbor neighborhoods for UMich students](https://wroomly.app/guides/best-neighborhoods-for-umich-students): All eleven neighborhoods compared by walk time, vibe, and value.
+- [The UMich off-campus housing timeline](https://wroomly.app/guides/umich-off-campus-housing-timeline): Ann Arbor's early leasing calendar month by month, and where sublets fit.
+- [Sublet vs. relet vs. lease takeover](https://wroomly.app/guides/sublet-vs-relet-lease-takeover): Who stays on the lease, who holds the risk, and which arrangement fits.
+- [Housing at UMich as an international student](https://wroomly.app/guides/international-student-housing-guide-umich): Renting from abroad safely — timing, documents, and sight-unseen precautions.
+- [Grad student housing in Ann Arbor](https://wroomly.app/guides/grad-student-housing-ann-arbor): The quieter neighborhoods, medical-campus logistics, and sublet timing for grad life.
+- [Winter semester sublets in Ann Arbor](https://wroomly.app/guides/winter-semester-sublets-ann-arbor): The January move-in market — who leaves mid-year and how to price a spring semester.
+- [How to price your Ann Arbor sublet](https://wroomly.app/guides/how-to-price-your-sublet): Anchoring on live comparables and the empty-room math.
+- [Your first Ann Arbor apartment: the move-in checklist](https://wroomly.app/guides/first-apartment-checklist-ann-arbor): Condition photos, utilities, renters insurance, and Ann Arbor-specific details.
+
+## Buildings
+
+Building-by-building sublet pages with verified addresses, floor plans, and amenities: [all buildings](https://wroomly.app/buildings)
+
+- [Verve](https://wroomly.app/buildings/verve): 721 S Forest Ave — 12-story, 741-bed high-rise near Central Campus.
+- [Hub on Campus](https://wroomly.app/buildings/hub-on-campus): 603 E Huron St — 15th-floor pool and rooftop deck.
+- [Six11](https://wroomly.app/buildings/six11): 611 E University Ave — 343 beds, one block from the Diag.
+- [Landmark](https://wroomly.app/buildings/landmark): 1300 S University Ave — 14 stories on the South U strip.
+- [The Standard](https://wroomly.app/buildings/the-standard): 425 S Main St — downtown Main Street location.
+- [Arbor Blu](https://wroomly.app/buildings/arbor-blu): 624 Church St — LEED Silver high-rise in the South U area.
+- [Foundry Lofts](https://wroomly.app/buildings/foundry-lofts): 413 E Huron St — modern-industrial lofts, 204 units.
+- [Vic Village North](https://wroomly.app/buildings/vic-village-north) and [Vic Village South](https://wroomly.app/buildings/vic-village-south): sister towers on S University Ave.
+- [Z Place](https://wroomly.app/buildings/z-place): 619 E University Ave — furnished 2–6 bedroom apartments.
+- [Saga](https://wroomly.app/buildings/saga): 411 E Washington St — formerly 411 Lofts / Sterling 4Eleven / YOUnion.
+- [The Yard](https://wroomly.app/buildings/the-yard): 615 S Main St — near Michigan Stadium, campus shuttle.
+- [Tower Plaza](https://wroomly.app/buildings/tower-plaza): 555 E William St — Ann Arbor's tallest building, 26 stories.
+- [The Varsity](https://wroomly.app/buildings/the-varsity): 425 E Washington St — 13-story student high-rise.
+- [Courtyards](https://wroomly.app/buildings/courtyards): 1780 Broadway St — 6-minute walk to North Campus.
+- [Forest Plaza](https://wroomly.app/buildings/forest-plaza): 715 S Forest Ave — vintage 1929 building by Ross.
+- [Ann Arbor City Apartments](https://wroomly.app/buildings/ann-arbor-city-apartments): W Washington & S First — downtown, grad-friendly.
+- [The Legacy](https://wroomly.app/buildings/the-legacy): 616 E Washington St — 19-story high-rise by the Michigan Theatre.
 
 ## Neighborhoods
 
@@ -24,11 +58,16 @@
 - [Kerrytown](https://wroomly.app/ann-arbor/kerrytown)
 - [Old West Side](https://wroomly.app/ann-arbor/old-west-side)
 - [Burns Park](https://wroomly.app/ann-arbor/burns-park)
+- [Water Hill](https://wroomly.app/ann-arbor/water-hill)
+- [Eberwhite](https://wroomly.app/ann-arbor/eberwhite)
+- [Pittsfield](https://wroomly.app/ann-arbor/pittsfield)
 - [Downtown](https://wroomly.app/ann-arbor/downtown)
+- [Lower Town](https://wroomly.app/ann-arbor/lower-town)
 
 ## Key pages
 
 - [Browse listings](https://wroomly.app/listings): Current sublets and rooms available near U-M.
+- [All buildings](https://wroomly.app/buildings): Sublets by building, with addresses and amenities.
 - [All guides](https://wroomly.app/guides): Every Wroomly guide plus a frequently-asked-questions section.
 - [About Wroomly](https://wroomly.app/about): What Wroomly is and who it's for.
 - [Sitemap](https://wroomly.app/sitemap.xml)

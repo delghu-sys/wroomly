@@ -123,6 +123,25 @@ export default async function GuidePage({
           ))}
         </div>
 
+        {g.links && g.links.length > 0 && (
+          <section className="mt-10">
+            <p className="text-[11px] uppercase tracking-[0.16em] text-ink-muted font-semibold mb-3">
+              Explore
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {g.links.map(l => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* FAQ — mirrors the FAQPage JSON-LD above so the visible content
             matches the structured data (a Google requirement). */}
         <section className="mt-12 pt-8 border-t border-line">

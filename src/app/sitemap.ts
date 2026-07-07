@@ -62,6 +62,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.6,
     },
+    {
+      url: `${ORIGIN}/buildings`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      // Live-data page (own route, not part of GUIDES) — recomputed per
+      // visit, so it genuinely changes daily.
+      url: `${ORIGIN}/guides/ann-arbor-rent-prices`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
   ]
 
   // SEO landing pages — neighborhood + building + guide pages. These are
