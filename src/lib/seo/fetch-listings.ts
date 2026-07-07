@@ -1,9 +1,12 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { ListingWithDetails } from '@/types/database'
 
+// Runs under the session/anon client, so it must not `select('*')` — the
+// anon/authenticated roles can't read the columns locked by migration 035.
 const LISTING_SELECT = `
-  *,
+  ${PUBLIC_LISTING_COLUMNS},
   listing_images(*),
   listing_amenities(*),
   swap_preferences(*),

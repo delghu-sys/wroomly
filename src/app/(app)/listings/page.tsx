@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { Metadata } from 'next'
 import type { ListingWithDetails } from '@/types/database'
 import { ListingsFilters } from '@/components/listings/ListingsFilters'
@@ -57,7 +58,7 @@ export default async function ListingsPage({
     .from('listings')
     .select(
       `
-      *,
+      ${PUBLIC_LISTING_COLUMNS},
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
@@ -178,7 +179,7 @@ export default async function ListingsPage({
     // hides itself under 3 results rather than padding with old inventory.
     supabase
       .from('listings')
-      .select('*, listing_images(*)')
+      .select(`${PUBLIC_LISTING_COLUMNS}, listing_images(*)`)
       .eq('status', 'active')
       .gte('created_at', justListedCutoffISO())
       .order('created_at', { ascending: false })
@@ -212,7 +213,7 @@ export default async function ListingsPage({
 
   const view: 'grid' | 'map' = filters.view === 'map' ? 'map' : 'grid'
   const typedListings = (listings ?? []) as ListingWithDetails[]
-  const justListed = (justListedRes.data ?? []) as ListingWithDetails[]
+  const justListed = (justListedRes.data ?? []) as unknown as ListingWithDetails[]
 
   const mapListings: MapListing[] = typedListings.map(l => {
     const firstImage = l.listing_images?.[0]

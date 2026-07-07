@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Pencil, BedDouble } from 'lucide-react'
@@ -30,12 +31,12 @@ export default async function MyListingsPage() {
 
   const { data: listingsData } = await supabase
     .from('listings')
-    .select('*')
+    .select(PUBLIC_LISTING_COLUMNS)
     .eq('supplier_id', user.id)
     .order('created_at', { ascending: false })
     .limit(200)
 
-  const listings = (listingsData ?? []) as Listing[]
+  const listings = (listingsData ?? []) as unknown as Listing[]
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

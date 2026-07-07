@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { ListingWithDetails } from '@/types/database'
 import { BrandedGallery } from '@/components/listings/BrandedGallery'
 import { ListingMap } from '@/components/listings/ListingMap'
@@ -111,7 +112,7 @@ export default async function ListingDetailPage({
   const { data: listing } = await supabase
     .from('listings')
     .select(`
-      *,
+      ${PUBLIC_LISTING_COLUMNS},
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
@@ -122,7 +123,7 @@ export default async function ListingDetailPage({
 
   if (!listing) notFound()
 
-  const l = listing as ListingWithDetails & {
+  const l = listing as unknown as ListingWithDetails & {
     users: {
       id: string
       full_name: string | null

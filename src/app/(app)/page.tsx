@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { ListingWithDetails } from '@/types/database'
 import { HomeHero } from '@/components/home/HomeHero'
 import { BrandListingCard } from '@/components/listings/BrandListingCard'
@@ -18,7 +19,7 @@ export default async function HomePage() {
   const { data: newest } = await supabase
     .from('listings')
     .select(`
-      *,
+      ${PUBLIC_LISTING_COLUMNS},
       listing_images(*),
       listing_amenities(*),
       swap_preferences(*),
@@ -28,7 +29,7 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(8)
 
-  const listings = (newest ?? []) as ListingWithDetails[]
+  const listings = (newest ?? []) as unknown as ListingWithDetails[]
 
   return (
     <div>

@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import { EditListingForm } from '@/components/listings/EditListingForm'
 import { ArrowLeft } from 'lucide-react'
 import type { Listing } from '@/types/database'
@@ -30,13 +31,13 @@ export default async function EditListingPage({
 
   const { data: listing } = await supabase
     .from('listings')
-    .select('*')
+    .select(PUBLIC_LISTING_COLUMNS)
     .eq('id', id)
     .single()
 
   if (!listing) notFound()
 
-  const l = listing as Listing
+  const l = listing as unknown as Listing
   const isOwner = l.supplier_id === user.id
   const isAdmin = userType === 'admin'
   if (!isOwner && !isAdmin) {
