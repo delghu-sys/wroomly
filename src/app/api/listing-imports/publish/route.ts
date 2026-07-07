@@ -6,6 +6,7 @@ import { copyImportFileToPublic } from '@/lib/listing-import/uploads'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
 import { validatePublishRequirements } from '@/lib/listing-import/publish-validation'
 import { dispatchInstantForListing } from '@/lib/match/dispatch'
+import { classifyNeighborhood } from '@/lib/neighborhoods-geo'
 import { z } from 'zod'
 
 export const runtime = 'nodejs'
@@ -117,7 +118,11 @@ export async function POST(request: Request) {
       type: 'sublet',
       title: draft.title,
       description: draft.description,
-      neighborhood: draft.neighborhood,
+      // Derive the neighborhood from the geocoded coordinates so it lands in
+      // the canonical set the browse filter offers (the AI's free-text
+      // neighborhood — "Geddes Ave / South University area" — wouldn't match
+      // any filter option). Fall back to the AI text only if unclassifiable.
+      neighborhood: classifyNeighborhood(draft.lat, draft.lng) ?? draft.neighborhood,
       address: draft.address,
       lat: draft.lat,
       lng: draft.lng,

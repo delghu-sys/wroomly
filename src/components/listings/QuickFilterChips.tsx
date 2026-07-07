@@ -51,13 +51,12 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
         id: 'near-campus',
         label: 'Near campus',
         icon: GraduationCap,
-        // For near-campus we set a comma-joined list. The browse page's
-        // .or() query needs to interpret it; for now this just sets one
-        // representative neighborhood (Central Campus) which existing
-        // single-neighborhood filtering handles. Multi-select arrives
-        // with a later commit.
-        isActive: () => currentFilters.neighborhood === 'Central Campus',
-        apply: { neighborhood: 'Central Campus' },
+        // Comma-joined list of the campus-adjacent neighborhoods; the browse
+        // query splits on comma and matches any (`.in()`), so this returns
+        // everything in/around campus. (Previously hardcoded 'Central Campus'
+        // — a value no listing had, so the chip always showed "no listings".)
+        isActive: () => currentFilters.neighborhood === NEAR_CAMPUS_NEIGHBORHOODS.join(','),
+        apply: { neighborhood: NEAR_CAMPUS_NEIGHBORHOODS.join(',') },
         clear: ['neighborhood'],
       },
       {
