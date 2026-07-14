@@ -49,6 +49,22 @@ export async function POST(request: Request) {
   }
 
   const service = createServiceClient()
+
+  // Verification gate. Publishing goes through the service role (below), which
+  // bypasses the RLS insert policy that gates the create-listing wizard — so the
+  // "must be UMich-verified to list" rule is enforced here in code too. Keeps
+  // every published listing tied to a verified UMich account.
+  const { data: publisher } = await service
+    .from('users')
+    .select('is_verified')
+    .eq('id', user.id)
+    .maybeSingle()
+  if (!(publisher as { is_verified?: boolean } | null)?.is_verified) {
+    return NextResponse.json(
+      { error: 'Verify your UMich account to publish a listing.', needsVerification: true },
+      { status: 403 },
+    )
+  }
   const { data: req } = await service
     .from('listing_import_requests')
     .select(

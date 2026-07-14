@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ListingWizard } from '@/components/listings/ListingWizard'
+import { VerifyToListPrompt } from '@/components/listings/VerifyToListPrompt'
 import { House, EnvelopeOpen, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
 
@@ -18,9 +19,19 @@ export default async function NewListingPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('user_type')
+    .select('user_type, is_verified')
     .eq('id', user.id)
     .single()
+
+  // Verification gate — listing requires the UMich blue check (also enforced by
+  // RLS + the publish route). Unverified suppliers get the verify path, not a
+  // silent failure when the wizard's insert is rejected.
+  const isVerified = (profile as { is_verified?: boolean } | null)?.is_verified === true
+  const isSupplierRole =
+    profile?.user_type === 'supplier' || profile?.user_type === 'admin'
+  if (isSupplierRole && !isVerified) {
+    return <VerifyToListPrompt />
+  }
 
   // ── Non-supplier interstitial — explains why we can't continue and
   //    points them somewhere useful, instead of a silent redirect. ──

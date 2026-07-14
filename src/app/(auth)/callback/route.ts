@@ -69,8 +69,30 @@ export async function GET(request: Request) {
 
   // Server-side enforcement: `user_type` claim is only accepted if it's not
   // `admin` (you don't make yourself admin via signup). Any email may be a
-  // supplier — there's no domain restriction.
+  // supplier — verification (not role) is what gates listing.
   const effectiveType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
+
+  // ── UMich verification (the blue check) ──────────────────────────────────
+  // Verified ⟺ signed in with Google on an @umich.edu account. @umich.edu is
+  // Google Workspace, so a Google login on that domain necessarily went through
+  // UMich Weblogin + Duo — a live, 2FA-backed SSO session we can trust, far
+  // stronger than "received an email at an @umich.edu address". We check the
+  // provider + email domain server-side and NEVER trust a client claim. Email/
+  // password and non-umich Google accounts are valid users, just unverified.
+  const provider =
+    (data.user.app_metadata?.provider as string | undefined) ??
+    (data.user.app_metadata?.providers?.[0] as string | undefined)
+  const emailDomain = (data.user.email ?? '').toLowerCase().split('@')[1] ?? ''
+  // Primary signal: the login itself is a Google @umich.edu session. Secondary:
+  // a linked Google @umich.edu identity (the "verify later" path, where someone
+  // who joined with email/non-umich Google links their UMich Google — the
+  // primary email may still be the original, so inspect the identities too).
+  const hasUmichGoogleIdentity = (data.user.identities ?? []).some(i => {
+    const idEmail = (i.identity_data?.email as string | undefined)?.toLowerCase() ?? ''
+    return i.provider === 'google' && idEmail.endsWith('@umich.edu')
+  })
+  const isUmichSso =
+    (provider === 'google' && emailDomain === 'umich.edu') || hasUmichGoogleIdentity
 
   // Critical: only create a `users` row on first login. NEVER overwrite an
   // existing row's `user_type` — that would silently demote admins back to
@@ -97,7 +119,9 @@ export async function GET(request: Request) {
       full_name: googleName,
       university: meta.university ?? null,
       user_type: effectiveType,
-      is_verified: true,
+      // Only a real UMich Google SSO login earns the badge (see above).
+      is_verified: isUmichSso,
+      verification_method: isUmichSso ? 'umich_sso' : null,
     }
 
     // Deploy-order safety: if this code ships before migration 030 is
@@ -110,6 +134,17 @@ export async function GET(request: Request) {
       console.warn('[callback] insert with signup_source failed, retrying bare:', insertError.message)
       await supabase.from('users').insert(row)
     }
+  } else if (isUmichSso) {
+    // Returning login that IS a UMich SSO session — upgrade an existing
+    // unverified account to verified (the "verify to list" path: a user who
+    // joined with email or a non-umich Google later links/logs-in with their
+    // UMich Google account). Only ever an upgrade; a normal re-login never
+    // strips verification, and user_type/other fields are untouched.
+    await supabase
+      .from('users')
+      .update({ is_verified: true, verification_method: 'umich_sso' })
+      .eq('id', data.user.id)
+      .eq('is_verified', false)
   }
 
   return NextResponse.redirect(`${origin}${next}`)

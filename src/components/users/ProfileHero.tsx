@@ -4,7 +4,7 @@ import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MapPin, CalendarBlank, Crown } from '@phosphor-icons/react/dist/ssr'
 import { format, parseISO } from 'date-fns'
-import { VerifiedSeal } from './VerifiedSeal'
+import { VerifiedBadge } from './VerifiedBadge'
 import { StarRating } from './StarRating'
 
 interface ProfileHeroProps {
@@ -84,8 +84,8 @@ export function ProfileHero({
           </Avatar>
           {isVerified && (
             <span className="absolute -bottom-1 -right-1">
-              <span className="inline-flex items-center justify-center rounded-full bg-white p-0.5 ring-2 ring-white shadow-[0_4px_14px_oklch(0.84_0.17_85/0.30)]">
-                <VerifiedSeal size={26} />
+              <span className="inline-flex items-center justify-center rounded-full bg-white p-0.5 ring-2 ring-white shadow-[0_4px_14px_oklch(0.55_0.22_264/0.30)]">
+                <VerifiedBadge size={26} />
               </span>
             </span>
           )}
@@ -108,17 +108,7 @@ export function ProfileHero({
           transition={{ ...spring, delay: 0.24 }}
           className="mt-3 flex flex-wrap items-center gap-2"
         >
-          {isVerified && (
-            <span
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide"
-              style={{
-                background: 'oklch(0.84 0.17 85 / 0.15)',
-                color: 'oklch(0.32 0.10 85)',
-              }}
-            >
-              U of M verified
-            </span>
-          )}
+          {isVerified && <VerifiedBadge label size={13} />}
           <span
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white border border-line text-ink-soft capitalize"
           >

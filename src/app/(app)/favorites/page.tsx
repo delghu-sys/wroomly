@@ -23,7 +23,7 @@ export default async function FavoritesPage() {
         listing_images(*),
         listing_amenities(*),
         swap_preferences(*),
-        users:supplier_id(id, full_name, avatar_url, university)
+        users:supplier_id(id, full_name, avatar_url, university, is_verified)
       )
     `)
     .eq('user_id', user.id)

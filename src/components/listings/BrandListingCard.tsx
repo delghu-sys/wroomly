@@ -22,6 +22,7 @@ import { FavoriteButton } from './FavoriteButton'
 import { CardGallery } from './CardGallery'
 import { TiltCard } from '@/components/home/TiltCard'
 import { BrandChip } from '@/components/brand/BrandChip'
+import { VerifiedBadge } from '@/components/users/VerifiedBadge'
 
 interface BrandListingCardProps {
   listing: ListingWithDetails
@@ -181,6 +182,7 @@ export function BrandListingCard({
                 <span className="text-xs text-ink-muted truncate max-w-[80px]">
                   {listing.users?.full_name?.split(' ')[0]}
                 </span>
+                {listing.users?.is_verified && <VerifiedBadge size={13} />}
               </div>
             </div>
           </div>

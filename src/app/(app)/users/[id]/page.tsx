@@ -29,12 +29,14 @@ export async function generateMetadata({
   const supabase = await createClient()
   const { data } = await supabase
     .from('users')
-    .select('full_name')
+    .select('full_name, is_verified')
     .eq('id', id)
     .single()
 
   const name = data?.full_name ?? 'Profile'
-  const description = 'Verified U of M student on Wroomly.'
+  const description = (data as { is_verified?: boolean } | null)?.is_verified
+    ? 'Verified University of Michigan student on Wroomly.'
+    : 'Member profile on Wroomly.'
 
   return {
     title: name,
@@ -97,7 +99,7 @@ export default async function UserProfilePage({
         listing_images(*),
         listing_amenities(*),
         swap_preferences(*),
-        users:supplier_id(id, full_name, avatar_url, university)
+        users:supplier_id(id, full_name, avatar_url, university, is_verified)
       `)
       .eq('supplier_id', id)
       .eq('status', 'active')

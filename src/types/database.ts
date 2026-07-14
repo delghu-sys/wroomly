@@ -439,7 +439,7 @@ export interface ListingWithDetails extends Listing {
   listing_images: ListingImage[]
   listing_amenities: ListingAmenity[]
   swap_preferences: SwapPreference | null
-  users: Pick<User, 'id' | 'full_name' | 'avatar_url' | 'university'>
+  users: Pick<User, 'id' | 'full_name' | 'avatar_url' | 'university' | 'is_verified'>
 }
 
 export interface ConversationWithDetails extends Conversation {

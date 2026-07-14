@@ -42,6 +42,13 @@ interface GoogleAuthButtonProps {
   disabled?: boolean
   /** Surface an OAuth-initiation error to the parent form. */
   onError?: (message: string) => void
+  /**
+   * When true, hint Google to the umich.edu workspace (`hd=umich.edu`) so the
+   * account chooser prefers a UMich login. This is the verification path — the
+   * server still confirms the returned account is @umich.edu before granting
+   * the badge; the hint is UX only, never the enforcement.
+   */
+  umich?: boolean
 }
 
 /**
@@ -55,6 +62,7 @@ export function GoogleAuthButton({
   next = '/',
   disabled = false,
   onError,
+  umich = false,
 }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false)
 
@@ -72,7 +80,9 @@ export function GoogleAuthButton({
       provider: 'google',
       options: {
         redirectTo,
-        queryParams: { prompt: 'select_account' },
+        queryParams: umich
+          ? { prompt: 'select_account', hd: 'umich.edu' }
+          : { prompt: 'select_account' },
       },
     })
 
