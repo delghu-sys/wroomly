@@ -6,11 +6,13 @@
 -- "U of M verified" seal on profiles showed for everyone — including non-UMich
 -- accounts. This migration gives the flag meaning and gates listing on it.
 --
--- New model (badge, not gate): anyone can sign up (Google / Apple / email) and
--- browse or inquire. Verification = signing in with a Google @umich.edu account
--- (Google Workspace ⇒ the login goes through UMich Weblogin + Duo), which the
--- callback confirms server-side and records as verification_method='umich_sso'.
--- Only verified users get the blue check and only they can publish a listing.
+-- New model (pure badge, no gate): anyone can sign up (Google / Apple / email),
+-- browse, inquire, AND list — verification gates nothing. Verification = signing
+-- in with a Google @umich.edu account (Google Workspace ⇒ the login goes through
+-- UMich Weblogin + Duo), which the callback confirms server-side and records as
+-- verification_method='umich_sso'. Its only effect is the blue check next to the
+-- user's name, so renters can see which listings come from a verified UMich
+-- student. Listing itself stays open to everyone.
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- 1. How the account earned its verification. 'umich_sso' (Google @umich.edu),
@@ -37,19 +39,7 @@ set
 --    in 029; those columns are otherwise unchanged).
 grant select (verification_method) on public.users to anon, authenticated;
 
--- 4. Gate listing creation on verification, at the DB layer (the create-listing
---    wizard inserts under the user's own session, so RLS — not app code — is the
---    real enforcement). The subquery reads id + is_verified, both already
---    granted to `authenticated` by 029, so it evaluates under the caller's role.
---    Service-role paths (import publish, partner, seed inventory) bypass RLS and
---    enforce verification in code where relevant.
-drop policy if exists "Suppliers can insert own listings" on public.listings;
-create policy "Verified suppliers can insert own listings"
-  on public.listings for insert
-  with check (
-    auth.uid() = supplier_id
-    and exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.is_verified = true
-    )
-  );
+-- NOTE: listing creation is deliberately NOT gated on verification. Anyone can
+-- post; the blue check is a visible signal, not a permission. The existing
+-- "Suppliers can insert own listings" policy (auth.uid() = supplier_id) stays
+-- exactly as-is.

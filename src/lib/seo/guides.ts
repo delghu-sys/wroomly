@@ -164,7 +164,7 @@ export const GUIDES: Guide[] = [
       {
         question: 'Are Ann Arbor summer sublets safe?',
         answer:
-          'They can be, if you verify who you\'re dealing with. Use a platform that confirms identity — Wroomly verifies every account with an @umich.edu email — see the place in person or over live video, get the agreement in writing, and never pay by wire, gift card, or crypto.',
+          'They can be, if you verify who you\'re dealing with. Use a platform that confirms identity — on Wroomly, verified UMich students carry a blue check so you can see who is a real student — see the place in person or over live video, get the agreement in writing, and never pay by wire, gift card, or crypto.',
       },
     ],
   },
@@ -222,7 +222,7 @@ export const GUIDES: Guide[] = [
       {
         question: 'How can I verify a sublet listing in Ann Arbor is real?',
         answer:
-          'See the place in person or on a live video call where the person walks you through it. Reverse-image-search the photos. Verify the lister is a real student — on Wroomly, every account is confirmed with an @umich.edu email. Never move money before the agreement is in writing.',
+          'See the place in person or on a live video call where the person walks you through it. Reverse-image-search the photos. Check that the lister is a real student — on Wroomly, verified UMich students carry a blue check next to their name. Never move money before the agreement is in writing.',
       },
       {
         question: 'What should I do if I got scammed on a sublet?',
@@ -269,7 +269,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Deposits on Wroomly',
         paragraphs: [
-          'Listings on Wroomly state the deposit up front, and because every account is @umich.edu-verified, you know exactly who is holding your money. Pay the deposit by a traceable method and keep the written terms — that paper trail is half the battle when it\'s time to get your deposit back.',
+          'Listings on Wroomly state the deposit up front, and a blue check marks listers who\'ve verified as UMich students, so you can see who is holding your money. Pay the deposit by a traceable method and keep the written terms — that paper trail is half the battle when it\'s time to get your deposit back.',
         ],
       },
     ],
@@ -526,7 +526,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Verify the person before the place',
         paragraphs: [
-          "A listing is only as real as the human behind it. Insist on a live video call — not a pre-recorded video — where the person walks the actual apartment and shows the street outside. On Wroomly, every account is verified with an @umich.edu email before it can list or message, so the person on the other end is a named, real University of Michigan student. That single check removes most of the fraud you'd face in open Facebook groups.",
+          "A listing is only as real as the human behind it. Insist on a live video call — not a pre-recorded video — where the person walks the actual apartment and shows the street outside. On Wroomly, UMich students verify through their @umich.edu Google login and carry a blue check, so you can see when the person on the other end is a named, real University of Michigan student. Looking for that check removes most of the fraud you'd face in open Facebook groups.",
         ],
       },
       {

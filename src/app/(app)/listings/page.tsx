@@ -23,7 +23,7 @@ import { getListingImageUrl, justListedCutoffISO } from '@/lib/utils/listing'
 export const metadata: Metadata = {
   title: 'Browse University of Michigan Sublets in Ann Arbor',
   description:
-    'Browse verified University of Michigan sublets in Ann Arbor. Filter by neighborhood, price, bedrooms, and move-in date. Every account @umich.edu-verified.',
+    'Browse verified University of Michigan sublets in Ann Arbor. Filter by neighborhood, price, bedrooms, and move-in date. Verified UMich students carry a blue check.',
   // SEO: every filtered variant (?type=sublet, ?furnished=true, ?q=…) is the
   // same content sliced differently — canonicalize them all to the bare
   // /listings URL so crawl equity isn't split across thousands of

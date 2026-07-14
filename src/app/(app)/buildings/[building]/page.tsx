@@ -24,8 +24,8 @@ export async function generateMetadata({
 
   const title = `Sublets at ${b.name} — University of Michigan Housing, Ann Arbor`
   const description = b.address
-    ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. Verified University of Michigan student sublets, plus floor plans, amenities, and location facts — every account @umich.edu-verified.`
-    : `Looking to sublet at ${b.name} in Ann Arbor? Find verified University of Michigan student sublets at ${b.name} on Wroomly — every account @umich.edu-verified.`
+    ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. Verified University of Michigan student sublets, plus floor plans, amenities, and location facts. Verified UMich students carry a blue check.`
+    : `Looking to sublet at ${b.name} in Ann Arbor? Find verified University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`
   return {
     title,
     description,

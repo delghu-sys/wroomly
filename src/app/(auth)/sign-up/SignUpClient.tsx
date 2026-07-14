@@ -149,7 +149,7 @@ export default function SignUpClient({
           headline1="Make room for"
           headline2="connection."
           accentWords={['connection.']}
-          subhead="Sublet housing near the University of Michigan. Every listing comes from a UMich student verified through their @umich.edu Google login — look for the blue check."
+          subhead="Sublet housing near the University of Michigan. Verified UMich students wear a blue check next to their name — so you can always see whose listing is from a real student."
         />
 
         <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
@@ -329,8 +329,10 @@ export default function SignUpClient({
                 />
                 <p className="text-center text-[12px] text-ink-muted leading-snug">
                   Sign in with your <strong>@umich.edu</strong> Google account to
-                  get the blue <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check.
-                  {isSupplier && ' Verification is required to list a place.'}
+                  get the blue <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check
+                  {isSupplier
+                    ? ' — so renters can see your listing is from a real UMich student.'
+                    : ' next to your name.'}
                 </p>
               </>
             )}
