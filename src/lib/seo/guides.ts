@@ -846,6 +846,95 @@ export const GUIDES: Guide[] = [
       },
     ],
   },
+  {
+    slug: 'how-to-verify-an-ann-arbor-landlord',
+    title: 'How to verify an Ann Arbor landlord before you pay anyone',
+    description:
+      'Ann Arbor requires every legal rental to hold a city Certificate of Compliance. Here is how to look one up, what it proves about a listing, and what it does not — a scam check almost no student uses.',
+    excerpt:
+      'The city keeps a public record of every legal rental in Ann Arbor. Most students never check it. Here is how — and exactly what it does and doesn’t prove.',
+    updated: '2026-07-14',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'The one check almost nobody does',
+        paragraphs: [
+          "Every renter in Ann Arbor knows the usual scam advice: don’t wire money, insist on a video tour, check whether the poster’s profile looks real. All good. But there’s one check that’s stronger than any of them and almost nobody uses it, because it’s hiding in city government instead of a housing group.",
+          "Ann Arbor law requires every rental unit to hold a valid Certificate of Compliance from the city. The municipal code is blunt about it: “No person shall lease or otherwise make a dwelling or rooming unit available for occupancy if a Certificate of Compliance is not in effect for the unit” (Section 8:516). The certificate means the city has actually inspected the place and licensed it to be rented. It’s not optional, and the records are public.",
+          "So a legitimate Ann Arbor rental has a paper trail with the city. A fake listing — an address the “landlord” doesn’t control, or a unit that isn’t a licensed rental at all — usually doesn’t. That gap is a scam detector the scammers don’t expect you to use.",
+        ],
+      },
+      {
+        heading: 'How to actually look it up',
+        paragraphs: [
+          "The city tracks rental registrations and Certificates of Compliance in an online permit system called STREAM, at stream.a2gov.org, for records from mid-2022 on. Older records live in the city’s A2Trak permit archive. Search by the property address and look for a rental registration and a Certificate of Compliance that hasn’t expired — certificates run about 2.5 years from the last inspection (3.5 if the property passed on the first try).",
+        ],
+        bullets: [
+          'Search the exact street address in STREAM (stream.a2gov.org)',
+          'Look for a rental registration + a current (unexpired) Certificate of Compliance',
+          'For older buildings, check the A2Trak archive too',
+          'No luck online? Call Ann Arbor Rental Housing Services at 734.794.6264 — they can confirm whether an address is a registered rental',
+        ],
+      },
+      {
+        heading: 'What it proves — and what it doesn’t',
+        paragraphs: [
+          "Be honest with yourself about what this check does. A valid certificate proves the place is real: the address is a licensed, city-inspected rental that legally exists. If an address has no rental registration at all, that’s a serious red flag — either it’s not a legal rental or the person listing it is making things up.",
+          "What the certificate does not prove is that the person messaging you is actually connected to that unit. A scammer can copy a real, registered address off Zillow and pretend to rent it. So the permit check is necessary but not sufficient: it confirms the place, not the person. You still have to confirm you’re dealing with the real leaseholder — which is the other half of the problem.",
+          "That’s the whole reason Wroomly is built the way it is. The certificate lookup confirms the place is legitimate; Wroomly’s @umich.edu verification confirms the person on the other end is a real, named University of Michigan student, not an anonymous account. Together they close both halves of the scam — real place, real person.",
+        ],
+      },
+      {
+        heading: 'Applying it to a sublet',
+        paragraphs: [
+          "Sublets have a wrinkle: the person renting to you usually isn’t the landlord, so they won’t appear on the Certificate of Compliance — the original tenant does, through their lease. That’s expected and fine. The certificate still does its job: it confirms the building and unit are a legal, inspected rental rather than an invented address.",
+          "For the person side of a sublet, your checks are the ones in the subletting guides: the original tenant’s written landlord approval to sublet (most Ann Arbor leases require it), a written sublease agreement, and — on Wroomly — the @umich.edu verification that says the student handing you the keys is who they claim to be. Certificate for the place, consent-plus-verification for the person.",
+        ],
+      },
+      {
+        heading: 'Two more local protections most students miss',
+        paragraphs: [
+          "While you’re learning what Ann Arbor law gives you, two more are worth knowing, because they push back on the parts of the market students complain about most.",
+          "Right to Renew / the Early Leasing Ordinance: Ann Arbor limits how early a landlord can pressure you about next year. Under the current ordinance, landlords generally can’t make you decide on a renewal or show your occupied unit until well into your lease, and you keep a right to renew until roughly 150 days before the term ends. It exists specifically to blunt the notorious October leasing rush — so you don’t have to sign for next year in week three.",
+          "Free legal help: University of Michigan Student Legal Services will review a lease or sublease for enrolled students at no cost, and Legal Services of South Central Michigan and the Fair Housing Center are there if something goes wrong. Using them is normal, not dramatic — a ten-minute lease review beats a lost deposit.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Does every rental in Ann Arbor need a Certificate of Compliance?',
+        answer:
+          'Yes. Ann Arbor Municipal Code Section 8:516 states no one may lease a dwelling or rooming unit for occupancy unless a Certificate of Compliance is in effect. It means the city has inspected and licensed the unit as a legal rental, and the records are public — so a legitimate rental has a city paper trail.',
+      },
+      {
+        question: 'How do I look up an Ann Arbor rental’s Certificate of Compliance?',
+        answer:
+          'Search the property address in the city’s STREAM permit system at stream.a2gov.org (records from mid-2022 on), or the A2Trak archive for older ones. Look for a rental registration and an unexpired Certificate of Compliance. If you can’t find it online, call Ann Arbor Rental Housing Services at 734.794.6264.',
+      },
+      {
+        question: 'Does a valid rental permit mean a listing is not a scam?',
+        answer:
+          'Not by itself. A certificate proves the place is a real, licensed rental — but a scammer can copy a real registered address they don’t control. It confirms the place, not the person. Pair it with confirming you’re dealing with the actual leaseholder, which is what Wroomly’s @umich.edu verification does.',
+      },
+      {
+        question: 'Do I need a Certificate of Compliance to sublet in Ann Arbor?',
+        answer:
+          'The certificate belongs to the property and the original tenant’s lease, not to you as a subletter, so you won’t be on it — that’s normal. It still confirms the building is a legal rental. For the sublet itself, get the landlord’s written approval and a written sublease agreement.',
+      },
+      {
+        question: 'What if the address has no rental registration in Ann Arbor?',
+        answer:
+          'Treat it as a serious red flag. Either the unit isn’t a legal rental or the person listing it is fabricating the address. Don’t send any money, ask the lister to explain, and confirm the address with Ann Arbor Rental Housing Services (734.794.6264) before going further.',
+      },
+    ],
+    links: [
+      { label: 'How to avoid sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Security deposits', href: '/guides/security-deposits-ann-arbor-sublets' },
+      { label: 'How to sublet your apartment', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
+      { label: 'Sublet vs. relet', href: '/guides/sublet-vs-relet-lease-takeover' },
+      { label: 'Browse buildings', href: '/buildings' },
+    ],
+  },
 ]
 
 export function getGuide(slug: string): Guide | undefined {
