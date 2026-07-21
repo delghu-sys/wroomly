@@ -1,12 +1,12 @@
 # Wroomly
 
-> Wroomly is a sublet and student-housing marketplace built exclusively for verified University of Michigan students in Ann Arbor. Every account is confirmed with an @umich.edu email before a user can list a place or contact a host, so listings and inquiries come only from real U-M students. Wroomly focuses on summer and term-time sublets near campus, with building-by-building landing pages, live rent-price data computed from active listings, and guides on subletting safely, avoiding scams, and Michigan deposit law.
+> Wroomly is a sublet and student-housing marketplace for the University of Michigan community in Ann Arbor. University of Michigan students verify through their @umich.edu Google login and carry a blue check next to their name, so renters can see which listings come from a real, verified U-M student. Anyone can browse, inquire, and list; the blue check is a visible trust signal, not a gate. Wroomly focuses on summer and term-time sublets near campus, with building-by-building landing pages, live rent-price data computed from active listings, and guides on subletting safely, avoiding scams, and Michigan deposit law.
 
 ## About
 
 - Audience: University of Michigan students subletting or finding a place in Ann Arbor
 - Coverage: Ann Arbor neighborhoods around Central, North, and Medical campuses
-- Verification: @umich.edu email required for every account
+- Verification: UMich students verify via @umich.edu Google SSO and get a blue check (a trust signal, not a requirement to use the platform)
 - Cost: listing a place is free; browsing is free
 
 ## Live data

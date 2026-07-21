@@ -14,6 +14,7 @@ import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
+import { AppleAuthButton } from '@/components/auth/AppleAuthButton'
 import { AuthDivider } from '@/components/auth/AuthDivider'
 import { RoleSelectorCards, type Role } from '@/components/auth/RoleSelectorCards'
 import { RoleContinueCta } from '@/components/auth/RoleContinueCta'
@@ -71,6 +72,12 @@ export default function SignUpClient({
   const [pendingRole, setPendingRole] = useState<Role | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  // Whether the person is a UMich student. An explicit, required choice — no
+  // default — because it decides the auth method: UMich → Google @umich.edu SSO
+  // ONLY (the login runs through UMich's 2FA, and it's what earns the blue
+  // check); non-UMich → Google / Apple / email, no badge. No auth method renders
+  // until this is answered.
+  const [umichStudent, setUmichStudent] = useState<boolean | null>(null)
 
   const supplierForm = useForm<SupplierForm>({
     resolver: zodResolver(supplierSchema),
@@ -141,7 +148,7 @@ export default function SignUpClient({
           headline1="Make room for"
           headline2="connection."
           accentWords={['connection.']}
-          subhead="Sublet housing through a marketplace built just for U of M students — every account verified with an @umich.edu email."
+          subhead="Sublet housing near the University of Michigan. Verified UMich students wear a blue check next to their name — so you can always see whose listing is from a real student."
         />
 
         <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
@@ -169,31 +176,16 @@ export default function SignUpClient({
               onSelect={setPendingRole}
             />
 
-            {/* Continue CTA — only after a role is selected */}
+            {/* Continue CTA — only after a role is selected. The auth methods
+                (and the "are you a UMich student?" step that decides them) live
+                on the next screen, so there is deliberately NO Google button
+                here — it would skip the UMich question. */}
             <div className="mt-6">
               <RoleContinueCta
                 selected={pendingRole}
                 onContinue={() => setRole(pendingRole)}
               />
             </div>
-
-            {/* Google sign-up — appears once a side is picked, so we know
-                which user_type to create. */}
-            {pendingRole && (
-              <div className="mt-5 space-y-3">
-                <AuthDivider label="or" />
-                <GoogleAuthButton
-                  intendedType={pendingRole}
-                  onError={setError}
-                  label="Continue with Google"
-                />
-                {error && (
-                  <p className="text-center text-xs text-[oklch(0.55_0.20_25)]">
-                    {error}
-                  </p>
-                )}
-              </div>
-            )}
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -283,24 +275,87 @@ export default function SignUpClient({
             transition={{ ...spring, delay: 0.1 }}
             className="space-y-3 mb-5"
           >
-            <GoogleAuthButton
-              intendedType={role}
-              onError={setError}
-              label="Sign up with Google"
-            />
-            <p className="text-center text-[12px] text-ink-muted leading-snug">
-              By continuing with Google, you agree to our{' '}
-              <Link
-                href="/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 hover:underline"
-              >
-                Terms of Service
-              </Link>
-              .
+            {/* UMich-student question — a required choice that decides the auth
+                method. No default: nothing else renders until it's answered. */}
+            <p className="text-[13px] font-semibold text-ink">
+              Are you a University of Michigan student?
             </p>
-            <AuthDivider label="or sign up with email" />
+            <div className="rounded-2xl border border-line bg-surface/60 p-1 flex gap-1">
+              <button
+                type="button"
+                onClick={() => setUmichStudent(true)}
+                aria-pressed={umichStudent === true}
+                className={`flex-1 h-10 rounded-xl text-[13px] font-semibold transition-all ${
+                  umichStudent === true
+                    ? 'bg-[oklch(0.55_0.22_264)] text-white shadow-sm'
+                    : 'text-ink-soft hover:text-ink'
+                }`}
+              >
+                I&rsquo;m a UMich student
+              </button>
+              <button
+                type="button"
+                onClick={() => setUmichStudent(false)}
+                aria-pressed={umichStudent === false}
+                className={`flex-1 h-10 rounded-xl text-[13px] font-semibold transition-all ${
+                  umichStudent === false
+                    ? 'bg-navy text-white shadow-sm'
+                    : 'text-ink-soft hover:text-ink'
+                }`}
+              >
+                I&rsquo;m not
+              </button>
+            </div>
+
+            {umichStudent === null && (
+              <p className="text-center text-[12px] text-ink-muted leading-snug pt-1">
+                Choose one to continue.
+              </p>
+            )}
+
+            {umichStudent === true && (
+              <>
+                <GoogleAuthButton
+                  intendedType={role}
+                  onError={setError}
+                  umich
+                  label="Continue with your UMich Google"
+                />
+                <p className="text-center text-[12px] text-ink-muted leading-snug">
+                  UMich students sign in with their <strong>@umich.edu</strong>{' '}
+                  Google account — the login runs through the university&rsquo;s
+                  secure 2-step verification, and it gives you the blue{' '}
+                  <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check
+                  {isSupplier
+                    ? ' so renters can see your listing is from a real UMich student.'
+                    : ' next to your name.'}
+                </p>
+              </>
+            )}
+
+            {umichStudent === false && (
+              <>
+                <GoogleAuthButton
+                  intendedType={role}
+                  onError={setError}
+                  label="Sign up with Google"
+                />
+                <AppleAuthButton intendedType={role} onError={setError} />
+                <p className="text-center text-[12px] text-ink-muted leading-snug">
+                  By continuing, you agree to our{' '}
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 hover:underline"
+                  >
+                    Terms of Service
+                  </Link>
+                  .
+                </p>
+                <AuthDivider label="or sign up with email" />
+              </>
+            )}
           </motion.div>
 
           <motion.form
@@ -308,6 +363,11 @@ export default function SignUpClient({
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.15 }}
             onSubmit={onSubmit}
+            // Email/password is only offered on the non-UMich path — UMich
+            // verification requires the Google SSO round-trip, so we hide the
+            // email form until they pick "I'm not" (or leave it hidden for the
+            // UMich path, guiding them to the Google button above).
+            hidden={umichStudent !== false}
             className="space-y-5"
           >
             <BrandFormInput

@@ -69,8 +69,30 @@ export async function GET(request: Request) {
 
   // Server-side enforcement: `user_type` claim is only accepted if it's not
   // `admin` (you don't make yourself admin via signup). Any email may be a
-  // supplier — there's no domain restriction.
+  // supplier — verification (not role) is what gates listing.
   const effectiveType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
+
+  // ── UMich verification (the blue check) ──────────────────────────────────
+  // Verified ⟺ signed in with Google on an @umich.edu account. @umich.edu is
+  // Google Workspace, so a Google login on that domain necessarily went through
+  // UMich Weblogin + Duo — a live, 2FA-backed SSO session we can trust, far
+  // stronger than "received an email at an @umich.edu address". We check the
+  // provider + email domain server-side and NEVER trust a client claim. Email/
+  // password and non-umich Google accounts are valid users, just unverified.
+  const provider =
+    (data.user.app_metadata?.provider as string | undefined) ??
+    (data.user.app_metadata?.providers?.[0] as string | undefined)
+  const emailDomain = (data.user.email ?? '').toLowerCase().split('@')[1] ?? ''
+  // Primary signal: the login itself is a Google @umich.edu session. Secondary:
+  // a linked Google @umich.edu identity (the "verify later" path, where someone
+  // who joined with email/non-umich Google links their UMich Google — the
+  // primary email may still be the original, so inspect the identities too).
+  const hasUmichGoogleIdentity = (data.user.identities ?? []).some(i => {
+    const idEmail = (i.identity_data?.email as string | undefined)?.toLowerCase() ?? ''
+    return i.provider === 'google' && idEmail.endsWith('@umich.edu')
+  })
+  const isUmichSso =
+    (provider === 'google' && emailDomain === 'umich.edu') || hasUmichGoogleIdentity
 
   // Critical: only create a `users` row on first login. NEVER overwrite an
   // existing row's `user_type` — that would silently demote admins back to
@@ -91,24 +113,54 @@ export async function GET(request: Request) {
       cookieStore.get(ATTRIBUTION_COOKIE)?.value ?? null
     )
 
+    // Core columns that have existed since 001 — always safe to insert.
     const row = {
       id: data.user.id,
       email: data.user.email!,
       full_name: googleName,
       university: meta.university ?? null,
       user_type: effectiveType,
-      is_verified: true,
+      // Only a real UMich Google SSO login earns the badge (see above).
+      is_verified: isUmichSso,
     }
 
-    // Deploy-order safety: if this code ships before migration 030 is
-    // applied, inserting signup_source would fail on the missing column and
-    // break every new signup. Attribution is never worth that — retry bare.
-    const { error: insertError } = await supabase
+    // Deploy-order safety: `signup_source` (migration 030) and
+    // `verification_method` (036) are newer columns — if this code ships before
+    // either migration is applied, an insert naming the missing column would
+    // fail and break every new signup. So progressively degrade: try the full
+    // row, then drop the newest add-ons, then bare. is_verified still lands
+    // correctly on the bare path (the badge just can't record its method until
+    // 036 is applied).
+    const full = {
+      ...row,
+      signup_source: signupSource,
+      verification_method: isUmichSso ? 'umich_sso' : null,
+    }
+    const { error: e1 } = await supabase.from('users').insert(full)
+    if (e1) {
+      console.warn('[callback] full insert failed, retrying without new columns:', e1.message)
+      const { error: e2 } = await supabase.from('users').insert(row)
+      if (e2) console.error('[callback] bare user insert failed:', e2.message)
+    }
+  } else if (isUmichSso) {
+    // Returning login that IS a UMich SSO session — upgrade an existing
+    // unverified account to verified (the "verify to list" path: a user who
+    // joined with email or a non-umich Google later links/logs-in with their
+    // UMich Google account). Only ever an upgrade; a normal re-login never
+    // strips verification, and user_type/other fields are untouched.
+    const { error: upErr } = await supabase
       .from('users')
-      .insert({ ...row, signup_source: signupSource })
-    if (insertError) {
-      console.warn('[callback] insert with signup_source failed, retrying bare:', insertError.message)
-      await supabase.from('users').insert(row)
+      .update({ is_verified: true, verification_method: 'umich_sso' })
+      .eq('id', data.user.id)
+      .eq('is_verified', false)
+    // Deploy-order safety: if verification_method (036) isn't applied yet, retry
+    // the upgrade without it so the badge still lands.
+    if (upErr) {
+      await supabase
+        .from('users')
+        .update({ is_verified: true })
+        .eq('id', data.user.id)
+        .eq('is_verified', false)
     }
   }
 

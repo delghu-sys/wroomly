@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     template: '%s | Wroomly — UMich Student Sublets',
   },
   description:
-    'University of Michigan student sublets in Ann Arbor — every account verified with an @umich.edu email, no scams. Find a summer sublet near campus or list your place free.',
+    'University of Michigan student sublets in Ann Arbor. Verified UMich students carry a blue check, so you can see who is a real student. Find a summer sublet near campus or list your place free.',
   keywords: [
     'University of Michigan sublet',
     'UMich sublet',

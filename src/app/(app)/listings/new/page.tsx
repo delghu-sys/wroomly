@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ListingWizard } from '@/components/listings/ListingWizard'
+import { VerifyBadgeNudge } from '@/components/listings/VerifyBadgeNudge'
 import { House, EnvelopeOpen, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
 
@@ -18,9 +19,14 @@ export default async function NewListingPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('user_type')
+    .select('user_type, is_verified')
     .eq('id', user.id)
     .single()
+
+  // Listing is open to everyone — verification is NOT required. Unverified
+  // suppliers see an optional nudge (below the header) to verify and earn the
+  // blue check on their listing; verified ones don't.
+  const isVerified = (profile as { is_verified?: boolean } | null)?.is_verified === true
 
   // ── Non-supplier interstitial — explains why we can't continue and
   //    points them somewhere useful, instead of a silent redirect. ──
@@ -123,6 +129,11 @@ export default async function NewListingPage() {
           It only takes a few minutes. You can save drafts and come back.
         </p>
       </div>
+
+      {/* Optional verification nudge — listing is open to everyone, but a UMich
+          student can earn the blue check so renters see their listing is from a
+          verified student. Not shown once verified. */}
+      {!isVerified && <VerifyBadgeNudge />}
 
       {/* Shortcut: import an existing post instead of filling this out by hand. */}
       <Link

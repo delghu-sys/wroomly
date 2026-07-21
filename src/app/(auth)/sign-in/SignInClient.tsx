@@ -13,6 +13,7 @@ import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
+import { AppleAuthButton } from '@/components/auth/AppleAuthButton'
 import { AuthDivider } from '@/components/auth/AuthDivider'
 
 // NOTE: no testimonials on auth panels until real ones exist. Placeholder
@@ -103,6 +104,7 @@ function SignInForm() {
             className="space-y-5"
           >
             <GoogleAuthButton next={next} onError={setError} />
+            <AppleAuthButton next={next} onError={setError} />
             <AuthDivider label="or sign in with email" />
           </motion.div>
 

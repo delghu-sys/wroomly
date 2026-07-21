@@ -42,9 +42,10 @@ export default function AboutPage() {
               </h1>
 
               <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-xl">
-                Wroomly is a verified marketplace for sublets between
-                University of Michigan students. Every account is verified, every
-                listing is reviewed, and every conversation stays on-platform.
+                Wroomly is a marketplace for sublets near the University of
+                Michigan. Verified UMich students carry a blue check so you can
+                see whose listing is from a real student, every listing is
+                reviewed, and every conversation stays on-platform.
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
