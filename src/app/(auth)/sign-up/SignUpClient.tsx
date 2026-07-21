@@ -17,6 +17,7 @@ import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton'
 import { AppleAuthButton } from '@/components/auth/AppleAuthButton'
 import { AuthDivider } from '@/components/auth/AuthDivider'
 import { RoleSelectorCards, type Role } from '@/components/auth/RoleSelectorCards'
+import { UmichSelectorCards } from '@/components/auth/UmichSelectorCards'
 import { RoleContinueCta } from '@/components/auth/RoleContinueCta'
 
 // NOTE: no testimonials on auth panels until real ones exist — see the note
@@ -29,7 +30,13 @@ const termsAgreement = z.literal(true, {
 
 const supplierSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
+  email: z
+    .string()
+    .email('Invalid email')
+    .refine(
+      e => !e.trim().toLowerCase().endsWith('@umich.edu'),
+      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+    ),
   university: z.literal('University of Michigan'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
@@ -37,7 +44,13 @@ const supplierSchema = z.object({
 
 const consumerSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
+  email: z
+    .string()
+    .email('Invalid email')
+    .refine(
+      e => !e.trim().toLowerCase().endsWith('@umich.edu'),
+      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+    ),
   university: z.string().min(2, 'Enter your university name'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
@@ -113,6 +126,17 @@ export default function SignUpClient({
     password: string
     user_type: Role
   }) {
+    // A UMich email must go through Google SSO (2-step verification), never a
+    // password — otherwise someone could hold an @umich.edu account that never
+    // passed the university login. Block it here and point them to the UMich
+    // path. (The server also never badges a password signup — verification
+    // requires a Google @umich.edu session — so this is the UX half of that.)
+    if (data.email.trim().toLowerCase().endsWith('@umich.edu')) {
+      setError(
+        'That’s a University of Michigan email — UMich students sign up with Google for secure 2-step verification. Choose “Yes, I’m a UMich student” above and continue with Google.',
+      )
+      return
+    }
     setLoading(true)
     setError(null)
     const supabase = createClient()
@@ -277,35 +301,10 @@ export default function SignUpClient({
           >
             {/* UMich-student question — a required choice that decides the auth
                 method. No default: nothing else renders until it's answered. */}
-            <p className="text-[13px] font-semibold text-ink">
+            <p className="text-[13px] font-semibold text-ink mb-1">
               Are you a University of Michigan student?
             </p>
-            <div className="rounded-2xl border border-line bg-surface/60 p-1 flex gap-1">
-              <button
-                type="button"
-                onClick={() => setUmichStudent(true)}
-                aria-pressed={umichStudent === true}
-                className={`flex-1 h-10 rounded-xl text-[13px] font-semibold transition-all ${
-                  umichStudent === true
-                    ? 'bg-[oklch(0.55_0.22_264)] text-white shadow-sm'
-                    : 'text-ink-soft hover:text-ink'
-                }`}
-              >
-                I&rsquo;m a UMich student
-              </button>
-              <button
-                type="button"
-                onClick={() => setUmichStudent(false)}
-                aria-pressed={umichStudent === false}
-                className={`flex-1 h-10 rounded-xl text-[13px] font-semibold transition-all ${
-                  umichStudent === false
-                    ? 'bg-navy text-white shadow-sm'
-                    : 'text-ink-soft hover:text-ink'
-                }`}
-              >
-                I&rsquo;m not
-              </button>
-            </div>
+            <UmichSelectorCards selected={umichStudent} onSelect={setUmichStudent} />
 
             {umichStudent === null && (
               <p className="text-center text-[12px] text-ink-muted leading-snug pt-1">
