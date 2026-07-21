@@ -113,6 +113,7 @@ export async function GET(request: Request) {
       cookieStore.get(ATTRIBUTION_COOKIE)?.value ?? null
     )
 
+    // Core columns that have existed since 001 — always safe to insert.
     const row = {
       id: data.user.id,
       email: data.user.email!,
@@ -121,18 +122,25 @@ export async function GET(request: Request) {
       user_type: effectiveType,
       // Only a real UMich Google SSO login earns the badge (see above).
       is_verified: isUmichSso,
-      verification_method: isUmichSso ? 'umich_sso' : null,
     }
 
-    // Deploy-order safety: if this code ships before migration 030 is
-    // applied, inserting signup_source would fail on the missing column and
-    // break every new signup. Attribution is never worth that — retry bare.
-    const { error: insertError } = await supabase
-      .from('users')
-      .insert({ ...row, signup_source: signupSource })
-    if (insertError) {
-      console.warn('[callback] insert with signup_source failed, retrying bare:', insertError.message)
-      await supabase.from('users').insert(row)
+    // Deploy-order safety: `signup_source` (migration 030) and
+    // `verification_method` (036) are newer columns — if this code ships before
+    // either migration is applied, an insert naming the missing column would
+    // fail and break every new signup. So progressively degrade: try the full
+    // row, then drop the newest add-ons, then bare. is_verified still lands
+    // correctly on the bare path (the badge just can't record its method until
+    // 036 is applied).
+    const full = {
+      ...row,
+      signup_source: signupSource,
+      verification_method: isUmichSso ? 'umich_sso' : null,
+    }
+    const { error: e1 } = await supabase.from('users').insert(full)
+    if (e1) {
+      console.warn('[callback] full insert failed, retrying without new columns:', e1.message)
+      const { error: e2 } = await supabase.from('users').insert(row)
+      if (e2) console.error('[callback] bare user insert failed:', e2.message)
     }
   } else if (isUmichSso) {
     // Returning login that IS a UMich SSO session — upgrade an existing
@@ -140,11 +148,20 @@ export async function GET(request: Request) {
     // joined with email or a non-umich Google later links/logs-in with their
     // UMich Google account). Only ever an upgrade; a normal re-login never
     // strips verification, and user_type/other fields are untouched.
-    await supabase
+    const { error: upErr } = await supabase
       .from('users')
       .update({ is_verified: true, verification_method: 'umich_sso' })
       .eq('id', data.user.id)
       .eq('is_verified', false)
+    // Deploy-order safety: if verification_method (036) isn't applied yet, retry
+    // the upgrade without it so the badge still lands.
+    if (upErr) {
+      await supabase
+        .from('users')
+        .update({ is_verified: true })
+        .eq('id', data.user.id)
+        .eq('is_verified', false)
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`)

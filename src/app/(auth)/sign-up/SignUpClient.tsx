@@ -72,13 +72,12 @@ export default function SignUpClient({
   const [pendingRole, setPendingRole] = useState<Role | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  // Whether the person is a UMich student. Drives the auth method: UMich → the
-  // Google umich.edu SSO path that earns the blue check; non-UMich → Google /
-  // Apple / email, no badge. Suppliers default to UMich since listing requires
-  // verification; renters choose. `null` until chosen (renters).
-  const [umichStudent, setUmichStudent] = useState<boolean | null>(
-    initialRole === 'supplier' ? true : null,
-  )
+  // Whether the person is a UMich student. An explicit, required choice — no
+  // default — because it decides the auth method: UMich → Google @umich.edu SSO
+  // ONLY (the login runs through UMich's 2FA, and it's what earns the blue
+  // check); non-UMich → Google / Apple / email, no badge. No auth method renders
+  // until this is answered.
+  const [umichStudent, setUmichStudent] = useState<boolean | null>(null)
 
   const supplierForm = useForm<SupplierForm>({
     resolver: zodResolver(supplierSchema),
@@ -177,31 +176,16 @@ export default function SignUpClient({
               onSelect={setPendingRole}
             />
 
-            {/* Continue CTA — only after a role is selected */}
+            {/* Continue CTA — only after a role is selected. The auth methods
+                (and the "are you a UMich student?" step that decides them) live
+                on the next screen, so there is deliberately NO Google button
+                here — it would skip the UMich question. */}
             <div className="mt-6">
               <RoleContinueCta
                 selected={pendingRole}
                 onContinue={() => setRole(pendingRole)}
               />
             </div>
-
-            {/* Google sign-up — appears once a side is picked, so we know
-                which user_type to create. */}
-            {pendingRole && (
-              <div className="mt-5 space-y-3">
-                <AuthDivider label="or" />
-                <GoogleAuthButton
-                  intendedType={pendingRole}
-                  onError={setError}
-                  label="Continue with Google"
-                />
-                {error && (
-                  <p className="text-center text-xs text-[oklch(0.55_0.20_25)]">
-                    {error}
-                  </p>
-                )}
-              </div>
-            )}
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -291,7 +275,11 @@ export default function SignUpClient({
             transition={{ ...spring, delay: 0.1 }}
             className="space-y-3 mb-5"
           >
-            {/* UMich-student question — decides the verification path. */}
+            {/* UMich-student question — a required choice that decides the auth
+                method. No default: nothing else renders until it's answered. */}
+            <p className="text-[13px] font-semibold text-ink">
+              Are you a University of Michigan student?
+            </p>
             <div className="rounded-2xl border border-line bg-surface/60 p-1 flex gap-1">
               <button
                 type="button"
@@ -319,6 +307,12 @@ export default function SignUpClient({
               </button>
             </div>
 
+            {umichStudent === null && (
+              <p className="text-center text-[12px] text-ink-muted leading-snug pt-1">
+                Choose one to continue.
+              </p>
+            )}
+
             {umichStudent === true && (
               <>
                 <GoogleAuthButton
@@ -328,10 +322,12 @@ export default function SignUpClient({
                   label="Continue with your UMich Google"
                 />
                 <p className="text-center text-[12px] text-ink-muted leading-snug">
-                  Sign in with your <strong>@umich.edu</strong> Google account to
-                  get the blue <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check
+                  UMich students sign in with their <strong>@umich.edu</strong>{' '}
+                  Google account — the login runs through the university&rsquo;s
+                  secure 2-step verification, and it gives you the blue{' '}
+                  <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check
                   {isSupplier
-                    ? ' — so renters can see your listing is from a real UMich student.'
+                    ? ' so renters can see your listing is from a real UMich student.'
                     : ' next to your name.'}
                 </p>
               </>
