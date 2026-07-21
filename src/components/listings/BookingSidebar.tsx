@@ -182,8 +182,8 @@ export function BookingSidebar({
                       </>
                     ) : (
                       <>
-                        Every member is{' '}
-                        <span className="font-semibold text-ink-soft">@umich.edu verified</span>.
+                        Verified UMich students carry a{' '}
+                        <span className="font-semibold text-ink-soft">blue check</span>.
                       </>
                     )}
                   </p>
