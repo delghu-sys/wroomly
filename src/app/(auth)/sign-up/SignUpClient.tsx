@@ -30,7 +30,13 @@ const termsAgreement = z.literal(true, {
 
 const supplierSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
+  email: z
+    .string()
+    .email('Invalid email')
+    .refine(
+      e => !e.trim().toLowerCase().endsWith('@umich.edu'),
+      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+    ),
   university: z.literal('University of Michigan'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
@@ -38,7 +44,13 @@ const supplierSchema = z.object({
 
 const consumerSchema = z.object({
   full_name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
+  email: z
+    .string()
+    .email('Invalid email')
+    .refine(
+      e => !e.trim().toLowerCase().endsWith('@umich.edu'),
+      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+    ),
   university: z.string().min(2, 'Enter your university name'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
@@ -114,6 +126,17 @@ export default function SignUpClient({
     password: string
     user_type: Role
   }) {
+    // A UMich email must go through Google SSO (2-step verification), never a
+    // password — otherwise someone could hold an @umich.edu account that never
+    // passed the university login. Block it here and point them to the UMich
+    // path. (The server also never badges a password signup — verification
+    // requires a Google @umich.edu session — so this is the UX half of that.)
+    if (data.email.trim().toLowerCase().endsWith('@umich.edu')) {
+      setError(
+        'That’s a University of Michigan email — UMich students sign up with Google for secure 2-step verification. Choose “Yes, I’m a UMich student” above and continue with Google.',
+      )
+      return
+    }
     setLoading(true)
     setError(null)
     const supabase = createClient()

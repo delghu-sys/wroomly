@@ -48,6 +48,15 @@ function SignInForm() {
 
   async function onSubmit(data: FormValues) {
     setError(null)
+    // UMich accounts have no password — they sign in with Google (2-step
+    // verification). Steer @umich.edu emails to Google instead of the generic
+    // "didn't match" error they'd otherwise hit.
+    if (data.email.trim().toLowerCase().endsWith('@umich.edu')) {
+      setError(
+        'University of Michigan accounts sign in with Google, not a password. Use “Continue with Google” above.',
+      )
+      return
+    }
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: data.email,
