@@ -48,15 +48,12 @@ function SignInForm() {
 
   async function onSubmit(data: FormValues) {
     setError(null)
-    // UMich accounts have no password — they sign in with Google (2-step
-    // verification). Steer @umich.edu emails to Google instead of the generic
-    // "didn't match" error they'd otherwise hit.
-    if (data.email.trim().toLowerCase().endsWith('@umich.edu')) {
-      setError(
-        'University of Michigan accounts sign in with Google, not a password. Use “Continue with Google” above.',
-      )
-      return
-    }
+    // NOTE: no @umich.edu gate here. Sign-in accepts any account that has a
+    // password — including UMich accounts created before the Google-only rule
+    // (e.g. the admin account). The @umich.edu → Google requirement is a
+    // *sign-up* rule only; enforcing it at sign-in locks out existing
+    // password-holders. UMich users who prefer Google still have the button
+    // above; those without a password just get the generic "didn't match".
     const supabase = createClient()
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: data.email,
