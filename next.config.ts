@@ -57,6 +57,18 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Serve images straight from Supabase Storage's CDN instead of Vercel's
+    // Image Optimization. Vercel's optimizer is a metered, paid service: once
+    // the plan's monthly transformation quota is exhausted every /_next/image
+    // request returns HTTP 402 ("OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED"),
+    // which silently breaks EVERY image site-wide (listings, logo, avatars).
+    // `unoptimized` makes next/image emit the source URL directly, so images
+    // are served by Supabase's CDN (its own, more generous bandwidth allowance)
+    // and never depend on Vercel image billing. Stored listing photos are
+    // already right-sized (~200-375KB), so we lose little by skipping resize.
+    // To re-enable Vercel optimization later, delete this line (and confirm the
+    // plan's image quota / on-demand spend is configured).
+    unoptimized: true,
     qualities: [75, 90],
     remotePatterns: [
       {
