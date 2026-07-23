@@ -141,6 +141,19 @@ export function listingJsonLd(opts: {
 }
 
 /**
+ * Official Wroomly profiles, in `sameAs` order. This is the entity's
+ * off-site footprint — Google reconciles these to treat "Wroomly" as a known
+ * organization (a prerequisite for a branded knowledge panel / sitelinks).
+ * ONLY list profiles that actually exist and are named "Wroomly" with this
+ * same URL; a link to a missing/placeholder profile hurts rather than helps.
+ * Append here as each profile goes live (X, LinkedIn company page, Crunchbase,
+ * Google Business Profile, TikTok…).
+ */
+const SOCIAL_PROFILES: string[] = [
+  'https://instagram.com/wroomly.app',
+]
+
+/**
  * Organization + WebSite schema for the root layout. The WebSite node
  * carries a SearchAction so Google can render a sitelinks search box
  * pointing at our /listings?q= search.
@@ -153,7 +166,12 @@ export function siteJsonLd(): Record<string, unknown>[] {
       '@id': `${ORIGIN}/#organization`,
       name: 'Wroomly',
       url: ORIGIN,
-      logo: `${ORIGIN}/og-default.png`,
+      // The brand logo (square) — Google reads this for the org logo. Must be
+      // a real, reachable file; og-default.png does not exist in /public.
+      logo: {
+        '@type': 'ImageObject',
+        url: `${ORIGIN}/logo.png`,
+      },
       description:
         'Verified student housing marketplace for subletting near the University of Michigan in Ann Arbor.',
       areaServed: {
@@ -162,6 +180,7 @@ export function siteJsonLd(): Record<string, unknown>[] {
         containedInPlace: { '@type': 'State', name: 'Michigan' },
       },
       email: 'help@wroomly.app',
+      ...(SOCIAL_PROFILES.length > 0 ? { sameAs: SOCIAL_PROFILES } : {}),
     },
     {
       '@context': 'https://schema.org',
