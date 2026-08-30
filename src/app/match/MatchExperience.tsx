@@ -580,8 +580,8 @@ function Intro({ onStart }: { onStart: () => void }) {
             AI-powered matching
           </div>
           <h1 className="intro-h1">
-            Talk to someone who<br />
-            <em>gets Ann Arbor housing.</em>
+            What are you<br />
+            actually looking for?
           </h1>
           <p className="intro-sub">
             A few minutes with our housing concierge — it learns what actually matters to you,

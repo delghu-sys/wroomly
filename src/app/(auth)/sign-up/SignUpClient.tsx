@@ -169,9 +169,8 @@ export default function SignUpClient({
     return (
       <div className="min-h-[100dvh] flex flex-col lg:flex-row">
         <AtmosphericAuthPanel
-          headline1="Make room for"
-          headline2="connection."
-          accentWords={['connection.']}
+          headline1="Are you listing"
+          headline2="or looking?"
           subhead="Sublet housing near the University of Michigan. Verified UMich students wear a blue check next to their name — so you can always see whose listing is from a real student."
         />
 
@@ -241,11 +240,8 @@ export default function SignUpClient({
   return (
     <div className="min-h-[100dvh] flex flex-col lg:flex-row">
       <AtmosphericAuthPanel
-        headline1={isSupplier ? 'List your place,' : 'Find your next place,'}
-        headline2={isSupplier ? 'earn while away.' : 'the smart way.'}
-        accentWords={
-          isSupplier ? ['earn', 'while', 'away.'] : ['the', 'smart', 'way.']
-        }
+        headline1={isSupplier ? 'List your place' : 'Find a place'}
+        headline2={isSupplier ? 'in about a minute' : 'near campus'}
         subhead={
           isSupplier
             ? 'Going abroad or interning? Sublet your apartment to a verified student in a few minutes.'

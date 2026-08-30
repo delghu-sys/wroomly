@@ -53,8 +53,7 @@ export default function BuildingsIndexPage() {
           <Building2 className="w-3.5 h-3.5" /> Ann Arbor · Buildings
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
-          UMich sublets,{' '}
-          <span className="italic font-light text-navy">building by building.</span>
+          The buildings students actually sublet
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
           The major student apartment buildings near the University of Michigan

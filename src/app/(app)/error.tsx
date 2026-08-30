@@ -41,11 +41,7 @@ export default function AppError({ error, reset }: ErrorProps) {
         <h1 className="font-display text-[clamp(2.25rem,5vw,3.75rem)] leading-[0.98] tracking-tight text-white">
           <WordReveal text="We dropped" delay={0.1} />
           <br />
-          <WordReveal
-            text="the keys."
-            delay={0.35}
-            accentWords={['the', 'keys.']}
-          />
+          <WordReveal text="the keys" delay={0.35} />
         </h1>
 
         <motion.p
