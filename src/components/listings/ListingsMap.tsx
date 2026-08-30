@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useHoveredListing } from './HoveredListing'
 import type { Map as LeafletMap, Marker as LeafletMarker } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -33,10 +34,35 @@ function escapeHtml(s: string) {
     .replace(/'/g, '&#039;')
 }
 
-export function ListingsMap({ listings }: { listings: MapListing[] }) {
+export function ListingsMap({
+  listings,
+  /** Split view needs the map to fill its own sticky column instead of the
+      standalone view's viewport-height block. */
+  heightClass = 'h-[calc(100vh-260px)] min-h-[480px]',
+  /** Standalone map view has no list to talk to, so it skips the wiring. */
+  linkHover = false,
+}: {
+  listings: MapListing[]
+  heightClass?: string
+  linkHover?: boolean
+}) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
   const markersRef = useRef<LeafletMarker[]>([])
+  // listing id -> the pin's DOM node, so a hover can be reflected by toggling
+  // one class instead of re-rendering the marker layer.
+  const pinByListingRef = useRef<Map<string, HTMLElement>>(new Map())
+  const { hoveredId, setHoveredId } = useHoveredListing()
+  // Read through refs inside the marker effect so it doesn't re-run (and
+  // rebuild every marker) each time the hovered id changes. Kept fresh in an
+  // effect rather than assigned during render: a render can be discarded under
+  // concurrent rendering, so writing to a ref there is not safe.
+  const setHoveredRef = useRef(setHoveredId)
+  const linkHoverRef = useRef(linkHover)
+  useEffect(() => {
+    setHoveredRef.current = setHoveredId
+    linkHoverRef.current = linkHover
+  })
 
   // Initialize map once
   useEffect(() => {
@@ -82,6 +108,23 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
 
       markersRef.current.forEach(m => m.remove())
       markersRef.current = []
+      pinByListingRef.current.clear()
+
+      // Index the pin's DOM node against every listing it represents (a
+      // grouped pin stands in for all the units at that address), and let it
+      // report its own hover back to the list.
+      const registerPin = (marker: LeafletMarker, ids: string[]) => {
+        const el = marker
+          .getElement()
+          ?.querySelector<HTMLElement>('.mn-price-pin, .mn-cluster-pin')
+        if (!el) return
+        for (const id of ids) pinByListingRef.current.set(id, el)
+        if (!linkHoverRef.current) return
+        el.addEventListener('mouseenter', () => setHoveredRef.current(ids[0]))
+        el.addEventListener('mouseleave', () => setHoveredRef.current(null))
+        el.addEventListener('focus', () => setHoveredRef.current(ids[0]))
+        el.addEventListener('blur', () => setHoveredRef.current(null))
+      }
 
       const withCoords = listings.filter(
         l => Number.isFinite(l.lat) && Number.isFinite(l.lng)
@@ -132,6 +175,7 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
             .addTo(map)
             .bindPopup(popupHtml, { maxWidth: 260, closeButton: true })
           markersRef.current.push(marker)
+          registerPin(marker, [l.id])
           continue
         }
 
@@ -162,6 +206,7 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
           .addTo(map)
           .bindPopup(popupHtml, { maxWidth: 280, closeButton: true })
         markersRef.current.push(marker)
+        registerPin(marker, items.map(u => u.id))
       }
 
       const locations = Array.from(groups.values()).map(
@@ -179,6 +224,15 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
     }
   }, [listings])
 
+  // Reflect the shared hover onto the pins. This is why the map doesn't
+  // re-render on hover: it adds one class and removes it again.
+  useEffect(() => {
+    const pins = pinByListingRef.current
+    pins.forEach(el => el.classList.remove('is-linked'))
+    if (!hoveredId) return
+    pins.get(hoveredId)?.classList.add('is-linked')
+  }, [hoveredId, listings])
+
   const withoutCoords = listings.filter(
     l => !Number.isFinite(l.lat) || !Number.isFinite(l.lng)
   ).length
@@ -187,7 +241,7 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
     <div className="space-y-3">
       <div
         ref={containerRef}
-        className="w-full h-[calc(100vh-260px)] min-h-[480px] rounded-2xl overflow-hidden border border-line"
+        className={`w-full rounded-2xl overflow-hidden border border-line ${heightClass}`}
       />
       {withoutCoords > 0 && (
         <p className="text-xs text-ink-muted">
@@ -212,10 +266,20 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
           transform: translate(-50%, -50%);
           transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
         }
-        .mn-price-pin:hover {
-          background: #111;
-          color: #fff;
+        .mn-price-pin:hover,
+        .mn-price-pin.is-linked {
+          background: var(--navy-deep);
+          color: var(--maize-bright);
+          border-color: var(--navy-deep);
           transform: translate(-50%, -50%) scale(1.06);
+        }
+        /* The linked state also lifts the pin above its neighbours, so the
+           highlighted one isn't hidden under a pin that happens to overlap. */
+        .mn-price-pin.is-linked,
+        .mn-cluster-pin.is-linked {
+          z-index: 1000;
+          position: relative;
+          box-shadow: 0 6px 18px oklch(0 0 0 / 0.28);
         }
         .mn-cluster-pin {
           display: inline-flex;
@@ -234,8 +298,15 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
           transform: translate(-50%, -50%);
           transition: transform 0.12s ease;
         }
-        .mn-cluster-pin:hover {
+        .mn-cluster-pin:hover,
+        .mn-cluster-pin.is-linked {
           transform: translate(-50%, -50%) scale(1.1);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mn-price-pin,
+          .mn-cluster-pin {
+            transition: none;
+          }
         }
         .leaflet-container {
           font-family: inherit;

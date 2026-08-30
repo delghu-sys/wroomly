@@ -20,6 +20,7 @@ import {
 } from '@/lib/constants'
 import { getListingImageUrl, justListedCutoffISO } from '@/lib/utils/listing'
 import { FilterTransitionProvider, PendingResults, PendingIndicator } from '@/components/listings/FilterTransition'
+import { ListingsSplitView } from '@/components/listings/ListingsSplitView'
 
 export const metadata: Metadata = {
   title: 'Browse University of Michigan Sublets in Ann Arbor',
@@ -212,7 +213,8 @@ export default async function ListingsPage({
     }
   }
 
-  const view: 'grid' | 'map' = filters.view === 'map' ? 'map' : 'grid'
+  const view: 'grid' | 'split' | 'map' =
+    filters.view === 'map' ? 'map' : filters.view === 'split' ? 'split' : 'grid'
   const typedListings = (listings ?? []) as ListingWithDetails[]
   const justListed = (justListedRes.data ?? []) as unknown as ListingWithDetails[]
 
@@ -300,6 +302,22 @@ export default async function ListingsPage({
           <PendingResults className="flex-1 min-w-0">
             {typedListings.length === 0 ? (
               <EmptyListings />
+            ) : view === 'split' ? (
+              <div className="animate-fade-in">
+                <ListingsSplitView
+                  listings={typedListings}
+                  mapListings={mapListings}
+                  userId={authUser?.id ?? null}
+                  favoriteIds={favoriteIds}
+                  ratingBySupplier={ratingBySupplier}
+                />
+                <ListingsPagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  totalCount={totalCount}
+                  filters={filters}
+                />
+              </div>
             ) : view === 'map' ? (
               <div className="animate-fade-in">
                 <ListingsMap listings={mapListings} />
