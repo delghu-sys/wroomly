@@ -16,15 +16,15 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
   {
     slug: 'central-campus',
     name: 'Central Campus',
-    tagline: 'Walk-to-class central — the heart of student life.',
+    tagline: 'The shortest walk to class in Ann Arbor.',
     intro: [
-      "Central Campus is where most of your classes actually are — the Diag, Mason Hall, the UGLi, Angell Hall. If you want to roll out of bed fifteen minutes before lecture and still make it, this is the spot. It's also where the bulk of UMich's older rental housing sits, so subletting here means competing with a lot of people who want the exact same thing: short walk, central everything.",
-      "Expect a mix of converted houses, older apartment buildings, and a handful of newer high-rises. Rents run higher than the edges of town because you're paying for the location. Summer sublets are common here when people leave for internships, study abroad, or just go home — which is exactly what makes it a good place to look on Wroomly.",
+      "Central Campus is where most of your classes actually are. The Diag, Mason Hall, the UGLi, Angell Hall. If you want to roll out of bed fifteen minutes before lecture and still make it, this is the spot. It's also where the bulk of UMich's older rental housing sits, so subletting here means competing with a lot of people who want the exact same thing: short walk, central everything.",
+      "Expect a mix of converted houses, older apartment buildings, and a handful of newer high-rises. Rents run higher than the edges of town because you're paying for the location. Summer sublets are common here when people leave for internships, study abroad, or just go home. That's exactly what makes it a good place to look on Wroomly.",
     ],
     highlights: [
       'Steps from the Diag, Mason Hall, and the UGLi',
       'Close to State Street and South U food + coffee',
-      'Highest demand for summer sublets — book early',
+      'Highest demand for summer sublets. Book early',
       'Mostly older houses + apartments, some high-rises',
     ],
     bestFor: 'students who want the shortest possible walk to class',
@@ -32,10 +32,10 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
   {
     slug: 'north-campus',
     name: 'North Campus',
-    tagline: 'Quieter, greener — home base for engineering, music, and art.',
+    tagline: 'Quieter and greener. Home base for engineering, music, and art.',
     intro: [
-      "North Campus is its own world. If you're in Engineering, Music, Theatre & Dance, or Art & Design, your classes are up here, and living nearby saves you the bus commute across town. It's calmer and more spread out than Central — more trees, more parking, fewer crowds.",
-      "Housing skews toward apartment complexes and newer builds. The Northwood and Bursley areas anchor it. Sublets open up here for the same reasons as everywhere else — co-ops, internships, graduation — and because it's a bit removed, you can sometimes find better value than the Central Campus crush.",
+      "North Campus is its own world. If you're in Engineering, Music, Theatre & Dance, or Art & Design, your classes are up here, and living nearby saves you the bus commute across town. It's calmer and more spread out than Central. More trees, more parking, fewer crowds.",
+      "Housing skews toward apartment complexes and newer builds. The Northwood and Bursley areas anchor it. Sublets open up here for the same reasons as everywhere else: co-ops, internships, graduation. And because it's a bit removed, you can sometimes find better value than the Central Campus crush.",
     ],
     highlights: [
       'Home to Engineering, Music, and Art & Design',
@@ -50,8 +50,8 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'South University',
     tagline: 'Food, nightlife, and high-rises a block from class.',
     intro: [
-      "South University — \"South U\" — is the strip of restaurants, bars, and shops just east of Central Campus, plus the dense student housing packed around it. This is peak college-town living: you're a block or two from class and surrounded by places to eat at 1am.",
-      "A lot of the newer luxury high-rises (think The Landmark, Zaragon) cluster around here, alongside older apartments. It's lively, sometimes loud, and convenient. Summer sublets in the high-rises are some of the most common listings you'll see — people sign 12-month leases and need to fill the summer.",
+      "South University, or \"South U\", is the strip of restaurants, bars, and shops just east of Central Campus, plus the dense student housing packed around it. This is peak college-town living: you're a block or two from class and surrounded by places to eat at 1am.",
+      "A lot of the newer luxury high-rises (think The Landmark, Zaragon) cluster around here, alongside older apartments. It's lively, sometimes loud, and convenient. Summer sublets in the high-rises are some of the most common listings you'll see. People sign 12-month leases and need to fill the summer.",
     ],
     highlights: [
       'On the South U restaurant + nightlife strip',
@@ -66,7 +66,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'Kerrytown',
     tagline: 'Farmers market charm just north of downtown.',
     intro: [
-      "Kerrytown is the cozy, walkable pocket north of downtown built around the Kerrytown Market & Shops and the Ann Arbor Farmers Market. It's a little more grown-up than the high-rise strips — historic houses, brick sidewalks, good coffee, and the Saturday market.",
+      "Kerrytown is the cozy, walkable pocket north of downtown built around the Kerrytown Market & Shops and the Ann Arbor Farmers Market. It's a little more grown-up than the high-rise strips. Historic houses, brick sidewalks, good coffee, and the Saturday market.",
       "Housing here is mostly older homes and smaller apartment buildings, so subletting often means a room in a house or a unit in a converted building. It's a short walk to both downtown and Central Campus, which makes it a quietly great location that doesn't feel like a dorm zone.",
     ],
     highlights: [
@@ -82,7 +82,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'Old West Side',
     tagline: 'Historic, leafy, and a short bike from campus.',
     intro: [
-      "The Old West Side is a designated historic district just west of downtown — tree-lined streets, century-old houses, and a genuinely residential feel. It's popular with grad students, young families, and undergrads who'd rather not live in a party building.",
+      "The Old West Side is a designated historic district just west of downtown. Tree-lined streets, century-old houses, a genuinely residential feel. It's popular with grad students, young families, and undergrads who'd rather not live in a party building.",
       "Sublets here are usually rooms in houses or units in smaller multi-family homes. You're a flat bike ride or quick bus from campus, and you trade a few minutes of commute for a much quieter, prettier place to live. Good for anyone who wants Ann Arbor to feel like a town, not just a campus.",
     ],
     highlights: [
@@ -98,7 +98,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'Burns Park',
     tagline: 'Family-friendly and calm, just southeast of campus.',
     intro: [
-      "Burns Park is one of Ann Arbor's most beloved residential neighborhoods — named for the park at its center, full of well-kept homes, and a favorite of professors and families. For students, it's a quieter alternative that's still close to Central Campus.",
+      "Burns Park is one of Ann Arbor's most beloved residential neighborhoods. It's named for the park at its center, full of well-kept homes, and a favorite of professors and families. For students, it's a quieter alternative that's still close to Central Campus.",
       "Most sublets here are rooms in houses or in-law units, often with more space and a real backyard. It's the kind of place where you'll have neighbors who aren't students, which a lot of people find refreshing after a year in the high-rises.",
     ],
     highlights: [
@@ -115,7 +115,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     tagline: 'Artsy, affordable, and famously friendly.',
     intro: [
       "Water Hill is the neighborhood northwest of downtown known for its annual Water Hill Music Fest, where neighbors play music on their porches. It's artsy, a little funky, and generally more affordable than the campus-adjacent zones.",
-      "Housing is mostly older homes, so sublets tend to be rooms or small units. You're a bit further from Central Campus — a solid bike ride or a bus — but you trade that for lower rent and a genuinely warm community vibe.",
+      "Housing is mostly older homes, so sublets tend to be rooms or small units. You're a bit further from Central Campus, a solid bike ride or a bus. You trade that for lower rent and a genuinely warm community vibe.",
     ],
     highlights: [
       'Home of the Water Hill Music Fest',
@@ -130,7 +130,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'Eberwhite',
     tagline: 'Woodsy and residential on the west side.',
     intro: [
-      "Eberwhite, named for its elementary school and the woods beside it, is a quiet west-side neighborhood of mid-century homes and mature trees. It's residential through and through — not a student zone, which is exactly the appeal for some people.",
+      "Eberwhite, named for its elementary school and the woods beside it, is a quiet west-side neighborhood of mid-century homes and mature trees. It's residential through and through. Not a student zone, which is exactly the appeal for some people.",
       "Sublets here are usually rooms in houses. You'll want a bike or the bus for campus, but you get a peaceful, green place to live and rents that beat the high-rises. Good for upperclassmen and grad students who value calm.",
     ],
     highlights: [
@@ -147,7 +147,7 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     tagline: 'More space and value south of the city.',
     intro: [
       "Pittsfield Township wraps around the south side of Ann Arbor and is where a lot of the larger, more affordable apartment complexes live. If your top priority is square footage, parking, and a lower rent, this is worth a look.",
-      "You'll rely on a car or the bus to get to campus — it's not walkable — but the trade is real value and often newer, bigger units. Sublets here suit students with cars, grad students, or anyone who wants an actual apartment over a room in an old house.",
+      "You'll rely on a car or the bus to get to campus. It's not walkable. The trade is real value and often newer, bigger units. Sublets here suit students with cars, grad students, or anyone who wants an actual apartment over a room in an old house.",
     ],
     highlights: [
       'Larger apartment complexes',
@@ -162,8 +162,8 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     name: 'Downtown',
     tagline: 'Restaurants, Main Street, and city energy.',
     intro: [
-      "Downtown Ann Arbor centers on Main Street — the best restaurants in town, bars, the State and Michigan theaters, and the kind of walkable city core that makes Ann Arbor feel bigger than it is. Living here puts you in the middle of all of it.",
-      "Housing is a mix of newer apartments above the shops and converted historic buildings. It's a short walk or bus to Central Campus. Sublets downtown are great if you want restaurants and culture over a pure campus bubble — and they move fast.",
+      "Downtown Ann Arbor centers on Main Street. The best restaurants in town, bars, the State and Michigan theaters, and the kind of walkable city core that makes Ann Arbor feel bigger than it is. Living here puts you in the middle of all of it.",
+      "Housing is a mix of newer apartments above the shops and converted historic buildings. It's a short walk or bus to Central Campus. Sublets downtown are great if you want restaurants and culture over a pure campus bubble. They move fast.",
     ],
     highlights: [
       'On or near Main Street',
