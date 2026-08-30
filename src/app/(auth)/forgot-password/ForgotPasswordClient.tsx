@@ -49,7 +49,6 @@ export default function ForgotPasswordClient() {
       <AtmosphericAuthPanel
         headline1="Forgot your"
         headline2="password?"
-        accentWords={['password?']}
         subhead="We’ll send a one-time reset link to your verified email. The link expires in an hour."
       />
 
@@ -65,10 +64,7 @@ export default function ForgotPasswordClient() {
               Reset
             </p>
             <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
-              Send the{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
-                reset link.
-              </span>
+              Send the reset link
             </h2>
             <p className="text-ink-soft mt-3 leading-relaxed">
               Enter the email you signed up with — we’ll mail you a link to

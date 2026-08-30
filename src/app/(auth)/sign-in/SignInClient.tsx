@@ -75,9 +75,8 @@ function SignInForm() {
   return (
     <div className="min-h-[100dvh] flex flex-col lg:flex-row">
       <AtmosphericAuthPanel
-        headline1="Welcome back,"
-        headline2="wolverine."
-        accentWords={['wolverine.']}
+        headline1="Welcome"
+        headline2="back"
         subhead="Make room for connection — sign in to manage your listings, check messages, and stay on top of your housing."
       />
 
@@ -93,10 +92,7 @@ function SignInForm() {
               Welcome
             </p>
             <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
-              Sign{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
-                back in.
-              </span>
+              Sign back in
             </h2>
             <p className="text-ink-soft mt-3 leading-relaxed">
               Enter your credentials to access your account.

@@ -39,8 +39,7 @@ export default function GuidesIndexPage() {
           <BookOpen className="w-3.5 h-3.5" /> Resources
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
-          Subletting at Michigan,{' '}
-          <span className="italic font-light text-navy">explained.</span>
+          How subletting actually works here
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
           Straight-talking guides to subletting housing in Ann

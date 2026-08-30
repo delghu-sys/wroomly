@@ -47,11 +47,7 @@ export function NotFoundContent() {
             <h1 className="font-display text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] tracking-tight text-white">
               <WordReveal text="This room" delay={0.1} />
               <br />
-              <WordReveal
-                text="doesn’t exist."
-                delay={0.4}
-                accentWords={['doesn’t', 'exist.']}
-              />
+              <WordReveal text="doesn’t exist" delay={0.4} />
             </h1>
 
             <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-lg">

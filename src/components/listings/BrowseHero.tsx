@@ -46,9 +46,9 @@ export function BrowseHero({ totalCount, currentQuery, filters, view }: BrowseHe
 
         {/* Headline — staggered word reveal (CSS) */}
         <h1 className="font-display text-[clamp(2.5rem,6vw,4.75rem)] leading-[0.95] tracking-tight text-white mt-7 max-w-3xl">
-          <WordReveal text="Find your" delay={0.2} />
+          <WordReveal text="Every open sublet" delay={0.2} />
           <br />
-          <WordReveal text="next place." delay={0.45} accentWords={['next', 'place.']} />
+          <WordReveal text="near campus" delay={0.45} />
         </h1>
 
         <p

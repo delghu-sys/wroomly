@@ -67,8 +67,7 @@ export default function ResetPasswordClient() {
     <div className="min-h-[100dvh] flex flex-col lg:flex-row">
       <AtmosphericAuthPanel
         headline1="Choose a new"
-        headline2="password."
-        accentWords={['password.']}
+        headline2="password"
         subhead="Pick something you’ll remember — at least eight characters. You’ll be signed in after submitting."
       />
 
@@ -84,10 +83,7 @@ export default function ResetPasswordClient() {
               Reset password
             </p>
             <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
-              Pick a new{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
-                password.
-              </span>
+              Pick a new password
             </h2>
           </motion.div>
 
