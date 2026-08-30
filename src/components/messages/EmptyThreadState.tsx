@@ -24,7 +24,7 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
       {/* Soft mesh */}
       <div
         className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full blur-[120px] opacity-25 pointer-events-none"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
         aria-hidden
       />
       <div
@@ -42,10 +42,10 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
           className="relative inline-flex"
         >
           <div
-            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-[0_18px_50px_oklch(0.22_0.075_256/0.25)]"
+            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]"
             style={{
-              background: 'oklch(0.22 0.075 256)',
-              color: 'oklch(0.84 0.17 85)',
+              background: 'var(--navy-deep)',
+              color: 'var(--maize-bright)',
             }}
           >
             <MessageCircle className="w-11 h-11" strokeWidth={1.5} />
@@ -55,7 +55,7 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
             <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
             <span
               className="rounded-full h-3.5 w-3.5 bg-emerald-400 ring-2"
-              style={{ '--tw-ring-color': 'oklch(0.22 0.075 256)' } as React.CSSProperties}
+              style={{ '--tw-ring-color': 'var(--navy-deep)' } as React.CSSProperties}
             />
           </span>
         </motion.div>
@@ -69,14 +69,14 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
           {hasConversations ? (
             <>
               Pick up where you{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              <span className="italic font-light text-gold-deep">
                 left off.
               </span>
             </>
           ) : (
             <>
               No messages yet —{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              <span className="italic font-light text-gold-deep">
                 start one.
               </span>
             </>

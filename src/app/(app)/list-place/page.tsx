@@ -56,12 +56,12 @@ export default async function ListPlacePage() {
   return (
     <div className="min-h-[calc(100dvh-4rem)] flex items-center justify-center px-4 sm:px-6 py-12">
       <div className="max-w-lg w-full text-center animate-fade-up">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           List your place
         </p>
         <h1 className="font-display text-3xl sm:text-4xl tracking-tight text-ink leading-[1.05] text-balance">
           You&rsquo;re signed in as a{' '}
-          <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+          <span className="italic font-light text-gold-deep">
             consumer.
           </span>
         </h1>
@@ -73,7 +73,7 @@ export default async function ListPlacePage() {
         {/* Status line — show the current email so they know which
             account they're signed in as. */}
         <div className="mt-7 inline-flex items-center gap-2 rounded-2xl border border-line/70 bg-white/60 backdrop-blur-sm px-5 py-3 text-sm">
-          <Mail className="w-4 h-4 text-[oklch(0.45_0.13_85)]" strokeWidth={2} />
+          <Mail className="w-4 h-4 text-gold-deep" strokeWidth={2} />
           <span className="text-ink-soft">Signed in as</span>
           <span className="font-medium text-ink truncate max-w-[200px] sm:max-w-none">
             {email}
@@ -96,7 +96,7 @@ export default async function ListPlacePage() {
           <Link href="/listings">
             <Button
               variant="outline"
-              className="h-12 px-5 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)]"
+              className="h-12 px-5 rounded-full border-line hover:border-maize-bright/50"
             >
               <Home className="w-4 h-4 mr-1.5" /> Browse instead
             </Button>

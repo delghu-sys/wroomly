@@ -31,7 +31,7 @@ export function MessageAtmosphere() {
       {/* Two soft mesh blobs */}
       <div
         className="absolute -top-32 -right-20 w-[420px] h-[420px] rounded-full blur-[120px] opacity-[0.18] -z-10"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
         aria-hidden
       />
       <div

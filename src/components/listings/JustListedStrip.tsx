@@ -15,7 +15,7 @@ export function JustListedStrip({ listings }: { listings: ListingWithDetails[] }
 
   return (
     <section aria-label="Just listed" className="mb-8" data-testid="just-listed-strip">
-      <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+      <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-gold-deep font-bold mb-3">
         <Sparkles className="w-3.5 h-3.5" /> Just listed
       </p>
       <div
@@ -46,7 +46,7 @@ export function JustListedStrip({ listings }: { listings: ListingWithDetails[] }
                     <BedDouble className="w-7 h-7 text-ink-muted/30" />
                   </div>
                 )}
-                <span className="absolute top-2 left-2 inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]">
+                <span className="absolute top-2 left-2 inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-[0.08em] bg-maize-bright text-navy-deep">
                   New
                 </span>
               </div>

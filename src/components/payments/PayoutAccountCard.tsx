@@ -60,28 +60,28 @@ export function PayoutAccountCard({
       ? 'oklch(0.55 0.15 142)' // emerald
       : tone === 'warn'
         ? 'oklch(0.65 0.15 75)' // amber
-        : 'oklch(0.22 0.075 256)' // navy
+        : 'var(--navy-deep)' // navy
 
   const tileFg =
     tone === 'success'
       ? 'white'
       : tone === 'warn'
         ? 'oklch(0.15 0.05 75)'
-        : 'oklch(0.84 0.17 85)'
+        : 'var(--maize-bright)'
 
   const borderAccent =
     tone === 'success'
       ? 'oklch(0.55 0.15 142 / 0.35)'
       : tone === 'warn'
         ? 'oklch(0.65 0.15 75 / 0.40)'
-        : 'oklch(0.84 0.17 85 / 0.35)'
+        : 'color-mix(in oklab, var(--maize-bright) 35%, transparent)'
 
   const meshAccent =
     tone === 'success'
       ? 'oklch(0.55 0.15 142 / 0.18)'
       : tone === 'warn'
         ? 'oklch(0.65 0.15 75 / 0.22)'
-        : 'oklch(0.84 0.17 85 / 0.30)'
+        : 'color-mix(in oklab, var(--maize-bright) 30%, transparent)'
 
   return (
     <div

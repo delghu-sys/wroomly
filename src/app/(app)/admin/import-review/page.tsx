@@ -67,7 +67,7 @@ export default async function AdminImportReviewIndex() {
             <Link
               key={r.id}
               href={`/admin/import-review/${r.id}`}
-              className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-[oklch(0.84_0.17_85/0.45)] transition"
+              className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-maize-bright/45 transition"
             >
               <div className="min-w-0">
                 <p className="font-medium text-ink truncate">

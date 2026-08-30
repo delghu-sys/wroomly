@@ -77,18 +77,18 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
             className={`
               relative group w-full p-6 sm:p-7 rounded-3xl text-left overflow-hidden
               transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-              focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.25)]
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
               ${
                 active
-                  ? 'bg-white border-[2px] border-[oklch(0.45_0.13_85)] shadow-[0_18px_50px_oklch(0.84_0.17_85/0.22)]'
-                  : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-[oklch(0.84_0.17_85/0.40)] hover:shadow-[0_8px_24px_oklch(0_0_0/0.04)]'
+                  ? 'bg-white border-[2px] border-gold-deep shadow-[0_18px_50px_color-mix(in_oklab,var(--maize-bright)_22%,transparent)]'
+                  : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-maize-bright/40 hover:shadow-[0_8px_24px_oklch(0_0_0/0.04)]'
               }
             `}
             style={
               active
                 ? {
                     background:
-                      'linear-gradient(180deg, oklch(0.84 0.17 85 / 0.10) 0%, oklch(1 0 0) 60%)',
+                      'linear-gradient(180deg, color-mix(in oklab, var(--maize-bright) 10%, transparent) 0%, oklch(1 0 0) 60%)',
                   }
                 : undefined
             }
@@ -99,7 +99,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                 layoutId="role-active-glow"
                 transition={spring}
                 className="absolute -top-16 -right-12 w-56 h-56 rounded-full blur-3xl opacity-50 pointer-events-none"
-                style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+                style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
                 aria-hidden
               />
             )}
@@ -112,10 +112,10 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   exit={{ scale: 0.6, opacity: 0 }}
                   transition={popSpring}
-                  className="absolute top-4 right-4 inline-flex w-7 h-7 rounded-full items-center justify-center shadow-[0_4px_14px_oklch(0.84_0.17_85/0.40)]"
+                  className="absolute top-4 right-4 inline-flex w-7 h-7 rounded-full items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)]"
                   style={{
-                    background: 'oklch(0.84 0.17 85)',
-                    color: 'oklch(0.22 0.075 256)',
+                    background: 'var(--maize-bright)',
+                    color: 'var(--navy-deep)',
                   }}
                   aria-hidden
                 >
@@ -136,8 +136,8 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   transition-colors duration-500
                   ${
                     active
-                      ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_8px_24px_oklch(0.22_0.075_256/0.25)]'
-                      : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-[oklch(0.22_0.075_256)] group-hover:text-[oklch(0.84_0.17_85)]'
+                      ? 'bg-navy-deep text-maize-bright shadow-[0_8px_24px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]'
+                      : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-navy-deep group-hover:text-maize-bright'
                   }
                 `}
               >
@@ -157,7 +157,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                     transition-colors duration-500
                     ${
                       active
-                        ? 'bg-[oklch(0.84_0.17_85/0.18)] text-[oklch(0.32_0.10_85)]'
+                        ? 'bg-maize-bright/18 text-[oklch(0.32_0.10_85)]'
                         : 'bg-[oklch(0.97_0.008_75)] text-ink-soft'
                     }
                   `}

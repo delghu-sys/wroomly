@@ -103,7 +103,7 @@ export default function ForgotPasswordClient() {
               <div className="mt-5 flex items-center gap-3">
                 <Link
                   href="/sign-in"
-                  className="text-[13px] font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline transition-colors"
+                  className="text-[13px] font-medium text-ink-soft hover:text-gold-deep underline-offset-4 decoration-maize-bright/50 hover:underline transition-colors"
                 >
                   Back to sign in
                 </Link>
@@ -113,7 +113,7 @@ export default function ForgotPasswordClient() {
                 <button
                   type="button"
                   onClick={() => setSent(false)}
-                  className="text-[13px] font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline transition-colors"
+                  className="text-[13px] font-medium text-ink-soft hover:text-gold-deep underline-offset-4 decoration-maize-bright/50 hover:underline transition-colors"
                 >
                   Send again
                 </button>
@@ -157,7 +157,7 @@ export default function ForgotPasswordClient() {
                 Remembered it?{' '}
                 <Link
                   href="/sign-in"
-                  className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                  className="font-medium text-ink-soft hover:text-gold-deep transition-colors underline-offset-4 decoration-maize-bright/50 hover:underline"
                 >
                   Sign in
                 </Link>

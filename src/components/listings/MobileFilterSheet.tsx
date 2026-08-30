@@ -59,12 +59,12 @@ export function MobileFilterSheet({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="mobile-filter-sheet"
-        className="lg:hidden inline-flex items-center gap-2 h-9 px-4 rounded-full border border-line bg-white/70 backdrop-blur text-sm font-medium text-ink hover:border-[oklch(0.84_0.17_85/0.40)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_1px_2px_oklch(0_0_0/0.04)] active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+        className="lg:hidden inline-flex items-center gap-2 h-9 px-4 rounded-full border border-line bg-white/70 backdrop-blur text-sm font-medium text-ink hover:border-maize-bright/40 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_1px_2px_oklch(0_0_0/0.04)] active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
       >
         <SlidersHorizontal size={14} weight="bold" />
         Filters
         {activeFilterCount > 0 && (
-          <span className="w-5 h-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-[10px] font-bold flex items-center justify-center">
+          <span className="w-5 h-5 rounded-full bg-navy-deep text-maize-bright text-[10px] font-bold flex items-center justify-center">
             {activeFilterCount}
           </span>
         )}
@@ -97,7 +97,7 @@ export function MobileFilterSheet({
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close filters"
-                className="w-8 h-8 rounded-full bg-ink-muted/10 flex items-center justify-center hover:bg-ink-muted/20 transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+                className="w-8 h-8 rounded-full bg-ink-muted/10 flex items-center justify-center hover:bg-ink-muted/20 transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
               >
                 <X className="w-4 h-4" />
               </button>

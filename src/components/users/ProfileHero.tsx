@@ -53,7 +53,7 @@ export function ProfileHero({
       {/* Soft maize mesh blob behind avatar */}
       <div
         className="pointer-events-none absolute -top-20 -left-10 w-72 h-72 rounded-full blur-3xl opacity-25"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
         aria-hidden
       />
 
@@ -66,15 +66,15 @@ export function ProfileHero({
           className="relative inline-flex"
         >
           <Avatar
-            className="ring-2 ring-white shadow-[0_8px_28px_oklch(0.84_0.17_85/0.30)]"
+            className="ring-2 ring-white shadow-[0_8px_28px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
             style={{ width: 80, height: 80 }}
           >
             <AvatarImage src={avatarUrl ?? undefined} />
             <AvatarFallback
               className="font-display tracking-tight"
               style={{
-                background: 'oklch(0.84 0.17 85)',
-                color: 'oklch(0.22 0.075 256)',
+                background: 'var(--maize-bright)',
+                color: 'var(--navy-deep)',
                 fontSize: 30,
                 lineHeight: 1,
               }}
@@ -116,7 +116,7 @@ export function ProfileHero({
           </span>
           {isAdmin && (
             <span
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-[oklch(0.22_0.075_256)] text-white"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-navy-deep text-white"
             >
               <Crown size={11} weight="fill" />
               Admin

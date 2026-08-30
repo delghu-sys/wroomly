@@ -25,12 +25,12 @@ export default function PrivacyPage() {
         <AtmosphericBackground variant="hero" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-semibold mb-5">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-maize-bright font-semibold mb-5">
             Legal
           </p>
           <h1 className="font-display text-[clamp(2.5rem,5vw,4rem)] tracking-tight text-white leading-[0.98]">
             Privacy{' '}
-            <span className="italic font-light text-[oklch(0.84_0.17_85)]">
+            <span className="italic font-light text-maize-bright">
               policy.
             </span>
           </h1>
@@ -53,17 +53,17 @@ export default function PrivacyPage() {
       {/* ── Body ── */}
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         <div
-          className="rounded-3xl border border-[oklch(0.84_0.17_85/0.35)] bg-white/85 backdrop-blur-xl p-5 sm:p-6 mb-10 flex gap-4"
+          className="rounded-3xl border border-maize-bright/35 bg-white/85 backdrop-blur-xl p-5 sm:p-6 mb-10 flex gap-4"
           style={{
             boxShadow:
-              'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 24px oklch(0.84 0.17 85 / 0.10)',
+              'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 24px color-mix(in oklab, var(--maize-bright) 10%, transparent)',
           }}
         >
           <div
-            className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_oklch(0.84_0.17_85/0.30)]"
+            className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
             style={{
-              background: 'oklch(0.22 0.075 256)',
-              color: 'oklch(0.84 0.17 85)',
+              background: 'var(--navy-deep)',
+              color: 'var(--maize-bright)',
             }}
           >
             <ShieldCheck size={18} weight="duotone" />
@@ -85,10 +85,10 @@ export default function PrivacyPage() {
             [&_h2]:font-display [&_h2]:text-2xl [&_h2]:tracking-tight [&_h2]:text-ink [&_h2]:leading-tight [&_h2]:mt-2
             [&_p]:text-ink-soft [&_p]:leading-relaxed [&_p]:max-w-[65ch]
             [&_strong]:font-semibold [&_strong]:text-[oklch(0.32_0.10_85)]
-            [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:underline
+            [&_a]:text-gold-deep [&_a]:underline-offset-4 [&_a]:underline
             [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ul]:max-w-[65ch]
             [&_ul>li]:text-ink-soft [&_ul>li]:leading-relaxed
-            [&_ul>li::marker]:text-[oklch(0.45_0.13_85)]
+            [&_ul>li::marker]:text-gold-deep
           "
         >
           <section>

@@ -55,7 +55,7 @@ export function InquiryForm({
         <Link href={`/listings/${listing.id}/edit`} className="block">
           <Button
             variant="outline"
-            className="w-full h-12 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]"
+            className="w-full h-12 rounded-full border-line hover:border-maize-bright/50 transition-all duration-300 active:scale-[0.98]"
           >
             Edit listing
           </Button>
@@ -132,7 +132,7 @@ export function InquiryForm({
           </p>
           {conversationId && (
             <Link href={`/messages/${conversationId}`} className="block">
-              <Button className="w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]">
+              <Button className="w-full h-11 rounded-full bg-navy-deep text-maize-bright hover:bg-navy-deep/90 transition-all duration-300 active:scale-[0.98]">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Message your host
               </Button>
@@ -163,15 +163,15 @@ export function InquiryForm({
             disabled={paying}
             className="
               group relative w-full h-11 rounded-full overflow-hidden
-              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
+              bg-maize-bright text-navy-deep
               font-semibold
-              shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-              hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+              hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
               transition-shadow duration-500 active:scale-[0.98]
             "
           >
-            <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-            <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+            <span className="absolute inset-0 bg-navy-deep origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+            <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
               {paying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
               {paying ? 'Redirecting…' : 'Pay now'}
             </span>
@@ -182,8 +182,8 @@ export function InquiryForm({
             <Button
               className={
                 PAYMENTS_ENABLED
-                  ? 'w-full h-11 rounded-full border-line hover:border-[oklch(0.84_0.17_85/0.50)] transition-all duration-300 active:scale-[0.98]'
-                  : 'w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]'
+                  ? 'w-full h-11 rounded-full border-line hover:border-maize-bright/50 transition-all duration-300 active:scale-[0.98]'
+                  : 'w-full h-11 rounded-full bg-navy-deep text-maize-bright hover:bg-navy-deep/90 transition-all duration-300 active:scale-[0.98]'
               }
               variant={PAYMENTS_ENABLED ? 'outline' : 'default'}
             >
@@ -208,7 +208,7 @@ export function InquiryForm({
         </div>
         {conversationId && (
           <Link href={`/messages/${conversationId}`} className="block">
-            <Button className="w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]">
+            <Button className="w-full h-11 rounded-full bg-navy-deep text-maize-bright hover:bg-navy-deep/90 transition-all duration-300 active:scale-[0.98]">
               <MessageSquare className="w-4 h-4 mr-2" />
               Open chat
             </Button>
@@ -245,15 +245,15 @@ export function InquiryForm({
           onClick={() => setModalOpen(true)}
           className="
             group relative w-full h-12 rounded-full overflow-hidden
-            bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
+            bg-maize-bright text-navy-deep
             font-semibold text-sm tracking-tight
-            shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-            hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+            shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+            hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
             transition-all duration-300 active:scale-[0.98]
           "
         >
-          <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-          <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+          <span className="absolute inset-0 bg-navy-deep origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+          <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
             <Send className="w-4 h-4 -rotate-12" strokeWidth={2.25} />
             Send inquiry
           </span>

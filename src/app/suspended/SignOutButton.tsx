@@ -28,9 +28,9 @@ export function SignOutButton() {
         bg-white/[0.05] backdrop-blur-md text-white/85
         border border-white/[0.15]
         text-sm font-medium tracking-tight
-        hover:bg-white/[0.10] hover:border-[oklch(0.84_0.17_85/0.45)]
+        hover:bg-white/[0.10] hover:border-maize-bright/45
         transition-colors duration-300 active:scale-[0.97]
-        focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]
+        focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
         disabled:opacity-60 disabled:cursor-not-allowed
       "
     >

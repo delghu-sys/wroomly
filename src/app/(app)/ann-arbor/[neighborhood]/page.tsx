@@ -64,7 +64,7 @@ export default async function NeighborhoodPage({
 
       {/* Hero */}
       <header className="max-w-3xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <MapPin className="w-3.5 h-3.5" /> Ann Arbor · Neighborhood
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
@@ -90,7 +90,7 @@ export default async function NeighborhoodPage({
           <ul className="space-y-2.5">
             {n.highlights.map((h, i) => (
               <li key={i} className="flex items-start gap-2 text-[14px] text-ink-soft">
-                <Check className="w-4 h-4 text-[oklch(0.45_0.13_85)] shrink-0 mt-0.5" strokeWidth={2.5} />
+                <Check className="w-4 h-4 text-gold-deep shrink-0 mt-0.5" strokeWidth={2.5} />
                 {h}
               </li>
             ))}
@@ -130,7 +130,7 @@ export default async function NeighborhoodPage({
             </p>
             <Link
               href="/listings"
-              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold hover:bg-navy-deep/90 transition"
             >
               Browse all neighborhoods <ArrowRight className="w-4 h-4" />
             </Link>
@@ -150,7 +150,7 @@ export default async function NeighborhoodPage({
               <Link
                 key={b.slug}
                 href={`/buildings/${b.slug}`}
-                className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+                className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
               >
                 {b.name}
               </Link>
@@ -169,7 +169,7 @@ export default async function NeighborhoodPage({
             <Link
               key={o.slug}
               href={`/ann-arbor/${o.slug}`}
-              className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+              className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
             >
               {o.name}
             </Link>

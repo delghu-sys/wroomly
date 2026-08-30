@@ -56,7 +56,7 @@ export function CardGallery({
         tabIndex={multi ? 0 : undefined}
         role={multi ? 'group' : undefined}
         aria-label={multi ? `${alt} — ${images.length} photos, use arrow keys` : undefined}
-        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[oklch(0.84_0.17_85/0.60)]"
+        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
         style={{ scrollbarWidth: 'none' }}
       >
         {images.map((src, i) => (
@@ -82,7 +82,7 @@ export function CardGallery({
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(180deg, oklch(0.22 0.075 256 / 0.10) 0%, transparent 30%, transparent 55%, oklch(0.22 0.075 256 / 0.28) 100%)',
+            'linear-gradient(180deg, color-mix(in oklab, var(--navy-deep) 10%, transparent) 0%, transparent 30%, transparent 55%, color-mix(in oklab, var(--navy-deep) 28%, transparent) 100%)',
         }}
         aria-hidden
       />

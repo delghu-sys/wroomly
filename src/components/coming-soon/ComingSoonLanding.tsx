@@ -11,7 +11,7 @@ import { WaitlistForm } from './WaitlistForm'
 const EASE = [0.22, 1, 0.36, 1] as const
 // Supplier CTAs go to the chooser (import from a post vs. create manually).
 const SUPPLIER_HREF = '/start-listing'
-const NAVY = 'oklch(0.22 0.075 256)'
+const NAVY = 'var(--navy-deep)'
 
 /** Inline Instagram glyph — lucide-react dropped brand icons. */
 function InstagramIcon({ className }: { className?: string }) {
@@ -77,8 +77,8 @@ export function ComingSoonLanding() {
             href={SUPPLIER_HREF}
             className={`inline-flex items-center h-9 px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] ${
               scrolled
-                ? 'bg-[oklch(0.22_0.075_256)] text-white hover:opacity-90'
-                : 'bg-maize text-[oklch(0.22_0.075_256)] hover:shadow-[0_6px_22px_oklch(0.86_0.17_92/0.45)]'
+                ? 'bg-navy-deep text-white hover:opacity-90'
+                : 'bg-maize text-navy-deep hover:shadow-[0_6px_22px_oklch(0.86_0.17_92/0.45)]'
             }`}
           >
             List your place
@@ -92,8 +92,8 @@ export function ComingSoonLanding() {
 
         <div className="relative z-10 w-full max-w-[34rem] px-6 py-24 text-center flex flex-col items-center">
           <motion.div {...rise(0.05)}>
-            <span className="inline-flex items-center gap-2 rounded-full bg-maize px-3.5 py-1.5 text-[0.675rem] font-extrabold uppercase tracking-[0.08em] text-[oklch(0.22_0.075_256)] font-display">
-              <span className="w-[5px] h-[5px] rounded-full bg-[oklch(0.22_0.075_256/0.4)]" />
+            <span className="inline-flex items-center gap-2 rounded-full bg-maize px-3.5 py-1.5 text-[0.675rem] font-extrabold uppercase tracking-[0.08em] text-navy-deep font-display">
+              <span className="w-[5px] h-[5px] rounded-full bg-navy-deep/40" />
               Coming soon to campus
             </span>
           </motion.div>
@@ -147,7 +147,7 @@ export function ComingSoonLanding() {
 
             <Link
               href={SUPPLIER_HREF}
-              className="mt-7 inline-flex w-full max-w-[18rem] items-center justify-center gap-2 h-12 rounded-full bg-maize text-[oklch(0.22_0.075_256)] font-semibold text-[0.9375rem] shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition active:scale-[0.98]"
+              className="mt-7 inline-flex w-full max-w-[18rem] items-center justify-center gap-2 h-12 rounded-full bg-maize text-navy-deep font-semibold text-[0.9375rem] shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition active:scale-[0.98]"
             >
               List it free now
               <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />
@@ -172,7 +172,7 @@ export function ComingSoonLanding() {
       </section>
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer className="relative overflow-hidden bg-[oklch(0.22_0.075_256)] px-5 py-7">
+      <footer className="relative overflow-hidden bg-navy-deep px-5 py-7">
         <div
           className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full blur-[90px] opacity-25"
           style={{ background: 'oklch(0.86 0.17 92 / 0.5)' }}

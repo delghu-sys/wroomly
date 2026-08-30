@@ -176,7 +176,7 @@ export function InquiryPinnedCard({
       {/* Glass refraction + maize accent corner */}
       <div
         className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl opacity-30"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.40)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)' }}
         aria-hidden
       />
 
@@ -209,7 +209,7 @@ export function InquiryPinnedCard({
             </p>
             <Link
               href={`/listings/${listing.id}`}
-              className="font-display text-lg sm:text-xl tracking-tight text-ink leading-tight hover:text-[oklch(0.45_0.13_85)] transition-colors line-clamp-1"
+              className="font-display text-lg sm:text-xl tracking-tight text-ink leading-tight hover:text-gold-deep transition-colors line-clamp-1"
             >
               {listing.title}
             </Link>
@@ -262,15 +262,15 @@ export function InquiryPinnedCard({
           <div
             className="mt-5 rounded-2xl border p-4 flex items-start gap-3"
             style={{
-              borderColor: 'oklch(0.84 0.17 85 / 0.40)',
-              background: 'oklch(0.84 0.17 85 / 0.08)',
+              borderColor: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)',
+              background: 'color-mix(in oklab, var(--maize-bright) 8%, transparent)',
             }}
           >
             <div
               className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
               style={{
-                background: 'oklch(0.22 0.075 256)',
-                color: 'oklch(0.84 0.17 85)',
+                background: 'var(--navy-deep)',
+                color: 'var(--maize-bright)',
               }}
             >
               <Warning size={16} weight="duotone" />
@@ -308,16 +308,16 @@ export function InquiryPinnedCard({
                 group relative inline-flex items-center justify-center gap-2
                 h-11 px-5 rounded-full overflow-hidden flex-1
                 font-semibold text-sm tracking-tight
-                bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
-                shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-                hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+                bg-maize-bright text-navy-deep
+                shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+                hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
                 disabled:opacity-60 disabled:cursor-not-allowed
                 active:scale-[0.97]
                 transition-all duration-300
               "
             >
-              <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+              <span className="absolute inset-0 bg-navy-deep origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
                 {loading === 'accept' ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -461,15 +461,15 @@ function StatusBadge({ status }: { status: InquiryStatus }) {
   }
   // pending — slow breathing pulse
   return (
-    <span className="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-[oklch(0.84_0.17_85/0.10)] border-[oklch(0.84_0.17_85/0.40)] text-[oklch(0.32_0.10_85)]">
+    <span className="relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-maize-bright/10 border-maize-bright/40 text-[oklch(0.32_0.10_85)]">
       <span className="relative flex h-1.5 w-1.5">
         <span
           className="absolute inset-0 rounded-full animate-ping opacity-60"
-          style={{ background: 'oklch(0.84 0.17 85)' }}
+          style={{ background: 'var(--maize-bright)' }}
         />
         <span
           className="rounded-full h-1.5 w-1.5"
-          style={{ background: 'oklch(0.84 0.17 85)' }}
+          style={{ background: 'var(--maize-bright)' }}
         />
       </span>
       Pending
@@ -498,9 +498,9 @@ function ConfettiBurst() {
         rotate: (Math.random() - 0.5) * 720,
         color:
           i % 3 === 0
-            ? 'oklch(0.22 0.075 256)'
+            ? 'var(--navy-deep)'
             : i % 3 === 1
-              ? 'oklch(0.84 0.17 85)'
+              ? 'var(--maize-bright)'
               : 'oklch(0.55 0.15 142)',
       }
     })

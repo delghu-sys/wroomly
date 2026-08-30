@@ -94,7 +94,7 @@ export default function ResetPasswordClient() {
               </p>
               <Link
                 href="/forgot-password"
-                className="inline-flex items-center gap-1 mt-2 text-[13px] font-semibold text-[oklch(0.45_0.13_85)] underline-offset-4 hover:underline"
+                className="inline-flex items-center gap-1 mt-2 text-[13px] font-semibold text-gold-deep underline-offset-4 hover:underline"
               >
                 Send a fresh link →
               </Link>
@@ -173,7 +173,7 @@ export default function ResetPasswordClient() {
                 Remember it after all?{' '}
                 <Link
                   href="/sign-in"
-                  className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                  className="font-medium text-ink-soft hover:text-gold-deep transition-colors underline-offset-4 decoration-maize-bright/50 hover:underline"
                 >
                   Sign in
                 </Link>

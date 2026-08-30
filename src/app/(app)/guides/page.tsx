@@ -35,7 +35,7 @@ export default function GuidesIndexPage() {
       <Breadcrumbs crumbs={[{ name: 'Home', path: '/' }, { name: 'Guides' }]} />
 
       <header className="max-w-2xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <BookOpen className="w-3.5 h-3.5" /> Resources
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
@@ -51,9 +51,9 @@ export default function GuidesIndexPage() {
           listings at request time), so it's not part of GUIDES. */}
       <Link
         href="/guides/ann-arbor-rent-prices"
-        className="group mt-10 block rounded-3xl border border-line bg-[oklch(0.22_0.075_256)] p-6 sm:p-7 hover:-translate-y-0.5 transition-all duration-300"
+        className="group mt-10 block rounded-3xl border border-line bg-navy-deep p-6 sm:p-7 hover:-translate-y-0.5 transition-all duration-300"
       >
-        <p className="text-[10px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-bold">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-maize-bright font-bold">
           Live data
         </p>
         <h2 className="mt-2 font-display text-2xl tracking-tight text-white leading-snug">
@@ -63,7 +63,7 @@ export default function GuidesIndexPage() {
           Median asking rents by bedroom count and neighborhood — computed from
           the active verified listings on Wroomly, not last year&rsquo;s survey.
         </p>
-        <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-[oklch(0.84_0.17_85)] font-medium group-hover:gap-2 transition-all">
+        <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-maize-bright font-medium group-hover:gap-2 transition-all">
           See the numbers <ArrowRight className="w-3.5 h-3.5" />
         </span>
       </Link>
@@ -74,7 +74,7 @@ export default function GuidesIndexPage() {
           <Link
             key={g.slug}
             href={`/guides/${g.slug}`}
-            className="group rounded-3xl border border-line bg-surface p-6 hover:border-[oklch(0.84_0.17_85/0.45)] hover:-translate-y-0.5 transition-all duration-300"
+            className="group rounded-3xl border border-line bg-surface p-6 hover:border-maize-bright/45 hover:-translate-y-0.5 transition-all duration-300"
           >
             <h2 className="font-display text-xl tracking-tight text-ink leading-snug group-hover:text-navy transition-colors">
               {g.title}

@@ -160,14 +160,14 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
                 transition-all duration-200 ease-out active:scale-[0.97]
                 ${
                   active
-                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_4px_14px_oklch(0.22_0.075_256/0.25)]'
-                    : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink'
+                    ? 'bg-navy-deep text-maize-bright shadow-[0_4px_14px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]'
+                    : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink'
                 }
               `}
             >
               <Icon
                 className={`w-3.5 h-3.5 ${
-                  active ? 'text-[oklch(0.84_0.17_85)]' : 'text-ink-muted'
+                  active ? 'text-maize-bright' : 'text-ink-muted'
                 }`}
                 strokeWidth={2}
               />

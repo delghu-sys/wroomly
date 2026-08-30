@@ -49,7 +49,7 @@ export default function BuildingsIndexPage() {
       <Breadcrumbs crumbs={[{ name: 'Home', path: '/' }, { name: 'Buildings' }]} />
 
       <header className="max-w-2xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <Building2 className="w-3.5 h-3.5" /> Ann Arbor · Buildings
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
@@ -69,7 +69,7 @@ export default function BuildingsIndexPage() {
             <Link
               key={b.slug}
               href={`/buildings/${b.slug}`}
-              className="group rounded-3xl border border-line bg-surface p-6 hover:border-[oklch(0.84_0.17_85/0.45)] hover:-translate-y-0.5 transition-all duration-300"
+              className="group rounded-3xl border border-line bg-surface p-6 hover:border-maize-bright/45 hover:-translate-y-0.5 transition-all duration-300"
             >
               <h2 className="font-display text-xl tracking-tight text-ink leading-snug group-hover:text-navy transition-colors">
                 {b.name}
@@ -102,7 +102,7 @@ export default function BuildingsIndexPage() {
               <Link
                 key={b.slug}
                 href={`/buildings/${b.slug}`}
-                className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+                className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
               >
                 {b.name}
               </Link>

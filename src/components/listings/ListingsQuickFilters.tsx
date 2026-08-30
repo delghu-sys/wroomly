@@ -100,7 +100,7 @@ export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQui
         <button
           key={key + (value ?? '')}
           onClick={() => removeFilter(key, value)}
-          className="inline-flex items-center gap-1.5 h-7 pl-3 pr-2 rounded-full bg-[oklch(0.84_0.17_85/0.15)] text-[oklch(0.32_0.10_85)] text-xs font-medium hover:bg-[oklch(0.84_0.17_85/0.25)] transition-colors duration-300 group active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+          className="inline-flex items-center gap-1.5 h-7 pl-3 pr-2 rounded-full bg-maize-bright/15 text-[oklch(0.32_0.10_85)] text-xs font-medium hover:bg-maize-bright/25 transition-colors duration-300 group active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
         >
           {label}
           <X className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -110,7 +110,7 @@ export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQui
       {activeFilters.length > 1 && (
         <button
           onClick={clearAll}
-          className="text-xs text-ink-muted hover:text-[oklch(0.45_0.13_85)] font-medium transition-colors focus:outline-none focus-visible:underline underline-offset-4"
+          className="text-xs text-ink-muted hover:text-gold-deep font-medium transition-colors focus:outline-none focus-visible:underline underline-offset-4"
         >
           Clear all
         </button>

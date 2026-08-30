@@ -89,7 +89,7 @@ export function TiltCard({ children, className }: TiltCardProps) {
         className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] transition-opacity duration-300"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(circle 350px at ${mousePos.x}px ${mousePos.y}px, oklch(0.84 0.17 85 / 0.10), transparent 50%)`,
+          background: `radial-gradient(circle 350px at ${mousePos.x}px ${mousePos.y}px, color-mix(in oklab, var(--maize-bright) 10%, transparent), transparent 50%)`,
         }}
       />
     </motion.div>

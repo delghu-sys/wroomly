@@ -510,7 +510,7 @@ export function MatchExperience() {
           <main className="done-main">
             <div className="done-inner">
               <div className="done-check" aria-hidden="true">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="oklch(0.22 0.075 256)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--navy-deep)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
               </div>
@@ -553,13 +553,13 @@ function Atmo({ variant }: { variant: 'intro' | 'chat' }) {
       {variant === 'intro' ? (
         <>
           <div className="blob" style={{ top: '-8%', left: '4%', width: 640, height: 640, background: 'oklch(0.22 0.06 265)', filter: 'blur(140px)', opacity: 0.3, animation: 'wm-float-a 14s ease-in-out infinite' }} />
-          <div className="blob" style={{ bottom: '4%', right: '6%', width: 520, height: 520, background: 'oklch(0.84 0.17 85 / 0.35)', filter: 'blur(120px)', opacity: 0.18, animation: 'wm-float-b 10s ease-in-out infinite 2s' }} />
+          <div className="blob" style={{ bottom: '4%', right: '6%', width: 520, height: 520, background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)', filter: 'blur(120px)', opacity: 0.18, animation: 'wm-float-b 10s ease-in-out infinite 2s' }} />
           <div className="blob" style={{ top: '42%', right: '30%', width: 280, height: 280, background: 'oklch(0.50 0.10 280)', filter: 'blur(100px)', opacity: 0.1 }} />
         </>
       ) : (
         <>
           <div className="blob" style={{ top: '-12%', left: '-4%', width: 520, height: 520, background: 'oklch(0.22 0.06 265)', filter: 'blur(140px)', opacity: 0.24 }} />
-          <div className="blob" style={{ bottom: '12%', right: '2%', width: 400, height: 400, background: 'oklch(0.84 0.17 85 / 0.28)', filter: 'blur(110px)', opacity: 0.14 }} />
+          <div className="blob" style={{ bottom: '12%', right: '2%', width: 400, height: 400, background: 'color-mix(in oklab, var(--maize-bright) 28%, transparent)', filter: 'blur(110px)', opacity: 0.14 }} />
         </>
       )}
     </div>

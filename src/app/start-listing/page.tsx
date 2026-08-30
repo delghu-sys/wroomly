@@ -14,7 +14,7 @@ const NOISE_SVG =
   "data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
 
 const MAIZE_DEEP = 'oklch(0.74 0.16 85)'
-const NAVY = 'oklch(0.22 0.075 256)'
+const NAVY = 'var(--navy-deep)'
 
 /**
  * Supplier "List your place" chooser: import from an existing post (AI) or
@@ -49,7 +49,7 @@ export default async function StartListingPage() {
       />
       <div
         className="absolute bottom-[-10%] left-[-6%] w-[520px] h-[520px] rounded-full blur-[110px] -z-10 animate-float"
-        style={{ background: 'oklch(0.22 0.075 256 / 0.06)' }}
+        style={{ background: 'color-mix(in oklab, var(--navy-deep) 6%, transparent)' }}
         aria-hidden
       />
       <div
@@ -129,8 +129,8 @@ export default async function StartListingPage() {
                 aria-hidden
               />
               {/* Fastest badge */}
-              <span className="absolute top-5 right-5 inline-flex items-center gap-1.5 rounded-full bg-maize px-2.5 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.08em] text-[oklch(0.22_0.075_256)] font-display">
-                <span className="w-[4px] h-[4px] rounded-full bg-[oklch(0.22_0.075_256/0.4)]" />
+              <span className="absolute top-5 right-5 inline-flex items-center gap-1.5 rounded-full bg-maize px-2.5 py-1 text-[0.6rem] font-extrabold uppercase tracking-[0.08em] text-navy-deep font-display">
+                <span className="w-[4px] h-[4px] rounded-full bg-navy-deep/40" />
                 Fastest
               </span>
 
@@ -138,7 +138,7 @@ export default async function StartListingPage() {
                 className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-[0.875rem] text-maize transition-transform duration-300 group-hover:scale-[1.06] group-hover:rotate-[-4deg]"
                 style={{
                   background: NAVY,
-                  boxShadow: '0 6px 20px oklch(0.22 0.075 256 / 0.22)',
+                  boxShadow: '0 6px 20px color-mix(in oklab, var(--navy-deep) 22%, transparent)',
                 }}
               >
                 <Sparkles className="w-5 h-5" strokeWidth={2} />
@@ -166,10 +166,10 @@ export default async function StartListingPage() {
             {/* Card B — Manual */}
             <Link
               href={manualHref}
-              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-[1.5rem] border-[1.5px] border-border bg-white p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-[oklch(0.22_0.075_256/0.18)] hover:shadow-[0_20px_56px_oklch(0.22_0.075_256/0.08)]"
+              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-[1.5rem] border-[1.5px] border-border bg-white p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-navy-deep/18 hover:shadow-[0_20px_56px_color-mix(in_oklab,var(--navy-deep)_8%,transparent)]"
               style={{ animationDelay: '0.53s' }}
             >
-              <span className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-[0.875rem] bg-[oklch(0.96_0.008_85)] text-ink-soft transition-all duration-300 group-hover:scale-[1.06] group-hover:rotate-[-3deg] group-hover:bg-[oklch(0.22_0.075_256)] group-hover:text-maize">
+              <span className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-[0.875rem] bg-[oklch(0.96_0.008_85)] text-ink-soft transition-all duration-300 group-hover:scale-[1.06] group-hover:rotate-[-3deg] group-hover:bg-navy-deep group-hover:text-maize">
                 <PencilLine className="w-5 h-5" strokeWidth={2} />
               </span>
 
@@ -180,7 +180,7 @@ export default async function StartListingPage() {
                 Fill in the details step by step — photos, price, dates, and
                 amenities. Full control.
               </p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[oklch(0.22_0.075_256)] mt-5 transition-all group-hover:gap-2.5">
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep mt-5 transition-all group-hover:gap-2.5">
                 Start from scratch
                 <ArrowRight
                   className="w-4 h-4 transition-transform group-hover:translate-x-[3px]"
@@ -205,7 +205,7 @@ export default async function StartListingPage() {
       </main>
 
       {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="relative overflow-hidden bg-[oklch(0.22_0.075_256)] px-6 py-6">
+      <footer className="relative overflow-hidden bg-navy-deep px-6 py-6">
         <div
           className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 rounded-full blur-[90px] opacity-25"
           style={{ background: 'oklch(0.86 0.17 92 / 0.5)' }}

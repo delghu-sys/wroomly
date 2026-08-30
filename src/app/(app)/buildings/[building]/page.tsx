@@ -92,7 +92,7 @@ export default async function BuildingPage({
       />
 
       <header className="max-w-3xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <Building2 className="w-3.5 h-3.5" /> Ann Arbor · Building
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
@@ -140,7 +140,7 @@ export default async function BuildingPage({
           <ul className="rounded-2xl border border-line bg-surface px-5 py-4 space-y-2.5">
             {b.facts.map((f, i) => (
               <li key={i} className="flex items-start gap-2.5 text-[14px] text-ink-soft leading-snug">
-                <Check className="w-4 h-4 mt-0.5 shrink-0 text-[oklch(0.45_0.13_85)]" strokeWidth={2.5} />
+                <Check className="w-4 h-4 mt-0.5 shrink-0 text-gold-deep" strokeWidth={2.5} />
                 {f}
               </li>
             ))}
@@ -179,7 +179,7 @@ export default async function BuildingPage({
             </p>
             <Link
               href="/listings"
-              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+              className="inline-flex items-center gap-1.5 mt-4 h-11 px-5 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold hover:bg-navy-deep/90 transition"
             >
               Browse all listings <ArrowRight className="w-4 h-4" />
             </Link>
@@ -210,7 +210,7 @@ export default async function BuildingPage({
             <Link
               key={o.slug}
               href={`/buildings/${o.slug}`}
-              className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+              className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
             >
               {o.name}
             </Link>

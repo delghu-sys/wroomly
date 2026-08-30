@@ -41,7 +41,7 @@ export function WordReveal({
         return (
           <span
             key={`${word}-${i}`}
-            className={`inline-block animate-word-rise ${isAccent ? 'italic font-light text-[oklch(0.84_0.17_85)]' : ''}`}
+            className={`inline-block animate-word-rise ${isAccent ? 'italic font-light text-maize-bright' : ''}`}
             style={{
               animationDelay: `${delay + i * stagger}s`,
               marginRight: i < words.length - 1 ? '0.25em' : 0,

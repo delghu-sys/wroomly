@@ -86,7 +86,7 @@ export function BrandListingCard({
             <div className="absolute top-3 left-3 flex items-center gap-1.5">
               <BrandChip variant="ghost">Sublet</BrandChip>
               {isNewListing(listing.created_at) && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.08em] bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.08em] bg-maize-bright text-navy-deep">
                   New
                 </span>
               )}
@@ -123,12 +123,12 @@ export function BrandListingCard({
             <div className="flex items-start justify-between gap-2">
               {/* h2: each card is a top-level item under the page h1 (home /
                   browse grids have no intervening h2), so h3 skipped a level. */}
-              <h2 className="font-display text-[17px] leading-snug text-ink line-clamp-1 group-hover:text-[oklch(0.45_0.13_85)] transition-colors duration-300">
+              <h2 className="font-display text-[17px] leading-snug text-ink line-clamp-1 group-hover:text-gold-deep transition-colors duration-300">
                 {listing.title}
               </h2>
               {supplierRating && (
                 <span className="inline-flex items-center gap-0.5 text-xs text-ink shrink-0 mt-0.5">
-                  <Star className="w-3 h-3 fill-[oklch(0.84_0.17_85)] stroke-[oklch(0.84_0.17_85)]" />
+                  <Star className="w-3 h-3 fill-maize-bright stroke-maize-bright" />
                   <span className="font-semibold">{supplierRating.avg.toFixed(1)}</span>
                 </span>
               )}
@@ -189,7 +189,7 @@ export function BrandListingCard({
               <div className="flex items-center gap-1.5">
                 <Avatar className="h-6 w-6 ring-1 ring-line">
                   <AvatarImage src={listing.users?.avatar_url ?? undefined} />
-                  <AvatarFallback className="text-[10px] bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
+                  <AvatarFallback className="text-[10px] bg-navy-deep text-maize-bright">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

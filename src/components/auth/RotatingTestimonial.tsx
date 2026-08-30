@@ -70,7 +70,7 @@ export function RotatingTestimonial({
         size={24}
         weight="fill"
         className="absolute top-4 right-4"
-        style={{ color: 'oklch(0.84 0.17 85 / 0.40)' }}
+        style={{ color: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)' }}
         aria-hidden
       />
 
@@ -97,8 +97,8 @@ export function RotatingTestimonial({
                 w-7 h-7 rounded-full text-[10px] font-semibold
               "
               style={{
-                background: 'oklch(0.84 0.17 85)',
-                color: 'oklch(0.22 0.075 256)',
+                background: 'var(--maize-bright)',
+                color: 'var(--navy-deep)',
               }}
             >
               {t.initials}
@@ -139,7 +139,7 @@ export function RotatingTestimonial({
                   style={{
                     width: active ? 20 : 6,
                     background: active
-                      ? 'oklch(0.84 0.17 85)'
+                      ? 'var(--maize-bright)'
                       : 'oklch(1 0 0 / 0.20)',
                   }}
                 />

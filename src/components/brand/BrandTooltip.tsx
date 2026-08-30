@@ -53,7 +53,7 @@ export function BrandTooltip({
               data-[instant]:duration-0
             "
             style={{
-              background: 'oklch(0.22 0.075 256 / 0.92)',
+              background: 'color-mix(in oklab, var(--navy-deep) 92%, transparent)',
               boxShadow:
                 'inset 0 1px 0 oklch(1 0 0 / 0.10), 0 18px 50px oklch(0 0 0 / 0.40)',
             }}
@@ -62,12 +62,12 @@ export function BrandTooltip({
             <span
               aria-hidden
               className="pointer-events-none absolute inset-x-3 top-0 h-px"
-              style={{ background: 'oklch(0.84 0.17 85 / 0.40)' }}
+              style={{ background: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)' }}
             />
             {content}
             <Tooltip.Arrow
               className="
-                fill-[oklch(0.22_0.075_256/0.92)]
+                fill-navy-deep/92
                 stroke-white/[0.10]
                 data-[side=top]:-bottom-[7px]
                 data-[side=bottom]:-top-[7px]

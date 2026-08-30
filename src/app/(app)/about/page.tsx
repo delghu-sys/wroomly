@@ -31,7 +31,7 @@ export default function AboutPage() {
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 items-center">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-medium mb-5">
+              <p className="text-xs uppercase tracking-[0.22em] text-maize-bright font-medium mb-5">
                 How it works
               </p>
 
@@ -79,7 +79,7 @@ export default function AboutPage() {
                   <div className="h-2.5 w-3/4 rounded-full bg-white/[0.10]" />
                   <div className="h-2 w-1/2 rounded-full bg-white/[0.06]" />
                   <div className="mt-auto space-y-2">
-                    <div className="h-10 rounded-xl bg-[oklch(0.84_0.17_85/0.15)] border border-[oklch(0.84_0.17_85/0.20)]" />
+                    <div className="h-10 rounded-xl bg-maize-bright/15 border border-maize-bright/20" />
                     <div className="h-10 rounded-xl bg-white/[0.05] border border-white/[0.06]" />
                   </div>
                 </div>
@@ -90,9 +90,9 @@ export default function AboutPage() {
               >
                 <div className="animate-float-slow p-5 flex flex-col gap-3 h-full">
                   <div className="flex items-center gap-2">
-                    <span className="w-7 h-7 rounded-full bg-[oklch(0.84_0.17_85/0.25)] flex items-center justify-center">
+                    <span className="w-7 h-7 rounded-full bg-maize-bright/25 flex items-center justify-center">
                       <ShieldCheck
-                        className="w-3.5 h-3.5 text-[oklch(0.84_0.17_85)]"
+                        className="w-3.5 h-3.5 text-maize-bright"
                         strokeWidth={2}
                       />
                     </span>
@@ -114,7 +114,7 @@ export default function AboutPage() {
               </div>
 
               <div
-                className="absolute top-4 right-2 w-1.5 h-1.5 rounded-full bg-[oklch(0.84_0.17_85)]"
+                className="absolute top-4 right-2 w-1.5 h-1.5 rounded-full bg-maize-bright"
               />
               <div
                 className="absolute bottom-6 right-[300px] w-1 h-1 rounded-full bg-white/30 animate-float"
@@ -134,7 +134,7 @@ export default function AboutPage() {
             </p>
             <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight text-ink max-w-3xl leading-[0.95]">
               Six steps from{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              <span className="italic font-light text-gold-deep">
                 hello to keys in hand.
               </span>
             </h2>
@@ -156,7 +156,7 @@ export default function AboutPage() {
               </p>
               <h2 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[0.95]">
                 Built for students,{' '}
-                <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                <span className="italic font-light text-gold-deep">
                   not strangers.
                 </span>
               </h2>
@@ -179,15 +179,15 @@ export default function AboutPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ScrollReveal>
-            <p className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-medium mb-6">
-              <span className="w-8 h-px bg-[oklch(0.84_0.17_85_/_0.40)]" aria-hidden />
+            <p className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.22em] text-maize-bright font-medium mb-6">
+              <span className="w-8 h-px bg-maize-bright/40" aria-hidden />
               Ready when you are
-              <span className="w-8 h-px bg-[oklch(0.84_0.17_85_/_0.40)]" aria-hidden />
+              <span className="w-8 h-px bg-maize-bright/40" aria-hidden />
             </p>
             <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[0.95]">
               Find your next place.
               <br />
-              <span className="italic font-light text-[oklch(0.84_0.17_85)]">
+              <span className="italic font-light text-maize-bright">
                 Or list your own.
               </span>
             </h2>

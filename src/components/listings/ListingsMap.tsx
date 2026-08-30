@@ -226,8 +226,8 @@ export function ListingsMap({ listings }: { listings: MapListing[] }) {
           border-radius: 9999px;
           font-size: 13px;
           font-weight: 700;
-          color: oklch(0.84 0.17 85);
-          background: oklch(0.22 0.075 256);
+          color: var(--maize-bright);
+          background: var(--navy-deep);
           border: 2px solid #fff;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
           cursor: pointer;

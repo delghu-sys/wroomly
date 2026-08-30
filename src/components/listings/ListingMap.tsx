@@ -115,7 +115,7 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
     return (
       <div className="space-y-2">
         <div className="h-64 rounded-3xl border border-line bg-[oklch(0.97_0.01_85)] flex flex-col items-center justify-center text-ink-muted">
-          <MapPin className="w-7 h-7 mb-2 text-[oklch(0.45_0.13_85)]" strokeWidth={1.5} />
+          <MapPin className="w-7 h-7 mb-2 text-gold-deep" strokeWidth={1.5} />
           <p className="text-sm">Map unavailable</p>
           {neighborhood && (
             <p className="text-xs mt-1">{neighborhood}</p>

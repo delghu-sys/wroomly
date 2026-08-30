@@ -54,13 +54,13 @@ export function BookingSidebar({
         className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl"
         style={{
           boxShadow:
-            'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 28px 70px oklch(0.84 0.17 85 / 0.22), 0 8px 24px oklch(0.22 0.075 256 / 0.06)',
+            'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 28px 70px color-mix(in oklab, var(--maize-bright) 22%, transparent), 0 8px 24px color-mix(in oklab, var(--navy-deep) 6%, transparent)',
         }}
       >
         {/* Subtle gold mesh */}
         <div
           className="pointer-events-none absolute -top-24 -right-16 w-72 h-72 rounded-full blur-3xl opacity-35"
-          style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+          style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
           aria-hidden
         />
         <div
@@ -80,7 +80,7 @@ export function BookingSidebar({
               </p>
               {existingInquiry?.status === 'accepted' && conversationId && (
                 <Link href={`/messages/${conversationId}`} className="block mt-4">
-                  <Button className="w-full h-11 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 transition-all duration-300 active:scale-[0.98]">
+                  <Button className="w-full h-11 rounded-full bg-navy-deep text-maize-bright hover:bg-navy-deep/90 transition-all duration-300 active:scale-[0.98]">
                     Open chat
                   </Button>
                 </Link>
@@ -98,7 +98,7 @@ export function BookingSidebar({
                     <p
                       className="font-display tracking-tight leading-none"
                       style={{
-                        color: 'oklch(0.22 0.075 256)',
+                        color: 'var(--navy-deep)',
                         fontSize: 'clamp(2.5rem, 5.5vw, 3.25rem)',
                       }}
                     >
@@ -139,8 +139,8 @@ export function BookingSidebar({
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{
-                    background: 'oklch(0.22 0.075 256)',
-                    color: 'oklch(0.84 0.17 85)',
+                    background: 'var(--navy-deep)',
+                    color: 'var(--maize-bright)',
                   }}
                 >
                   <CalendarBlank size={16} weight="duotone" />
@@ -171,7 +171,7 @@ export function BookingSidebar({
                   <ShieldCheck
                     size={13}
                     weight="duotone"
-                    className="text-[oklch(0.45_0.13_85)] shrink-0"
+                    className="text-gold-deep shrink-0"
                   />
                   <p className="text-[11.5px] text-ink-muted leading-snug tracking-tight">
                     {PAYMENTS_ENABLED ? (

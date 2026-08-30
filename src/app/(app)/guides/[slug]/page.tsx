@@ -111,7 +111,7 @@ export default async function GuidePage({
                       className="flex items-start gap-2 text-[15px] text-ink-soft leading-relaxed"
                     >
                       <Check
-                        className="w-4 h-4 text-[oklch(0.45_0.13_85)] shrink-0 mt-1"
+                        className="w-4 h-4 text-gold-deep shrink-0 mt-1"
                         strokeWidth={2.5}
                       />
                       {b}
@@ -133,7 +133,7 @@ export default async function GuidePage({
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink transition"
+                  className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
                 >
                   {l.label}
                 </Link>
@@ -173,7 +173,7 @@ export default async function GuidePage({
         </p>
         <Link
           href="/listings"
-          className="inline-flex items-center gap-1.5 mt-5 h-11 px-6 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98]"
+          className="inline-flex items-center gap-1.5 mt-5 h-11 px-6 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold hover:bg-navy-deep/90 transition active:scale-[0.98]"
         >
           Browse listings <ArrowRight className="w-4 h-4" />
         </Link>
@@ -189,7 +189,7 @@ export default async function GuidePage({
             <Link
               key={o.slug}
               href={`/guides/${o.slug}`}
-              className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-[oklch(0.84_0.17_85/0.45)] transition"
+              className="group flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-maize-bright/45 transition"
             >
               <span className="font-medium text-ink text-[15px] group-hover:text-navy transition-colors">
                 {o.title}

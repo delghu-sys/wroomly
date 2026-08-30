@@ -188,7 +188,7 @@ export default function SignUpClient({
               <h2 className="font-display text-3xl sm:text-[2.5rem] tracking-tight text-ink leading-[1.05]">
                 Are you listing a place
                 <br />
-                <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                <span className="italic font-light text-gold-deep">
                   or looking for one?
                 </span>
               </h2>
@@ -219,7 +219,7 @@ export default function SignUpClient({
               Already have an account?{' '}
               <Link
                 href="/sign-in"
-                className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                className="font-medium text-ink-soft hover:text-gold-deep transition-colors underline-offset-4 decoration-maize-bright/50 hover:underline"
               >
                 Sign in
               </Link>
@@ -278,7 +278,7 @@ export default function SignUpClient({
             </p>
             <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
               Create your{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              <span className="italic font-light text-gold-deep">
                 account.
               </span>
             </h2>
@@ -342,7 +342,7 @@ export default function SignUpClient({
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] underline-offset-4 hover:underline"
+                    className="font-medium text-ink-soft hover:text-gold-deep underline-offset-4 hover:underline"
                   >
                     Terms of Service
                   </Link>
@@ -414,7 +414,7 @@ export default function SignUpClient({
                         id="agreed_to_terms"
                         checked={!!field.value}
                         onCheckedChange={checked => field.onChange(checked === true)}
-                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
+                        className="mt-0.5 data-[state=checked]:bg-navy-deep data-[state=checked]:border-navy-deep"
                       />
                     )}
                   />
@@ -427,7 +427,7 @@ export default function SignUpClient({
                         id="agreed_to_terms"
                         checked={!!field.value}
                         onCheckedChange={checked => field.onChange(checked === true)}
-                        className="mt-0.5 data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
+                        className="mt-0.5 data-[state=checked]:bg-navy-deep data-[state=checked]:border-navy-deep"
                       />
                     )}
                   />
@@ -441,7 +441,7 @@ export default function SignUpClient({
                     href="/terms"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 hover:underline"
+                    className="font-medium text-ink hover:text-gold-deep transition-colors underline-offset-4 hover:underline"
                   >
                     Terms of Service
                   </Link>
@@ -471,7 +471,7 @@ export default function SignUpClient({
               Already have an account?{' '}
               <Link
                 href="/sign-in"
-                className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                className="font-medium text-ink-soft hover:text-gold-deep transition-colors underline-offset-4 decoration-maize-bright/50 hover:underline"
               >
                 Sign in
               </Link>

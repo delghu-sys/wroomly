@@ -48,7 +48,7 @@ export function LiveBadge({
       {icon && (
         <span
           className={`shrink-0 ${
-            dark ? 'text-[oklch(0.84_0.17_85)]' : 'text-[oklch(0.45_0.13_85)]'
+            dark ? 'text-maize-bright' : 'text-gold-deep'
           }`}
         >
           {icon}

@@ -37,7 +37,7 @@ export function BrowseHero({ totalCount, currentQuery, filters, view }: BrowseHe
             <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
             <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
           </span>
-          <Sparkles className="w-3.5 h-3.5 text-[oklch(0.84_0.17_85)]" />
+          <Sparkles className="w-3.5 h-3.5 text-maize-bright" />
           <span className="text-sm text-white/65 font-medium">
             <span className="text-white">{totalCount}</span>{' '}
             {totalCount === 1 ? 'place' : 'places'} available · Ann Arbor

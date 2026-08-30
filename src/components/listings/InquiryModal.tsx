@@ -74,7 +74,7 @@ export function InquiryModal({
         i,
         x: Math.cos(angle) * dist,
         y: Math.sin(angle) * dist,
-        color: i % 2 === 0 ? 'oklch(0.84 0.17 85)' : 'oklch(0.22 0.075 256)',
+        color: i % 2 === 0 ? 'var(--maize-bright)' : 'var(--navy-deep)',
       }
     })
   )
@@ -267,7 +267,7 @@ export function InquiryModal({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={onClose}
-            className="absolute inset-0 bg-[oklch(0.22_0.075_256/0.55)] backdrop-blur-sm"
+            className="absolute inset-0 bg-navy-deep/55 backdrop-blur-sm"
           />
 
           {/* Modal surface.
@@ -287,7 +287,7 @@ export function InquiryModal({
               flex flex-col overflow-hidden
               rounded-none sm:rounded-3xl
               bg-white sm:border sm:border-line
-              shadow-none sm:shadow-[0_30px_80px_oklch(0.22_0.075_256/0.30)]
+              shadow-none sm:shadow-[0_30px_80px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
             "
             role="dialog"
             aria-modal="true"
@@ -295,7 +295,7 @@ export function InquiryModal({
             {/* Gold mesh accent */}
             <div
               className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-30"
-              style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+              style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
               aria-hidden
             />
 
@@ -320,7 +320,7 @@ export function InquiryModal({
                       when a listing has no photos. */}
                   <div className="shrink-0 px-5 sm:px-7 pt-6 sm:pt-7 pb-5 flex items-start justify-between gap-4 border-b border-line/70">
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-2">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-2">
                         Send inquiry
                       </p>
                       <h2 className="font-display text-[1.35rem] sm:text-2xl tracking-tight text-ink leading-[1.15]">
@@ -361,7 +361,7 @@ export function InquiryModal({
                         maxLength={2000}
                         placeholder="A few sentences about you — your school, dates, why this place is a good fit."
                         {...register('message')}
-                        className="rounded-2xl border-line focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.18)] focus-visible:border-[oklch(0.45_0.13_85)] text-[14px]"
+                        className="rounded-2xl border-line focus-visible:ring-4 focus-visible:ring-maize-bright/18 focus-visible:border-gold-deep text-[14px]"
                       />
                       {errors.message && (
                         <p className="text-xs text-[oklch(0.55_0.20_25)]">
@@ -382,7 +382,7 @@ export function InquiryModal({
                             min={listing.available_from}
                             max={listing.available_to}
                             {...register('move_in_date')}
-                            className="h-11 rounded-xl border-line focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.18)] focus-visible:border-[oklch(0.45_0.13_85)]"
+                            className="h-11 rounded-xl border-line focus-visible:ring-4 focus-visible:ring-maize-bright/18 focus-visible:border-gold-deep"
                           />
                         </div>
                         <div className="space-y-2">
@@ -394,7 +394,7 @@ export function InquiryModal({
                             min={listing.available_from}
                             max={listing.available_to}
                             {...register('move_out_date')}
-                            className="h-11 rounded-xl border-line focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.18)] focus-visible:border-[oklch(0.45_0.13_85)]"
+                            className="h-11 rounded-xl border-line focus-visible:ring-4 focus-visible:ring-maize-bright/18 focus-visible:border-gold-deep"
                           />
                         </div>
                       </div>
@@ -405,7 +405,7 @@ export function InquiryModal({
                       <div className="rounded-2xl border border-line bg-[oklch(0.97_0.008_75)]">
                         <div className="flex items-center justify-between px-4 py-3">
                           <div className="flex items-center gap-2 text-[12px] text-ink-soft">
-                            <Calendar className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" />
+                            <Calendar className="w-3.5 h-3.5 text-gold-deep" />
                             {format(parseISO(listing.available_from), 'MMM d')} —{' '}
                             {format(parseISO(listing.available_to), 'MMM d, yyyy')}
                           </div>
@@ -434,17 +434,17 @@ export function InquiryModal({
                       disabled={isSubmitting}
                       className="
                         group relative w-full h-12 rounded-full overflow-hidden mt-2
-                        bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
+                        bg-maize-bright text-navy-deep
                         font-semibold text-sm tracking-tight
-                        shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)]
-                        hover:shadow-[0_10px_32px_oklch(0.84_0.17_85/0.50)]
+                        shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]
+                        hover:shadow-[0_10px_32px_color-mix(in_oklab,var(--maize-bright)_50%,transparent)]
                         disabled:opacity-60 disabled:cursor-not-allowed
                         active:scale-[0.98]
                         transition-all duration-300
                       "
                     >
-                      <span className="absolute inset-0 bg-[oklch(0.22_0.075_256)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-                      <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+                      <span className="absolute inset-0 bg-navy-deep origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                      <span className="relative z-10 inline-flex items-center justify-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -495,10 +495,10 @@ export function InquiryModal({
                     initial={{ scale: 0.4, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ ...popSpring, delay: 0.05 }}
-                    className="relative inline-flex w-16 h-16 rounded-3xl items-center justify-center mx-auto shadow-[0_8px_28px_oklch(0.84_0.17_85/0.40)]"
+                    className="relative inline-flex w-16 h-16 rounded-3xl items-center justify-center mx-auto shadow-[0_8px_28px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)]"
                     style={{
-                      background: 'oklch(0.84 0.17 85)',
-                      color: 'oklch(0.22 0.075 256)',
+                      background: 'var(--maize-bright)',
+                      color: 'var(--navy-deep)',
                     }}
                   >
                     <CheckCircle2 className="w-7 h-7" strokeWidth={2.25} />
@@ -508,7 +508,7 @@ export function InquiryModal({
                       <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
                         Thanks —
                         <br />
-                        <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                        <span className="italic font-light text-gold-deep">
                           we&rsquo;ll notify you as listings open up.
                         </span>
                       </p>
@@ -521,7 +521,7 @@ export function InquiryModal({
                       <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
                         Inquiry sent —
                         <br />
-                        <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                        <span className="italic font-light text-gold-deep">
                           you&rsquo;ll hear back soon.
                         </span>
                       </p>

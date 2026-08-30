@@ -22,14 +22,14 @@ export function VerifiedSeal({
       {pulse && (
         <span
           className="absolute inset-0 rounded-full animate-ping opacity-30"
-          style={{ background: 'oklch(0.84 0.17 85)' }}
+          style={{ background: 'var(--maize-bright)' }}
           aria-hidden
         />
       )}
       <SealCheck
         size={size}
         weight="fill"
-        style={{ color: 'oklch(0.84 0.17 85)' }}
+        style={{ color: 'var(--maize-bright)' }}
         className="relative"
       />
     </span>

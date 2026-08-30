@@ -33,7 +33,7 @@ export function ProfileEmpty({ icon, title, accent, body }: ProfileEmptyProps) {
       {/* Watermark icon */}
       <div
         className="pointer-events-none absolute -top-4 -right-2 opacity-[0.08]"
-        style={{ color: 'oklch(0.45 0.13 85)' }}
+        style={{ color: 'var(--gold-deep)' }}
         aria-hidden
       >
         <div className="scale-[3]">{icon}</div>
@@ -44,7 +44,7 @@ export function ProfileEmpty({ icon, title, accent, body }: ProfileEmptyProps) {
         {accent && (
           <>
             {' '}
-            <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+            <span className="italic font-light text-gold-deep">
               {accent}
             </span>
           </>

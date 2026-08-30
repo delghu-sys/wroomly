@@ -134,7 +134,7 @@ function SignInForm() {
               trailing={
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-ink-muted hover:text-[oklch(0.45_0.13_85)] font-medium transition-colors"
+                  className="text-xs text-ink-muted hover:text-gold-deep font-medium transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -156,7 +156,7 @@ function SignInForm() {
               Don&apos;t have an account?{' '}
               <Link
                 href="/sign-up"
-                className="font-medium text-ink-soft hover:text-[oklch(0.45_0.13_85)] transition-colors underline-offset-4 decoration-[oklch(0.84_0.17_85/0.50)] hover:underline"
+                className="font-medium text-ink-soft hover:text-gold-deep transition-colors underline-offset-4 decoration-maize-bright/50 hover:underline"
               >
                 Sign up
               </Link>

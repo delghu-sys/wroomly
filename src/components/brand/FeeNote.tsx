@@ -27,7 +27,7 @@ export function FeeNote({ variant = 'inline' }: FeeNoteProps) {
           text-[10.5px] font-semibold tracking-wide
         "
         style={{
-          background: 'oklch(0.84 0.17 85 / 0.15)',
+          background: 'color-mix(in oklab, var(--maize-bright) 15%, transparent)',
           color: 'oklch(0.32 0.10 85)',
         }}
       >

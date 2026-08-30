@@ -17,7 +17,7 @@ interface AtmosphericBackgroundProps {
 }
 
 export function AtmosphericBackground({
-  base = 'oklch(0.22 0.075 256)',
+  base = 'var(--navy-deep)',
   variant = 'hero',
 }: AtmosphericBackgroundProps) {
   return (
@@ -55,7 +55,7 @@ export function AtmosphericBackground({
           />
           <div
             className="absolute bottom-[5%] right-[10%] w-[250px] h-[250px] sm:w-[500px] sm:h-[500px] rounded-full blur-[60px] sm:blur-[120px] opacity-15 -z-10 animate-float"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
             aria-hidden
           />
           <div
@@ -69,7 +69,7 @@ export function AtmosphericBackground({
         <>
           <div
             className="absolute -top-20 left-[12%] w-[420px] h-[420px] rounded-full blur-3xl opacity-30 -z-10 animate-float"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.25)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 25%, transparent)' }}
             aria-hidden
           />
           <div
@@ -83,7 +83,7 @@ export function AtmosphericBackground({
         <>
           <div
             className="absolute -top-32 -left-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-45 -z-10 animate-float"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
             aria-hidden
           />
           <div

@@ -156,7 +156,7 @@ export function AcceptedSystemCard({
                   {otherContact?.email && (
                     <a
                       href={`mailto:${otherContact.email}`}
-                      className="flex items-center gap-2 text-[13px] text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors break-all"
+                      className="flex items-center gap-2 text-[13px] text-ink hover:text-gold-deep transition-colors break-all"
                     >
                       <Mail className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
                       {otherContact.email}
@@ -165,7 +165,7 @@ export function AcceptedSystemCard({
                   {otherContact?.phone && (
                     <a
                       href={`tel:${otherContact.phone}`}
-                      className="flex items-center gap-2 text-[13px] text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors"
+                      className="flex items-center gap-2 text-[13px] text-ink hover:text-gold-deep transition-colors"
                     >
                       <Phone className="w-3.5 h-3.5 shrink-0 text-ink-muted" />
                       {otherContact.phone}
@@ -183,14 +183,14 @@ export function AcceptedSystemCard({
               disabled={paying}
               className="
                 group relative w-full mt-4 h-11 rounded-full overflow-hidden
-                bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]
-                hover:shadow-[0_8px_24px_oklch(0.22_0.075_256/0.30)]
+                bg-navy-deep text-maize-bright
+                hover:shadow-[0_8px_24px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
                 transition-shadow duration-500
                 active:scale-[0.98]
               "
             >
-              <span className="absolute inset-0 bg-[oklch(0.84_0.17_85)] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.22_0.075_256)] transition-colors duration-500">
+              <span className="absolute inset-0 bg-maize-bright origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+              <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-navy-deep transition-colors duration-500">
                 {paying ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (

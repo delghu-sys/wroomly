@@ -101,7 +101,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
         className={`
           relative flex items-center gap-3 px-3 py-3 rounded-2xl group
           transition-colors duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-          focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.25)]
+          focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
           ${active ? '' : 'hover:bg-white/60'}
         `}
       >
@@ -120,7 +120,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
             layoutId="convo-active-indicator"
             transition={{ type: 'spring', stiffness: 400, damping: 32 }}
             className="absolute left-0 top-1/2 -translate-y-1/2 h-7 w-[3px] rounded-full pointer-events-none"
-            style={{ background: 'oklch(0.84 0.17 85)' }}
+            style={{ background: 'var(--maize-bright)' }}
             aria-hidden
           />
         )}
@@ -132,8 +132,8 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
             <AvatarFallback
               className="text-xs font-semibold"
               style={{
-                background: 'oklch(0.22 0.075 256)',
-                color: 'oklch(0.84 0.17 85)',
+                background: 'var(--navy-deep)',
+                color: 'var(--maize-bright)',
               }}
             >
               {otherInitials}
@@ -171,7 +171,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
               {time && (
                 <span
                   className={`text-[10.5px] tabular-nums tracking-wide ${
-                    hasUnread ? 'text-[oklch(0.45_0.13_85)] font-semibold' : 'text-ink-muted'
+                    hasUnread ? 'text-gold-deep font-semibold' : 'text-ink-muted'
                   }`}
                 >
                   {time}
@@ -181,7 +181,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
             </div>
           </div>
 
-          <p className="text-[11.5px] tracking-wide font-medium text-[oklch(0.45_0.13_85)] truncate mb-0.5 group-hover:text-[oklch(0.32_0.10_85)] transition-colors">
+          <p className="text-[11.5px] tracking-wide font-medium text-gold-deep truncate mb-0.5 group-hover:text-[oklch(0.32_0.10_85)] transition-colors">
             {listingTitle ?? '—'}
           </p>
 
@@ -193,7 +193,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
             >
               {preview.icon === 'payment' && (
                 <CreditCard
-                  className="w-3.5 h-3.5 shrink-0 text-[oklch(0.45_0.13_85)]"
+                  className="w-3.5 h-3.5 shrink-0 text-gold-deep"
                   strokeWidth={1.75}
                 />
               )}

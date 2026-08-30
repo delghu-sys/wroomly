@@ -123,7 +123,7 @@ export default async function RentPricesPage() {
       />
 
       <header className="max-w-2xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <BookOpen className="w-3.5 h-3.5" /> Live data
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
@@ -295,7 +295,7 @@ export default async function RentPricesPage() {
       <section className="mt-14 pt-8 border-t border-line">
         <Link
           href="/listings"
-          className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+          className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold hover:bg-navy-deep/90 transition"
         >
           Browse live sublets <ArrowRight className="w-4 h-4" />
         </Link>

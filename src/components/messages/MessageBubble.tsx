@@ -53,7 +53,7 @@ export const MessageBubble = memo(function MessageBubble({
           {showAvatar && (
             <Avatar className="h-7 w-7 ring-1 ring-line">
               <AvatarImage src={otherAvatarUrl ?? undefined} />
-              <AvatarFallback className="text-[10px] bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold">
+              <AvatarFallback className="text-[10px] bg-navy-deep text-maize-bright font-semibold">
                 {otherInitials}
               </AvatarFallback>
             </Avatar>
@@ -88,7 +88,7 @@ export const MessageBubble = memo(function MessageBubble({
             (isRead ? (
               <CheckCheck
                 className="w-3.5 h-3.5"
-                style={{ color: 'oklch(0.84 0.17 85)' }}
+                style={{ color: 'var(--maize-bright)' }}
                 strokeWidth={2.25}
               />
             ) : (

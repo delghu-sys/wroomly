@@ -42,16 +42,16 @@ export default async function NewListingPage() {
         >
           <div
             className="pointer-events-none absolute -top-24 -right-16 w-64 h-64 rounded-full blur-3xl opacity-30"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
             aria-hidden
           />
 
           <div className="relative">
             <div
-              className="inline-flex w-12 h-12 rounded-2xl items-center justify-center shadow-[0_6px_20px_oklch(0.84_0.17_85/0.30)]"
+              className="inline-flex w-12 h-12 rounded-2xl items-center justify-center shadow-[0_6px_20px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
               style={{
-                background: 'oklch(0.22 0.075 256)',
-                color: 'oklch(0.84 0.17 85)',
+                background: 'var(--navy-deep)',
+                color: 'var(--maize-bright)',
               }}
             >
               <House size={22} weight="duotone" />
@@ -59,7 +59,7 @@ export default async function NewListingPage() {
 
             <h1 className="font-display text-3xl sm:text-4xl tracking-tight text-ink leading-[1.05] mt-6">
               Listing is{' '}
-              <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+              <span className="italic font-light text-gold-deep">
                 supplier-only.
               </span>
             </h1>
@@ -69,11 +69,11 @@ export default async function NewListingPage() {
               registered as a consumer, so the listing wizard is unavailable.
             </p>
 
-            <div className="mt-6 flex items-start gap-3 px-4 py-3 rounded-2xl bg-[oklch(0.84_0.17_85/0.08)] border border-[oklch(0.84_0.17_85/0.25)]">
+            <div className="mt-6 flex items-start gap-3 px-4 py-3 rounded-2xl bg-maize-bright/8 border border-maize-bright/25">
               <EnvelopeOpen
                 size={18}
                 weight="duotone"
-                className="text-[oklch(0.45_0.13_85)] mt-0.5 shrink-0"
+                className="text-gold-deep mt-0.5 shrink-0"
               />
               <p className="text-[13.5px] text-ink-soft leading-relaxed">
                 To become a supplier, sign up again with a{' '}
@@ -99,9 +99,9 @@ export default async function NewListingPage() {
                   h-11 px-5 rounded-full
                   bg-white border border-line text-ink-soft
                   text-[13.5px] font-medium
-                  hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink
+                  hover:border-maize-bright/40 hover:text-ink
                   transition-all duration-300 active:scale-[0.97]
-                  focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]
+                  focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
                 "
               >
                 Back to dashboard
@@ -121,7 +121,7 @@ export default async function NewListingPage() {
         </p>
         <h1 className="font-display text-3xl sm:text-[2.5rem] tracking-tight text-ink leading-[1.05]">
           List your{' '}
-          <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+          <span className="italic font-light text-gold-deep">
             place.
           </span>
         </h1>
@@ -138,7 +138,7 @@ export default async function NewListingPage() {
       {/* Shortcut: import an existing post instead of filling this out by hand. */}
       <Link
         href="/import-listing"
-        className="group mb-8 flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-[oklch(0.84_0.17_85/0.5)] transition"
+        className="group mb-8 flex items-center justify-between gap-4 rounded-2xl border border-line bg-surface px-5 py-4 hover:border-maize-bright/50 transition"
       >
         <div>
           <p className="font-medium text-ink text-[15px]">

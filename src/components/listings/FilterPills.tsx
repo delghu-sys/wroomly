@@ -68,19 +68,19 @@ export function FilterPills({ filters }: FilterPillsProps) {
             key={pill.label}
             type="button"
             onClick={() => apply(pill.patch(filters))}
-            className="relative inline-flex items-center h-9 px-4 text-sm font-medium transition-colors duration-300 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+            className="relative inline-flex items-center h-9 px-4 text-sm font-medium transition-colors duration-300 rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
             aria-pressed={active}
           >
             {active && (
               <motion.span
                 layoutId="filter-pill-active"
                 transition={spring}
-                className="absolute inset-0 rounded-full bg-[oklch(0.84_0.17_85)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)]"
+                className="absolute inset-0 rounded-full bg-maize-bright shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]"
               />
             )}
             <span
               className={`relative z-10 ${
-                active ? 'text-[oklch(0.22_0.075_256)]' : 'text-white/65 hover:text-white'
+                active ? 'text-navy-deep' : 'text-white/65 hover:text-white'
               }`}
             >
               {pill.label}

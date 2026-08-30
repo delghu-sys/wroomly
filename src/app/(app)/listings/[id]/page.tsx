@@ -351,7 +351,7 @@ export default async function ListingDetailPage({
                 </h1>
                 {l.neighborhood && (
                   <p className="mt-3 text-ink-muted flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-[oklch(0.45_0.13_85)]" strokeWidth={1.75} />
+                    <MapPin className="w-4 h-4 text-gold-deep" strokeWidth={1.75} />
                     {l.neighborhood}, {l.city}, {l.state}
                   </p>
                 )}
@@ -435,7 +435,7 @@ export default async function ListingDetailPage({
                     key={label}
                     className="rounded-2xl p-4 border border-line bg-white"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-[oklch(0.84_0.17_85/0.12)] text-[oklch(0.45_0.13_85)] flex items-center justify-center mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-maize-bright/12 text-gold-deep flex items-center justify-center mb-3">
                       <Icon className="w-4 h-4" strokeWidth={1.75} />
                     </div>
                     <p className="text-[10px] uppercase tracking-[0.15em] text-ink-muted font-semibold">

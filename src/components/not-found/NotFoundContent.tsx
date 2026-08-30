@@ -29,7 +29,7 @@ export function NotFoundContent() {
         "
         style={{
           fontSize: 'clamp(18rem, 38vw, 36rem)',
-          color: 'oklch(0.84 0.17 85 / 0.06)',
+          color: 'color-mix(in oklab, var(--maize-bright) 6%, transparent)',
           letterSpacing: '-0.05em',
         }}
       >
@@ -40,7 +40,7 @@ export function NotFoundContent() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
           {/* ── Left — copy + CTAs ── */}
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-semibold mb-5">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-maize-bright font-semibold mb-5">
               Error 404
             </p>
 

@@ -67,11 +67,11 @@ export function InquiryActions({
           className="
             inline-flex items-center gap-1.5 h-9 px-4 rounded-full
             text-[13px] font-semibold tracking-tight
-            bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
-            shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-            hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+            bg-maize-bright text-navy-deep
+            shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+            hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
             transition-shadow duration-500 active:scale-[0.97]
-            focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]
+            focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
           "
         >
           Set up payouts →

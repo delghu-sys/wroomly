@@ -33,7 +33,7 @@ export default function AppError({ error, reset }: ErrorProps) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-          className="text-[11px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-semibold mb-5"
+          className="text-[11px] uppercase tracking-[0.22em] text-maize-bright font-semibold mb-5"
         >
           Something broke
         </motion.p>
@@ -67,19 +67,19 @@ export default function AppError({ error, reset }: ErrorProps) {
             className="
               group relative inline-flex w-full items-center justify-center gap-2
               h-12 rounded-full overflow-hidden font-semibold tracking-tight text-sm
-              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
-              shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-              hover:shadow-[0_12px_36px_oklch(0.84_0.17_85/0.45)]
+              bg-maize-bright text-navy-deep
+              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+              hover:shadow-[0_12px_36px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
               transition-shadow duration-500 active:scale-[0.97]
-              focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.40)]
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/40
             "
           >
             <span
               className="absolute inset-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{ background: 'oklch(0.22 0.075 256)' }}
+              style={{ background: 'var(--navy-deep)' }}
               aria-hidden
             />
-            <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.84_0.17_85)] transition-colors duration-500">
+            <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
               <ArrowClockwise size={16} weight="bold" />
               Try again
             </span>
