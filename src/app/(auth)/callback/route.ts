@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { ATTRIBUTION_COOKIE, sanitizeSource } from '@/lib/attribution'
+import { TERMS_VERSION, PRIVACY_VERSION } from '@/lib/legal'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -161,6 +162,35 @@ export async function GET(request: Request) {
         .update({ is_verified: true })
         .eq('id', data.user.id)
         .eq('is_verified', false)
+    }
+  }
+
+
+  // ── Clickwrap evidence ────────────────────────────────────────────────────
+  // On FIRST login, record the Terms + Privacy acceptance the user affirmed
+  // before getting here: the email form's required checkbox stamps
+  // terms_accepted_at into user_metadata, and the OAuth buttons append
+  // accepted=1 to the redirect only once their consent box is ticked. The
+  // server stamps versions/IP/UA itself. Failure to log never blocks login —
+  // the LegalReacceptance gate will simply re-prompt.
+  if (!existing) {
+    const affirmed =
+      Boolean((meta as { terms_accepted_at?: string }).terms_accepted_at) ||
+      searchParams.get('accepted') === '1'
+    if (affirmed) {
+      const fwd = request.headers.get('x-forwarded-for')
+      const { error: accErr } = await createServiceClient()
+        .from('legal_acceptances')
+        .insert({
+          user_id: data.user.id,
+          ip_address: fwd?.split(',')[0]?.trim() || null,
+          user_agent: request.headers.get('user-agent'),
+          terms_version: TERMS_VERSION,
+          privacy_version: PRIVACY_VERSION,
+          acceptance_context: 'signup',
+        })
+      // Deploy-order safety: table lands with migration 039.
+      if (accErr) console.error('[callback] acceptance log failed:', accErr.message)
     }
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,6 +26,8 @@ import { Upload, X, Check } from 'lucide-react'
 import Image from 'next/image'
 import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
 import { monthToFromDate, monthToToDate } from '@/lib/utils/listing'
+import { checkFairHousing } from '@/lib/fairHousing'
+import { FairHousingWarning, FairHousingNotice, logFairHousing } from './FairHousingGuard'
 
 const STEPS = ['Details', 'Photos', 'Pricing', 'Review']
 
@@ -113,8 +115,38 @@ export function ListingWizard({ userId }: { userId: string }) {
     setPhotoURLs(prev => prev.filter((_, i) => i !== index))
   }
 
+  // Fair-housing guardrail state: the phrase currently matched per field
+  // (drives the warning box), plus which phrases have already been logged so
+  // a slow typist doesn't generate a row per keystroke.
+  const [fhMatch, setFhMatch] = useState<{ title?: string; description?: string }>({})
+  const fhLogged = useRef<Set<string>>(new Set())
+
+  function fairHousingBlur(field: 'title' | 'description') {
+    const text = form.getValues(field) ?? ''
+    const match = checkFairHousing(text)
+    setFhMatch(prev => ({ ...prev, [field]: match?.phrase }))
+    if (match && !fhLogged.current.has(`${field}:${match.phrase}`)) {
+      fhLogged.current.add(`${field}:${match.phrase}`)
+      logFairHousing({ text, field, phase: 'warn' })
+    }
+  }
+
   async function onSubmit(data: FormValues) {
     setSubmitting(true)
+    // Fair-housing outcome log: did a warned user edit the phrase away or
+    // submit it anyway? Fire-and-forget; never blocks submission.
+    for (const field of ['title', 'description'] as const) {
+      const shown = fhMatch[field]
+      const stillMatches = checkFairHousing(data[field] ?? '')
+      if (shown || stillMatches) {
+        logFairHousing({
+          text: data[field] ?? '',
+          field,
+          phase: 'submit',
+          shownPhrase: shown,
+        })
+      }
+    }
     const supabase = createClient()
 
     try {
@@ -273,10 +305,15 @@ export function ListingWizard({ userId }: { userId: string }) {
 
             <div className="space-y-2">
               <Label>Listing title</Label>
-              <Input placeholder="e.g. Sunny 1BR near Central Campus" {...form.register('title')} />
+              <Input
+                placeholder="e.g. Sunny 1BR near Central Campus"
+                {...form.register('title')}
+                onBlurCapture={() => fairHousingBlur('title')}
+              />
               {form.formState.errors.title && (
                 <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
               )}
+              {fhMatch.title && <FairHousingWarning phrase={fhMatch.title} />}
             </div>
 
             <div className="space-y-2">
@@ -285,10 +322,12 @@ export function ListingWizard({ userId }: { userId: string }) {
                 placeholder="Describe your place: layout, location highlights, what's nearby, house rules..."
                 rows={5}
                 {...form.register('description')}
+                onBlurCapture={() => fairHousingBlur('description')}
               />
               {form.formState.errors.description && (
                 <p className="text-sm text-red-600">{form.formState.errors.description.message}</p>
               )}
+              {fhMatch.description && <FairHousingWarning phrase={fhMatch.description} />}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -642,9 +681,12 @@ export function ListingWizard({ userId }: { userId: string }) {
               Continue
             </Button>
           ) : (
-            <Button type="submit" disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Submit listing'}
-            </Button>
+            <div className="flex flex-col items-end gap-2">
+              <Button type="submit" disabled={submitting}>
+                {submitting ? 'Submitting…' : 'Submit listing'}
+              </Button>
+              <FairHousingNotice />
+            </div>
           )}
         </div>
       </form>

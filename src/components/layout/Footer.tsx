@@ -73,7 +73,7 @@ export function Footer() {
 
         <div className="border-t border-white/10 mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-white/60">
-            &copy; {new Date().getFullYear()} Wroomly. Not affiliated with the University of Michigan.
+            &copy; {new Date().getFullYear()} Wroomly LLC · Ann Arbor, MI. Not affiliated with the University of Michigan.
           </p>
           <p className="text-xs text-maize/60 font-display italic">
             Make room for connection.

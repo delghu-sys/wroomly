@@ -4,6 +4,7 @@ import { FooterGate } from '@/components/layout/FooterGate'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { SUPPLY_ONLY_MODE } from '@/lib/config'
 import type { User } from '@/types/database'
+import { LegalReacceptance } from '@/components/legal/LegalReacceptance'
 
 export default async function AppLayout({
   children,
@@ -101,6 +102,9 @@ export default async function AppLayout({
         Skip to main content
       </a>
       <Navbar user={profile} unreadCount={unreadCount} supplyOnly={SUPPLY_ONLY_MODE} />
+      {/* Clickwrap gate: prompts signed-in users whose latest acceptance
+          predates the current policy versions (or who never clickwrapped). */}
+      {profile ? <LegalReacceptance /> : null}
       <main id="main-content" className="flex-1">
         <PageTransition>{children}</PageTransition>
       </main>

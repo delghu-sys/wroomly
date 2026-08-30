@@ -40,6 +40,10 @@ interface GoogleAuthButtonProps {
   /** Where to land after auth (already sanitized by the caller). */
   next?: string
   disabled?: boolean
+  /** The user ticked the Terms/Privacy/18+ consent box before launching
+      OAuth. Rides to /callback as accepted=1, where the clickwrap acceptance
+      row is logged on first login. */
+  accepted?: boolean
   /** Surface an OAuth-initiation error to the parent form. */
   onError?: (message: string) => void
   /**
@@ -61,6 +65,7 @@ export function GoogleAuthButton({
   intendedType,
   next = '/',
   disabled = false,
+  accepted = false,
   onError,
   umich = false,
 }: GoogleAuthButtonProps) {
@@ -74,6 +79,7 @@ export function GoogleAuthButton({
     const params = new URLSearchParams()
     if (intendedType) params.set('intended_type', intendedType)
     if (next) params.set('next', next)
+    if (accepted) params.set('accepted', '1')
     const redirectTo = `${window.location.origin}/callback?${params.toString()}`
 
     const { error } = await supabase.auth.signInWithOAuth({

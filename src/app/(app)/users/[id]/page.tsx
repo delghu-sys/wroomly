@@ -19,6 +19,7 @@ import { ScrollReveal } from '@/components/home/ScrollReveal'
 // `profile-photos/<user_id>/…` prefix, so the URL helper is shared with
 // listings. See ProfileForm for the upload path convention.
 import { getListingImageUrl as photoUrl } from '@/lib/utils/listing'
+import { ReportDialog } from '@/components/report/ReportDialog'
 
 export async function generateMetadata({
   params,
@@ -147,6 +148,10 @@ export default async function UserProfilePage({
               ratingAvg={ratingAvg}
               ratingCount={ratingCount}
             />
+
+            <div className="px-1">
+              <ReportDialog targetType="user" targetId={u.id} label="Report this profile" />
+            </div>
 
             {/* Social */}
             {u.instagram_handle && (
