@@ -41,7 +41,7 @@ export function Footer() {
               <span className="font-display text-base font-semibold tracking-tighter text-white">wroomly</span>
             </Link>
             <p className="text-sm text-white/60 leading-relaxed max-w-xs">
-              Make room for connection. Verified student housing for the University of Michigan community.
+              Make room for connection. Student housing for the University of Michigan community.
             </p>
           </div>
 

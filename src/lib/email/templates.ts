@@ -55,7 +55,7 @@ function shell(opts: { preheader: string; bodyHtml: string }): string {
                   <a href="mailto:help@wroomly.app" style="color:#4a4a5a; text-decoration:underline;">help@wroomly.app</a>.
                 </p>
                 <p style="margin:8px 0 0 0; font-size:11px; line-height:1.5; color:#a0a0aa;">
-                  Wroomly · Verified U of M student housing · Ann Arbor, MI
+                  Wroomly · U of M student housing · Ann Arbor, MI
                 </p>
               </td>
             </tr>
@@ -172,7 +172,7 @@ export function partnerInquiryEmail(opts: {
   moveOut?: string | null
 }) {
   const partnerFirst = (opts.partnerName ?? 'there').split(' ')[0]
-  const who = opts.inquirerName ?? 'A verified student'
+  const who = opts.inquirerName ?? 'A student'
   const dates =
     opts.moveIn || opts.moveOut
       ? `<p style="margin:0 0 16px 0; font-size:14px; color:#4a4a5a;">Requested dates: <strong style="color:#1a1a2e;">${escapeHtml(opts.moveIn ?? '?')} → ${escapeHtml(opts.moveOut ?? '?')}</strong></p>`
@@ -212,7 +212,7 @@ export function inquiryReceivedEmail(opts: {
   conversationUrl: string
 }) {
   const supplierFirst = (opts.supplierName ?? 'there').split(' ')[0]
-  const consumerName = opts.consumerName ?? 'A verified student'
+  const consumerName = opts.consumerName ?? 'A student'
   const messagePreview = opts.inquiryMessage.slice(0, 240)
 
   const body = `

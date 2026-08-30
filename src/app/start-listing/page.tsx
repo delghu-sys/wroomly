@@ -199,7 +199,7 @@ export default async function StartListingPage() {
             <span className="w-[3px] h-[3px] rounded-full bg-line" />
             <span>~60-second listing</span>
             <span className="w-[3px] h-[3px] rounded-full bg-line" />
-            <span>Verified U of M students</span>
+            <span>U of M student marketplace</span>
           </div>
         </div>
       </main>

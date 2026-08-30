@@ -169,7 +169,7 @@ export default async function DashboardPage() {
             icon={<Home className="w-6 h-6" strokeWidth={1.75} />}
             title="No listings yet —"
             accent="your move."
-            description="Post your place and verified students can start asking about it."
+            description="Post your place and students near U of M can start asking about it."
             action={{ label: 'Create your first listing', href: '/listings/new' }}
           />
         )}

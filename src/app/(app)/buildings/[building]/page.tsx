@@ -24,8 +24,8 @@ export async function generateMetadata({
 
   const title = `Sublets at ${b.name} — University of Michigan Housing, Ann Arbor`
   const description = b.address
-    ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. Verified University of Michigan student sublets, plus floor plans, amenities, and location facts. Verified UMich students carry a blue check.`
-    : `Looking to sublet at ${b.name} in Ann Arbor? Find verified University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`
+    ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. University of Michigan student sublets, plus floor plans, amenities, and location facts. Verified UMich students carry a blue check.`
+    : `Looking to sublet at ${b.name} in Ann Arbor? Find University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`
   return {
     title,
     description,
@@ -153,7 +153,7 @@ export default async function BuildingPage({
       <p className="mt-6 max-w-3xl text-[12px] text-ink-muted leading-relaxed rounded-2xl border border-line bg-surface px-4 py-3">
         Wroomly is an independent student marketplace. We are not affiliated
         with, endorsed by, or managed by {b.name} or the University of Michigan.
-        Listings are posted by individual verified students. Building details
+        Listings are posted by individual students, and those who verify with a UMich account carry a blue check. Building details
         above are compiled from public sources and may change — always confirm
         with the building directly.
       </p>

@@ -9,12 +9,12 @@ import { Building2, ArrowRight, MapPin } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Ann Arbor Student Buildings — Sublets by Building | UMich Housing',
   description:
-    'Every major student apartment building near the University of Michigan — addresses, floor plans, amenities, and live verified sublets at Verve, Hub on Campus, Landmark, The Standard, and more.',
+    'Every major student apartment building near the University of Michigan — addresses, floor plans, amenities, and live sublets at Verve, Hub on Campus, Landmark, The Standard, and more.',
   alternates: { canonical: '/buildings' },
   openGraph: {
     title: 'Ann Arbor Student Buildings — Sublets by Building | Wroomly',
     description:
-      'Addresses, floor plans, amenities, and live verified UMich sublets, building by building.',
+      'Addresses, floor plans, amenities, and live UMich sublets, building by building.',
     images: ['/og-default.png'],
   },
 }

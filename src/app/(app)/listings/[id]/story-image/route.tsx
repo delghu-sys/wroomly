@@ -27,6 +27,9 @@ export async function GET(
   let bedroomsLabel: string | null = null
   let datesLabel: string | null = null
   let coverUrl: string | null = null
+  // The verified chip is per-listing, not a platform-wide claim: it renders
+  // only when this listing's host actually carries the UMich blue check.
+  let hostVerified = false
 
   try {
     // Anon read — RLS allows status='active' without auth.
@@ -34,7 +37,7 @@ export async function GET(
     const { data } = await supabase
       .from('listings')
       .select(
-        'title, neighborhood, price_per_month, bedrooms, available_from, available_to, listing_images(storage_path, display_order)',
+        'title, neighborhood, price_per_month, bedrooms, available_from, available_to, listing_images(storage_path, display_order), users:supplier_id(is_verified)',
       )
       .eq('id', id)
       .eq('status', 'active')
@@ -59,6 +62,8 @@ export async function GET(
       }[]
       const first = imgs.sort((a, b) => a.display_order - b.display_order).at(0)
       if (first) coverUrl = getListingImageUrl(first.storage_path)
+      hostVerified =
+        (data.users as { is_verified?: boolean } | null)?.is_verified === true
     }
   } catch {
     // fall through to the branded text-only card
@@ -141,7 +146,8 @@ export async function GET(
           <span style={{ color: MAIZE }}>w</span>roomly
         </div>
 
-        {/* Verified chip top-right */}
+        {/* Verified chip top-right — only when this host is verified */}
+        {hostVerified ? (
         <div
           style={{
             position: 'absolute',
@@ -160,6 +166,7 @@ export async function GET(
         >
           @umich.edu verified
         </div>
+        ) : null}
 
         {/* Info panel */}
         <div
@@ -233,7 +240,7 @@ export async function GET(
             }}
           >
             <div style={{ display: 'flex', color: 'rgba(255,255,255,0.85)', fontSize: 36 }}>
-              Sublets by verified U-M students
+              UMich student sublets in Ann Arbor
             </div>
             <div style={{ display: 'flex', color: MAIZE, fontSize: 40, fontWeight: 700 }}>
               wroomly.app
