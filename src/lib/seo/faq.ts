@@ -5,12 +5,12 @@ export const FAQS: { question: string; answer: string }[] = [
   {
     question: 'Who can use Wroomly?',
     answer:
-      'Wroomly is for University of Michigan students. Every account is verified with an @umich.edu email address before you can list a place or send an inquiry, so you know everyone on the platform is a real U of M student.',
+      'Wroomly is for University of Michigan students. Students who sign in with their UMich Google account are verified and carry a blue check on their profile and their listings, so you can tell at a glance who is a confirmed U of M student rather than an anonymous account.',
   },
   {
     question: 'How does Wroomly keep sublets safe?',
     answer:
-      'Every Wroomly account is verified with an @umich.edu email, so listings and inquiries come from real University of Michigan students — not anonymous strangers. From there, Wroomly pushes both sides toward the safe path: see the place live, put the agreement in writing, and never pay by wire, gift card, or crypto.',
+      'Students who verify with their UMich Google login carry a blue check, so you can see which listings and inquiries come from confirmed University of Michigan students. From there, Wroomly pushes both sides toward the safe path: see the place live, put the agreement in writing, and never pay by wire, gift card, or crypto.',
   },
   {
     question: 'What does Wroomly cost?',
