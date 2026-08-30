@@ -54,7 +54,7 @@ export default function SuspendedPage() {
 
         <div className="mt-9 inline-flex flex-col sm:flex-row items-center gap-3">
           <a
-            href="mailto:help@wroomly.com"
+            href="mailto:delghu@umich.edu"
             className="
               group inline-flex items-center gap-2 h-12 px-5 rounded-full
               bg-maize-bright text-navy-deep
@@ -66,7 +66,7 @@ export default function SuspendedPage() {
             "
           >
             <Mail size={16} />
-            Email help@wroomly.com
+            Email delghu@umich.edu
           </a>
           <SignOutButton />
         </div>

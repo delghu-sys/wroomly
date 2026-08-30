@@ -151,7 +151,7 @@ export default function PrivacyPage() {
             <h2>Contact</h2>
             <p>
               Privacy questions go to{' '}
-              <a href="mailto:privacy@wroomly.com">privacy@wroomly.com</a>. For
+              <a href="mailto:delghu@umich.edu">delghu@umich.edu</a>. For
               the broader user agreement, see our{' '}
               <Link href="/terms">Terms of Service</Link>.
             </p>
