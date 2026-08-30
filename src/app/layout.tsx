@@ -1,16 +1,13 @@
 import type { Metadata } from 'next'
-import { Syne, Instrument_Sans, Geist_Mono } from 'next/font/google'
+import { Syne, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { Analytics } from '@vercel/analytics/next'
 import { JsonLd, siteJsonLd } from '@/components/seo/JsonLd'
 
-const body = Instrument_Sans({
-  variable: '--font-body',
-  subsets: ['latin'],
-  display: 'swap',
-})
-
+// The body/UI font is Satoshi, served from Fontshare (it is not on Google
+// Fonts, so next/font/google can't load it). The <link> lives in <head> below
+// and the family itself is declared once, as --font-body in globals.css.
 const display = Syne({
   variable: '--font-display',
   subsets: ['latin'],
@@ -93,8 +90,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${body.variable} ${display.variable} ${mono.variable} h-full antialiased`}
+      className={`${display.variable} ${mono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <JsonLd data={siteJsonLd()} />
         {children}

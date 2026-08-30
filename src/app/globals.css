@@ -107,6 +107,13 @@
 }
 
 :root {
+  /* Body/UI typeface. Declared here and nowhere else: --font-sans maps to it
+     in the @theme block above, so every `font-sans` utility (and the `body`
+     base rule) follows this one line. --font-display and --font-geist-mono
+     still come from next/font in layout.tsx and are untouched. */
+  --font-body: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+
   /* Editorial palette — warm cream, U-M navy, maize */
   --background: oklch(0.985 0.006 85);
   --foreground: oklch(0.18 0.025 255);
@@ -223,6 +230,9 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+    /* Satoshi's 500 is the intended UI weight — denser than its 400 without
+       reading as bold. Anything with an explicit weight utility keeps it. */
+    font-weight: 500;
   }
   ::selection {
     background-color: var(--maize);
@@ -243,6 +253,14 @@
   .font-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.035em;
+  }
+  /* Headings previously inherited body's 400. Now that body is 500, they would
+     have silently thickened, so pin display type back to the 400 it has always
+     rendered at. Wrapped in :where() for zero specificity, so every explicit
+     weight utility (font-light, font-semibold, …) still wins as before — this
+     only catches display type that was relying on inheritance. */
+  :where(.font-display) {
+    font-weight: 400;
   }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
