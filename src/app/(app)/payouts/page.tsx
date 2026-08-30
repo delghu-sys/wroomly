@@ -9,6 +9,7 @@ import type { Transaction, User } from '@/types/database'
 import { fetchConnectStatus } from '@/lib/stripe'
 import { PayoutAccountCard } from '@/components/payments/PayoutAccountCard'
 import { PAYMENTS_ENABLED } from '@/lib/config'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'Payouts' }
 
@@ -145,15 +146,12 @@ export default async function PayoutsPage() {
       <div className="animate-fade-up delay-150">
         <h2 className="font-display text-lg font-semibold text-ink mb-4">Transaction history</h2>
         {transactions.length === 0 ? (
-          <div className="text-center py-16 rounded-3xl border border-dashed border-line bg-surface/60">
-            <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <p className="font-display text-2xl text-ink">No transactions yet</p>
-            <p className="text-sm text-ink-muted mt-2 max-w-sm mx-auto">
-              When students book your listings, payments will appear here.
-            </p>
-          </div>
+          <EmptyState
+            icon={<Wallet className="w-6 h-6" strokeWidth={1.75} />}
+            title="No transactions"
+            accent="yet."
+            description="When students book your listings, payments will appear here."
+          />
         ) : (
           <div className="stagger-reveal space-y-2">
             {transactions.map(t => {

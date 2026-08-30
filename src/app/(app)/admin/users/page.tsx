@@ -6,8 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { AdminUserActions } from '@/components/admin/AdminUserActions'
 import { format, parseISO } from 'date-fns'
-import { Search, ShieldCheck, Ban } from 'lucide-react'
+import { Ban, Search, ShieldCheck, Users } from 'lucide-react'
 import type { User } from '@/types/database'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'Admin — Users' }
 
@@ -114,9 +115,12 @@ export default async function AdminUsersPage({
       </div>
 
       {users.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="font-medium text-gray-600">No users match those filters</p>
-        </div>
+        <EmptyState
+          size="sm"
+          icon={<Users className="w-5 h-5" strokeWidth={1.75} />}
+          title="No users match those filters"
+          description="Try a different role or verification filter."
+        />
       ) : (
         <div className="bg-white border rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
