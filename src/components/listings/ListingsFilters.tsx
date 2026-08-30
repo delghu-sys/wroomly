@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
-import { SlidersHorizontal } from '@phosphor-icons/react/dist/ssr'
+import { SlidersHorizontal } from 'lucide-react'
 import { useFilterNavigation } from './FilterTransition'
 
 interface ListingsFiltersProps {
@@ -112,7 +112,6 @@ export function ListingsFilters({
           <div className="w-7 h-7 rounded-lg bg-maize-bright/12 flex items-center justify-center">
             <SlidersHorizontal
               size={14}
-              weight="bold"
               className="text-gold-deep"
             />
           </div>

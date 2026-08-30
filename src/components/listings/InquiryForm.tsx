@@ -6,8 +6,7 @@ import type { ListingWithDetails } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { PAYMENTS_ENABLED } from '@/lib/config'
-import { CheckCircle2, CreditCard, MessageSquare, Send, Loader2 } from 'lucide-react'
-import { PaperPlaneTilt, UserPlus } from '@phosphor-icons/react/dist/ssr'
+import { CheckCircle2, CreditCard, Loader2, MessageSquare, Send, UserPlus } from 'lucide-react'
 import { InquiryModal } from './InquiryModal'
 import { getListingImageUrl } from '@/lib/utils/listing'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
@@ -71,7 +70,7 @@ export function InquiryForm({
         <MagneticLinkCta
           href={`/sign-in?next=/listings/${listing.id}`}
           variant="primary"
-          icon={<PaperPlaneTilt size={16} weight="fill" className="-rotate-12" />}
+          icon={<Send size={16} fill="currentColor" className="-rotate-12" />}
         >
           Sign in to inquire
         </MagneticLinkCta>
@@ -79,7 +78,7 @@ export function InquiryForm({
           href="/sign-up"
           variant="ghost"
           size="sm"
-          icon={<UserPlus size={15} weight="duotone" />}
+          icon={<UserPlus size={15} />}
         >
           Create account
         </MagneticLinkCta>

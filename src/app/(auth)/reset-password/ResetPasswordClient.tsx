@@ -8,8 +8,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
-import { AlertCircle } from 'lucide-react'
-import { CheckCircle, LockKey } from '@phosphor-icons/react/dist/ssr'
+import { AlertCircle, CheckCircle2, LockKeyhole } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
@@ -115,7 +114,7 @@ export default function ResetPasswordClient() {
                 className="inline-flex w-11 h-11 rounded-2xl items-center justify-center shadow-glow-success"
                 style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
               >
-                <CheckCircle size={20} weight="duotone" />
+                <CheckCircle2 size={20} />
               </div>
               <p className="font-display text-xl tracking-tight text-ink mt-4 leading-tight">
                 Password updated.
@@ -163,7 +162,7 @@ export default function ResetPasswordClient() {
                   loading={isSubmitting}
                   disabled={hasSession === false}
                 >
-                  <LockKey size={16} weight="duotone" className="mr-1" />
+                  <LockKeyhole size={16} className="mr-1" />
                   Save new password
                 </AuthSubmitButton>
               </div>

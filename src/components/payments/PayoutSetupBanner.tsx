@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
+import { AlertTriangle, ArrowRight } from 'lucide-react'
 import type { ConnectStatus } from '@/lib/fees'
 
 interface PayoutSetupBannerProps {
@@ -40,7 +40,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
             color: 'var(--maize-bright)',
           }}
         >
-          <Warning size={18} weight="duotone" />
+          <AlertTriangle size={18} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -56,7 +56,6 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
 
         <ArrowRight
           size={18}
-          weight="bold"
           className="shrink-0 text-ink-muted transition-all duration-300 group-hover:text-gold-deep group-hover:translate-x-0.5"
         />
       </div>

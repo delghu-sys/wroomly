@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import Link from 'next/link'
-import { CalendarBlank, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
+import { Calendar, ShieldCheck } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
 import { PAYMENTS_ENABLED } from '@/lib/config'
@@ -132,7 +132,7 @@ export function BookingSidebar({
                     color: 'var(--maize-bright)',
                   }}
                 >
-                  <CalendarBlank size={16} weight="duotone" />
+                  <Calendar size={16} />
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-[0.18em] text-ink-muted font-semibold">
@@ -159,7 +159,6 @@ export function BookingSidebar({
                 <div className="pt-3 mt-1 flex items-center justify-center gap-1.5 border-t border-line/70">
                   <ShieldCheck
                     size={13}
-                    weight="duotone"
                     className="text-gold-deep shrink-0"
                   />
                   <p className="text-[11.5px] text-ink-muted leading-snug tracking-tight">

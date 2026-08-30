@@ -1,6 +1,6 @@
 'use client'
 
-import { SealCheck, GraduationCap, User, Check } from '@phosphor-icons/react/dist/ssr'
+import { BadgeCheck, Check, GraduationCap, User } from 'lucide-react'
 
 /**
  * The "Are you a University of Michigan student?" choice, as two clear cards
@@ -74,7 +74,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
                 }}
                 aria-hidden
               >
-                <Check size={13} weight="bold" />
+                <Check size={13} />
               </span>
             )}
             <div className="flex items-start gap-3.5 pr-7">
@@ -87,7 +87,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
                       : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-[#2F6BFF] group-hover:text-white'
                 }`}
               >
-                <Icon size={22} weight={active ? 'fill' : 'duotone'} />
+                <Icon size={22} fill={active ? 'currentColor' : 'none'} />
               </span>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display text-[17px] tracking-tight text-ink leading-snug">
@@ -103,7 +103,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
                       : 'bg-[oklch(0.97_0.008_75)] text-ink-soft'
                   }`}
                 >
-                  {opt.accent && <SealCheck size={12} weight="fill" />}
+                  {opt.accent && <BadgeCheck size={12} />}
                   {opt.badge}
                 </span>
               </div>

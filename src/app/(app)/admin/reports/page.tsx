@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { format, parseISO } from 'date-fns'
-import { Flag, ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeft, Flag } from 'lucide-react'
 import type { Report, User } from '@/types/database'
 import { EmptyState } from '@/components/brand/EmptyState'
 
@@ -59,7 +59,7 @@ export default async function AdminReportsPage() {
         href="/admin"
         className="inline-flex items-center gap-1.5 text-sm text-ink-muted hover:text-ink mb-6 transition-colors"
       >
-        <ArrowLeft size={14} weight="bold" />
+        <ArrowLeft size={14} />
         Back to admin
       </Link>
 
@@ -78,7 +78,7 @@ export default async function AdminReportsPage() {
 
       {reports.length === 0 ? (
         <EmptyState
-          icon={<Flag size={22} weight="duotone" />}
+          icon={<Flag size={22} />}
           title="No reports right now"
           description="New reports from listing flags, message complaints, or user reports will land here."
         />

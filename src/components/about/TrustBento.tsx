@@ -2,22 +2,17 @@
 
 import { useRef, useState, useCallback } from 'react'
 import { motion, useInView } from 'motion/react'
-import {
-  ShieldCheck,
-  Robot,
-  Lock,
-  Flag,
-} from '@phosphor-icons/react/dist/ssr'
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+import { Bot, Flag, Lock, ShieldCheck } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const ITEMS: { icon: PhosphorIcon; title: string; body: string }[] = [
+const ITEMS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: ShieldCheck,
     title: 'Verified U-M accounts',
     body: 'Sign in with your @umich.edu Google account and you get a blue check on your profile and your listings, so the other side can see you are a real U-M student.',
   },
   {
-    icon: Robot,
+    icon: Bot,
     title: 'Every listing reviewed',
     body: 'An AI moderator scans each new listing for scams, off-platform contact, and discriminatory language. Borderline cases go to a human admin before they go live.',
   },
@@ -40,7 +35,7 @@ function Tile({
   index,
   inView,
 }: {
-  icon: PhosphorIcon
+  icon: LucideIcon
   title: string
   body: string
   index: number
@@ -101,7 +96,7 @@ function Tile({
             group-hover:scale-110
           "
         >
-          <Icon size={22} weight="duotone" />
+          <Icon size={22} />
         </div>
         <h3 className="font-display text-xl sm:text-2xl tracking-tight text-ink mb-3 leading-tight">
           {title}

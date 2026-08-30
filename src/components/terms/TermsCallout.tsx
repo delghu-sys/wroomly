@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Warning } from '@phosphor-icons/react/dist/ssr'
+import { AlertTriangle } from 'lucide-react'
 
 interface TermsCalloutProps {
   title: string
@@ -39,7 +39,7 @@ export function TermsCallout({ title, children }: TermsCalloutProps) {
             color: 'var(--maize-bright)',
           }}
         >
-          <Warning size={18} weight="duotone" />
+          <AlertTriangle size={18} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10.5px] uppercase tracking-[0.18em] text-[oklch(0.32_0.10_85)] font-semibold">

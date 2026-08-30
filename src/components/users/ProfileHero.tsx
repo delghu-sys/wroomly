@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MapPin, CalendarBlank, Crown } from '@phosphor-icons/react/dist/ssr'
+import { Calendar, Crown, MapPin } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { VerifiedBadge } from './VerifiedBadge'
 import { StarRating } from './StarRating'
@@ -112,7 +112,7 @@ export function ProfileHero({
             <span
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-navy-deep text-white"
             >
-              <Crown size={11} weight="fill" />
+              <Crown size={11} fill="currentColor" />
               Admin
             </span>
           )}
@@ -127,12 +127,12 @@ export function ProfileHero({
         >
           {university && (
             <p className="inline-flex items-center gap-1.5">
-              <MapPin size={14} weight="duotone" />
+              <MapPin size={14} />
               {university}
             </p>
           )}
           <p className="inline-flex items-center gap-1.5">
-            <CalendarBlank size={14} weight="duotone" />
+            <Calendar size={14} />
             On Wroomly since {format(parseISO(createdAt), 'MMM yyyy')}
           </p>
         </motion.div>

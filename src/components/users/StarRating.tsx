@@ -1,4 +1,4 @@
-import { Star } from '@phosphor-icons/react/dist/ssr'
+import { Star } from 'lucide-react'
 
 interface StarRatingProps {
   /** Rating value 0–5 (supports halves). */
@@ -41,7 +41,6 @@ export function StarRating({
               {/* Empty (outline) */}
               <Star
                 size={size}
-                weight="regular"
                 style={{ color: 'oklch(0.70 0.02 92 / 0.50)' }}
                 className="absolute inset-0"
               />
@@ -53,7 +52,7 @@ export function StarRating({
                 >
                   <Star
                     size={size}
-                    weight="fill"
+                    fill="currentColor"
                     style={{ color: 'var(--maize-bright)' }}
                   />
                 </span>

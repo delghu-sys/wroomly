@@ -1,4 +1,4 @@
-import { SealCheck } from '@phosphor-icons/react/dist/ssr'
+import { BadgeCheck } from 'lucide-react'
 
 /**
  * The blue "UMich verified" check. Shown ONLY for accounts whose is_verified is
@@ -30,15 +30,16 @@ export function VerifiedBadge({
       <span
         className={`inline-flex items-center gap-1 rounded-full bg-[oklch(0.55_0.22_264/0.10)] px-2 py-0.5 text-[11px] font-semibold text-[#2F6BFF] ${className}`}
       >
-        <SealCheck size={size} weight="fill" style={{ color: BLUE }} aria-hidden />
+        <BadgeCheck size={size} fill="currentColor" stroke="white" style={{ color: BLUE }} aria-hidden />
         UMich verified
       </span>
     )
   }
   return (
-    <SealCheck
+    <BadgeCheck
       size={size}
-      weight="fill"
+      fill="currentColor"
+      stroke="white"
       style={{ color: BLUE }}
       className={`inline-block shrink-0 align-middle ${className}`}
       aria-label="UMich verified"

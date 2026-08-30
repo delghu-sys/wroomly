@@ -3,7 +3,7 @@
 import { useRef, type ReactNode } from 'react'
 import Link from 'next/link'
 import { motion, useMotionValue, useSpring } from 'motion/react'
-import { ArrowRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight } from 'lucide-react'
 
 interface MagneticLinkCtaProps {
   href: string
@@ -119,7 +119,6 @@ export function MagneticLinkCta({
           {showArrowResolved && (
             <ArrowRight
               size={15}
-              weight="bold"
               className="transition-transform duration-300 group-hover:translate-x-0.5"
             />
           )}

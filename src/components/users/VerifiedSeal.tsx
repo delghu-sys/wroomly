@@ -1,4 +1,4 @@
-import { SealCheck } from '@phosphor-icons/react/dist/ssr'
+import { BadgeCheck } from 'lucide-react'
 
 interface VerifiedSealProps {
   size?: number
@@ -8,7 +8,7 @@ interface VerifiedSealProps {
 }
 
 /**
- * Animated maize verified seal (Phosphor SealCheck).
+ * Animated maize verified seal (Phosphor BadgeCheck).
  * Pure CSS animation — server-renderable; muted automatically by the
  * `prefers-reduced-motion` rules in globals.css.
  */
@@ -26,9 +26,10 @@ export function VerifiedSeal({
           aria-hidden
         />
       )}
-      <SealCheck
+      <BadgeCheck
         size={size}
-        weight="fill"
+        fill="currentColor"
+        stroke="var(--navy-deep)"
         style={{ color: 'var(--maize-bright)' }}
         className="relative"
       />

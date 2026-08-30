@@ -7,7 +7,7 @@ import type {
   Review,
   ListingWithDetails,
 } from '@/types/database'
-import { Star, House, Notepad } from '@phosphor-icons/react/dist/ssr'
+import { Home, NotebookPen, Star } from 'lucide-react'
 import { ProfileHero } from '@/components/users/ProfileHero'
 import { SocialPill } from '@/components/users/SocialPill'
 import { ProfileEmpty } from '@/components/users/ProfileEmpty'
@@ -172,7 +172,7 @@ export default async function UserProfilePage({
                   </p>
                 ) : (
                   <ProfileEmpty
-                    icon={<Notepad size={36} weight="duotone" />}
+                    icon={<NotebookPen size={36} />}
                     title="No bio yet."
                     accent="Just vibes."
                     body="This student hasn't written a bio. You can still message them about a listing — Wroomly keeps replies and reputation public."
@@ -208,7 +208,7 @@ export default async function UserProfilePage({
                   <UserListingsStrip listings={listings} />
                 ) : (
                   <ProfileEmpty
-                    icon={<House size={36} weight="duotone" />}
+                    icon={<Home size={36} />}
                     title="No active listings"
                     accent="right now."
                     body={
@@ -267,7 +267,7 @@ export default async function UserProfilePage({
                   <ReviewList reviews={reviews} />
                 ) : (
                   <ProfileEmpty
-                    icon={<Star size={36} weight="duotone" />}
+                    icon={<Star size={36} />}
                     title="Reviews appear here"
                     accent="after a stay."
                     body="Once a booking wraps up, both sides leave a public review. Reputation makes the next match easier for everyone."

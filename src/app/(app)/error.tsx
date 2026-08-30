@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { motion } from 'motion/react'
-import { ArrowClockwise, House } from '@phosphor-icons/react/dist/ssr'
+import { Home, RotateCw } from 'lucide-react'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
@@ -80,7 +80,7 @@ export default function AppError({ error, reset }: ErrorProps) {
               aria-hidden
             />
             <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-maize-bright transition-colors duration-500">
-              <ArrowClockwise size={16} weight="bold" />
+              <RotateCw size={16} />
               Try again
             </span>
           </button>
@@ -89,7 +89,7 @@ export default function AppError({ error, reset }: ErrorProps) {
             variant="ghost"
             tone="dark"
             size="sm"
-            icon={<House size={15} weight="duotone" />}
+            icon={<Home size={15} />}
           >
             Go home
           </MagneticLinkCta>

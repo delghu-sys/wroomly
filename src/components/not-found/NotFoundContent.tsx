@@ -1,4 +1,4 @@
-import { House, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
+import { Home, Search } from 'lucide-react'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
@@ -59,7 +59,7 @@ export function NotFoundContent() {
               <MagneticLinkCta
                 href="/listings"
                 variant="primary"
-                icon={<MagnifyingGlass size={16} weight="bold" />}
+                icon={<Search size={16} />}
               >
                 Browse listings
               </MagneticLinkCta>
@@ -68,7 +68,7 @@ export function NotFoundContent() {
                 variant="ghost"
                 tone="dark"
                 size="sm"
-                icon={<House size={15} weight="duotone" />}
+                icon={<Home size={15} />}
               >
                 Go home
               </MagneticLinkCta>

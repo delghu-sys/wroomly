@@ -2,7 +2,29 @@
 
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring } from 'motion/react'
-import { InstagramLogo, ArrowUpRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowUpRight } from 'lucide-react'
+
+/* Lucide no longer ships brand glyphs; this is the classic Instagram mark
+   drawn in the same 24-grid / 2px-stroke style so it sits flush with the
+   rest of the icon set. */
+function InstagramGlyph({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  )
+}
 
 interface SocialPillProps {
   /** Currently supports Instagram. Add more variants as the schema grows. */
@@ -64,15 +86,10 @@ export function SocialPill({ network, handle }: SocialPillProps) {
         aria-hidden
       />
       <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-navy-deep transition-colors duration-500">
-        <InstagramLogo
-          size={16}
-          weight="duotone"
-          className="shrink-0"
-        />
+        <InstagramGlyph className="w-4 h-4 shrink-0" />
         <span>@{cleanHandle}</span>
         <ArrowUpRight
           size={13}
-          weight="bold"
           className="opacity-50 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
         />
       </span>

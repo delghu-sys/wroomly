@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { SealCheck, X } from '@phosphor-icons/react/dist/ssr'
+import { BadgeCheck, X } from 'lucide-react'
 
 /**
  * Optional, dismissible nudge shown above the listing wizard for suppliers who
@@ -45,7 +45,7 @@ export function VerifyBadgeNudge() {
         <X size={16} />
       </button>
       <div className="flex items-start gap-3 pr-6">
-        <SealCheck size={22} weight="fill" style={{ color: '#2F6BFF' }} className="mt-0.5 shrink-0" />
+        <BadgeCheck size={22} fill="currentColor" stroke="white" style={{ color: '#2F6BFF' }} className="mt-0.5 shrink-0" />
         <div className="min-w-0">
           <p className="font-semibold text-ink text-[14.5px]">
             Add the blue check to your listing
@@ -63,7 +63,7 @@ export function VerifyBadgeNudge() {
             disabled={loading}
             className="mt-3 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#2F6BFF] text-white font-semibold text-[13px] transition-all hover:brightness-110 disabled:opacity-60 active:scale-[0.98]"
           >
-            <SealCheck size={15} weight="fill" />
+            <BadgeCheck size={15} fill="currentColor" stroke="#2F6BFF" />
             {loading ? 'Redirecting…' : 'Verify with UMich Google'}
           </button>
           {error && <p className="mt-2 text-[12px] text-[oklch(0.55_0.20_25)]">{error}</p>}

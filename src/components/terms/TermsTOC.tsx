@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { CaretDown } from '@phosphor-icons/react/dist/ssr'
+import { ChevronDown } from 'lucide-react'
 
 export interface TocEntry {
   id: string
@@ -151,9 +151,8 @@ export function TermsTOC({ entries }: TermsTOCProps) {
             </span>
             <span className="truncate">{activeEntry?.title}</span>
           </span>
-          <CaretDown
+          <ChevronDown
             size={14}
-            weight="bold"
             className={`text-ink-muted shrink-0 transition-transform duration-300 ${
               mobileOpen ? 'rotate-180' : ''
             }`}

@@ -1,4 +1,4 @@
-import { EnvelopeSimple, ArrowUpRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowUpRight, Mail } from 'lucide-react'
 
 /**
  * Bottom-of-page contact card replacing the raw `mailto:` anchor.
@@ -35,7 +35,7 @@ export function TermsContactCard() {
             color: 'var(--maize-bright)',
           }}
         >
-          <EnvelopeSimple size={20} weight="duotone" />
+          <Mail size={20} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10.5px] uppercase tracking-[0.18em] text-ink-muted font-semibold">
@@ -50,7 +50,6 @@ export function TermsContactCard() {
         </div>
         <ArrowUpRight
           size={18}
-          weight="bold"
           className="
             shrink-0 text-ink-muted
             transition-all duration-300
