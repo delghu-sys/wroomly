@@ -67,7 +67,7 @@ export function MagneticLinkCta({
     'bg-maize-bright text-navy-deep shadow-glow-maize hover:shadow-glow-maize-strong'
 
   const ghostLight =
-    'bg-white text-ink-soft border border-line shadow-1 hover:shadow-2 hover:border-maize-bright/40'
+    'bg-surface text-ink-soft border border-line shadow-1 hover:shadow-2 hover:border-maize-bright/40'
 
   const ghostDark =
     'bg-white/[0.05] backdrop-blur-md text-white/85 border border-white/[0.15] hover:bg-white/[0.10] hover:border-maize-bright/45'

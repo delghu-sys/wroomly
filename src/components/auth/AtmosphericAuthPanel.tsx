@@ -7,7 +7,6 @@ import { LogoMark } from '@/components/brand/Logo'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
 import { LiveBadge } from '@/components/brand/LiveBadge'
-import { RotatingTestimonial, type Testimonial } from './RotatingTestimonial'
 
 interface AtmosphericAuthPanelProps {
   /** First line of the headline */
@@ -18,8 +17,6 @@ interface AtmosphericAuthPanelProps {
   accentWords?: string[]
   /** Subhead body copy */
   subhead: string
-  /** Optional rotating testimonial list. */
-  testimonials?: Testimonial[]
 }
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
@@ -33,14 +30,13 @@ const TRUST_ITEMS = [
 /**
  * The reusable left-side atmospheric panel for /sign-in and /sign-up.
  * Mesh + noise + brand copy + live trust badges + optional rotating
- * testimonial — matching the homepage hero atmosphere.
+ * matching the homepage hero atmosphere.
  */
 export function AtmosphericAuthPanel({
   headline1,
   headline2,
   accentWords,
   subhead,
-  testimonials,
 }: AtmosphericAuthPanelProps) {
   return (
     <div className="relative lg:w-[48%] xl:w-[45%] overflow-hidden flex flex-col justify-between p-8 sm:p-12 lg:p-16 min-h-[40vh] lg:min-h-[100dvh] isolate">
@@ -61,7 +57,7 @@ export function AtmosphericAuthPanel({
         </Link>
       </motion.div>
 
-      {/* Middle — headline + trust badges + testimonial */}
+      {/* Middle — headline + trust badges */}
       <div className="relative z-10 my-auto py-12 lg:py-0 space-y-9">
         <div>
           <h1 className="font-display text-[clamp(2.4rem,5vw,3.75rem)] tracking-tight leading-[1.02] text-white">
@@ -93,10 +89,6 @@ export function AtmosphericAuthPanel({
           ))}
         </div>
 
-        {/* Rotating testimonial */}
-        {testimonials && testimonials.length > 0 && (
-          <RotatingTestimonial testimonials={testimonials} />
-        )}
       </div>
 
       {/* Bottom — fine print */}

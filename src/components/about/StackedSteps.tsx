@@ -124,10 +124,6 @@ function Step({
                 className="absolute inset-0 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-3"
                 style={{ boxShadow: 'var(--shadow-edge), var(--shadow-3)' }}
               />
-              <div
-                className="absolute -top-8 -right-8 w-44 h-44 rounded-full blur-3xl opacity-50"
-                style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-              />
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="font-display text-[8rem] leading-none tracking-tighter text-navy-deep italic font-light">
                   {n}

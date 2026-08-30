@@ -1,5 +1,5 @@
 /**
- * Server-safe atmospheric background — dark navy mesh + noise overlay.
+ * Server-safe atmospheric background — dark navy base + noise overlay.
  * Matches the homepage hero / CTA section treatment.
  *
  * Use as the first child of a `relative isolate overflow-hidden` section
@@ -12,13 +12,13 @@ const NOISE_SVG =
 interface AtmosphericBackgroundProps {
   /** Background base color — defaults to homepage dark navy */
   base?: string
-  /** Slightly different mesh layout flavor */
+  /** Accepted for call-site compatibility; the variants only differed in
+      their decorative mesh blobs, which are gone. */
   variant?: 'hero' | 'panel' | 'auth'
 }
 
 export function AtmosphericBackground({
   base = 'var(--navy-deep)',
-  variant = 'hero',
 }: AtmosphericBackgroundProps) {
   return (
     <>
@@ -40,64 +40,6 @@ export function AtmosphericBackground({
         }}
         aria-hidden
       />
-
-      {/* Mesh gradients — three blobs, position varies by variant.
-          Mobile gets half-size blobs with half the blur radius: raster cost
-          of a gaussian blur scales with area × radius, and the full-size
-          blobs took seconds to paint on a throttled phone CPU. Halving both
-          keeps the visual proportions on a small screen. */}
-      {variant === 'hero' && (
-        <>
-          <div
-            className="absolute top-[-10%] left-[5%] w-[350px] h-[350px] sm:w-[700px] sm:h-[700px] rounded-full blur-[70px] sm:blur-[140px] opacity-30 -z-10 animate-float-slow"
-            style={{ background: 'oklch(0.22 0.06 265)' }}
-            aria-hidden
-          />
-          <div
-            className="absolute bottom-[5%] right-[10%] w-[250px] h-[250px] sm:w-[500px] sm:h-[500px] rounded-full blur-[60px] sm:blur-[120px] opacity-15 -z-10 animate-float"
-            style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-            aria-hidden
-          />
-          <div
-            className="absolute top-[40%] right-[30%] w-[150px] h-[150px] sm:w-[300px] sm:h-[300px] rounded-full blur-[50px] sm:blur-[100px] opacity-10 -z-10"
-            style={{ background: 'oklch(0.50 0.10 280)' }}
-            aria-hidden
-          />
-        </>
-      )}
-      {variant === 'panel' && (
-        <>
-          <div
-            className="absolute -top-20 left-[12%] w-[420px] h-[420px] rounded-full blur-3xl opacity-30 -z-10 animate-float"
-            style={{ background: 'color-mix(in oklab, var(--maize-bright) 25%, transparent)' }}
-            aria-hidden
-          />
-          <div
-            className="absolute bottom-0 right-[8%] w-[520px] h-[520px] rounded-full blur-3xl opacity-25 -z-10 animate-float-slow"
-            style={{ background: 'oklch(0.50 0.10 280 / 0.5)' }}
-            aria-hidden
-          />
-        </>
-      )}
-      {variant === 'auth' && (
-        <>
-          <div
-            className="absolute -top-32 -left-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-45 -z-10 animate-float"
-            style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-            aria-hidden
-          />
-          <div
-            className="absolute bottom-[-10%] right-[-10%] w-[560px] h-[560px] rounded-full blur-[140px] opacity-25 -z-10 animate-float-slow"
-            style={{ background: 'oklch(0.45 0.10 280 / 0.55)' }}
-            aria-hidden
-          />
-          <div
-            className="absolute top-[35%] right-[25%] w-[260px] h-[260px] rounded-full blur-[100px] opacity-15 -z-10"
-            style={{ background: 'oklch(0.22 0.06 265)' }}
-            aria-hidden
-          />
-        </>
-      )}
     </>
   )
 }

@@ -60,7 +60,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
                 active && opt.accent
                   ? 'bg-[oklch(0.55_0.22_264/0.06)] border-[2px] border-[#2F6BFF] focus-visible:ring-[oklch(0.55_0.22_264/0.20)]'
                   : active
-                    ? 'bg-white border-[2px] border-navy focus-visible:ring-navy-deep/18'
+                    ? 'bg-surface border-[2px] border-navy focus-visible:ring-navy-deep/18'
                     : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-[oklch(0.55_0.22_264/0.40)] focus-visible:ring-[oklch(0.55_0.22_264/0.15)]'
               }
             `}

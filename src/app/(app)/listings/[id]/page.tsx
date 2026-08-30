@@ -433,7 +433,7 @@ export default async function ListingDetailPage({
                 ].map(({ icon: Icon, label, value }) => (
                   <div
                     key={label}
-                    className="rounded-2xl p-4 border border-line bg-white"
+                    className="rounded-2xl p-4 border border-line bg-surface"
                   >
                     <div className="w-9 h-9 rounded-xl bg-maize-bright/12 text-gold-deep flex items-center justify-center mb-3">
                       <Icon className="w-4 h-4" strokeWidth={1.75} />

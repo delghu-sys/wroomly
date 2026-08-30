@@ -133,7 +133,7 @@ export function SavedSearchRow({ search }: SavedSearchRowProps) {
             ${
               alertsOn
                 ? 'bg-[oklch(0.55_0.15_142/0.15)] text-[oklch(0.35_0.13_142)] border border-[oklch(0.55_0.15_142/0.40)]'
-                : 'bg-white border border-line text-ink-muted hover:text-ink'
+                : 'bg-surface border border-line text-ink-muted hover:text-ink'
             }
           `}
         >

@@ -130,16 +130,6 @@ export default async function UserProfilePage({
   return (
     <div className="relative min-h-[calc(100dvh-4rem)] bg-[oklch(0.985_0.006_85)] overflow-hidden">
       {/* Very subtle ambient mesh */}
-      <div
-        className="pointer-events-none absolute -top-32 right-[-10%] w-[640px] h-[640px] rounded-full blur-[140px] opacity-25"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -bottom-40 -left-20 w-[520px] h-[520px] rounded-full blur-[140px] opacity-15"
-        style={{ background: 'oklch(0.45 0.10 280 / 0.30)' }}
-        aria-hidden
-      />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,360px)_1fr] gap-8 lg:gap-12">

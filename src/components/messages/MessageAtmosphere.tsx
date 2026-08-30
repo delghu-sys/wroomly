@@ -28,17 +28,6 @@ export function MessageAtmosphere() {
         }}
         aria-hidden
       />
-      {/* Two soft mesh blobs */}
-      <div
-        className="absolute -top-32 -right-20 w-[420px] h-[420px] rounded-full blur-[120px] opacity-[0.18] -z-10"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-        aria-hidden
-      />
-      <div
-        className="absolute -bottom-20 -left-32 w-[480px] h-[480px] rounded-full blur-[140px] opacity-[0.10] -z-10"
-        style={{ background: 'oklch(0.45 0.10 280 / 0.30)' }}
-        aria-hidden
-      />
     </>
   )
 }

@@ -140,7 +140,7 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
             </AvatarFallback>
           </Avatar>
           {/* Listing thumbnail — small rounded square at bottom-right */}
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md overflow-hidden ring-2 ring-background bg-white">
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md overflow-hidden ring-2 ring-background bg-surface">
             {listingThumbnail ? (
               <Image
                 src={listingThumbnail}

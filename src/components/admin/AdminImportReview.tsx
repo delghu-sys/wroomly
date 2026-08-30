@@ -14,7 +14,7 @@ interface AdminImportReviewProps {
 
 const labelCls = 'block text-[12px] font-medium text-ink-soft mb-1'
 const inputCls =
-  'w-full rounded-lg border border-line bg-white px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-maize-bright/30 focus:border-gold-deep'
+  'w-full rounded-lg border border-line bg-surface px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-maize-bright/30 focus:border-gold-deep'
 
 export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminImportReviewProps) {
   const router = useRouter()
@@ -163,7 +163,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
           <p className={labelCls}>Amenities</p>
           <div className="flex flex-wrap gap-1.5">
             {draft.amenities.map(a => (
-              <span key={a} className="inline-flex px-2.5 py-1 rounded-full text-[12px] bg-white border border-line text-ink-soft">{a}</span>
+              <span key={a} className="inline-flex px-2.5 py-1 rounded-full text-[12px] bg-surface border border-line text-ink-soft">{a}</span>
             ))}
           </div>
         </div>

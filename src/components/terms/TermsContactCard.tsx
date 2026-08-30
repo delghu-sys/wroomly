@@ -21,11 +21,6 @@ export function TermsContactCard() {
         boxShadow: 'var(--shadow-edge), var(--shadow-2)',
       }}
     >
-      <div
-        className="pointer-events-none absolute -top-20 -right-12 w-60 h-60 rounded-full blur-3xl opacity-30"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-        aria-hidden
-      />
 
       <div className="relative flex items-center gap-4">
         <div

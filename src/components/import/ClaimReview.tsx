@@ -57,7 +57,7 @@ function Badge({ label }: { label: SourceLabel }) {
 
 const labelCls = 'flex items-center gap-2 text-[13px] font-medium text-ink-soft mb-1.5'
 const inputCls =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
+  'w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
 
 export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
   const router = useRouter()
@@ -349,7 +349,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           <p className={labelCls}>Amenities <Badge label={attribution.buildingAmenities ?? 'UNKNOWN'} /></p>
           <div className="flex flex-wrap gap-1.5">
             {draft.amenities.map(a => (
-              <span key={a} className="inline-flex px-2.5 py-1 rounded-full text-[12px] bg-white border border-line text-ink-soft">{a}</span>
+              <span key={a} className="inline-flex px-2.5 py-1 rounded-full text-[12px] bg-surface border border-line text-ink-soft">{a}</span>
             ))}
           </div>
         </div>

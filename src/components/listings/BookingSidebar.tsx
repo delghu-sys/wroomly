@@ -57,17 +57,6 @@ export function BookingSidebar({
             'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 28px 70px color-mix(in oklab, var(--maize-bright) 22%, transparent), 0 8px 24px color-mix(in oklab, var(--navy-deep) 6%, transparent)',
         }}
       >
-        {/* Subtle gold mesh */}
-        <div
-          className="pointer-events-none absolute -top-24 -right-16 w-72 h-72 rounded-full blur-3xl opacity-35"
-          style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-24 -left-20 w-64 h-64 rounded-full blur-3xl opacity-20"
-          style={{ background: 'oklch(0.45 0.10 280 / 0.30)' }}
-          aria-hidden
-        />
 
         <div className="relative p-6 space-y-5">
           {closed ? (

@@ -46,11 +46,6 @@ export function DealClosedSystemCard({
           boxShadow: 'var(--shadow-edge), var(--shadow-glow-success)',
         }}
       >
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl opacity-50"
-          style={{ background: 'oklch(0.55 0.15 142 / 0.25)' }}
-          aria-hidden
-        />
 
         <div className="relative p-5 text-center">
           <motion.div

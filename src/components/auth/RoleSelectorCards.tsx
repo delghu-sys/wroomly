@@ -80,7 +80,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
               focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
               ${
                 active
-                  ? 'bg-white border-[2px] border-gold-deep shadow-glow-maize'
+                  ? 'bg-surface border-[2px] border-gold-deep shadow-glow-maize'
                   : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-maize-bright/40 hover:shadow-2'
               }
             `}
@@ -93,17 +93,6 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                 : undefined
             }
           >
-            {/* Active highlight blob */}
-            {active && (
-              <motion.div
-                layoutId="role-active-glow"
-                transition={spring}
-                className="absolute -top-16 -right-12 w-56 h-56 rounded-full blur-3xl opacity-50 pointer-events-none"
-                style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-                aria-hidden
-              />
-            )}
-
             {/* Selected checkmark badge — top-right, spring pop-in */}
             <AnimatePresence>
               {active && (

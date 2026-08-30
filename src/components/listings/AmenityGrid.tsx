@@ -101,7 +101,7 @@ export function AmenityGrid({ amenities }: AmenityGridProps) {
             }}
             className="
               group flex items-center gap-3
-              px-4 py-3 rounded-2xl bg-white border border-line
+              px-4 py-3 rounded-2xl bg-surface border border-line
               hover:border-maize-bright/40
               hover:shadow-2
               transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]

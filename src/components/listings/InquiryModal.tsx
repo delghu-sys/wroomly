@@ -286,18 +286,13 @@ export function InquiryModal({
               relative w-full h-[100dvh] sm:h-auto sm:max-w-xl sm:max-h-[92dvh]
               flex flex-col overflow-hidden
               rounded-none sm:rounded-3xl
-              bg-white sm:border sm:border-line
+              bg-surface sm:border sm:border-line
               shadow-none sm:shadow-glow-navy-strong
             "
             role="dialog"
             aria-modal="true"
           >
             {/* Gold mesh accent */}
-            <div
-              className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full blur-3xl opacity-30"
-              style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-              aria-hidden
-            />
 
             <AnimatePresence mode="wait">
               {phase === 'form' ? (

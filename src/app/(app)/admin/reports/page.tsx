@@ -20,7 +20,7 @@ const STATUS_TONES: Record<string, string> = {
   open: 'text-[oklch(0.55_0.15_25)] border-[oklch(0.85_0.10_25)] bg-[oklch(0.97_0.04_25)]',
   reviewing: 'text-[oklch(0.50_0.15_75)] border-[oklch(0.85_0.10_75)] bg-[oklch(0.97_0.04_75)]',
   resolved: 'text-[oklch(0.40_0.13_142)] border-[oklch(0.85_0.10_142)] bg-[oklch(0.97_0.04_142)]',
-  dismissed: 'text-ink-muted border-line bg-white',
+  dismissed: 'text-ink-muted border-line bg-surface',
 }
 
 export default async function AdminReportsPage() {
@@ -87,7 +87,7 @@ export default async function AdminReportsPage() {
           {reports.map(r => (
             <li
               key={r.id}
-              className="rounded-2xl border border-line bg-white px-5 py-4"
+              className="rounded-2xl border border-line bg-surface px-5 py-4"
             >
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div>

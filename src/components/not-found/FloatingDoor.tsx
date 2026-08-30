@@ -31,10 +31,6 @@ export const FloatingDoor = memo(function FloatingDoor() {
           style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.10), var(--shadow-overlay)' }}
         >
           {/* Gold accent corner glow */}
-          <div
-            className="pointer-events-none absolute -top-12 -right-10 w-52 h-52 rounded-full blur-3xl opacity-50"
-            style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-          />
 
           {/* Door icon — gentle floating spring */}
           <motion.div

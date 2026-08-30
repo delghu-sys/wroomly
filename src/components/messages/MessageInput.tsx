@@ -90,7 +90,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
               onClick={() => setValue(v => (v ? v + ' ' + prompt : prompt))}
               className="
                 inline-flex items-center px-2.5 py-1 rounded-full
-                bg-white border border-line
+                bg-surface border border-line
                 text-[11px] font-medium text-ink-soft
                 hover:border-maize-bright/50 hover:text-ink
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -122,7 +122,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
             disabled={disabled || sending}
             className="
               w-full resize-none rounded-3xl
-              bg-white border border-line
+              bg-surface border border-line
               px-4 py-3 text-[14.5px] leading-[22px] text-ink
               placeholder:text-ink-muted/65
               focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { LogoMark } from '@/components/brand/Logo'
-import { Sparkles, PencilLine, ArrowRight } from 'lucide-react'
+import { Camera, PencilLine, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'List your place | Wroomly',
@@ -42,16 +42,6 @@ export default async function StartListingPage() {
   return (
     <div className="relative isolate overflow-hidden min-h-dvh flex flex-col bg-background">
       {/* ── Atmospheric background (cream-tuned) ─────────────────────────── */}
-      <div
-        className="absolute top-[-12%] right-[-8%] w-[620px] h-[620px] rounded-full blur-[130px] -z-10 animate-float-slow"
-        style={{ background: 'oklch(0.86 0.17 92 / 0.22)' }}
-        aria-hidden
-      />
-      <div
-        className="absolute bottom-[-10%] left-[-6%] w-[520px] h-[520px] rounded-full blur-[110px] -z-10 animate-float"
-        style={{ background: 'color-mix(in oklab, var(--navy-deep) 6%, transparent)' }}
-        aria-hidden
-      />
       <div
         className="absolute top-[42%] left-[40%] w-[300px] h-[300px] rounded-full blur-[90px] -z-10"
         style={{ background: 'oklch(0.50 0.11 280 / 0.04)' }}
@@ -141,7 +131,7 @@ export default async function StartListingPage() {
                   boxShadow: 'var(--shadow-glow-navy)',
                 }}
               >
-                <Sparkles className="w-5 h-5" strokeWidth={2} />
+                <Camera className="w-5 h-5" strokeWidth={2} />
               </span>
 
               <h2 className="font-display font-bold text-ink tracking-[-0.035em] mt-5 text-[1.1875rem]">
@@ -166,7 +156,7 @@ export default async function StartListingPage() {
             {/* Card B — Manual */}
             <Link
               href={manualHref}
-              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-3xl border-[1.5px] border-border bg-white p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-navy-deep/18 hover:shadow-3"
+              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-3xl border-[1.5px] border-border bg-surface p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-navy-deep/18 hover:shadow-3"
               style={{ animationDelay: '0.53s' }}
             >
               <span className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-lg bg-[oklch(0.96_0.008_85)] text-ink-soft transition-all duration-300 group-hover:scale-[1.06] group-hover:rotate-[-3deg] group-hover:bg-navy-deep group-hover:text-maize">

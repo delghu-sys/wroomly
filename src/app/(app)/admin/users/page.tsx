@@ -68,27 +68,27 @@ export default async function AdminUsersPage({
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-          <p className="text-sm text-gray-500 mt-1">{users.length} {users.length === 1 ? 'user' : 'users'}</p>
+          <h1 className="font-display text-3xl tracking-tight text-ink">Users</h1>
+          <p className="text-sm text-ink-muted mt-1">{users.length} {users.length === 1 ? 'user' : 'users'}</p>
         </div>
       </div>
 
       {/* Filters */}
       <form action="/admin/users" className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
           <input
             type="text"
             name="q"
             defaultValue={q ?? ''}
             placeholder="Search by name, email, or university…"
-            className="w-full h-9 pl-9 pr-3 rounded-lg border border-gray-200 bg-white text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            className="w-full h-9 pl-9 pr-3 rounded-lg border border-line bg-surface text-sm outline-none focus:border-navy focus:ring-2 focus:ring-navy-soft"
           />
           {role && <input type="hidden" name="role" value={role} />}
         </div>
         <button
           type="submit"
-          className="h-9 px-4 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+          className="h-9 px-4 rounded-lg bg-navy-deep text-maize-bright text-sm font-medium hover:bg-navy-deep/90"
         >
           Search
         </button>
@@ -105,7 +105,7 @@ export default async function AdminUsersPage({
               key={tab.value}
               href={href}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                active ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                active ? 'bg-navy-deep text-maize-bright' : 'bg-surface text-ink-soft hover:bg-navy-soft'
               }`}
             >
               {tab.label}
@@ -122,9 +122,9 @@ export default async function AdminUsersPage({
           description="Try a different role or verification filter."
         />
       ) : (
-        <div className="bg-white border rounded-2xl overflow-hidden">
+        <div className="bg-surface border rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+            <thead className="bg-navy-soft/40 text-ink-muted text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-5 py-3 font-medium">User</th>
                 <th className="text-left px-5 py-3 font-medium">University</th>
@@ -145,33 +145,33 @@ export default async function AdminUsersPage({
                 const isMe = u.id === user.id
 
                 return (
-                  <tr key={u.id} className="border-t border-gray-100 hover:bg-gray-50/60">
+                  <tr key={u.id} className="border-t border-line hover:bg-navy-soft/30">
                     <td className="px-5 py-3">
                       <Link href={`/users/${u.id}`} className="flex items-center gap-3 group">
                         <Avatar className="h-9 w-9">
                           <AvatarImage src={u.avatar_url ?? undefined} />
-                          <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                          <AvatarFallback className="text-xs bg-navy-soft text-navy">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-900 truncate group-hover:underline">
+                          <p className="font-medium text-ink truncate group-hover:underline">
                             {u.full_name ?? '—'}
                           </p>
-                          <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                          <p className="text-xs text-ink-muted truncate">{u.email}</p>
                         </div>
                       </Link>
                     </td>
-                    <td className="px-5 py-3 text-gray-600">{u.university ?? '—'}</td>
+                    <td className="px-5 py-3 text-ink-soft">{u.university ?? '—'}</td>
                     <td className="px-5 py-3">
                       <Badge
                         variant="outline"
                         className={
                           u.user_type === 'admin'
-                            ? 'border-blue-300 text-blue-700'
+                            ? 'border-navy/30 text-navy'
                             : u.user_type === 'supplier'
                               ? 'border-emerald-300 text-emerald-700'
-                              : 'border-gray-300 text-gray-600'
+                              : 'border-line text-ink-soft'
                         }
                       >
                         {u.user_type}
@@ -184,15 +184,15 @@ export default async function AdminUsersPage({
                             <Ban className="w-3 h-3" /> Suspended
                           </span>
                         ) : u.is_verified ? (
-                          <span className="inline-flex items-center gap-1 text-xs text-blue-600">
+                          <span className="inline-flex items-center gap-1 text-xs text-[#2F6BFF]">
                             <ShieldCheck className="w-3 h-3" /> Verified
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-400">Unverified</span>
+                          <span className="text-xs text-ink-muted">Unverified</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-gray-500 text-xs whitespace-nowrap">
+                    <td className="px-5 py-3 text-ink-muted text-xs whitespace-nowrap">
                       {format(parseISO(u.created_at), 'MMM d, yyyy')}
                     </td>
                     <td className="px-5 py-3 text-right">
@@ -204,7 +204,7 @@ export default async function AdminUsersPage({
                           isVerified={u.is_verified}
                         />
                       )}
-                      {isMe && <span className="text-xs text-gray-400">You</span>}
+                      {isMe && <span className="text-xs text-ink-muted">You</span>}
                     </td>
                   </tr>
                 )
