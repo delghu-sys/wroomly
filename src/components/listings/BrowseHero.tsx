@@ -2,14 +2,14 @@ import { Sparkles } from 'lucide-react'
 import { WordReveal } from '@/components/brand/WordReveal'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { ListingsSearch } from './ListingsSearch'
-import { ListingsViewToggle } from './ListingsViewToggle'
+import { ListingsViewToggle, type BrowseView } from './ListingsViewToggle'
 import { FilterPills } from './FilterPills'
 
 interface BrowseHeroProps {
   totalCount: number
   currentQuery?: string
   filters: Record<string, string | undefined>
-  view: 'grid' | 'map'
+  view: BrowseView
 }
 
 /**
