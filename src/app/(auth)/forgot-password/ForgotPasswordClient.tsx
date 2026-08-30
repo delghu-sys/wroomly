@@ -7,8 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/client'
-import { AlertCircle } from 'lucide-react'
-import { EnvelopeSimple, CheckCircle } from '@phosphor-icons/react/dist/ssr'
+import { AlertCircle, CheckCircle2, Mail } from 'lucide-react'
 import { AtmosphericAuthPanel } from '@/components/auth/AtmosphericAuthPanel'
 import { BrandFormInput } from '@/components/auth/BrandFormInput'
 import { AuthSubmitButton } from '@/components/auth/AuthSubmitButton'
@@ -86,7 +85,7 @@ export default function ForgotPasswordClient() {
                 className="inline-flex w-11 h-11 rounded-2xl items-center justify-center shadow-glow-success"
                 style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
               >
-                <CheckCircle size={20} weight="duotone" />
+                <CheckCircle2 size={20} />
               </div>
               <p className="font-display text-xl tracking-tight text-ink mt-4 leading-tight">
                 Check your inbox.
@@ -143,9 +142,8 @@ export default function ForgotPasswordClient() {
 
               <div className="pt-2">
                 <AuthSubmitButton loading={isSubmitting}>
-                  <EnvelopeSimple
+                  <Mail
                     size={16}
-                    weight="duotone"
                     className="mr-1"
                   />
                   Send reset link

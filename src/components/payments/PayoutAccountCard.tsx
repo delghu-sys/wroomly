@@ -1,9 +1,4 @@
-import {
-  ShieldCheck,
-  Warning,
-  Bank,
-  ArrowSquareOut,
-} from '@phosphor-icons/react/dist/ssr'
+import { AlertTriangle, ExternalLink, Landmark, ShieldCheck } from 'lucide-react'
 import type { ConnectStatus } from '@/lib/fees'
 import { ConnectStripeButton } from './ConnectStripeButton'
 
@@ -30,7 +25,7 @@ export function PayoutAccountCard({
         : 'neutral'
 
   const Icon =
-    tone === 'success' ? ShieldCheck : tone === 'warn' ? Warning : Bank
+    tone === 'success' ? ShieldCheck : tone === 'warn' ? AlertTriangle : Landmark
 
   const eyebrow =
     status === 'active'
@@ -89,7 +84,7 @@ export function PayoutAccountCard({
           className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center shadow-2"
           style={{ background: tileBg, color: tileFg }}
         >
-          <Icon size={20} weight="duotone" />
+          <Icon size={20} />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -117,9 +112,8 @@ export function PayoutAccountCard({
         <div className="shrink-0 inline-flex items-center gap-2">
           <ConnectStripeButton status={status} variant="solid" />
           {status === 'active' && (
-            <ArrowSquareOut
+            <ExternalLink
               size={14}
-              weight="bold"
               className="text-ink-muted/70 hidden sm:inline-block"
               aria-hidden
             />

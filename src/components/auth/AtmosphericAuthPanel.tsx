@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { ShieldCheck, ChatCircleDots, Tag } from '@phosphor-icons/react/dist/ssr'
+import { MessageCircle, ShieldCheck, Tag } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { WordReveal } from '@/components/brand/WordReveal'
@@ -23,7 +23,7 @@ const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
 const TRUST_ITEMS = [
   { Icon: ShieldCheck, text: 'UMich blue-check verification' },
-  { Icon: ChatCircleDots, text: 'Private in-app messaging' },
+  { Icon: MessageCircle, text: 'Private in-app messaging' },
   { Icon: Tag, text: 'Free to list & browse' },
 ] as const
 
@@ -81,7 +81,7 @@ export function AtmosphericAuthPanel({
           {TRUST_ITEMS.map(({ Icon, text }, i) => (
             <LiveBadge
               key={text}
-              icon={<Icon size={14} weight="duotone" />}
+              icon={<Icon size={14} />}
               delay={0.8 + i * 0.1}
             >
               {text}

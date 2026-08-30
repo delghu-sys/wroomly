@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Warning, EnvelopeSimple } from '@phosphor-icons/react/dist/ssr'
+import { AlertTriangle, Mail } from 'lucide-react'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 import { SignOutButton } from './SignOutButton'
 
@@ -27,7 +27,7 @@ export default function SuspendedPage() {
             color: 'oklch(0.10 0.05 75)',
           }}
         >
-          <Warning size={24} weight="duotone" />
+          <AlertTriangle size={24} />
         </div>
 
         <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-maize-bright font-semibold">
@@ -65,7 +65,7 @@ export default function SuspendedPage() {
               focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
             "
           >
-            <EnvelopeSimple size={16} weight="duotone" />
+            <Mail size={16} />
             Email help@wroomly.com
           </a>
           <SignOutButton />

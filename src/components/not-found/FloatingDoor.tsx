@@ -2,7 +2,7 @@
 
 import { memo } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { Door, Keyhole } from '@phosphor-icons/react/dist/ssr'
+import { DoorOpen, KeyRound } from 'lucide-react'
 
 /**
  * Decorative floating door + keyhole motif for the 404 page.
@@ -32,7 +32,7 @@ export const FloatingDoor = memo(function FloatingDoor() {
         >
           {/* Gold accent corner glow */}
 
-          {/* Door icon — gentle floating spring */}
+          {/* DoorOpen icon — gentle floating spring */}
           <motion.div
             initial={prefersReducedMotion ? false : { y: 12, rotate: -2 }}
             animate={
@@ -47,9 +47,8 @@ export const FloatingDoor = memo(function FloatingDoor() {
             }
             className="absolute inset-0 flex items-center justify-center"
           >
-            <Door
+            <DoorOpen
               size={104}
-              weight="duotone"
               style={{ color: 'var(--maize-bright)' }}
             />
           </motion.div>
@@ -69,9 +68,8 @@ export const FloatingDoor = memo(function FloatingDoor() {
             }
             className="absolute top-6 right-6"
           >
-            <Keyhole
+            <KeyRound
               size={20}
-              weight="duotone"
               className="text-white/40"
             />
           </motion.div>

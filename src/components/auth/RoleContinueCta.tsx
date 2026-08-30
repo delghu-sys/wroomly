@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react'
-import { ArrowRight } from '@phosphor-icons/react/dist/ssr'
+import { ArrowRight } from 'lucide-react'
 import type { Role } from './RoleSelectorCards'
 
 interface RoleContinueCtaProps {
@@ -82,7 +82,6 @@ export function RoleContinueCta({ selected, onContinue }: RoleContinueCtaProps) 
               {label}
               <ArrowRight
                 size={16}
-                weight="bold"
                 className="transition-transform duration-300 group-hover:translate-x-0.5"
               />
             </span>

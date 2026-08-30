@@ -2,28 +2,8 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'motion/react'
-import {
-  WifiHigh,
-  Barbell,
-  WashingMachine,
-  Wind,
-  Archive,
-  Drop,
-  Elevator,
-  Car,
-  ForkKnife,
-  Buildings,
-  Flame,
-  PawPrint,
-  Lightning,
-  Television,
-  Bathtub,
-  Bicycle,
-  Lock,
-  TreePalm,
-  Couch,
-} from '@phosphor-icons/react/dist/ssr'
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+import { Archive, ArrowUpDown, Bath, Bike, Building2, Car, Droplet, Dumbbell, Flame, Lock, Palmtree, PawPrint, Sofa, Tv, Utensils, WashingMachine, Wifi, Wind, Zap } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface AmenityGridProps {
   amenities: string[]
@@ -32,12 +12,12 @@ interface AmenityGridProps {
 /**
  * Map an amenity label to a Phosphor glyph using the keyword table from the
  * design spec. Anything we don't recognise falls through to a neutral
- * `Couch` icon.
+ * `Sofa` icon.
  */
-function iconFor(label: string): PhosphorIcon {
+function iconFor(label: string): LucideIcon {
   const k = label.toLowerCase()
-  if (k.includes('wifi') || k.includes('internet')) return WifiHigh
-  if (k.includes('gym') || k.includes('fitness')) return Barbell
+  if (k.includes('wifi') || k.includes('internet')) return Wifi
+  if (k.includes('gym') || k.includes('fitness')) return Dumbbell
   if (k.includes('laundry') || k.includes('washer') || k.includes('dryer'))
     return WashingMachine
   if (
@@ -49,16 +29,16 @@ function iconFor(label: string): PhosphorIcon {
     return Wind
   if (k.includes('storage') || k.includes('closet')) return Archive
   if (k.includes('pool') || k.includes('hot tub') || k.includes('jacuzzi'))
-    return Drop
-  if (k.includes('elevator') || k.includes('lift')) return Elevator
+    return Droplet
+  if (k.includes('elevator') || k.includes('lift')) return ArrowUpDown
   if (k.includes('parking') || k.includes('garage')) return Car
-  if (k.includes('dishwasher') || k.includes('kitchen')) return ForkKnife
+  if (k.includes('dishwasher') || k.includes('kitchen')) return Utensils
   if (
     k.includes('rooftop') ||
     k.includes('roof deck') ||
     k.includes('terrace')
   )
-    return Buildings
+    return Building2
   if (
     k.includes('heat') ||
     k.includes('fireplace') ||
@@ -66,14 +46,14 @@ function iconFor(label: string): PhosphorIcon {
   )
     return Flame
   if (k.includes('pet')) return PawPrint
-  if (k.includes('util') || k.includes('electric')) return Lightning
-  if (k.includes('tv') || k.includes('cable')) return Television
-  if (k.includes('bath')) return Bathtub
-  if (k.includes('bike')) return Bicycle
+  if (k.includes('util') || k.includes('electric')) return Zap
+  if (k.includes('tv') || k.includes('cable')) return Tv
+  if (k.includes('bath')) return Bath
+  if (k.includes('bike')) return Bike
   if (k.includes('secur') || k.includes('door')) return Lock
   if (k.includes('yard') || k.includes('patio') || k.includes('balcon'))
-    return TreePalm
-  return Couch
+    return Palmtree
+  return Sofa
 }
 
 export function AmenityGrid({ amenities }: AmenityGridProps) {
@@ -116,7 +96,7 @@ export function AmenityGrid({ amenities }: AmenityGridProps) {
                 group-hover:scale-110 group-hover:-rotate-[4deg]
               "
             >
-              <Icon size={20} weight="duotone" />
+              <Icon size={20} />
             </div>
             <span className="text-sm text-ink-soft leading-snug">{amenity}</span>
           </motion.div>

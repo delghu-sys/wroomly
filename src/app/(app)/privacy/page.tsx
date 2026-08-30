@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
-import { ShieldCheck } from '@phosphor-icons/react/dist/ssr'
+import { ShieldCheck } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
               color: 'var(--maize-bright)',
             }}
           >
-            <ShieldCheck size={18} weight="duotone" />
+            <ShieldCheck size={18} />
           </div>
           <div>
             <p className="text-[10.5px] uppercase tracking-[0.18em] text-[oklch(0.32_0.10_85)] font-semibold">

@@ -4,8 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
-import { Calendar, BedDouble, CheckCircle2, XCircle, Loader2, PartyPopper, Bell } from 'lucide-react'
-import { Warning, ArrowRight } from '@phosphor-icons/react/dist/ssr'
+import { AlertTriangle, ArrowRight, BedDouble, Bell, Calendar, CheckCircle2, Loader2, PartyPopper, XCircle } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
 import type { InquiryStatus } from '@/types/database'
@@ -268,7 +267,7 @@ export function InquiryPinnedCard({
                 color: 'var(--maize-bright)',
               }}
             >
-              <Warning size={16} weight="duotone" />
+              <AlertTriangle size={16} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[10.5px] uppercase tracking-[0.18em] font-semibold text-[oklch(0.32_0.10_85)]">
@@ -286,7 +285,7 @@ export function InquiryPinnedCard({
                   underline-offset-4 hover:underline transition-colors
                 "
               >
-                Set up payouts <ArrowRight size={13} weight="bold" />
+                Set up payouts <ArrowRight size={13} />
               </Link>
             </div>
           </div>

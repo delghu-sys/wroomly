@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { SignOut } from '@phosphor-icons/react/dist/ssr'
-import { Loader2 } from 'lucide-react'
+import { Loader2, LogOut } from 'lucide-react'
 
 export function SignOutButton() {
   const router = useRouter()
@@ -34,7 +33,7 @@ export function SignOutButton() {
         disabled:opacity-60 disabled:cursor-not-allowed
       "
     >
-      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <SignOut size={16} weight="duotone" />}
+      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut size={16} />}
       Sign out
     </button>
   )

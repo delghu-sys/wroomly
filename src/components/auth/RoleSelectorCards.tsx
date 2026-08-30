@@ -1,13 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'motion/react'
-import {
-  House,
-  MagnifyingGlass,
-  Check,
-  ShieldCheck,
-  EnvelopeOpen,
-} from '@phosphor-icons/react/dist/ssr'
+import { Check, Home, MailOpen, Search, ShieldCheck } from 'lucide-react'
 
 export type Role = 'supplier' | 'consumer'
 
@@ -21,7 +15,7 @@ const popSpring = { type: 'spring' as const, stiffness: 240, damping: 16 }
 
 interface RoleDef {
   value: Role
-  icon: typeof House
+  icon: typeof Home
   title: string
   body: string
   badge: string
@@ -31,7 +25,7 @@ interface RoleDef {
 const ROLES: RoleDef[] = [
   {
     value: 'supplier',
-    icon: House,
+    icon: Home,
     title: 'I have a place',
     body: 'Subletting your apartment or room near U of M.',
     badge: 'Any email accepted',
@@ -39,11 +33,11 @@ const ROLES: RoleDef[] = [
   },
   {
     value: 'consumer',
-    icon: MagnifyingGlass,
+    icon: Search,
     title: 'I need a place',
     body: 'Student from another university looking for housing near U of M.',
     badge: 'Any email accepted',
-    badgeIcon: EnvelopeOpen,
+    badgeIcon: MailOpen,
   },
 ]
 
@@ -108,7 +102,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   }}
                   aria-hidden
                 >
-                  <Check size={14} weight="bold" />
+                  <Check size={14} />
                 </motion.span>
               )}
             </AnimatePresence>
@@ -130,7 +124,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   }
                 `}
               >
-                <Icon size={24} weight={active ? 'fill' : 'duotone'} />
+                <Icon size={24} fill={active ? 'currentColor' : 'none'} />
               </motion.div>
 
               <div className="flex-1 min-w-0 pr-8">
@@ -151,7 +145,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                     }
                   `}
                 >
-                  <BadgeIcon size={11} weight="bold" />
+                  <BadgeIcon size={11} />
                   {role.badge}
                 </span>
               </div>

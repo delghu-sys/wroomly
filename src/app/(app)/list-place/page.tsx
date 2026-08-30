@@ -4,8 +4,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
-import { PaperPlaneTilt } from '@phosphor-icons/react/dist/ssr'
-import { Home, Mail } from 'lucide-react'
+import { Home, Mail, Send } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'List your place',
@@ -89,7 +88,7 @@ export default async function ListPlacePage() {
           <MagneticLinkCta
             href="/sign-up?as=supplier&next=/listings/new"
             variant="primary"
-            icon={<PaperPlaneTilt size={16} weight="fill" className="-rotate-12" />}
+            icon={<Send size={16} fill="currentColor" className="-rotate-12" />}
           >
             Create a supplier account
           </MagneticLinkCta>

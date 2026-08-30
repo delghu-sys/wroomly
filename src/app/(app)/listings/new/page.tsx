@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ListingWizard } from '@/components/listings/ListingWizard'
 import { VerifyBadgeNudge } from '@/components/listings/VerifyBadgeNudge'
-import { House, EnvelopeOpen, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
+import { Home, MailOpen, Search } from 'lucide-react'
 import { MagneticLinkCta } from '@/components/brand/MagneticLinkCta'
 
 export const metadata: Metadata = { title: 'List Your Place' }
@@ -48,7 +48,7 @@ export default async function NewListingPage() {
                 color: 'var(--maize-bright)',
               }}
             >
-              <House size={22} weight="duotone" />
+              <Home size={22} />
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl tracking-tight text-ink leading-[1.05] mt-6">
@@ -64,9 +64,8 @@ export default async function NewListingPage() {
             </p>
 
             <div className="mt-6 flex items-start gap-3 px-4 py-3 rounded-2xl bg-maize-bright/8 border border-maize-bright/25">
-              <EnvelopeOpen
+              <MailOpen
                 size={18}
-                weight="duotone"
                 className="text-gold-deep mt-0.5 shrink-0"
               />
               <p className="text-[13.5px] text-ink-soft leading-relaxed">
@@ -82,7 +81,7 @@ export default async function NewListingPage() {
               <MagneticLinkCta
                 href="/listings"
                 variant="primary"
-                icon={<MagnifyingGlass size={15} weight="bold" />}
+                icon={<Search size={15} />}
               >
                 Browse listings instead
               </MagneticLinkCta>
