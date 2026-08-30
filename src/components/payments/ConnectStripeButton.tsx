@@ -48,12 +48,12 @@ export function ConnectStripeButton({
       if (data.url) {
         window.location.href = data.url
       } else {
-        toast.error(data.error ?? 'Could not start Stripe — please try again.')
+        toast.error(data.error ?? 'Could not start Stripe. Please try again.')
         setLoading(false)
         router.refresh()
       }
     } catch {
-      toast.error('Network error — please try again.')
+      toast.error('Network error. Please try again.')
       setLoading(false)
     }
   }

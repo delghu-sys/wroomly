@@ -112,7 +112,7 @@ export function SavedSearchRow({ search }: SavedSearchRowProps) {
           </div>
         ) : (
           <p className="text-[12px] text-ink-muted italic">
-            All listings — no filters applied
+            All listings, no filters applied
           </p>
         )}
         <p className="text-[11px] text-ink-muted mt-2">

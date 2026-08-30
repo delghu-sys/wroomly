@@ -67,7 +67,7 @@ export default function TermsPage() {
           </div>
           <p className="mt-7 text-base sm:text-lg text-white/70 leading-relaxed max-w-2xl">
             The plain-English layout of the legal agreement between you and
-            Wroomly. The text below is the binding version — we&rsquo;ve given
+            Wroomly. The text below is the binding version. We&rsquo;ve given
             it visual hierarchy, not new wording.
           </p>
         </div>
@@ -146,7 +146,7 @@ export default function TermsPage() {
             </TermsSection>
 
             {/* §3 — CALLOUT */}
-            <TermsSection id="s3" n="3" title="Sublets and Lease Compliance — Supplier Representations & Assumption of Risk">
+            <TermsSection id="s3" n="3" title="Sublets and Lease Compliance: Supplier Representations & Assumption of Risk">
               <p>
                 If you post a Listing as a Supplier, you represent and warrant,
                 on each occasion you post or update a Listing and on each
@@ -469,7 +469,7 @@ export default function TermsPage() {
                 jurisdiction of those courts.
               </p>
 
-              <TermsCallout title="Disputes are individual — no class actions.">
+              <TermsCallout title="Disputes are individual. No class actions.">
                 <p>
                   Before filing a lawsuit, the parties agree to attempt in good
                   faith to resolve any dispute informally for at least thirty

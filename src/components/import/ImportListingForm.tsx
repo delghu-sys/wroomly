@@ -246,7 +246,7 @@ export function ImportListingForm() {
             Add photos of your place
           </h2>
           <p className="text-[14px] text-ink-soft mt-1.5 leading-relaxed">
-            Upload photos of the room or apartment — plus screenshots of your existing
+            Upload photos of the room or apartment, plus screenshots of your existing
             post (Facebook, GroupMe, Reddit…) or a PDF of your lease/flyer if you have
             one. That’s all Wroomly needs to draft your listing.
           </p>
@@ -359,7 +359,7 @@ export function ImportListingForm() {
         )}
       </button>
       <p className="text-[12px] text-ink-muted text-center -mt-4">
-        AI can make mistakes — you’ll review everything before anything goes live.
+        AI can make mistakes. You’ll review everything before anything goes live.
       </p>
     </form>
   )
@@ -428,7 +428,7 @@ function FileField({
         <Upload className={large ? 'w-8 h-8 text-gold-deep' : 'w-5 h-5 text-ink-muted'} />
         <span className={large ? 'text-[15px] font-medium text-ink' : 'text-[13px] text-ink-soft'}>
           {files.length > 0
-            ? `${files.length} file${files.length === 1 ? '' : 's'} added — tap to add more`
+            ? `${files.length} file${files.length === 1 ? '' : 's'} added. Tap to add more`
             : large
               ? 'Tap to add photos, screenshots & PDFs'
               : 'Tap to choose files'}

@@ -38,7 +38,7 @@ export default async function ProfilePage() {
           How others <span className="italic font-light text-navy">see you.</span>
         </h1>
         <p className="text-ink-muted mt-2">
-          Keep your details up to date — verified profiles get more responses.
+          Keep your details up to date. Verified profiles get more responses.
         </p>
       </div>
       <div className="animate-fade-up delay-100">

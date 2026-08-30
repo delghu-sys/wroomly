@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = {
   title: 'Saved searches',
-  description: 'Filter combos you saved on Wroomly — and the email alerts for them.',
+  description: 'Filter combos you saved on Wroomly, and the email alerts for them.',
 }
 
 export default async function SavedSearchesPage() {

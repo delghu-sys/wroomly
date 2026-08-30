@@ -71,8 +71,8 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               fontSize: 16,
             }}
           >
-            A page-level error stopped the app from rendering. Reload the page
-            — if it keeps happening, mail us at{' '}
+            A page-level error stopped the app from rendering. Reload the page.
+            If it keeps happening, mail us at{' '}
             <a
               href="mailto:help@wroomly.com"
               style={{

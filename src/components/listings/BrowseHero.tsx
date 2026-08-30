@@ -54,7 +54,7 @@ export function BrowseHero({ totalCount, currentQuery, filters, view }: BrowseHe
           style={{ animationDelay: '0.55s' }}
         >
           Sublets near U&nbsp;of&nbsp;M, with a blue check on the students who
-          verified. Filter by neighborhood, dates, price — the right listing is a
+          verified. Filter by neighborhood, dates, price. The right listing is a
           couple of clicks away.
         </p>
 

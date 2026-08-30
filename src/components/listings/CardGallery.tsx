@@ -55,7 +55,7 @@ export function CardGallery({
         // Arrow keys scroll a focused overflow container natively.
         tabIndex={multi ? 0 : undefined}
         role={multi ? 'group' : undefined}
-        aria-label={multi ? `${alt} — ${images.length} photos, use arrow keys` : undefined}
+        aria-label={multi ? `${alt}, ${images.length} photos, use arrow keys` : undefined}
         className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
         style={{ scrollbarWidth: 'none' }}
       >

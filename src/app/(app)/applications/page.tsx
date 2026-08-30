@@ -50,7 +50,7 @@ export default async function ApplicationsPage() {
           icon={<MessageSquare className="w-6 h-6" strokeWidth={1.75} />}
           title="No applications"
           accent="yet."
-          description="Find a place you like and send an inquiry — the conversation starts there."
+          description="Find a place you like and send an inquiry. The conversation starts there."
           action={{ label: 'Browse listings', href: '/listings' }}
         />
       ) : (

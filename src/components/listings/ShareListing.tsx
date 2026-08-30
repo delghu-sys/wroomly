@@ -53,7 +53,7 @@ export function ShareListing({ listingId, title, priceLabel }: ShareListingProps
     } catch (err) {
       // AbortError = user closed the sheet; not a failure worth surfacing.
       if ((err as Error)?.name !== 'AbortError') {
-        toast.error('Could not share the image — link copied instead.')
+        toast.error('Could not share the image. Link copied instead.')
         await copyLink(false)
       }
     } finally {
@@ -73,7 +73,7 @@ export function ShareListing({ listingId, title, priceLabel }: ShareListingProps
   async function copyLink(announce = true) {
     try {
       await navigator.clipboard.writeText(url)
-      if (announce) toast.success('Link copied — paste it anywhere.')
+      if (announce) toast.success('Link copied. Paste it anywhere.')
       track('share_completed', { method: 'copy_link', listingId })
     } catch {
       toast.error('Could not copy the link.')

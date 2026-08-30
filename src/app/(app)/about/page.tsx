@@ -161,7 +161,7 @@ export default function AboutPage() {
                 </span>
               </h2>
               <p className="mt-5 text-ink-soft leading-relaxed max-w-[55ch]">
-                We&rsquo;re a small platform on purpose — blue-check verification, reviewed
+                We&rsquo;re a small platform on purpose: blue-check verification, reviewed
                 listings, and conversations that never go off-platform.
               </p>
             </div>

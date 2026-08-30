@@ -43,12 +43,12 @@ export function PayoutAccountCard({
 
   const body =
     status === 'active'
-      ? 'Rent is routed to your bank on Stripe’s standard schedule — usually 2 business days after a booking clears. Manage payout schedule and bank info from your Stripe dashboard.'
+      ? 'Rent is routed to your bank on Stripe’s standard schedule, usually 2 business days after a booking clears. Manage payout schedule and bank info from your Stripe dashboard.'
       : status === 'incomplete'
         ? detailsSubmitted
           ? 'Stripe is verifying your info. If they ask for more, the link below will pick up where you left off.'
           : 'You started Express onboarding but didn’t finish. Finish the form to start accepting bookings.'
-        : 'It takes about five minutes — Stripe handles the legal and bank verification side. Wroomly never sees your bank account.'
+        : 'It takes about five minutes. Stripe handles the legal and bank verification side, and Wroomly never sees your bank account.'
 
   const tileBg =
     tone === 'success'

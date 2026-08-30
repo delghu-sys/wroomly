@@ -7,19 +7,19 @@ import { SUPPLY_ONLY_MODE } from '@/lib/config'
 // to bypass the root template and render exactly this string.
 export const metadata: Metadata = {
   title: {
-    absolute: 'Join Wroomly — Find or List Student Housing',
+    absolute: 'Join Wroomly: Find or List Student Housing',
   },
   description:
     'Sign up to sublet your U of M apartment, or find student housing in Ann Arbor.',
   openGraph: {
-    title: 'Join Wroomly — Find or List Student Housing',
+    title: 'Join Wroomly: Find or List Student Housing',
     description:
       'Sign up to sublet your U of M apartment, or find student housing in Ann Arbor.',
     images: ['/og-default.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Join Wroomly — Find or List Student Housing',
+    title: 'Join Wroomly: Find or List Student Housing',
     description:
       'Sign up to sublet your U of M apartment, or find student housing in Ann Arbor.',
     images: ['/og-default.png'],

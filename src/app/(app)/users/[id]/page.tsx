@@ -175,7 +175,7 @@ export default async function UserProfilePage({
                     icon={<NotebookPen size={36} />}
                     title="No bio yet."
                     accent="Just vibes."
-                    body="This student hasn't written a bio. You can still message them about a listing — Wroomly keeps replies and reputation public."
+                    body="This student hasn't written a bio. You can still message them about a listing. Wroomly keeps replies and reputation public."
                   />
                 )}
               </div>

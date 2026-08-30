@@ -47,7 +47,7 @@ export function InquiryActions({
       )
       router.refresh()
     } catch {
-      toast.error('Network error — please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setLoading(null)
     }
@@ -59,7 +59,7 @@ export function InquiryActions({
     return (
       <div className="flex items-center gap-3 flex-wrap">
         <p className="text-xs text-ink-muted leading-snug max-w-[34ch]">
-          Connect Stripe before accepting — that&rsquo;s where the rent
+          Connect Stripe before accepting. That&rsquo;s where the rent
           lands.
         </p>
         <Link

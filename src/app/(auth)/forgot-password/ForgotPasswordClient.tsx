@@ -66,7 +66,7 @@ export default function ForgotPasswordClient() {
               Send the reset link
             </h2>
             <p className="text-ink-soft mt-3 leading-relaxed">
-              Enter the email you signed up with — we’ll mail you a link to
+              Enter the email you signed up with. We’ll mail you a link to
               choose a new password.
             </p>
           </motion.div>

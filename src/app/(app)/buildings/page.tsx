@@ -7,12 +7,12 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Building2, ArrowRight, MapPin } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Ann Arbor Student Buildings — Sublets by Building | UMich Housing',
+  title: 'Ann Arbor Student Buildings: Sublets by Building | UMich Housing',
   description:
-    'Every major student apartment building near the University of Michigan — addresses, floor plans, amenities, and live sublets at Verve, Hub on Campus, Landmark, The Standard, and more.',
+    'Every major student apartment building near the University of Michigan: addresses, floor plans, amenities, and live sublets at Verve, Hub on Campus, Landmark, The Standard, and more.',
   alternates: { canonical: '/buildings' },
   openGraph: {
-    title: 'Ann Arbor Student Buildings — Sublets by Building | Wroomly',
+    title: 'Ann Arbor Student Buildings: Sublets by Building | Wroomly',
     description:
       'Addresses, floor plans, amenities, and live UMich sublets, building by building.',
     images: ['/og-default.png'],
@@ -56,8 +56,8 @@ export default function BuildingsIndexPage() {
           The buildings students actually sublet
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          The major student apartment buildings near the University of Michigan
-          — where they are, what they offer, and the live sublets posted at each
+          The major student apartment buildings near the University of Michigan:
+          where they are, what they offer, and the live sublets posted at each
           by verified @umich.edu students.
         </p>
       </header>
@@ -131,7 +131,7 @@ export default function BuildingsIndexPage() {
         <p className="mt-4 text-[12px] text-ink-muted leading-relaxed">
           Wroomly is an independent student marketplace, not affiliated with any
           building or the University of Michigan. Building details are compiled
-          from public sources and may change — confirm with the building
+          from public sources and may change. Confirm with the building
           directly.
         </p>
       </section>

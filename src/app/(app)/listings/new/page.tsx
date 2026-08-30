@@ -138,7 +138,7 @@ export default async function NewListingPage() {
             Already posted this sublet somewhere else?
           </p>
           <p className="text-[13px] text-ink-muted mt-0.5">
-            Paste your post or upload screenshots — we’ll draft it for you.
+            Paste your post or upload screenshots. We’ll draft it for you.
           </p>
         </div>
         <span className="shrink-0 inline-flex items-center gap-1 text-[13px] font-semibold text-navy group-hover:gap-2 transition-all">

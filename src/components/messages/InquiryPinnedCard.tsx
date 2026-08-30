@@ -87,11 +87,11 @@ export function InquiryPinnedCard({
         setClosing(false)
         return
       }
-      toast.success('Marked as taken — listing is off the market.')
+      toast.success('Marked as taken. The listing is off the market.')
       router.refresh()
       // Leave `closing` true; the refresh re-renders without the button.
     } catch {
-      toast.error('Network error — please try again.')
+      toast.error('Network error. Please try again.')
       setClosing(false)
     }
   }
@@ -105,14 +105,14 @@ export function InquiryPinnedCard({
       conversation_id: conversationId,
       sender_id: inquiry.consumer_id,
       content:
-        'Hey! I think we’ve got a deal — could you mark this place as taken on Wroomly so it comes off the market? 🙌',
+        'Hey! I think we’ve got a deal. Could you mark this place as taken on Wroomly so it comes off the market? 🙌',
     })
     if (error) {
       toast.error('Could not send. Please try again.')
       setNudged(false)
       return
     }
-    toast.success('Sent — asked the owner to confirm.')
+    toast.success('Sent! We asked the owner to confirm.')
   }
 
   async function decide(next: 'accepted' | 'rejected') {
@@ -139,7 +139,7 @@ export function InquiryPinnedCard({
         okResponse = true
       }
     } catch {
-      serverError = 'Network error — please try again.'
+      serverError = 'Network error. Please try again.'
     }
 
     if (!okResponse) {
@@ -274,8 +274,8 @@ export function InquiryPinnedCard({
                 Payout setup needed
               </p>
               <p className="text-[13.5px] text-ink-soft mt-0.5 leading-relaxed">
-                Connect Stripe before accepting — that&rsquo;s where the rent
-                lands. Takes about 5 minutes.
+                Connect Stripe before accepting. That&rsquo;s where the rent
+                lands, and it takes about 5 minutes.
               </p>
               <Link
                 href="/payouts"
@@ -371,7 +371,7 @@ export function InquiryPinnedCard({
               ) : (
                 <PartyPopper className="w-4 h-4" strokeWidth={2} />
               )}
-              {closing ? 'Closing…' : 'We made a deal — mark as taken'}
+              {closing ? 'Closing…' : 'We made a deal! Mark as taken'}
             </button>
             <p className="text-[11.5px] text-ink-muted mt-2 leading-snug text-center">
               Takes the listing off the market and declines other pending

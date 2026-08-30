@@ -309,7 +309,7 @@ export function MatchExperience() {
       track('match_alert_created')
       setScreen('done')
     } catch {
-      setError('Network error — please try again.')
+      setError('Network error. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -467,7 +467,7 @@ export function MatchExperience() {
 
               <p className="s-ask">Where should we send matches?</p>
               <p className="s-hint">
-                Ranked matches with an honest read on each — only when something genuinely
+                Ranked matches with an honest read on each, sent only when something genuinely
                 fits. You&rsquo;re also first in line when Wroomly opens to renters.
               </p>
 
@@ -584,7 +584,7 @@ function Intro({ onStart }: { onStart: () => void }) {
             actually looking for?
           </h1>
           <p className="intro-sub">
-            A few minutes with our housing concierge — it learns what actually matters to you,
+            A few minutes with our housing concierge. It learns what actually matters to you,
             then emails you ranked matches with an honest read on each. Free, always.
           </p>
           <button className="btn-start" onClick={onStart} aria-label="Start chatting with Wroomly Match">

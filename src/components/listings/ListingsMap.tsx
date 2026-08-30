@@ -211,7 +211,7 @@ export function ListingsMap({
         const popupHtml = `
           <div style="width:248px;font-family:inherit">
             <div style="font-weight:600;color:#111;font-size:13px;margin-bottom:2px">${items.length} listings here</div>
-            <div style="font-size:11px;color:#666">Same building — tap one to view</div>
+            <div style="font-size:11px;color:#666">Same building. Tap one to view</div>
             <div style="max-height:240px;overflow:auto;margin-top:4px">${rows}</div>
           </div>
         `
@@ -258,7 +258,7 @@ export function ListingsMap({
       />
       {withoutCoords > 0 && (
         <p className="text-xs text-ink-muted">
-          {withoutCoords} listing{withoutCoords === 1 ? '' : 's'} not shown — no map location set.
+          {withoutCoords} listing{withoutCoords === 1 ? '' : 's'} not shown (no map location set).
         </p>
       )}
       <style jsx global>{`

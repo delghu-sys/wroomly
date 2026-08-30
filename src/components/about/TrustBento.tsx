@@ -19,7 +19,7 @@ const ITEMS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Lock,
     title: 'Connect, then arrange directly',
-    body: 'Once a host accepts your inquiry, you both get connected and can sort out rent, deposit, and move-in directly — on your terms. No middleman holding your money.',
+    body: 'Once a host accepts your inquiry, you both get connected and can sort out rent, deposit, and move-in directly, on your terms. No middleman holding your money.',
   },
   {
     icon: Flag,

@@ -22,7 +22,7 @@ export async function generateMetadata({
   const b = getBuilding(building)
   if (!b) return { title: 'Building not found' }
 
-  const title = `Sublets at ${b.name} — University of Michigan Housing, Ann Arbor`
+  const title = `Sublets at ${b.name}: University of Michigan Housing, Ann Arbor`
   const description = b.address
     ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. University of Michigan student sublets, plus floor plans, amenities, and location facts. Verified UMich students carry a blue check.`
     : `Looking to sublet at ${b.name} in Ann Arbor? Find University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`
@@ -154,7 +154,7 @@ export default async function BuildingPage({
         Wroomly is an independent student marketplace. We are not affiliated
         with, endorsed by, or managed by {b.name} or the University of Michigan.
         Listings are posted by individual students, and those who verify with a UMich account carry a blue check. Building details
-        above are compiled from public sources and may change — always confirm
+        above are compiled from public sources and may change. Always confirm
         with the building directly.
       </p>
 
@@ -220,8 +220,8 @@ export default async function BuildingPage({
           New to subletting?{' '}
           <Link href="/guides" className="underline underline-offset-2 hover:text-ink transition">
             Read the Wroomly guides
-          </Link>{' '}
-          — how to sublet, pricing, deposits, and avoiding scams.
+          </Link>{': '}
+          how to sublet, pricing, deposits, and avoiding scams.
         </p>
       </section>
     </div>

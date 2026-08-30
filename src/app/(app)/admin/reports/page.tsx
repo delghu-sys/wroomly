@@ -8,7 +8,7 @@ import type { Report, User } from '@/types/database'
 import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = {
-  title: 'Reports — Admin',
+  title: 'Admin: Reports',
   robots: { index: false, follow: false },
 }
 

@@ -35,7 +35,7 @@ const STEPS: { icon: LucideIcon; n: string; title: string; body: string }[] = [
     icon: FileText,
     n: '04',
     title: 'Agree in writing',
-    body: 'Put the sublease in writing — dates, rent, deposit terms, utilities. You arrange payment directly with the other student, by a method with a paper trail.',
+    body: 'Put the sublease in writing: dates, rent, deposit terms, utilities. You arrange payment directly with the other student, by a method with a paper trail.',
   },
   {
     icon: KeyRound,

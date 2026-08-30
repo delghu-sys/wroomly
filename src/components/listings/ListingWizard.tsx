@@ -187,7 +187,7 @@ export function ListingWizard({ userId }: { userId: string }) {
         body: JSON.stringify({ listingId }),
       }).catch(() => {})
 
-      toast.success('Listing submitted! Our AI moderator is reviewing it now — it should go live in a few seconds.')
+      toast.success('Listing submitted! Our AI moderator is reviewing it now. It should go live in a few seconds.')
       router.push('/my-listings')
     } catch {
       toast.error('Something went wrong. Please try again.')
@@ -282,7 +282,7 @@ export function ListingWizard({ userId }: { userId: string }) {
             <div className="space-y-2">
               <Label>Description</Label>
               <Textarea
-                placeholder="Describe your place — layout, location highlights, what's nearby, house rules..."
+                placeholder="Describe your place: layout, location highlights, what's nearby, house rules..."
                 rows={5}
                 {...form.register('description')}
               />
@@ -510,7 +510,7 @@ export function ListingWizard({ userId }: { userId: string }) {
             <label className="block border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 transition-colors">
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p className="text-sm font-medium text-gray-700">Click to upload photos</p>
-              <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP — max 10MB each</p>
+              <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP, max 10MB each</p>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -570,7 +570,7 @@ export function ListingWizard({ userId }: { userId: string }) {
             </div>
 
             <div className="space-y-2">
-              <Label>Security deposit ($) — optional</Label>
+              <Label>Security deposit ($), optional</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <Input
@@ -591,7 +591,7 @@ export function ListingWizard({ userId }: { userId: string }) {
                 </p>
               ) : (
                 <p>
-                  Wroomly connects you with a verified U-M student — once you accept an inquiry,
+                  Wroomly connects you with a verified U-M student. Once you accept an inquiry,
                   you arrange rent and any deposit directly with them. Listing is free and Wroomly
                   takes no fee.
                 </p>

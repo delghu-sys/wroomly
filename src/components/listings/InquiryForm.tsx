@@ -83,7 +83,7 @@ export function InquiryForm({
           Create account
         </MagneticLinkCta>
         <p className="pt-1 text-[11.5px] text-ink-muted text-center leading-relaxed">
-          Inquiries open a private chat — no commitment until both sides agree.
+          Inquiries open a private chat, with no commitment until both sides agree.
         </p>
       </div>
     )
@@ -153,7 +153,7 @@ export function InquiryForm({
           <p className="text-sm text-ink-soft mt-0.5">
             {PAYMENTS_ENABLED
               ? 'Confirm your booking to lock in this place.'
-              : "You're connected — arrange the details with your host in chat."}
+              : "You're connected. Arrange the details with your host in chat."}
           </p>
         </div>
         {PAYMENTS_ENABLED && (
@@ -258,7 +258,7 @@ export function InquiryForm({
           </span>
         </button>
         <p className="text-xs text-ink-muted text-center leading-relaxed">
-          Opens a chat with the supplier — no commitment.
+          Opens a chat with the supplier, no commitment.
         </p>
       </div>
 

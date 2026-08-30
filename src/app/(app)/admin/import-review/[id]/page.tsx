@@ -85,7 +85,7 @@ export default async function AdminImportReviewPage({
           <Field label="Pasted text">
             {req.personal_pasted_text ? (
               <p className="whitespace-pre-wrap text-[14px] text-ink-soft">{req.personal_pasted_text}</p>
-            ) : <Empty>No text — photos only</Empty>}
+            ) : <Empty>No text, photos only</Empty>}
           </Field>
 
           {req.personal_source_url && (

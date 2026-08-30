@@ -152,7 +152,7 @@ export default async function ClaimListingPage({
         <Sparkles className="w-3.5 h-3.5" /> Review your draft
       </p>
       <h1 className="font-display text-3xl tracking-tight text-ink leading-tight mb-6">
-        Almost there — review & publish
+        Almost there. Review & publish
       </h1>
       <ClaimReview
         token={token}

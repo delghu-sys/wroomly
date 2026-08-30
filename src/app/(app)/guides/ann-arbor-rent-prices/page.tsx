@@ -17,12 +17,12 @@ import { BookOpen, ArrowRight } from 'lucide-react'
 const MIN_SAMPLE = 3
 
 export const metadata: Metadata = {
-  title: 'Ann Arbor Rent Prices for Students — Live Sublet Data',
+  title: 'Ann Arbor Rent Prices for Students: Live Sublet Data',
   description:
     'What University of Michigan sublets actually cost right now: live median asking rents by bedroom count and neighborhood, computed from active student listings on Wroomly.',
   alternates: { canonical: '/guides/ann-arbor-rent-prices' },
   openGraph: {
-    title: 'Ann Arbor Rent Prices for Students — Live Sublet Data | Wroomly',
+    title: 'Ann Arbor Rent Prices for Students: Live Sublet Data | Wroomly',
     description:
       'Live median sublet rents near UMich, by bedroom count and neighborhood.',
     images: ['/og-default.png'],
@@ -78,7 +78,7 @@ export default async function RentPricesPage() {
       ? [
           {
             question: 'How much does a sublet cost in Ann Arbor right now?',
-            answer: `The median asking rent across the ${priced.length} active student sublets on Wroomly today is ${usd(overall)} per month. Prices vary widely by bedroom count, furniture, and distance to the University of Michigan Central Campus — furnished rooms near campus command the most.`,
+            answer: `The median asking rent across the ${priced.length} active student sublets on Wroomly today is ${usd(overall)} per month. Prices vary widely by bedroom count, furniture, and distance to the University of Michigan Central Campus. Furnished rooms near campus command the most.`,
           },
         ]
       : []),
@@ -105,7 +105,7 @@ export default async function RentPricesPage() {
           ]),
           articleJsonLd({
             slug: 'ann-arbor-rent-prices',
-            headline: 'Ann Arbor rent prices for students — live sublet data',
+            headline: 'Ann Arbor rent prices for students: live sublet data',
             description:
               'Live median asking rents for University of Michigan sublets, by bedroom count and neighborhood.',
             datePublished: today,
@@ -132,7 +132,7 @@ export default async function RentPricesPage() {
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
           Median asking rents computed live from the active student sublets on
-          Wroomly — not estimates, not last year&rsquo;s survey.
+          Wroomly. Not estimates, not last year&rsquo;s survey.
         </p>
         <p className="mt-2 text-[12px] text-ink-muted">
           Computed {today} from {priced.length} active listing
@@ -226,7 +226,7 @@ export default async function RentPricesPage() {
                 Right now, the median furnished sublet asks {usd(furnishedMedian)}/month
                 ({furnished.length} listings) versus {usd(unfurnishedMedian)}/month
                 unfurnished ({unfurnished.length} listings). Furniture is one of
-                the two biggest pricing levers in the student market — the other
+                the two biggest pricing levers in the student market. The other
                 is walking distance to Central Campus.
               </p>
             </section>
@@ -235,8 +235,8 @@ export default async function RentPricesPage() {
       ) : (
         <section className="mt-10 max-w-3xl">
           <p className="rounded-2xl border border-dashed border-line bg-surface/60 px-5 py-6 text-[15px] text-ink-soft leading-relaxed">
-            Not enough active listings right now to compute reliable medians —
-            we only publish numbers backed by at least {MIN_SAMPLE} live
+            Not enough active listings right now to compute reliable medians.
+            We only publish numbers backed by at least {MIN_SAMPLE} live
             listings. Check the{' '}
             <Link href="/listings" className="underline underline-offset-2">
               live listings
@@ -252,8 +252,8 @@ export default async function RentPricesPage() {
         </h2>
         <div className="space-y-4 text-[15px] text-ink-soft leading-relaxed">
           <p>
-            These are <strong>asking rents on sublets</strong>, not lease rates
-            — and that distinction matters. Sublet prices, especially in summer,
+            These are <strong>asking rents on sublets</strong>, not lease rates,
+            and that distinction matters. Sublet prices, especially in summer,
             typically sit below what the same unit costs on a 12-month lease,
             because the person subletting mostly wants to stop paying for an
             empty room. Use these medians to sanity-check a deal, not as the

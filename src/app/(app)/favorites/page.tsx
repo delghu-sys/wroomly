@@ -51,7 +51,7 @@ export default async function FavoritesPage() {
           icon={<Heart className="w-6 h-6" strokeWidth={1.75} />}
           title="Nothing saved"
           accent="yet."
-          description="Tap the heart on any listing you like — it'll show up here so you can come back later."
+          description="Tap the heart on any listing you like and it'll show up here so you can come back later."
           action={{ label: 'Browse listings', href: '/listings' }}
         />
       ) : (

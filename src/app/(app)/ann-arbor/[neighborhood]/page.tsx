@@ -23,7 +23,7 @@ export async function generateMetadata({
   const n = getNeighborhood(neighborhood)
   if (!n) return { title: 'Neighborhood not found' }
 
-  const title = `${n.name} Sublets — University of Michigan Housing in Ann Arbor`
+  const title = `${n.name} Sublets: University of Michigan Housing in Ann Arbor`
   const description = `${n.tagline} Find UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0].slice(0, 90)}…`
   return {
     title,
@@ -126,7 +126,7 @@ export default async function NeighborhoodPage({
         ) : (
           <div className="rounded-3xl border border-dashed border-line bg-surface/60 p-10 text-center">
             <p className="text-ink-soft">
-              Nothing in {n.name} at the moment — but listings post all the time.
+              Nothing in {n.name} at the moment, but listings post all the time.
             </p>
             <Link
               href="/listings"

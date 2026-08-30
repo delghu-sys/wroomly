@@ -4,7 +4,7 @@ import { ComingSoonLanding } from '@/components/coming-soon/ComingSoonLanding'
 export const metadata: Metadata = {
   title: 'Coming soon | Wroomly',
   description:
-    'The easiest way to sublease in Ann Arbor — a free marketplace built for University of Michigan students. Launching soon. Join the waitlist.',
+    'The easiest way to sublease in Ann Arbor: a free marketplace built for University of Michigan students. Launching soon. Join the waitlist.',
 }
 
 /**

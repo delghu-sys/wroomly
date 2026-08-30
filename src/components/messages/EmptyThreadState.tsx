@@ -65,9 +65,9 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
             </>
           ) : (
             <>
-              No messages yet —{' '}
+              No messages yet.{' '}
               <span className="italic font-light text-gold-deep">
-                start one.
+                Start one.
               </span>
             </>
           )}
@@ -80,7 +80,7 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
           className="mt-4 text-ink-soft leading-relaxed max-w-[42ch] mx-auto"
         >
           {hasConversations
-            ? 'Pick a conversation from the list — your most recent thread is on top.'
+            ? 'Pick a conversation from the list. Your most recent thread is on top.'
             : 'Browse listings and send an inquiry. Once a supplier replies, your chat will appear here.'}
         </motion.p>
 

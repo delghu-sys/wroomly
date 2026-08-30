@@ -67,7 +67,7 @@ export default function ResetPasswordClient() {
       <AtmosphericAuthPanel
         headline1="Choose a new"
         headline2="password"
-        subhead="Pick something you’ll remember — at least eight characters. You’ll be signed in after submitting."
+        subhead="Pick something you’ll remember, at least eight characters. You’ll be signed in after submitting."
       />
 
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">

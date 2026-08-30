@@ -50,7 +50,7 @@ export default function AppError({ error, reset }: ErrorProps) {
           transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.6 }}
           className="mt-6 text-lg text-white/65 max-w-lg mx-auto leading-relaxed"
         >
-          The page hit an unexpected error. Try again — most of the time it’s a
+          The page hit an unexpected error. Try again. Most of the time it’s a
           one-off blip. If it keeps happening, head home and check back in a
           minute.
         </motion.p>

@@ -202,7 +202,7 @@ export function AddressAutocomplete({
       )}
       {!hasPick && value.length >= 3 && !loading && results.length === 0 && (
         <p className="text-xs text-ink-muted mt-1">
-          No matches yet — keep typing the full street address.
+          No matches yet. Keep typing the full street address.
         </p>
       )}
       {hasPick && (
