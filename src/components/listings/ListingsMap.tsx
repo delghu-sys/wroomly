@@ -54,11 +54,15 @@ export function ListingsMap({
   const pinByListingRef = useRef<Map<string, HTMLElement>>(new Map())
   const { hoveredId, setHoveredId } = useHoveredListing()
   // Read through refs inside the marker effect so it doesn't re-run (and
-  // rebuild every marker) each time the hovered id changes.
+  // rebuild every marker) each time the hovered id changes. Kept fresh in an
+  // effect rather than assigned during render: a render can be discarded under
+  // concurrent rendering, so writing to a ref there is not safe.
   const setHoveredRef = useRef(setHoveredId)
-  setHoveredRef.current = setHoveredId
   const linkHoverRef = useRef(linkHover)
-  linkHoverRef.current = linkHover
+  useEffect(() => {
+    setHoveredRef.current = setHoveredId
+    linkHoverRef.current = linkHover
+  })
 
   // Initialize map once
   useEffect(() => {
