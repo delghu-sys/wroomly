@@ -1,8 +1,9 @@
 'use client'
 
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { motion } from 'motion/react'
 import { useCallback } from 'react'
+import { useFilterNavigation } from './FilterTransition'
 
 interface FilterPillsProps {
   filters: Record<string, string | undefined>
@@ -40,7 +41,7 @@ const pills: Pill[] = [
 const spring = { type: 'spring' as const, stiffness: 400, damping: 32 }
 
 export function FilterPills({ filters }: FilterPillsProps) {
-  const router = useRouter()
+  const { navigate } = useFilterNavigation()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -54,9 +55,9 @@ export function FilterPills({ filters }: FilterPillsProps) {
       for (const [k, v] of Object.entries(merged)) {
         if (v) params.set(k, v)
       }
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      navigate(`${pathname}?${params.toString()}`, { scroll: false })
     },
-    [filters, pathname, searchParams, router]
+    [filters, pathname, searchParams, navigate]
   )
 
   return (

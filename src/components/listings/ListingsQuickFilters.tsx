@@ -1,9 +1,10 @@
 'use client'
 
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { X } from 'lucide-react'
+import { useFilterNavigation } from './FilterTransition'
 
 interface ListingsQuickFiltersProps {
   currentFilters: Record<string, string | undefined>
@@ -29,7 +30,7 @@ const FILTER_LABELS: Record<string, (v: string) => string> = {
 }
 
 export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQuickFiltersProps) {
-  const router = useRouter()
+  const { navigate } = useFilterNavigation()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -50,13 +51,13 @@ export function ListingsQuickFilters({ currentFilters, totalCount }: ListingsQui
     // Changing the result set invalidates the current page number — a user on
     // page 6 who drops a filter would otherwise land on an out-of-range page.
     params.delete('page')
-    router.push(`${pathname}?${params.toString()}`)
+    navigate(`${pathname}?${params.toString()}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, searchParams, router])
+  }, [pathname, searchParams, navigate])
 
   const clearAll = useCallback(() => {
-    router.push(pathname)
-  }, [pathname, router])
+    navigate(pathname)
+  }, [pathname, navigate])
 
   // Only known filter keys become chips — currentFilters carries every raw
   // query param, so pagination (?page=2) or junk params would otherwise render
