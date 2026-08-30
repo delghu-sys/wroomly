@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -33,6 +33,8 @@ import {
   monthToToDate,
 } from '@/lib/utils/listing'
 import type { Listing } from '@/types/database'
+import { checkFairHousing } from '@/lib/fairHousing'
+import { FairHousingWarning, logFairHousing } from './FairHousingGuard'
 
 const schema = z.object({
   title: z.string().min(5).max(100),
@@ -109,6 +111,19 @@ function statusOptionsFor(current: string): StatusOption[] {
 
 export function EditListingForm({ listing }: { listing: Listing }) {
   const router = useRouter()
+  // Same fair-housing guardrail as the creation wizard: edits can introduce
+  // a discriminatory phrase after the initial review, so warn here too.
+  const [fhMatch, setFhMatch] = useState<{ title?: string; description?: string }>({})
+  const fhLogged = useRef<Set<string>>(new Set())
+  function fairHousingBlur(field: 'title' | 'description') {
+    const text = form.getValues(field) ?? ''
+    const match = checkFairHousing(text)
+    setFhMatch(prev => ({ ...prev, [field]: match?.phrase }))
+    if (match && !fhLogged.current.has(`${field}:${match.phrase}`)) {
+      fhLogged.current.add(`${field}:${match.phrase}`)
+      logFairHousing({ text, field, phase: 'warn' })
+    }
+  }
   const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const isSublet = listing.type === 'sublet'
@@ -221,18 +236,27 @@ export function EditListingForm({ listing }: { listing: Listing }) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
       <div className="space-y-2">
         <Label>Title</Label>
-        <Input {...form.register('title')} />
+        <Input
+          {...form.register('title')}
+          onBlurCapture={() => fairHousingBlur('title')}
+        />
         {form.formState.errors.title && (
           <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
         )}
+        {fhMatch.title && <FairHousingWarning phrase={fhMatch.title} />}
       </div>
 
       <div className="space-y-2">
         <Label>Description</Label>
-        <Textarea rows={6} {...form.register('description')} />
+        <Textarea
+          rows={6}
+          {...form.register('description')}
+          onBlurCapture={() => fairHousingBlur('description')}
+        />
         {form.formState.errors.description && (
           <p className="text-sm text-red-600">{form.formState.errors.description.message}</p>
         )}
+        {fhMatch.description && <FairHousingWarning phrase={fhMatch.description} />}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

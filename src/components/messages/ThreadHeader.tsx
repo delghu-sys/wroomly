@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { ArrowLeft, BedDouble, BadgeCheck } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { StatusDot } from './StatusDot'
+import { ReportDialog } from '@/components/report/ReportDialog'
 
 interface ThreadHeaderProps {
   otherName: string | null
@@ -18,6 +19,8 @@ interface ThreadHeaderProps {
   active?: boolean
   /** Override label for the status line (e.g. "Last seen 3h ago"). */
   statusLabel?: string
+  /** When set, show a Report control for this conversation. */
+  conversationId?: string | null
 }
 
 export function ThreadHeader({
@@ -30,6 +33,7 @@ export function ThreadHeader({
   listingThumbnail,
   active = true,
   statusLabel,
+  conversationId = null,
 }: ThreadHeaderProps) {
   return (
     <header
@@ -112,6 +116,15 @@ export function ThreadHeader({
               )}
             </div>
           </Link>
+        )}
+
+        {conversationId && (
+          <ReportDialog
+            targetType="message"
+            targetId={conversationId}
+            label=""
+            className="shrink-0 p-2 -mr-1"
+          />
         )}
       </div>
     </header>

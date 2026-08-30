@@ -273,6 +273,7 @@ export function ThreadView({
         listingNeighborhood={listing?.neighborhood ?? null}
         listingThumbnail={listing?.thumbnailUrl ?? null}
         active
+        conversationId={conversation.id}
       />
 
       {/* Scrollable thread */}

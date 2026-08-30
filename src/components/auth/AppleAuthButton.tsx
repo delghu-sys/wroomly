@@ -18,10 +18,15 @@ export function AppleAuthButton({
   intendedType,
   next = '/',
   onError,
+  accepted = false,
+  disabled = false,
 }: {
   intendedType?: 'supplier' | 'consumer'
   next?: string
   onError?: (message: string) => void
+  /** Consent box ticked pre-OAuth; logged as clickwrap at /callback. */
+  accepted?: boolean
+  disabled?: boolean
 }) {
   const [loading, setLoading] = useState(false)
 
@@ -34,6 +39,7 @@ export function AppleAuthButton({
     const params = new URLSearchParams()
     if (intendedType) params.set('intended_type', intendedType)
     if (next) params.set('next', next)
+    if (accepted) params.set('accepted', '1')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
       options: { redirectTo: `${window.location.origin}/callback?${params.toString()}` },
@@ -48,7 +54,7 @@ export function AppleAuthButton({
     <button
       type="button"
       onClick={handleClick}
-      disabled={loading}
+      disabled={loading || disabled}
       className="group w-full h-12 rounded-full border border-line bg-black text-white font-semibold text-sm tracking-tight inline-flex items-center justify-center gap-2.5 transition-all duration-300 hover:bg-[#111] disabled:opacity-60 active:scale-[0.98]"
     >
       {loading ? (

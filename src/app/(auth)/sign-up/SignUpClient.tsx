@@ -25,7 +25,8 @@ import { RoleContinueCta } from '@/components/auth/RoleContinueCta'
 // the panel's `testimonials` prop.
 
 const termsAgreement = z.literal(true, {
-  message: 'You must agree to the Terms of Service to continue',
+  message:
+    'You must confirm you are 18 or older and agree to the Terms of Service and Privacy Policy to continue',
 })
 
 const supplierSchema = z.object({
@@ -55,6 +56,45 @@ const consumerSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   agreed_to_terms: termsAgreement,
 })
+
+function OauthConsent({
+  agreed,
+  onChange,
+}: {
+  agreed: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <label className="flex items-start gap-2.5 cursor-pointer select-none rounded-2xl border border-line bg-surface px-4 py-3">
+      <Checkbox
+        checked={agreed}
+        onCheckedChange={c => onChange(c === true)}
+        className="mt-0.5 data-[state=checked]:bg-navy-deep data-[state=checked]:border-navy-deep"
+      />
+      <span className="text-[13px] text-ink-soft leading-snug">
+        I am 18 or older and I agree to the{' '}
+        <Link
+          href="/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-ink hover:text-gold-deep underline-offset-4 underline"
+        >
+          Terms of Service
+        </Link>{' '}
+        and{' '}
+        <Link
+          href="/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-ink hover:text-gold-deep underline-offset-4 underline"
+        >
+          Privacy Policy
+        </Link>
+        .
+      </span>
+    </label>
+  )
+}
 
 type SupplierForm = z.infer<typeof supplierSchema>
 type ConsumerForm = z.infer<typeof consumerSchema>
@@ -91,6 +131,10 @@ export default function SignUpClient({
   // check); non-UMich → Google / Apple / email, no badge. No auth method renders
   // until this is answered.
   const [umichStudent, setUmichStudent] = useState<boolean | null>(null)
+  // Clickwrap for the OAuth paths: the buttons stay disabled until this is
+  // ticked, and it rides to /callback (accepted=1) where the acceptance row
+  // is logged. The email form has its own required checkbox below.
+  const [oauthAgreed, setOauthAgreed] = useState(false)
 
   const supplierForm = useForm<SupplierForm>({
     resolver: zodResolver(supplierSchema),
@@ -310,10 +354,13 @@ export default function SignUpClient({
 
             {umichStudent === true && (
               <>
+                <OauthConsent agreed={oauthAgreed} onChange={setOauthAgreed} />
                 <GoogleAuthButton
                   intendedType={role}
                   onError={setError}
                   umich
+                  disabled={!oauthAgreed}
+                  accepted={oauthAgreed}
                   label="Continue with your UMich Google"
                 />
                 <p className="text-center text-[12px] text-ink-muted leading-snug">
@@ -330,24 +377,20 @@ export default function SignUpClient({
 
             {umichStudent === false && (
               <>
+                <OauthConsent agreed={oauthAgreed} onChange={setOauthAgreed} />
                 <GoogleAuthButton
                   intendedType={role}
                   onError={setError}
+                  disabled={!oauthAgreed}
+                  accepted={oauthAgreed}
                   label="Sign up with Google"
                 />
-                <AppleAuthButton intendedType={role} onError={setError} />
-                <p className="text-center text-[12px] text-ink-muted leading-snug">
-                  By continuing, you agree to our{' '}
-                  <Link
-                    href="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-ink-soft hover:text-gold-deep underline-offset-4 hover:underline"
-                  >
-                    Terms of Service
-                  </Link>
-                  .
-                </p>
+                <AppleAuthButton
+                  intendedType={role}
+                  onError={setError}
+                  disabled={!oauthAgreed}
+                  accepted={oauthAgreed}
+                />
                 <AuthDivider label="or sign up with email" />
               </>
             )}
@@ -436,7 +479,7 @@ export default function SignUpClient({
                   htmlFor="agreed_to_terms"
                   className="text-sm font-normal text-ink-soft leading-snug select-none"
                 >
-                  I have read and agree to the{' '}
+                  I am 18 or older and I have read and agree to the{' '}
                   <Link
                     href="/terms"
                     target="_blank"
@@ -444,7 +487,17 @@ export default function SignUpClient({
                     className="font-medium text-ink hover:text-gold-deep transition-colors underline-offset-4 hover:underline"
                   >
                     Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-ink hover:text-gold-deep transition-colors underline-offset-4 hover:underline"
+                  >
+                    Privacy Policy
                   </Link>
+                  .
                 </label>
               </div>
               {form.formState.errors.agreed_to_terms && (

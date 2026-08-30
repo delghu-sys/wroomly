@@ -30,6 +30,7 @@ import {
   listingJsonLd,
   breadcrumbJsonLd,
 } from '@/components/seo/JsonLd'
+import { ReportDialog } from '@/components/report/ReportDialog'
 
 export async function generateMetadata({
   params,
@@ -344,6 +345,11 @@ export default async function ListingDetailPage({
                         : null
                     }
                   />
+                  {authUser && !isOwner && (
+                    <div className="mt-2">
+                      <ReportDialog targetType="listing" targetId={l.id} label="Report this listing" />
+                    </div>
+                  )}
                 </div>
 
                 <h1 className="font-display text-[clamp(2rem,4vw,3.25rem)] tracking-tight text-ink leading-[1.05]">
