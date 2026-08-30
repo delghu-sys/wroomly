@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
     description:
-      'Verified UMich student sublets in Ann Arbor. @umich.edu-only, free to list.',
+      'UMich student sublets in Ann Arbor. Verified students carry a blue check. Free to list.',
     type: 'website',
     siteName: 'Wroomly',
     locale: 'en_US',
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
     description:
-      'Verified UMich student sublets in Ann Arbor. @umich.edu-only, free to list.',
+      'UMich student sublets in Ann Arbor. Verified students carry a blue check. Free to list.',
     images: ['/og-default.png'],
   },
 }

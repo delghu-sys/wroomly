@@ -14,7 +14,7 @@ const ITEMS: { icon: PhosphorIcon; title: string; body: string }[] = [
   {
     icon: ShieldCheck,
     title: 'Verified U-M accounts',
-    body: 'Suppliers and consumers verify their identity and university affiliation before posting or applying.',
+    body: 'Sign in with your @umich.edu Google account and you get a blue check on your profile and your listings, so the other side can see you are a real U-M student.',
   },
   {
     icon: Robot,

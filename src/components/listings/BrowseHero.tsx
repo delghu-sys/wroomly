@@ -55,8 +55,9 @@ export function BrowseHero({ totalCount, currentQuery, filters, view }: BrowseHe
           className="animate-fade-up mt-6 text-base sm:text-lg text-white/70 leading-relaxed max-w-xl"
           style={{ animationDelay: '0.55s' }}
         >
-          Sublets from verified U&nbsp;of&nbsp;M students. Filter by
-          neighborhood, dates, price — the right listing is a couple of clicks away.
+          Sublets near U&nbsp;of&nbsp;M, with a blue check on the students who
+          verified. Filter by neighborhood, dates, price — the right listing is a
+          couple of clicks away.
         </p>
 
         {/* Search + view toggle */}

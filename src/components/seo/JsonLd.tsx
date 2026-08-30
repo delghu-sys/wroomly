@@ -173,7 +173,7 @@ export function siteJsonLd(): Record<string, unknown>[] {
         url: `${ORIGIN}/logo.png`,
       },
       description:
-        'Verified student housing marketplace for subletting near the University of Michigan in Ann Arbor.',
+        'Student housing marketplace for subletting near the University of Michigan in Ann Arbor, where verified UMich students carry a blue check.',
       areaServed: {
         '@type': 'City',
         name: 'Ann Arbor',

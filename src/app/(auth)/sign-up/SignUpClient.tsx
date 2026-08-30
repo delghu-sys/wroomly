@@ -244,8 +244,8 @@ export default function SignUpClient({
         headline2={isSupplier ? 'in about a minute' : 'near campus'}
         subhead={
           isSupplier
-            ? 'Going abroad or interning? Sublet your apartment to a verified student in a few minutes.'
-            : 'Browse verified listings from U of M students. Real students, private messaging, no surprises.'
+            ? 'Going abroad or interning? Sublet your apartment to another student in a few minutes.'
+            : 'Browse listings from U of M students. Verified students carry a blue check, private messaging, no surprises.'
         }
       />
 

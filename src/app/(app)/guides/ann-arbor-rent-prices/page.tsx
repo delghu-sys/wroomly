@@ -19,7 +19,7 @@ const MIN_SAMPLE = 3
 export const metadata: Metadata = {
   title: 'Ann Arbor Rent Prices for Students — Live Sublet Data',
   description:
-    'What University of Michigan sublets actually cost right now: live median asking rents by bedroom count and neighborhood, computed from active verified student listings on Wroomly.',
+    'What University of Michigan sublets actually cost right now: live median asking rents by bedroom count and neighborhood, computed from active student listings on Wroomly.',
   alternates: { canonical: '/guides/ann-arbor-rent-prices' },
   openGraph: {
     title: 'Ann Arbor Rent Prices for Students — Live Sublet Data | Wroomly',
@@ -78,7 +78,7 @@ export default async function RentPricesPage() {
       ? [
           {
             question: 'How much does a sublet cost in Ann Arbor right now?',
-            answer: `The median asking rent across the ${priced.length} active verified student sublets on Wroomly today is ${usd(overall)} per month. Prices vary widely by bedroom count, furniture, and distance to the University of Michigan Central Campus — furnished rooms near campus command the most.`,
+            answer: `The median asking rent across the ${priced.length} active student sublets on Wroomly today is ${usd(overall)} per month. Prices vary widely by bedroom count, furniture, and distance to the University of Michigan Central Campus — furnished rooms near campus command the most.`,
           },
         ]
       : []),
@@ -90,7 +90,7 @@ export default async function RentPricesPage() {
     {
       question: 'Where does this rent data come from?',
       answer:
-        'Every number on this page is a median of live asking rents on active sublet listings posted by @umich.edu-verified University of Michigan students on Wroomly, recomputed on each visit. Categories with fewer than three listings are hidden rather than shown from a tiny sample.',
+        'Every number on this page is a median of live asking rents on active sublet listings on Wroomly, recomputed on each visit. Listings come from students in the Ann Arbor market; those who sign in with a UMich account carry a verified blue check. Categories with fewer than three listings are hidden rather than shown from a tiny sample.',
     },
   ]
 
@@ -131,8 +131,8 @@ export default async function RentPricesPage() {
           <span className="italic font-light text-navy">actually cost.</span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          Median asking rents computed live from the active, verified student
-          sublets on Wroomly — not estimates, not last year&rsquo;s survey.
+          Median asking rents computed live from the active student sublets on
+          Wroomly — not estimates, not last year&rsquo;s survey.
         </p>
         <p className="mt-2 text-[12px] text-ink-muted">
           Computed {today} from {priced.length} active listing

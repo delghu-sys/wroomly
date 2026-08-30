@@ -61,7 +61,7 @@ export default function GuidesIndexPage() {
         </h2>
         <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
           Median asking rents by bedroom count and neighborhood — computed from
-          the active verified listings on Wroomly, not last year&rsquo;s survey.
+          the active listings on Wroomly, not last year&rsquo;s survey.
         </p>
         <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-maize-bright font-medium group-hover:gap-2 transition-all">
           See the numbers <ArrowRight className="w-3.5 h-3.5" />

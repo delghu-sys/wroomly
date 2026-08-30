@@ -53,7 +53,7 @@ export default function AboutPage() {
                   icon={<ShieldCheck className="w-3.5 h-3.5" strokeWidth={1.75} />}
                   delay={0.7}
                 >
-                  @umich.edu verified
+                  @umich.edu blue check
                 </LiveBadge>
                 <LiveBadge
                   icon={<BadgeDollarSign className="w-3.5 h-3.5" strokeWidth={1.75} />}
@@ -161,7 +161,7 @@ export default function AboutPage() {
                 </span>
               </h2>
               <p className="mt-5 text-ink-soft leading-relaxed max-w-[55ch]">
-                We&rsquo;re a small platform on purpose — verified accounts, reviewed
+                We&rsquo;re a small platform on purpose — blue-check verification, reviewed
                 listings, and conversations that never go off-platform.
               </p>
             </div>

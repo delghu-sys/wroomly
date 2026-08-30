@@ -25,7 +25,7 @@ interface AtmosphericAuthPanelProps {
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
 const TRUST_ITEMS = [
-  { Icon: ShieldCheck, text: 'Verified email accounts' },
+  { Icon: ShieldCheck, text: 'UMich blue-check verification' },
   { Icon: ChatCircleDots, text: 'Private in-app messaging' },
   { Icon: Tag, text: 'Free to list & browse' },
 ] as const

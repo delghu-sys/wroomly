@@ -24,7 +24,7 @@ export async function generateMetadata({
   if (!n) return { title: 'Neighborhood not found' }
 
   const title = `${n.name} Sublets — University of Michigan Housing in Ann Arbor`
-  const description = `${n.tagline} Find verified UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0].slice(0, 90)}…`
+  const description = `${n.tagline} Find UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0].slice(0, 90)}…`
   return {
     title,
     description,

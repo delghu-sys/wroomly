@@ -80,7 +80,7 @@ export async function POST(request: Request) {
           mcc: '6513', // "Real estate agents and managers — rentals"
           url: process.env.NEXT_PUBLIC_APP_URL!,
           product_description:
-            'Subletting an apartment or dorm room to a verified U-of-M student via the Wroomly platform.',
+            'Subletting an apartment or dorm room to another student near the University of Michigan via the Wroomly platform.',
         },
         capabilities: {
           card_payments: { requested: true },

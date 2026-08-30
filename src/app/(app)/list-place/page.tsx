@@ -9,7 +9,7 @@ import { Home, Mail } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'List your place',
-  description: 'Sublet your apartment to verified U of M students.',
+  description: 'Sublet your apartment to another student near U of M.',
 }
 
 /**

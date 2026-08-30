@@ -31,7 +31,7 @@ export function ShareListing({ listingId, title, priceLabel }: ShareListingProps
   const [busy, setBusy] = useState(false)
 
   const url = `https://wroomly.app/listings/${listingId}`
-  const text = `${title}${priceLabel ? ` — ${priceLabel}` : ''} · verified UMich sublet`
+  const text = `${title}${priceLabel ? ` — ${priceLabel}` : ''} · UMich sublet on Wroomly`
 
   // File-share support (mobile share sheets); probed lazily with a dummy file.
   const canShareFiles =
