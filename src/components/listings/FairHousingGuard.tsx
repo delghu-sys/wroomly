@@ -20,7 +20,15 @@ export function FairHousingWarning({ phrase }: { phrase: string }) {
         phrase &ldquo;{phrase}&rdquo; could indicate a preference based on a
         protected characteristic, which is illegal in housing ads under
         federal, Michigan, and Ann Arbor law. Describe the property and the
-        terms, not the kind of person you want.
+        terms, not the kind of person you want.{' '}
+        <a
+          href="/safety#fair-housing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold underline underline-offset-2"
+        >
+          Learn more
+        </a>
       </p>
     </div>
   )

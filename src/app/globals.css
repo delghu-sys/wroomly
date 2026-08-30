@@ -267,6 +267,82 @@
   :where(.font-display) {
     font-weight: 400;
   }
+  /* ── Legal pages (/privacy, /terms, /safety) ─────────────────────────────
+     Typography for the marked-rendered policy markdown. ~70ch measure and a
+     quiet, print-friendly treatment; the text itself is the legal instrument
+     and gets no decorative treatment. */
+  .legal-prose {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+  .legal-prose h2 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+    font-size: 1.45rem;
+    color: var(--ink);
+    margin-top: 2.75em;
+    margin-bottom: 0.75em;
+    scroll-margin-top: 6rem;
+  }
+  .legal-prose h3 {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+    scroll-margin-top: 6rem;
+  }
+  .legal-prose h2:first-child { margin-top: 0; }
+  .legal-prose a.legal-anchor { color: inherit; text-decoration: none; }
+  .legal-prose a.legal-anchor:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .legal-prose p { margin: 0.9em 0; }
+  .legal-prose strong { color: var(--ink); font-weight: 700; }
+  .legal-prose ul, .legal-prose ol { margin: 0.9em 0; padding-left: 1.4em; }
+  .legal-prose ul { list-style: disc; }
+  .legal-prose ol { list-style: decimal; }
+  .legal-prose li { margin: 0.4em 0; }
+  .legal-prose li::marker { color: var(--ink-muted); }
+  .legal-prose blockquote {
+    margin: 1.2em 0;
+    padding: 0.75em 1.1em;
+    border-left: 3px solid var(--maize-bright);
+    background: var(--surface);
+    border-radius: 0 12px 12px 0;
+    color: var(--ink);
+  }
+  .legal-prose blockquote p { margin: 0; }
+  .legal-prose table {
+    width: 100%;
+    margin: 1.2em 0;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .legal-prose th {
+    text-align: left;
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 2px solid var(--line);
+    padding: 0.5em 0.9em 0.5em 0;
+    vertical-align: bottom;
+  }
+  .legal-prose td {
+    border-bottom: 1px solid var(--line);
+    padding: 0.6em 0.9em 0.6em 0;
+    vertical-align: top;
+  }
+  .legal-prose a:not(.legal-anchor) {
+    color: var(--gold-deep);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  @media print {
+    .legal-toc-mobile, nav[aria-label='Table of contents'], header:not(.legal-header), footer { display: none !important; }
+    .legal-prose { color: black; font-size: 11pt; }
+    .legal-prose a:not(.legal-anchor)::after { content: ' (' attr(href) ')'; font-size: 0.85em; }
+  }
+
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
