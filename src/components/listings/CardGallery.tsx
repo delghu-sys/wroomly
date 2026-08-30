@@ -94,7 +94,7 @@ export function CardGallery({
               type="button"
               onClick={e => go(e, -1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-white"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-surface"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -104,7 +104,7 @@ export function CardGallery({
               type="button"
               onClick={e => go(e, 1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-white"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-surface"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -116,7 +116,7 @@ export function CardGallery({
               <span
                 key={i}
                 className={`h-1.5 rounded-full transition-all duration-200 ${
-                  i === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/55'
+                  i === idx ? 'w-4 bg-surface' : 'w-1.5 bg-white/55'
                 }`}
               />
             ))}

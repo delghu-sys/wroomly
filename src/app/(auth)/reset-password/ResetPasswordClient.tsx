@@ -88,7 +88,7 @@ export default function ResetPasswordClient() {
           </motion.div>
 
           {hasSession === false && (
-            <div className="rounded-2xl border border-line bg-white px-5 py-4 mb-6">
+            <div className="rounded-2xl border border-line bg-surface px-5 py-4 mb-6">
               <p className="text-sm text-ink-soft leading-relaxed">
                 This reset link has expired or has already been used.
               </p>

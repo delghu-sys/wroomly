@@ -75,7 +75,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
             </AvatarFallback>
           </Avatar>
           {user.is_verified && (
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-white ring-2 ring-white">
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-surface ring-2 ring-white">
               <VerifiedBadge size={20} />
             </span>
           )}

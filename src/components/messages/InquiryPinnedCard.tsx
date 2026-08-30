@@ -174,11 +174,6 @@ export function InquiryPinnedCard({
       style={{ boxShadow: 'var(--shadow-edge), var(--shadow-2)' }}
     >
       {/* Glass refraction + maize accent corner */}
-      <div
-        className="pointer-events-none absolute -top-12 -right-12 w-48 h-48 rounded-full blur-3xl opacity-30"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)' }}
-        aria-hidden
-      />
 
       <div className="relative p-5 sm:p-6">
         {/* Header row */}
@@ -332,7 +327,7 @@ export function InquiryPinnedCard({
               disabled={!!loading}
               className="
                 inline-flex items-center justify-center gap-2
-                h-11 px-5 rounded-full border border-line bg-white text-ink-soft
+                h-11 px-5 rounded-full border border-line bg-surface text-ink-soft
                 font-medium text-sm
                 hover:border-[oklch(0.65_0.20_25/0.30)] hover:text-[oklch(0.55_0.20_25)]
                 disabled:opacity-60 disabled:cursor-not-allowed
@@ -395,7 +390,7 @@ export function InquiryPinnedCard({
               disabled={nudged}
               className="
                 inline-flex w-full items-center justify-center gap-2
-                h-10 px-4 rounded-full border border-line bg-white text-ink-soft
+                h-10 px-4 rounded-full border border-line bg-surface text-ink-soft
                 font-medium text-[13px]
                 hover:border-[oklch(0.55_0.15_142/0.40)] hover:text-[oklch(0.40_0.13_142)]
                 disabled:opacity-60 disabled:cursor-not-allowed

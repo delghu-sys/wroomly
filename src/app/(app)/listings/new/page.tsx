@@ -39,11 +39,6 @@ export default async function NewListingPage() {
             boxShadow: 'var(--shadow-edge), var(--shadow-3)',
           }}
         >
-          <div
-            className="pointer-events-none absolute -top-24 -right-16 w-64 h-64 rounded-full blur-3xl opacity-30"
-            style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-            aria-hidden
-          />
 
           <div className="relative">
             <div
@@ -96,7 +91,7 @@ export default async function NewListingPage() {
                 className="
                   inline-flex w-full items-center justify-center
                   h-11 px-5 rounded-full
-                  bg-white border border-line text-ink-soft
+                  bg-surface border border-line text-ink-soft
                   text-[13.5px] font-medium
                   hover:border-maize-bright/40 hover:text-ink
                   transition-all duration-300 active:scale-[0.97]

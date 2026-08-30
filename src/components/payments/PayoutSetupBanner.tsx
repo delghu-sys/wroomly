@@ -31,11 +31,6 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
         boxShadow: 'var(--shadow-edge), var(--shadow-glow-soft)',
       }}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-16 -right-12 w-56 h-56 rounded-full blur-3xl opacity-50"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-      />
 
       <div className="relative flex items-center gap-4 p-4 sm:p-5">
         <div

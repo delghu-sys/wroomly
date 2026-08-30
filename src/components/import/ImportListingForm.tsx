@@ -35,7 +35,7 @@ function filesValid(files: File[]): string | null {
 
 const labelCls = 'block text-[13px] font-medium text-ink-soft mb-1.5'
 const inputCls =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/60 focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
+  'w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/60 focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
 
 export function ImportListingForm() {
   const [phase, setPhase] = useState<Phase>({ name: 'form' })
@@ -378,7 +378,7 @@ function Thumb({ file }: { file: File }) {
   }, [url])
   if (file.type === 'application/pdf') {
     return (
-      <span className="w-full h-full flex flex-col items-center justify-center gap-1 bg-white text-ink-muted">
+      <span className="w-full h-full flex flex-col items-center justify-center gap-1 bg-surface text-ink-muted">
         <FileText className="w-5 h-5" />
         <span className="text-[9px] px-1 truncate max-w-full">{file.name}</span>
       </span>
@@ -448,7 +448,7 @@ function FileField({
       {files.length > 0 && (
         <div className="mt-3 grid grid-cols-4 sm:grid-cols-5 gap-2">
           {files.map((f, i) => (
-            <div key={`${f.name}-${f.size}`} className="relative aspect-square rounded-xl overflow-hidden border border-line bg-white">
+            <div key={`${f.name}-${f.size}`} className="relative aspect-square rounded-xl overflow-hidden border border-line bg-surface">
               <Thumb file={f} />
               <button
                 type="button"

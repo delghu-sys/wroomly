@@ -171,7 +171,7 @@ export function AddressAutocomplete({
       {open && results.length > 0 && (
         <ul
           role="listbox"
-          className="absolute z-30 mt-1 w-full max-h-72 overflow-auto rounded-md border border-line bg-white shadow-lg"
+          className="absolute z-30 mt-1 w-full max-h-72 overflow-auto rounded-md border border-line bg-surface shadow-lg"
         >
           {results.map((r, i) => {
             const formatted = formatAddress(r)
@@ -185,7 +185,7 @@ export function AddressAutocomplete({
                     pick(r)
                   }}
                   className={`w-full text-left flex items-start gap-2 px-3 py-2 text-sm ${
-                    i === highlight ? 'bg-ink-soft/10' : 'bg-white'
+                    i === highlight ? 'bg-ink-soft/10' : 'bg-surface'
                   } hover:bg-ink-soft/10 transition`}
                 >
                   <MapPin className="w-4 h-4 text-ink-muted mt-0.5 shrink-0" />

@@ -63,7 +63,7 @@ export function HomeSearch() {
         role="search"
         aria-label="Search listings"
         className="
-          text-left bg-white overflow-hidden rounded-2xl
+          text-left bg-surface overflow-hidden rounded-2xl
           shadow-popover
           min-[680px]:flex min-[680px]:items-stretch min-[680px]:h-[4.25rem]
           min-[680px]:rounded-full min-[680px]:pl-0 min-[680px]:pr-[0.375rem] min-[680px]:py-[0.375rem]

@@ -107,7 +107,7 @@ export default async function AdminImportReviewPage({
                   </div>
                 )}
                 {personal.pdfs.map((url: string, i: number) => (
-                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-[13px] text-navy hover:border-navy/40">
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-[13px] text-navy hover:border-navy/40">
                     <FileText className="w-4 h-4 shrink-0" /> View submitted PDF {i + 1}
                   </a>
                 ))}

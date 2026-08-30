@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Syne, Geist_Mono } from 'next/font/google'
+import { Syne } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { Analytics } from '@vercel/analytics/next'
@@ -10,12 +10,6 @@ import { JsonLd, siteJsonLd } from '@/components/seo/JsonLd'
 // and the family itself is declared once, as --font-body in globals.css.
 const display = Syne({
   variable: '--font-display',
-  subsets: ['latin'],
-  display: 'swap',
-})
-
-const mono = Geist_Mono({
-  variable: '--font-geist-mono',
   subsets: ['latin'],
   display: 'swap',
 })
@@ -90,7 +84,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${mono.variable} h-full antialiased`}
+      className={`${display.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://api.fontshare.com" />

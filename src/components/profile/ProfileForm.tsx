@@ -183,7 +183,7 @@ export function ProfileForm({
             <AvatarImage src={avatarUrl ?? undefined} />
             <AvatarFallback className="bg-blue-100 text-blue-700 text-xl font-semibold">{initials}</AvatarFallback>
           </Avatar>
-          <label className="absolute bottom-0 right-0 w-6 h-6 bg-white border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-gray-50">
+          <label className="absolute bottom-0 right-0 w-6 h-6 bg-surface border rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-gray-50">
             <Camera className="w-3 h-3 text-gray-600" />
             <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} disabled={uploadingAvatar} />
           </label>

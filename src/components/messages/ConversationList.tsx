@@ -69,7 +69,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search messages…"
-            className="h-11 w-full rounded-2xl bg-white border border-line pl-11 pr-9 text-sm text-ink placeholder:text-ink-muted/65 shadow-1 focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition-all duration-300"
+            className="h-11 w-full rounded-2xl bg-surface border border-line pl-11 pr-9 text-sm text-ink placeholder:text-ink-muted/65 shadow-1 focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition-all duration-300"
           />
           {query && (
             <button

@@ -20,16 +20,6 @@ export function EmptyListings() {
       className="relative rounded-3xl overflow-hidden border border-line bg-white/60 backdrop-blur-xl"
     >
       {/* Subtle atmosphere inside the panel */}
-      <div
-        className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-40 pointer-events-none"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 18%, transparent)' }}
-        aria-hidden
-      />
-      <div
-        className="absolute -bottom-32 -left-24 w-[380px] h-[380px] rounded-full blur-3xl opacity-30 pointer-events-none"
-        style={{ background: 'oklch(0.50 0.10 280 / 0.18)' }}
-        aria-hidden
-      />
 
       <div className="relative px-6 py-16 sm:py-20 text-center">
         {/* Floating compass mark */}
@@ -85,7 +75,7 @@ export function EmptyListings() {
           ].map(({ icon: Icon, label }) => (
             <span
               key={label}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white border border-line text-xs text-ink-soft shadow-1"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-surface border border-line text-xs text-ink-soft shadow-1"
             >
               <Icon className="w-3 h-3 text-gold-deep" />
               {label}

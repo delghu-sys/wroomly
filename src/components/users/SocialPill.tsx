@@ -50,7 +50,7 @@ export function SocialPill({ network, handle }: SocialPillProps) {
       className="
         group relative inline-flex items-center gap-2
         h-10 pl-3 pr-3.5 rounded-full overflow-hidden
-        bg-white border border-line text-ink-soft
+        bg-surface border border-line text-ink-soft
         text-[13px] font-medium tracking-tight
         shadow-1
         hover:shadow-glow-maize

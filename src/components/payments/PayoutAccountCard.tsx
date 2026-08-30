@@ -76,13 +76,6 @@ export function PayoutAccountCard({
         ? 'oklch(0.65 0.15 75 / 0.40)'
         : 'color-mix(in oklab, var(--maize-bright) 35%, transparent)'
 
-  const meshAccent =
-    tone === 'success'
-      ? 'oklch(0.55 0.15 142 / 0.18)'
-      : tone === 'warn'
-        ? 'oklch(0.65 0.15 75 / 0.22)'
-        : 'color-mix(in oklab, var(--maize-bright) 30%, transparent)'
-
   return (
     <div
       className="relative rounded-3xl overflow-hidden border bg-white/85 backdrop-blur-xl"
@@ -91,13 +84,6 @@ export function PayoutAccountCard({
         boxShadow: 'var(--shadow-edge), var(--shadow-2)',
       }}
     >
-      {/* Mesh accent in the corner */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-20 -right-16 w-60 h-60 rounded-full blur-3xl opacity-50"
-        style={{ background: meshAccent }}
-      />
-
       <div className="relative p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
         <div
           className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center shadow-2"

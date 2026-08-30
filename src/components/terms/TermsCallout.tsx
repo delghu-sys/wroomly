@@ -26,11 +26,6 @@ export function TermsCallout({ title, children }: TermsCalloutProps) {
       }}
     >
       {/* Mesh accent */}
-      <div
-        className="pointer-events-none absolute -top-16 -right-16 w-52 h-52 rounded-full blur-3xl opacity-40"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-        aria-hidden
-      />
 
       <div className="relative p-5 sm:p-6 flex gap-4">
         <div

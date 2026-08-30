@@ -74,7 +74,7 @@ export function ConnectStripeButton({
     'px-5 bg-maize-bright text-navy-deep shadow-glow-maize hover:shadow-glow-maize-strong'
 
   const ghost =
-    'px-4 bg-white border border-line text-ink-soft hover:border-maize-bright/40 hover:text-ink'
+    'px-4 bg-surface border border-line text-ink-soft hover:border-maize-bright/40 hover:text-ink'
 
   return (
     <button

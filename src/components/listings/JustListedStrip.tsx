@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { ListingWithDetails } from '@/types/database'
 import { formatCents, getListingImageUrl } from '@/lib/utils/listing'
-import { Sparkles, BedDouble } from 'lucide-react'
+import { Clock, BedDouble } from 'lucide-react'
 
 /**
  * "Just listed" strip (audit item 3): the newest active listings (≤72h) in a
@@ -16,7 +16,7 @@ export function JustListedStrip({ listings }: { listings: ListingWithDetails[] }
   return (
     <section aria-label="Just listed" className="mb-8" data-testid="just-listed-strip">
       <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-gold-deep font-bold mb-3">
-        <Sparkles className="w-3.5 h-3.5" /> Just listed
+        <Clock className="w-3.5 h-3.5" /> Just listed
       </p>
       <div
         className="flex gap-3 overflow-x-auto snap-x pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"

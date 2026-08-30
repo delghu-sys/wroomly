@@ -15,16 +15,6 @@ export function Footer() {
     <footer className="relative border-t border-line bg-navy text-white mt-auto overflow-hidden">
       {/* Decorative background elements */}
       <div
-        className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full -z-0 blur-3xl opacity-20"
-        style={{ background: 'radial-gradient(closest-side, oklch(0.86 0.17 92 / 0.4), transparent)' }}
-        aria-hidden
-      />
-      <div
-        className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full -z-0 blur-3xl opacity-15"
-        style={{ background: 'radial-gradient(closest-side, oklch(0.5 0.1 257 / 0.5), transparent)' }}
-        aria-hidden
-      />
-      <div
         className="absolute inset-0 -z-0 opacity-[0.04]"
         style={{
           backgroundImage: 'radial-gradient(oklch(1 0 0 / 0.5) 1px, transparent 1px)',

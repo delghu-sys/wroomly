@@ -22,16 +22,6 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
   return (
     <div className="relative flex-1 flex items-center justify-center overflow-hidden">
       {/* Soft mesh */}
-      <div
-        className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full blur-[120px] opacity-25 pointer-events-none"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
-        aria-hidden
-      />
-      <div
-        className="absolute -bottom-32 -left-32 w-[460px] h-[460px] rounded-full blur-[140px] opacity-15 pointer-events-none"
-        style={{ background: 'oklch(0.45 0.10 280 / 0.30)' }}
-        aria-hidden
-      />
 
       <div className="relative text-center px-8 max-w-md">
         {/* Watermark icon */}

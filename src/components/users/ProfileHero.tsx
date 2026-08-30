@@ -50,11 +50,6 @@ export function ProfileHero({
       }}
     >
       {/* Soft maize mesh blob behind avatar */}
-      <div
-        className="pointer-events-none absolute -top-20 -left-10 w-72 h-72 rounded-full blur-3xl opacity-25"
-        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
-        aria-hidden
-      />
 
       <div className="relative">
         {/* Avatar — 96px brand accent */}
@@ -83,7 +78,7 @@ export function ProfileHero({
           </Avatar>
           {isVerified && (
             <span className="absolute -bottom-1 -right-1">
-              <span className="inline-flex items-center justify-center rounded-full bg-white p-0.5 ring-2 ring-white shadow-[0_4px_14px_oklch(0.55_0.22_264/0.30)]">
+              <span className="inline-flex items-center justify-center rounded-full bg-surface p-0.5 ring-2 ring-white shadow-[0_4px_14px_oklch(0.55_0.22_264/0.30)]">
                 <VerifiedBadge size={26} />
               </span>
             </span>
@@ -109,7 +104,7 @@ export function ProfileHero({
         >
           {isVerified && <VerifiedBadge label size={13} />}
           <span
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-white border border-line text-ink-soft capitalize"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-surface border border-line text-ink-soft capitalize"
           >
             {userType}
           </span>
@@ -148,7 +143,7 @@ export function ProfileHero({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.36 }}
-            className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-line shadow-1"
+            className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-line shadow-1"
           >
             <StarRating
               value={ratingAvg}

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { ListingWithDetails } from '@/types/database'
@@ -47,7 +47,7 @@ export default async function HomePage() {
               href="/listings"
               className="
                 group inline-flex items-center gap-1.5 h-9 px-4 rounded-full shrink-0
-                border border-line bg-white text-[0.8125rem] font-semibold text-navy
+                border border-line bg-surface text-[0.8125rem] font-semibold text-navy
                 shadow-1
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                 hover:border-navy/30 hover:shadow-2 hover:-translate-y-px
@@ -112,7 +112,7 @@ export default async function HomePage() {
       <section aria-label="List your place" className="bg-background px-6 pb-16 sm:pb-20">
         <div
           className="
-            max-w-[40rem] mx-auto rounded-3xl border border-line bg-white
+            max-w-[40rem] mx-auto rounded-3xl border border-line bg-surface
             shadow-2
             px-7 py-8 sm:px-9
             flex flex-col items-center text-center gap-5
@@ -124,7 +124,7 @@ export default async function HomePage() {
               className="shrink-0 inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-navy text-maize"
               style={{ boxShadow: 'var(--shadow-glow-navy)' }}
             >
-              <Sparkles className="w-5 h-5" strokeWidth={2} />
+              <Camera className="w-5 h-5" strokeWidth={2} />
             </span>
             <div>
               <h3 className="font-display text-[1.1875rem] font-bold tracking-[-0.032em] text-ink leading-tight">
