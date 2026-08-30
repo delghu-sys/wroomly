@@ -55,12 +55,11 @@ export default function PrivacyPage() {
         <div
           className="rounded-3xl border border-maize-bright/35 bg-white/85 backdrop-blur-xl p-5 sm:p-6 mb-10 flex gap-4"
           style={{
-            boxShadow:
-              'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 24px color-mix(in oklab, var(--maize-bright) 10%, transparent)',
+            boxShadow: 'var(--shadow-edge), var(--shadow-glow-soft)',
           }}
         >
           <div
-            className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
+            className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-glow-maize"
             style={{
               background: 'var(--navy-deep)',
               color: 'var(--maize-bright)',

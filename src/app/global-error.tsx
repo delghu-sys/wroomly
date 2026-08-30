@@ -99,7 +99,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               fontSize: 14,
               background: 'var(--maize-bright)',
               color: 'var(--navy-deep)',
-              boxShadow: '0 4px 18px color-mix(in oklab, var(--maize-bright) 30%, transparent)',
+              boxShadow: 'var(--shadow-glow-maize)',
             }}
           >
             Reload

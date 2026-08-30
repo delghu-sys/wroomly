@@ -67,8 +67,8 @@ export function RoleContinueCta({ selected, onContinue }: RoleContinueCtaProps) 
               group relative w-full h-12 rounded-full overflow-hidden
               bg-maize-bright text-navy-deep
               font-semibold text-sm tracking-tight
-              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]
-              hover:shadow-[0_10px_32px_color-mix(in_oklab,var(--maize-bright)_50%,transparent)]
+              shadow-glow-maize
+              hover:shadow-glow-maize-strong
               transition-shadow duration-500
             "
           >

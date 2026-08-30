@@ -39,7 +39,7 @@ export function EmptyListings() {
           transition={{ ...spring, delay: 0.1 }}
           className="relative inline-flex"
         >
-          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-navy-deep text-maize-bright shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]">
+          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-navy-deep text-maize-bright shadow-glow-navy-strong">
             <Compass className="w-9 h-9" strokeWidth={1.5} />
             {/* Live pulse */}
             <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
@@ -85,7 +85,7 @@ export function EmptyListings() {
           ].map(({ icon: Icon, label }) => (
             <span
               key={label}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white border border-line text-xs text-ink-soft shadow-[0_1px_2px_oklch(0_0_0/0.04)]"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white border border-line text-xs text-ink-soft shadow-1"
             >
               <Icon className="w-3 h-3 text-gold-deep" />
               {label}

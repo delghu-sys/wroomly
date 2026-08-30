@@ -59,7 +59,7 @@ export function MobileFilterSheet({
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="mobile-filter-sheet"
-        className="lg:hidden inline-flex items-center gap-2 h-9 px-4 rounded-full border border-line bg-white/70 backdrop-blur text-sm font-medium text-ink hover:border-maize-bright/40 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-[0_1px_2px_oklch(0_0_0/0.04)] active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
+        className="lg:hidden inline-flex items-center gap-2 h-9 px-4 rounded-full border border-line bg-white/70 backdrop-blur text-sm font-medium text-ink hover:border-maize-bright/40 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-1 active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
       >
         <SlidersHorizontal size={14} weight="bold" />
         Filters

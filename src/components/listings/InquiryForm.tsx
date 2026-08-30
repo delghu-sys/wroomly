@@ -165,8 +165,8 @@ export function InquiryForm({
               group relative w-full h-11 rounded-full overflow-hidden
               bg-maize-bright text-navy-deep
               font-semibold
-              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-              hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+              shadow-glow-maize
+              hover:shadow-glow-maize-strong
               transition-shadow duration-500 active:scale-[0.98]
             "
           >
@@ -247,8 +247,8 @@ export function InquiryForm({
             group relative w-full h-12 rounded-full overflow-hidden
             bg-maize-bright text-navy-deep
             font-semibold text-sm tracking-tight
-            shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-            hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+            shadow-glow-maize
+            hover:shadow-glow-maize-strong
             transition-all duration-300 active:scale-[0.98]
           "
         >

@@ -71,7 +71,7 @@ export function ConnectStripeButton({
     'group relative inline-flex items-center justify-center gap-2 rounded-full overflow-hidden font-semibold tracking-tight transition-shadow duration-500 active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30 disabled:opacity-60 disabled:cursor-not-allowed'
 
   const solid =
-    'px-5 bg-maize-bright text-navy-deep shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)] hover:shadow-[0_12px_32px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]'
+    'px-5 bg-maize-bright text-navy-deep shadow-glow-maize hover:shadow-glow-maize-strong'
 
   const ghost =
     'px-4 bg-white border border-line text-ink-soft hover:border-maize-bright/40 hover:text-ink'

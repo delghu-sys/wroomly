@@ -62,7 +62,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             focusable controls. Keyboard/AT users open the lightbox via the
             dedicated "Open full-size photos" button rendered below. */}
         <div
-          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-navy-deep cursor-zoom-in shadow-[0_18px_50px_oklch(0_0_0/0.10)]"
+          className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-navy-deep cursor-zoom-in shadow-3"
           onClick={() => setLightboxOpen(true)}
         >
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
@@ -106,7 +106,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
               setLightboxOpen(true)
             }}
             aria-label="Open full-size photos"
-            className="absolute right-4 top-4 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-[0_4px_12px_oklch(0_0_0/0.20)] transition-all duration-300 active:scale-[0.92] hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/50"
+            className="absolute right-4 top-4 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-on-media transition-all duration-300 active:scale-[0.92] hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/50"
           >
             <Expand className="w-4 h-4" />
           </button>
@@ -118,7 +118,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
                   e.stopPropagation()
                   prev()
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-[0_4px_12px_oklch(0_0_0/0.20)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] hover:scale-105"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-on-media transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] hover:scale-105"
                 aria-label="Previous photo"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -128,7 +128,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
                   e.stopPropagation()
                   next()
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-[0_4px_12px_oklch(0_0_0/0.20)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] hover:scale-105"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/85 backdrop-blur hover:bg-white text-ink flex items-center justify-center shadow-on-media transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.92] hover:scale-105"
                 aria-label="Next photo"
               >
                 <ChevronRight className="w-5 h-5" />

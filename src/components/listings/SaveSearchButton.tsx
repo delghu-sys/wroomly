@@ -96,7 +96,7 @@ export function SaveSearchButton({ currentFilters, authed }: SaveSearchButtonPro
         disabled:opacity-50 disabled:cursor-not-allowed
         ${
           saved
-            ? 'bg-[oklch(0.55_0.15_142)] text-white shadow-[0_4px_14px_oklch(0.55_0.15_142/0.30)]'
+            ? 'bg-[oklch(0.55_0.15_142)] text-white shadow-glow-success'
             : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink'
         }
       `}

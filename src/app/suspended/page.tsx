@@ -21,7 +21,7 @@ export default function SuspendedPage() {
 
       <div className="relative w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center">
         <div
-          className="inline-flex w-14 h-14 rounded-2xl items-center justify-center mx-auto shadow-[0_8px_28px_oklch(0.65_0.15_75/0.30)]"
+          className="inline-flex w-14 h-14 rounded-2xl items-center justify-center mx-auto shadow-glow-maize"
           style={{
             background: 'oklch(0.65 0.15 75)',
             color: 'oklch(0.10 0.05 75)',
@@ -59,8 +59,8 @@ export default function SuspendedPage() {
               group inline-flex items-center gap-2 h-12 px-5 rounded-full
               bg-maize-bright text-navy-deep
               text-sm font-semibold tracking-tight
-              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-              hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+              shadow-glow-maize
+              hover:shadow-glow-maize-strong
               transition-shadow duration-500 active:scale-[0.97]
               focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
             "

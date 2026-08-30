@@ -41,7 +41,7 @@ export const BrandFormInput = forwardRef<HTMLInputElement, BrandFormInputProps>(
           className={`
             h-12 w-full rounded-2xl bg-white border px-4 text-[15px] text-ink
             placeholder:text-ink-muted/60
-            shadow-[0_1px_2px_oklch(0_0_0/0.04)]
+            shadow-1
             transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
             focus:outline-none focus:ring-4
             ${

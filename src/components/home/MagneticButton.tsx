@@ -41,7 +41,7 @@ export function MagneticButton({
 
   const styles = {
     primary:
-      'bg-maize-bright text-navy-deep font-semibold hover:shadow-[0_8px_30px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]',
+      'bg-maize-bright text-navy-deep font-semibold hover:shadow-glow-maize',
     secondary:
       'bg-transparent text-white border border-white/20 hover:border-white/40 hover:shadow-[0_8px_30px_oklch(1_0_0_/_0.05)]',
   }

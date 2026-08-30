@@ -108,12 +108,11 @@ export default function ResetPasswordClient() {
               transition={{ ...spring, delay: 0.1 }}
               className="rounded-3xl border border-line bg-white/85 backdrop-blur-xl p-6"
               style={{
-                boxShadow:
-                  'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 4px 18px oklch(0 0 0 / 0.04)',
+                boxShadow: 'var(--shadow-edge), var(--shadow-2)',
               }}
             >
               <div
-                className="inline-flex w-11 h-11 rounded-2xl items-center justify-center shadow-[0_6px_20px_oklch(0.55_0.15_142/0.30)]"
+                className="inline-flex w-11 h-11 rounded-2xl items-center justify-center shadow-glow-success"
                 style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
               >
                 <CheckCircle size={20} weight="duotone" />

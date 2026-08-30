@@ -127,7 +127,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
               placeholder:text-ink-muted/65
               focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep
               transition-all duration-300
-              shadow-[0_1px_2px_oklch(0_0_0/0.04)]
+              shadow-1
             "
             style={{ minHeight: 46 }}
           />
@@ -148,7 +148,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
             transition-all duration-300
             ${
               ready
-                ? 'bg-maize-bright text-navy-deep shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)] hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_50%,transparent)]'
+                ? 'bg-maize-bright text-navy-deep shadow-glow-maize hover:shadow-glow-maize-strong'
                 : 'bg-ink-muted/10 text-ink-muted cursor-not-allowed'
             }
           `}

@@ -93,10 +93,10 @@ export function AcceptedSystemCard({
           relative rounded-3xl overflow-hidden
           bg-white/85 backdrop-blur-xl
           border border-emerald-300/40
-          shadow-[0_8px_28px_oklch(0.55_0.15_142/0.18)]
+          shadow-glow-success
           max-w-sm w-full
         "
-        style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 8px 28px oklch(0.55 0.15 142 / 0.18)' }}
+        style={{ boxShadow: 'var(--shadow-edge), var(--shadow-glow-success)' }}
       >
         <div
           className="pointer-events-none absolute -top-12 -right-12 w-44 h-44 rounded-full blur-3xl opacity-50"
@@ -109,7 +109,7 @@ export function AcceptedSystemCard({
             initial={{ scale: 0.4 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.05 }}
-            className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 shadow-[0_6px_20px_oklch(0.55_0.15_142/0.30)]"
+            className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 shadow-glow-success"
             style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
           >
             <CheckCircle2 className="w-5 h-5" strokeWidth={2.25} />
@@ -184,7 +184,7 @@ export function AcceptedSystemCard({
               className="
                 group relative w-full mt-4 h-11 rounded-full overflow-hidden
                 bg-navy-deep text-maize-bright
-                hover:shadow-[0_8px_24px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
+                hover:shadow-glow-navy-strong
                 transition-shadow duration-500
                 active:scale-[0.98]
               "

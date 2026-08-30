@@ -36,8 +36,7 @@ export default async function NewListingPage() {
         <div
           className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl p-8 sm:p-10"
           style={{
-            boxShadow:
-              'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 18px 50px oklch(0 0 0 / 0.06)',
+            boxShadow: 'var(--shadow-edge), var(--shadow-3)',
           }}
         >
           <div
@@ -48,7 +47,7 @@ export default async function NewListingPage() {
 
           <div className="relative">
             <div
-              className="inline-flex w-12 h-12 rounded-2xl items-center justify-center shadow-[0_6px_20px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
+              className="inline-flex w-12 h-12 rounded-2xl items-center justify-center shadow-glow-maize"
               style={{
                 background: 'var(--navy-deep)',
                 color: 'var(--maize-bright)',

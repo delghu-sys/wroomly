@@ -24,11 +24,11 @@ export const FloatingDoor = memo(function FloatingDoor() {
       >
         <div
           className="
-            relative w-64 h-64 rounded-[2rem]
+            relative w-64 h-64 rounded-4xl
             border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl
-            shadow-[0_30px_80px_oklch(0_0_0/0.30)]
+            shadow-overlay
           "
-          style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.10), 0 30px 80px oklch(0 0 0 / 0.30)' }}
+          style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.10), var(--shadow-overlay)' }}
         >
           {/* Gold accent corner glow */}
           <div

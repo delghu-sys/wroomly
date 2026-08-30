@@ -48,9 +48,9 @@ export default async function HomePage() {
               className="
                 group inline-flex items-center gap-1.5 h-9 px-4 rounded-full shrink-0
                 border border-line bg-white text-[0.8125rem] font-semibold text-navy
-                shadow-[0_1px_3px_oklch(0_0_0/0.05)]
+                shadow-1
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                hover:border-navy/30 hover:shadow-[0_4px_16px_oklch(0_0_0/0.10)] hover:-translate-y-px
+                hover:border-navy/30 hover:shadow-2 hover:-translate-y-px
               "
             >
               See all
@@ -89,7 +89,7 @@ export default async function HomePage() {
                 group inline-flex items-center gap-2 h-12 px-7 rounded-full
                 bg-navy text-white font-semibold text-[0.9375rem]
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                hover:-translate-y-px hover:shadow-[0_8px_28px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
+                hover:-translate-y-px hover:shadow-glow-navy-strong
               "
             >
               See all listings
@@ -112,8 +112,8 @@ export default async function HomePage() {
       <section aria-label="List your place" className="bg-background px-6 pb-16 sm:pb-20">
         <div
           className="
-            max-w-[40rem] mx-auto rounded-[1.75rem] border border-line bg-white
-            shadow-[0_4px_28px_oklch(0.18_0.025_255/0.06)]
+            max-w-[40rem] mx-auto rounded-3xl border border-line bg-white
+            shadow-2
             px-7 py-8 sm:px-9
             flex flex-col items-center text-center gap-5
             min-[680px]:flex-row min-[680px]:items-center min-[680px]:justify-between min-[680px]:text-left min-[680px]:gap-7
@@ -122,7 +122,7 @@ export default async function HomePage() {
           <div className="flex flex-col items-center gap-4 min-[680px]:flex-row min-[680px]:flex-1">
             <span
               className="shrink-0 inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-navy text-maize"
-              style={{ boxShadow: '0 6px 18px color-mix(in oklab, var(--navy-deep) 25%, transparent)' }}
+              style={{ boxShadow: 'var(--shadow-glow-navy)' }}
             >
               <Sparkles className="w-5 h-5" strokeWidth={2} />
             </span>

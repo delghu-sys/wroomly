@@ -129,7 +129,7 @@ export function ListingMap({ lat, lng, neighborhood }: ListingMapProps) {
     <div className="space-y-2">
       <div
         ref={mapContainer}
-        className="h-64 rounded-3xl overflow-hidden border border-line shadow-[0_4px_18px_oklch(0_0_0/0.05)]"
+        className="h-64 rounded-3xl overflow-hidden border border-line shadow-2"
       />
       {neighborhood && (
         <p className="text-sm text-ink-muted leading-relaxed">

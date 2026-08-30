@@ -38,7 +38,7 @@ export function MessageBubbleSkeleton({
   return (
     <div className={`flex ${align === 'right' ? 'justify-end' : 'justify-start'} mb-2`}>
       <div
-        className="h-9 rounded-[1.25rem] shimmer"
+        className="h-9 rounded-2xl shimmer"
         style={{ width, maxWidth: '70%' }}
       />
     </div>

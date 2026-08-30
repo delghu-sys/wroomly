@@ -170,8 +170,8 @@ export function InquiryPinnedCard({
       initial={{ opacity: 0, y: -14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={spring}
-      className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl shadow-[0_4px_18px_oklch(0_0_0/0.05)]"
-      style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 4px 18px oklch(0 0 0 / 0.05)' }}
+      className="relative rounded-3xl overflow-hidden border border-line bg-white/85 backdrop-blur-xl shadow-2"
+      style={{ boxShadow: 'var(--shadow-edge), var(--shadow-2)' }}
     >
       {/* Glass refraction + maize accent corner */}
       <div
@@ -309,8 +309,8 @@ export function InquiryPinnedCard({
                 h-11 px-5 rounded-full overflow-hidden flex-1
                 font-semibold text-sm tracking-tight
                 bg-maize-bright text-navy-deep
-                shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-                hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+                shadow-glow-maize
+                hover:shadow-glow-maize-strong
                 disabled:opacity-60 disabled:cursor-not-allowed
                 active:scale-[0.97]
                 transition-all duration-300
@@ -366,8 +366,8 @@ export function InquiryPinnedCard({
                 h-11 px-5 rounded-full overflow-hidden
                 font-semibold text-sm tracking-tight
                 bg-[oklch(0.55_0.15_142)] text-white
-                shadow-[0_4px_18px_oklch(0.55_0.15_142/0.30)]
-                hover:shadow-[0_10px_28px_oklch(0.55_0.15_142/0.45)]
+                shadow-glow-success
+                hover:shadow-glow-success
                 disabled:opacity-60 disabled:cursor-not-allowed
                 active:scale-[0.97] transition-all duration-300
               "

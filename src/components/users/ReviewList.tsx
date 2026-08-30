@@ -60,11 +60,10 @@ export function ReviewList({ reviews }: ReviewListProps) {
           className="
             relative rounded-3xl overflow-hidden
             border border-line bg-white/85 backdrop-blur-xl
-            shadow-[0_2px_12px_oklch(0_0_0/0.04)]
+            shadow-2
           "
           style={{
-            boxShadow:
-              'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 12px oklch(0 0 0 / 0.04)',
+            boxShadow: 'var(--shadow-edge), var(--shadow-2)',
           }}
         >
           <div className="p-5 sm:p-6 flex gap-4">

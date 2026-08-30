@@ -64,10 +64,10 @@ export function MagneticLinkCta({
     'group relative inline-flex w-full items-center justify-center gap-2 rounded-full overflow-hidden font-semibold tracking-tight transition-shadow duration-500 active:scale-[0.97]'
 
   const primary =
-    'bg-maize-bright text-navy-deep shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)] hover:shadow-[0_12px_36px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]'
+    'bg-maize-bright text-navy-deep shadow-glow-maize hover:shadow-glow-maize-strong'
 
   const ghostLight =
-    'bg-white text-ink-soft border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)] hover:shadow-[0_6px_18px_oklch(0_0_0/0.04)] hover:border-maize-bright/40'
+    'bg-white text-ink-soft border border-line shadow-1 hover:shadow-2 hover:border-maize-bright/40'
 
   const ghostDark =
     'bg-white/[0.05] backdrop-blur-md text-white/85 border border-white/[0.15] hover:bg-white/[0.10] hover:border-maize-bright/45'

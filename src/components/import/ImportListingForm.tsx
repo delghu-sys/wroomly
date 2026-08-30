@@ -240,7 +240,7 @@ export function ImportListingForm() {
       </div>
 
       {/* ── PRIMARY: photos + screenshots ── */}
-      <section className="rounded-3xl border-2 border-maize-bright/45 bg-surface p-5 sm:p-7 space-y-4 shadow-[0_8px_30px_color-mix(in_oklab,var(--maize-bright)_10%,transparent)]">
+      <section className="rounded-3xl border-2 border-maize-bright/45 bg-surface p-5 sm:p-7 space-y-4 shadow-glow-soft">
         <div>
           <h2 className="font-display text-xl tracking-tight text-ink">
             Add photos of your place

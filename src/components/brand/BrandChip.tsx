@@ -22,7 +22,7 @@ export function BrandChip({
     primary:
       'bg-maize-bright text-navy-deep border border-maize-bright',
     ghost:
-      'bg-white/85 backdrop-blur text-ink border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)]',
+      'bg-white/85 backdrop-blur text-ink border border-line shadow-1',
     accent:
       'bg-maize-bright/12 text-gold-deep border border-maize-bright/25',
     navy:

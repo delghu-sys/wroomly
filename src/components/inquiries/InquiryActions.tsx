@@ -68,8 +68,8 @@ export function InquiryActions({
             inline-flex items-center gap-1.5 h-9 px-4 rounded-full
             text-[13px] font-semibold tracking-tight
             bg-maize-bright text-navy-deep
-            shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-            hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+            shadow-glow-maize
+            hover:shadow-glow-maize-strong
             transition-shadow duration-500 active:scale-[0.97]
             focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
           "

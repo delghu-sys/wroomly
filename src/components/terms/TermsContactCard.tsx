@@ -12,14 +12,13 @@ export function TermsContactCard() {
         group relative block rounded-3xl overflow-hidden
         border border-line bg-white/85 backdrop-blur-xl
         p-5 sm:p-6
-        shadow-[0_2px_12px_oklch(0_0_0/0.04)]
-        hover:shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_10%,transparent)]
+        shadow-2
+        hover:shadow-3
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
         hover:-translate-y-0.5
       "
       style={{
-        boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 12px oklch(0 0 0 / 0.04)',
+        boxShadow: 'var(--shadow-edge), var(--shadow-2)',
       }}
     >
       <div

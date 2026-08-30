@@ -43,7 +43,7 @@ export const DateSeparator = memo(function DateSeparator({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '0px 0px -20px 0px' }}
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-        className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide text-ink-soft bg-white/70 backdrop-blur-xl border border-line/70 shadow-[inset_0_1px_0_oklch(1_0_0/0.85)]"
+        className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide text-ink-soft bg-white/70 backdrop-blur-xl border border-line/70 shadow-edge"
       >
         {labelFor(iso, now)}
       </motion.span>

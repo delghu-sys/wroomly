@@ -84,12 +84,12 @@ export function WaitlistForm() {
           onChange={e => setEmail(e.target.value)}
           placeholder="Your .edu email"
           aria-label="Email address"
-          className="h-[3.125rem] w-full rounded-[0.875rem] border-[1.5px] border-white/28 bg-white/[0.11] backdrop-blur-[10px] px-4 text-white text-[0.9375rem] placeholder:text-white/30 transition focus:outline-none focus:border-maize focus:ring-2 focus:ring-[oklch(0.86_0.17_92/0.18)]"
+          className="h-[3.125rem] w-full rounded-lg border-[1.5px] border-white/28 bg-white/[0.11] backdrop-blur-[10px] px-4 text-white text-[0.9375rem] placeholder:text-white/30 transition focus:outline-none focus:border-maize focus:ring-2 focus:ring-[oklch(0.86_0.17_92/0.18)]"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="h-[3.125rem] w-full rounded-[0.875rem] bg-maize text-navy-deep font-semibold text-[0.9375rem] inline-flex items-center justify-center gap-2 shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.99]"
+          className="h-[3.125rem] w-full rounded-lg bg-maize text-navy-deep font-semibold text-[0.9375rem] inline-flex items-center justify-center gap-2 shadow-glow-maize hover:shadow-glow-maize-strong transition disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.99]"
         >
           {status === 'loading' ? (
             'Joining…'

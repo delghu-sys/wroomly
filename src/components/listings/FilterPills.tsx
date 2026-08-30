@@ -75,7 +75,7 @@ export function FilterPills({ filters }: FilterPillsProps) {
               <motion.span
                 layoutId="filter-pill-active"
                 transition={spring}
-                className="absolute inset-0 rounded-full bg-maize-bright shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]"
+                className="absolute inset-0 rounded-full bg-maize-bright shadow-glow-maize"
               />
             )}
             <span

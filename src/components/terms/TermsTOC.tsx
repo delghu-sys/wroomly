@@ -136,7 +136,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
             inline-flex items-center justify-between gap-2
             bg-white border border-line text-ink
             text-[13px] font-medium tracking-tight
-            shadow-[0_1px_2px_oklch(0_0_0/0.04)]
+            shadow-1
             transition-colors duration-300
             active:scale-[0.99]
           "
@@ -179,7 +179,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                 transition={{ type: 'spring', stiffness: 200, damping: 22 }}
                 className="
                   absolute left-4 right-4 sm:left-6 sm:right-6 top-full mt-2 z-50
-                  rounded-2xl border border-line bg-white shadow-[0_18px_50px_oklch(0_0_0/0.12)]
+                  rounded-2xl border border-line bg-white shadow-3
                   max-h-[60vh] overflow-y-auto p-1.5
                 "
               >

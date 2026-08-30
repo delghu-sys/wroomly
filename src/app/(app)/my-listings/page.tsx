@@ -50,7 +50,7 @@ export default async function MyListingsPage() {
           </h1>
         </div>
         <Link href="/listings/new">
-          <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-5 shadow-[0_8px_24px_oklch(0.27_0.07_257_/_0.22)]">
+          <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-5 shadow-glow-navy">
             <Plus className="w-4 h-4 mr-1" /> New listing
           </Button>
         </Link>
