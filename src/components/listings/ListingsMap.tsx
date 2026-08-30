@@ -18,6 +18,19 @@ export interface MapListing {
 // Ann Arbor central campus
 const AA_CENTER: [number, number] = [42.2780, -83.7430]
 
+// CARTO now requires a key on their raster basemaps. Unkeyed requests are not
+// blocked — they return a normal 200 PNG — but every tile comes back with
+// "API KEY REQUIRED" burned diagonally across it, which is what you see on the
+// map without this set.
+//
+// Absent a key we still render the map rather than showing nothing: a
+// watermarked map beats an empty grey box, and this way a missing env var in
+// one environment doesn't take the feature down.
+const CARTO_KEY = process.env.NEXT_PUBLIC_CARTO_KEY
+const CARTO_TILES =
+  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' +
+  (CARTO_KEY ? `?key=${encodeURIComponent(CARTO_KEY)}` : '')
+
 function priceLabel(cents: number | null): string {
   if (!cents) return '—'
   const dollars = Math.round(cents / 100)
@@ -78,7 +91,7 @@ export function ListingsMap({
       })
 
       L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        CARTO_TILES,
         {
           maxZoom: 19,
           attribution:
