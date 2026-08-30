@@ -12,7 +12,17 @@ import { BrandChip } from '@/components/brand/BrandChip'
 import { ScrollReveal } from '@/components/home/ScrollReveal'
 import { ShareListing } from '@/components/listings/ShareListing'
 import { ViewPing } from '@/components/listings/ViewPing'
-import { BedDouble, Bath, Maximize2, Calendar, MapPin, Eye, Heart } from 'lucide-react'
+import {
+  BedDouble,
+  Bath,
+  Maximize2,
+  Calendar,
+  MapPin,
+  Eye,
+  Heart,
+  Footprints,
+} from 'lucide-react'
+import { walkToCampus } from '@/lib/campus'
 import { formatDateRange, getListingImageUrl } from '@/lib/utils/listing'
 import { format, parseISO } from 'date-fns'
 import {
@@ -220,6 +230,8 @@ export default async function ListingDetailPage({
   }
 
   const sortedImages = l.listing_images.sort((a, b) => a.display_order - b.display_order)
+
+  const walk = walkToCampus(l.lat, l.lng)
   const amenities = l.listing_amenities.map(a => a.amenity)
 
   // SEO: only emit Accommodation/Breadcrumb structured data for publicly
@@ -470,6 +482,15 @@ export default async function ListingDetailPage({
                   <h2 className="font-display text-[1.75rem] tracking-tight text-ink mb-4 leading-tight">
                     Location
                   </h2>
+                  {walk && (
+                    <p className="flex items-center gap-1.5 text-[15px] font-medium text-navy mb-3">
+                      <Footprints className="w-4 h-4 shrink-0" />
+                      {walk.label}
+                      <span className="font-normal text-ink-muted">
+                        · estimated from the approximate address
+                      </span>
+                    </p>
+                  )}
                   <ListingMap lat={l.lat} lng={l.lng} neighborhood={l.neighborhood} />
                 </div>
               </ScrollReveal>

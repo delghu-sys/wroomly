@@ -11,7 +11,9 @@ import {
   Star,
   Sofa,
   PawPrint,
+  Footprints,
 } from 'lucide-react'
+import { walkToCampus } from '@/lib/campus'
 import {
   formatCents,
   formatDateRange,
@@ -47,6 +49,8 @@ export function BrandListingCard({
   const imageUrls = [...listing.listing_images]
     .sort((a, b) => a.display_order - b.display_order)
     .map(img => getListingImageUrl(img.storage_path))
+
+  const walk = walkToCampus(listing.lat, listing.lng)
 
   const initials = listing.users?.full_name
     ?.split(' ')
@@ -136,6 +140,16 @@ export function BrandListingCard({
                 <span className="truncate">
                   {listing.neighborhood}, {listing.city}
                 </span>
+              </div>
+            )}
+
+            {/* Walk time to campus — the one thing a national listing site
+                can't tell a Michigan student. Absent when the listing has no
+                coordinates or sits too far out for walking to be the answer. */}
+            {walk && (
+              <div className="flex items-center gap-1 text-[13px] font-medium text-navy mt-1">
+                <Footprints className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{walk.label}</span>
               </div>
             )}
 
