@@ -116,7 +116,7 @@ export default async function StartListingPage() {
             {/* Card A — Import (recommended) */}
             <Link
               href="/import-listing"
-              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-[1.5rem] border-[1.5px] border-[oklch(0.86_0.17_92/0.28)] p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-[oklch(0.86_0.17_92/0.68)] hover:shadow-[0_22px_64px_oklch(0.86_0.17_92/0.22)]"
+              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-3xl border-[1.5px] border-[oklch(0.86_0.17_92/0.28)] p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-[oklch(0.86_0.17_92/0.68)] hover:shadow-glow-maize"
               style={{
                 animationDelay: '0.4s',
                 background:
@@ -135,10 +135,10 @@ export default async function StartListingPage() {
               </span>
 
               <span
-                className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-[0.875rem] text-maize transition-transform duration-300 group-hover:scale-[1.06] group-hover:rotate-[-4deg]"
+                className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-lg text-maize transition-transform duration-300 group-hover:scale-[1.06] group-hover:rotate-[-4deg]"
                 style={{
                   background: NAVY,
-                  boxShadow: '0 6px 20px color-mix(in oklab, var(--navy-deep) 22%, transparent)',
+                  boxShadow: 'var(--shadow-glow-navy)',
                 }}
               >
                 <Sparkles className="w-5 h-5" strokeWidth={2} />
@@ -166,10 +166,10 @@ export default async function StartListingPage() {
             {/* Card B — Manual */}
             <Link
               href={manualHref}
-              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-[1.5rem] border-[1.5px] border-border bg-white p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-navy-deep/18 hover:shadow-[0_20px_56px_color-mix(in_oklab,var(--navy-deep)_8%,transparent)]"
+              className="group animate-fade-up relative isolate overflow-hidden flex flex-col rounded-3xl border-[1.5px] border-border bg-white p-7 transition-all duration-300 hover:-translate-y-[5px] hover:border-navy-deep/18 hover:shadow-3"
               style={{ animationDelay: '0.53s' }}
             >
-              <span className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-[0.875rem] bg-[oklch(0.96_0.008_85)] text-ink-soft transition-all duration-300 group-hover:scale-[1.06] group-hover:rotate-[-3deg] group-hover:bg-navy-deep group-hover:text-maize">
+              <span className="inline-flex w-[50px] h-[50px] items-center justify-center rounded-lg bg-[oklch(0.96_0.008_85)] text-ink-soft transition-all duration-300 group-hover:scale-[1.06] group-hover:rotate-[-3deg] group-hover:bg-navy-deep group-hover:text-maize">
                 <PencilLine className="w-5 h-5" strokeWidth={2} />
               </span>
 

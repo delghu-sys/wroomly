@@ -45,7 +45,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
         group relative rounded-3xl overflow-hidden
         border border-line bg-white/70 backdrop-blur-xl p-6
         transition-shadow duration-500
-        hover:shadow-[0_18px_50px_oklch(0_0_0/0.08)]
+        hover:shadow-3
       "
     >
       {/* Glass refraction highlight */}

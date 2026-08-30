@@ -43,11 +43,10 @@ export function ProfileHero({
         relative overflow-hidden rounded-3xl
         border border-line bg-white/70 backdrop-blur-xl
         p-6 sm:p-8
-        shadow-[0_2px_12px_oklch(0_0_0/0.04)]
+        shadow-2
       "
       style={{
-        boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 12px oklch(0 0 0 / 0.04)',
+        boxShadow: 'var(--shadow-edge), var(--shadow-2)',
       }}
     >
       {/* Soft maize mesh blob behind avatar */}
@@ -66,7 +65,7 @@ export function ProfileHero({
           className="relative inline-flex"
         >
           <Avatar
-            className="ring-2 ring-white shadow-[0_8px_28px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
+            className="ring-2 ring-white shadow-glow-maize"
             style={{ width: 80, height: 80 }}
           >
             <AvatarImage src={avatarUrl ?? undefined} />
@@ -149,7 +148,7 @@ export function ProfileHero({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...spring, delay: 0.36 }}
-            className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)]"
+            className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-line shadow-1"
           >
             <StarRating
               value={ratingAvg}

@@ -61,6 +61,49 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.04), 0 4px 12px oklch(0 0 0 / 0.04);
   --shadow-glow: 0 8px 32px oklch(0.27 0.07 257 / 0.18);
+
+  /* ── Elevation ───────────────────────────────────────────────────────────
+     Three steps, and they mean something: how far off the page a thing sits.
+     1 = resting on it (inputs, pills, rows). 2 = lifted (cards, hovered rows).
+     3 = floating (sticky sidebars, feature panels).
+
+     Overlay is deliberately NOT step 4. It sits above a scrim rather than the
+     page, so it needs a much darker shadow to read at all — same geometry,
+     different job. Popover is the two-layer version for menus and dropdowns,
+     where a tight inner shadow keeps the edge crisp against busy content.
+
+     Before this existed there were 26 distinct black shadows across 43 uses,
+     no two components agreeing on what "a card shadow" was. */
+  --shadow-1: 0 1px 2px oklch(0 0 0 / 0.04);
+  --shadow-2: 0 4px 18px oklch(0 0 0 / 0.05);
+  --shadow-3: 0 18px 50px oklch(0 0 0 / 0.08);
+  --shadow-overlay: 0 18px 50px oklch(0 0 0 / 0.40);
+  --shadow-popover: 0 12px 56px oklch(0 0 0 / 0.36), 0 3px 16px oklch(0 0 0 / 0.16);
+  /* Controls that sit on top of a photo (gallery arrows, image badges). The
+     page-elevation steps are tuned for cream and vanish against a photograph,
+     so this one is darker and tighter on purpose. */
+  --shadow-on-media: 0 4px 12px oklch(0 0 0 / 0.20);
+
+  /* ── Glow ────────────────────────────────────────────────────────────────
+     A separate axis from elevation, not a fourth step on it. These say "this
+     control is the brand-coloured one you're meant to press" — they carry the
+     button's own hue, so folding them into the neutral scale would flatten
+     every maize CTA on the site into a grey card.
+
+     Each has a -strong pair used on hover; keeping the pair named means the
+     rest/hover relationship stays consistent instead of being re-guessed at
+     each call site (it was: 45%, 50%, and 42% all appeared as "the hover"). */
+  --shadow-glow-soft: 0 8px 30px color-mix(in oklab, var(--maize-bright) 12%, transparent);
+  --shadow-glow-maize: 0 4px 18px color-mix(in oklab, var(--maize-bright) 30%, transparent);
+  --shadow-glow-maize-strong: 0 10px 32px color-mix(in oklab, var(--maize-bright) 45%, transparent);
+  --shadow-glow-navy: 0 8px 24px color-mix(in oklab, var(--navy-deep) 25%, transparent);
+  --shadow-glow-navy-strong: 0 12px 36px color-mix(in oklab, var(--navy-deep) 35%, transparent);
+  --shadow-glow-success: 0 6px 20px oklch(0.55 0.15 142 / 0.30);
+
+  /* The 1px inner top highlight that makes the frosted surfaces read as glass.
+     Recurs on its own and prefixed to other shadows; named so it stops being
+     retyped with a slightly different alpha each time. */
+  --shadow-edge: inset 0 1px 0 oklch(1 0 0 / 0.85);
 }
 
 :root {

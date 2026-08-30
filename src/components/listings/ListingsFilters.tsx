@@ -98,7 +98,7 @@ export function ListingsFilters({
     'text-[10px] uppercase tracking-[0.15em] text-ink-muted font-semibold'
 
   return (
-    <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl border border-white/60 p-5 space-y-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto shadow-[0_2px_16px_oklch(0_0_0/0.04)]">
+    <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl border border-white/60 p-5 space-y-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto shadow-2">
       {/* Soft inner highlight for glass refraction */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl"
@@ -220,7 +220,7 @@ export function ListingsFilters({
                 onClick={() => toggleMulti('neighborhood', n)}
                 className={`text-sm px-3 py-1.5 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-[0_4px_16px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]'
+                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-glow-navy'
                     : 'text-ink-soft border-line bg-white/60 hover:border-maize-bright/40 hover:text-ink'
                 }`}
               >
@@ -321,7 +321,7 @@ export function ListingsFilters({
                 }
                 className={`text-sm py-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-[0_4px_16px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]'
+                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-glow-navy'
                     : 'text-ink-soft border-line bg-white/60 hover:border-maize-bright/40 hover:text-ink'
                 }`}
               >

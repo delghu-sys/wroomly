@@ -68,7 +68,7 @@ export default async function FavoritesPage() {
             you can come back later.
           </p>
           <Link href="/listings">
-            <Button className="press rounded-full bg-maize-bright text-navy-deep hover:shadow-[0_8px_24px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)] h-11 px-6 font-semibold transition-shadow duration-500">
+            <Button className="press rounded-full bg-maize-bright text-navy-deep hover:shadow-glow-maize h-11 px-6 font-semibold transition-shadow duration-500">
               Browse listings
             </Button>
           </Link>

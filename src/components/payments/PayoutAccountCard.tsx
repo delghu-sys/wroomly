@@ -88,8 +88,7 @@ export function PayoutAccountCard({
       className="relative rounded-3xl overflow-hidden border bg-white/85 backdrop-blur-xl"
       style={{
         borderColor: borderAccent,
-        boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 24px oklch(0 0 0 / 0.05)',
+        boxShadow: 'var(--shadow-edge), var(--shadow-2)',
       }}
     >
       {/* Mesh accent in the corner */}
@@ -101,7 +100,7 @@ export function PayoutAccountCard({
 
       <div className="relative p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
         <div
-          className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center shadow-[0_6px_20px_oklch(0_0_0/0.08)]"
+          className="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center shadow-2"
           style={{ background: tileBg, color: tileFg }}
         >
           <Icon size={20} weight="duotone" />

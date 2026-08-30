@@ -64,7 +64,7 @@ export const MessageBubble = memo(function MessageBubble({
       <div
         className={`
           relative max-w-[78%] sm:max-w-[68%] px-4 py-2.5 text-[14.5px] leading-[1.45]
-          rounded-[1.25rem] shadow-[0_1px_2px_oklch(0_0_0/0.05)]
+          rounded-2xl shadow-1
           ${
             isMe
               ? 'bg-[oklch(0.18_0.025_255)] text-white rounded-br-[4px]'
@@ -74,7 +74,7 @@ export const MessageBubble = memo(function MessageBubble({
         style={
           isMe
             ? undefined
-            : { boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 1px 2px oklch(0 0 0 / 0.05)' }
+            : { boxShadow: 'var(--shadow-edge), var(--shadow-1)' }
         }
       >
         <p className="whitespace-pre-wrap break-words">{content}</p>

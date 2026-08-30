@@ -44,7 +44,7 @@ export function BrandTooltip({
               text-[12.5px] leading-snug
               text-white/85
               border border-white/[0.10]
-              shadow-[0_18px_50px_oklch(0_0_0/0.40)]
+              shadow-overlay
               backdrop-blur-xl
               origin-[var(--transform-origin)]
               transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -54,8 +54,7 @@ export function BrandTooltip({
             "
             style={{
               background: 'color-mix(in oklab, var(--navy-deep) 92%, transparent)',
-              boxShadow:
-                'inset 0 1px 0 oklch(1 0 0 / 0.10), 0 18px 50px oklch(0 0 0 / 0.40)',
+              boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.10), var(--shadow-overlay)',
             }}
           >
             {/* Soft maize accent stripe along the top for brand recognition */}

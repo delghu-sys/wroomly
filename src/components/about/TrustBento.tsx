@@ -73,12 +73,12 @@ function Tile({
         delay: index * 0.08,
       }}
       whileHover={{ y: -4 }}
-      className="group relative rounded-3xl overflow-hidden border border-line bg-white/70 backdrop-blur-xl p-7 sm:p-8 transition-shadow duration-500 hover:shadow-[0_24px_60px_oklch(0_0_0/0.08)]"
+      className="group relative rounded-3xl overflow-hidden border border-line bg-white/70 backdrop-blur-xl p-7 sm:p-8 transition-shadow duration-500 hover:shadow-3"
     >
       {/* Glass refraction highlight */}
       <div
         className="pointer-events-none absolute inset-0 rounded-3xl"
-        style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85)' }}
+        style={{ boxShadow: 'var(--shadow-edge)' }}
         aria-hidden
       />
       {/* Spotlight follower */}

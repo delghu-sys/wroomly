@@ -80,8 +80,8 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
               focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
               ${
                 active
-                  ? 'bg-white border-[2px] border-gold-deep shadow-[0_18px_50px_color-mix(in_oklab,var(--maize-bright)_22%,transparent)]'
-                  : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-maize-bright/40 hover:shadow-[0_8px_24px_oklch(0_0_0/0.04)]'
+                  ? 'bg-white border-[2px] border-gold-deep shadow-glow-maize'
+                  : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-maize-bright/40 hover:shadow-2'
               }
             `}
             style={
@@ -112,7 +112,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   animate={{ scale: 1, opacity: 1, rotate: 0 }}
                   exit={{ scale: 0.6, opacity: 0 }}
                   transition={popSpring}
-                  className="absolute top-4 right-4 inline-flex w-7 h-7 rounded-full items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)]"
+                  className="absolute top-4 right-4 inline-flex w-7 h-7 rounded-full items-center justify-center shadow-glow-maize"
                   style={{
                     background: 'var(--maize-bright)',
                     color: 'var(--navy-deep)',
@@ -136,7 +136,7 @@ export function RoleSelectorCards({ selected, onSelect }: RoleSelectorCardsProps
                   transition-colors duration-500
                   ${
                     active
-                      ? 'bg-navy-deep text-maize-bright shadow-[0_8px_24px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]'
+                      ? 'bg-navy-deep text-maize-bright shadow-glow-navy'
                       : 'bg-[oklch(0.97_0.008_75)] text-ink-soft group-hover:bg-navy-deep group-hover:text-maize-bright'
                   }
                 `}

@@ -43,8 +43,7 @@ export function DealClosedSystemCard({
       <div
         className="relative rounded-3xl overflow-hidden bg-white/85 backdrop-blur-xl border border-emerald-300/40 max-w-sm w-full"
         style={{
-          boxShadow:
-            'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 8px 28px oklch(0.55 0.15 142 / 0.18)',
+          boxShadow: 'var(--shadow-edge), var(--shadow-glow-success)',
         }}
       >
         <div
@@ -58,7 +57,7 @@ export function DealClosedSystemCard({
             initial={{ scale: 0.4 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.05 }}
-            className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 shadow-[0_6px_20px_oklch(0.55_0.15_142/0.30)]"
+            className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 shadow-glow-success"
             style={{ background: 'oklch(0.55 0.15 142)', color: 'white' }}
           >
             <PartyPopper className="w-5 h-5" strokeWidth={2.25} />

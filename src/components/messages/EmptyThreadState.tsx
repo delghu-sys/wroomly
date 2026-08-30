@@ -42,7 +42,7 @@ export function EmptyThreadState({ hasConversations }: EmptyThreadStateProps) {
           className="relative inline-flex"
         >
           <div
-            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]"
+            className="w-24 h-24 rounded-3xl flex items-center justify-center shadow-glow-navy-strong"
             style={{
               background: 'var(--navy-deep)',
               color: 'var(--maize-bright)',

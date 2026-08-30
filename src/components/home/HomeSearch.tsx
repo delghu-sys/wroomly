@@ -63,11 +63,11 @@ export function HomeSearch() {
         role="search"
         aria-label="Search listings"
         className="
-          text-left bg-white overflow-hidden rounded-[1.375rem]
-          shadow-[0_8px_48px_oklch(0_0_0/0.32),0_2px_12px_oklch(0_0_0/0.14)]
+          text-left bg-white overflow-hidden rounded-2xl
+          shadow-popover
           min-[680px]:flex min-[680px]:items-stretch min-[680px]:h-[4.25rem]
           min-[680px]:rounded-full min-[680px]:pl-0 min-[680px]:pr-[0.375rem] min-[680px]:py-[0.375rem]
-          min-[680px]:shadow-[0_12px_56px_oklch(0_0_0/0.36),0_3px_16px_oklch(0_0_0/0.16)]
+          min-[680px]:shadow-popover
         "
       >
         <div className="flex flex-col min-[680px]:flex-row min-[680px]:flex-1">
@@ -129,7 +129,7 @@ export function HomeSearch() {
               rounded-full bg-maize text-navy font-bold text-[1.0625rem] min-[680px]:text-[0.9375rem]
               inline-flex items-center justify-center gap-2 shrink-0
               transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-              hover:-translate-y-px hover:shadow-[0_8px_28px_oklch(0.86_0.17_92/0.42)] active:scale-[0.97]
+              hover:-translate-y-px hover:shadow-glow-maize-strong active:scale-[0.97]
             "
           >
             <span className="min-[680px]:hidden">Search listings</span>
@@ -147,7 +147,7 @@ export function HomeSearch() {
             group inline-flex items-center gap-2 h-11 px-6 rounded-full
             bg-maize text-navy text-[0.9375rem] font-bold
             transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-            hover:-translate-y-px hover:shadow-[0_8px_28px_oklch(0.86_0.17_92/0.42)]
+            hover:-translate-y-px hover:shadow-glow-maize-strong
           "
         >
           Browse all listings

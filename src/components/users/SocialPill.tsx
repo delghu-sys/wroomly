@@ -52,8 +52,8 @@ export function SocialPill({ network, handle }: SocialPillProps) {
         h-10 pl-3 pr-3.5 rounded-full overflow-hidden
         bg-white border border-line text-ink-soft
         text-[13px] font-medium tracking-tight
-        shadow-[0_1px_2px_oklch(0_0_0/0.04)]
-        hover:shadow-[0_6px_20px_color-mix(in_oklab,var(--maize-bright)_20%,transparent)]
+        shadow-1
+        hover:shadow-glow-maize
         transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
       "
     >

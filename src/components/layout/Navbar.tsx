@@ -81,7 +81,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
       className={`sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         transparent
           ? 'bg-transparent border-b border-transparent'
-          : 'mobile-frost bg-background/90 sm:bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-[0_1px_3px_oklch(0_0_0/0.04)] sm:supports-[backdrop-filter]:bg-background/60'
+          : 'mobile-frost bg-background/90 sm:bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-1 sm:supports-[backdrop-filter]:bg-background/60'
       }`}
     >
       <nav aria-label="Main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
@@ -118,7 +118,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
             </Link>
             <Link
               href="/list-place"
-              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-maize text-navy text-[0.8125rem] font-bold ease-smooth transition-all hover:-translate-y-px hover:shadow-[0_6px_20px_oklch(0.86_0.17_92/0.42)]"
+              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-maize text-navy text-[0.8125rem] font-bold ease-smooth transition-all hover:-translate-y-px hover:shadow-glow-maize"
             >
               <House className="w-3.5 h-3.5" strokeWidth={2.5} />
               List your place

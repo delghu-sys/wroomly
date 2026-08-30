@@ -103,7 +103,7 @@ export function AmenityGrid({ amenities }: AmenityGridProps) {
               group flex items-center gap-3
               px-4 py-3 rounded-2xl bg-white border border-line
               hover:border-maize-bright/40
-              hover:shadow-[0_4px_18px_oklch(0_0_0/0.04)]
+              hover:shadow-2
               transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
             "
           >

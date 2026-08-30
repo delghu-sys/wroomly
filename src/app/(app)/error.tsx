@@ -68,8 +68,8 @@ export default function AppError({ error, reset }: ErrorProps) {
               group relative inline-flex w-full items-center justify-center gap-2
               h-12 rounded-full overflow-hidden font-semibold tracking-tight text-sm
               bg-maize-bright text-navy-deep
-              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-              hover:shadow-[0_12px_36px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+              shadow-glow-maize
+              hover:shadow-glow-maize-strong
               transition-shadow duration-500 active:scale-[0.97]
               focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/40
             "

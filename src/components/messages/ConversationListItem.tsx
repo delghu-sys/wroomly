@@ -110,8 +110,8 @@ export function ConversationListItem({ data, active }: ConversationListItemProps
           <motion.span
             layoutId="convo-active-bg"
             transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-            className="absolute inset-0 rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl shadow-[0_1px_2px_oklch(0_0_0/0.04),_0_8px_24px_oklch(0_0_0/0.04)] pointer-events-none"
-            style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 8px 24px oklch(0 0 0 / 0.04)' }}
+            className="absolute inset-0 rounded-2xl border border-white/70 bg-white/85 backdrop-blur-xl shadow-2 pointer-events-none"
+            style={{ boxShadow: 'var(--shadow-edge), var(--shadow-2)' }}
           />
         )}
         {/* Active left indicator — animated maize bar */}

@@ -287,7 +287,7 @@ export function InquiryModal({
               flex flex-col overflow-hidden
               rounded-none sm:rounded-3xl
               bg-white sm:border sm:border-line
-              shadow-none sm:shadow-[0_30px_80px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
+              shadow-none sm:shadow-glow-navy-strong
             "
             role="dialog"
             aria-modal="true"
@@ -436,8 +436,8 @@ export function InquiryModal({
                         group relative w-full h-12 rounded-full overflow-hidden mt-2
                         bg-maize-bright text-navy-deep
                         font-semibold text-sm tracking-tight
-                        shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]
-                        hover:shadow-[0_10px_32px_color-mix(in_oklab,var(--maize-bright)_50%,transparent)]
+                        shadow-glow-maize
+                        hover:shadow-glow-maize-strong
                         disabled:opacity-60 disabled:cursor-not-allowed
                         active:scale-[0.98]
                         transition-all duration-300
@@ -495,7 +495,7 @@ export function InquiryModal({
                     initial={{ scale: 0.4, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ ...popSpring, delay: 0.05 }}
-                    className="relative inline-flex w-16 h-16 rounded-3xl items-center justify-center mx-auto shadow-[0_8px_28px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)]"
+                    className="relative inline-flex w-16 h-16 rounded-3xl items-center justify-center mx-auto shadow-glow-maize-strong"
                     style={{
                       background: 'var(--maize-bright)',
                       color: 'var(--navy-deep)',

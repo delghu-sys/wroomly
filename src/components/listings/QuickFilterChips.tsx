@@ -160,7 +160,7 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
                 transition-all duration-200 ease-out active:scale-[0.97]
                 ${
                   active
-                    ? 'bg-navy-deep text-maize-bright shadow-[0_4px_14px_color-mix(in_oklab,var(--navy-deep)_25%,transparent)]'
+                    ? 'bg-navy-deep text-maize-bright shadow-glow-navy'
                     : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink'
                 }
               `}

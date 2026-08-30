@@ -98,7 +98,7 @@ export function GoogleAuthButton({
       type="button"
       onClick={handleClick}
       disabled={disabled || loading}
-      className="group w-full h-12 rounded-full border border-line bg-white text-ink font-semibold text-sm tracking-tight inline-flex items-center justify-center gap-2.5 transition-all duration-300 hover:bg-[oklch(0.98_0.005_85)] hover:shadow-[0_4px_18px_oklch(0_0_0/0.06)] disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]"
+      className="group w-full h-12 rounded-full border border-line bg-white text-ink font-semibold text-sm tracking-tight inline-flex items-center justify-center gap-2.5 transition-all duration-300 hover:bg-[oklch(0.98_0.005_85)] hover:shadow-2 disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]"
     >
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleG />}
       {loading ? 'Redirecting…' : label}

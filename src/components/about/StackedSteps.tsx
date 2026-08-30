@@ -93,7 +93,7 @@ function Step({
 
           <div className="relative">
             <div className="inline-flex items-center gap-3 mb-5">
-              <div className="w-11 h-11 rounded-xl bg-navy-deep text-maize-bright flex items-center justify-center shadow-[0_8px_24px_color-mix(in_oklab,var(--navy-deep)_20%,transparent)]">
+              <div className="w-11 h-11 rounded-xl bg-navy-deep text-maize-bright flex items-center justify-center shadow-glow-navy">
                 <Icon className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <span className="text-xs uppercase tracking-[0.2em] text-ink-muted font-semibold">
@@ -121,8 +121,8 @@ function Step({
           >
             <div className="relative w-full h-full max-w-md">
               <div
-                className="absolute inset-0 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_18px_50px_oklch(0_0_0/0.06)]"
-                style={{ boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 18px 50px oklch(0 0 0 / 0.06)' }}
+                className="absolute inset-0 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-3"
+                style={{ boxShadow: 'var(--shadow-edge), var(--shadow-3)' }}
               />
               <div
                 className="absolute -top-8 -right-8 w-44 h-44 rounded-full blur-3xl opacity-50"

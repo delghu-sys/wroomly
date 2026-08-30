@@ -73,7 +73,7 @@ export default function AboutPage() {
             {/* Right — abstract glass composition */}
             <div className="hidden lg:block relative h-[440px]" aria-hidden>
               <div
-                className="absolute top-8 right-12 w-56 h-72 rounded-3xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_oklch(0_0_0/0.40)] rotate-[5deg]"
+                className="absolute top-8 right-12 w-56 h-72 rounded-3xl bg-white/[0.05] backdrop-blur-xl border border-white/[0.08] shadow-overlay rotate-[5deg]"
               >
                 <div className="animate-float p-5 flex flex-col gap-4 h-full">
                   <div className="h-2.5 w-3/4 rounded-full bg-white/[0.10]" />
@@ -86,7 +86,7 @@ export default function AboutPage() {
               </div>
 
               <div
-                className="absolute top-24 right-48 w-60 h-80 rounded-3xl bg-white/[0.07] backdrop-blur-xl border border-white/[0.10] shadow-[0_18px_50px_oklch(0_0_0/0.50)] -rotate-[4deg]"
+                className="absolute top-24 right-48 w-60 h-80 rounded-3xl bg-white/[0.07] backdrop-blur-xl border border-white/[0.10] shadow-overlay -rotate-[4deg]"
               >
                 <div className="animate-float-slow p-5 flex flex-col gap-3 h-full">
                   <div className="flex items-center gap-2">

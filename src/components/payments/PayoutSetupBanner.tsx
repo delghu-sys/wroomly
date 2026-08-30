@@ -28,8 +28,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
       "
       style={{
         borderColor: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)',
-        boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 18px color-mix(in oklab, var(--maize-bright) 12%, transparent)',
+        boxShadow: 'var(--shadow-edge), var(--shadow-glow-soft)',
       }}
     >
       <div
@@ -40,7 +39,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
 
       <div className="relative flex items-center gap-4 p-4 sm:p-5">
         <div
-          className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
+          className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-glow-maize"
           style={{
             background: 'var(--navy-deep)',
             color: 'var(--maize-bright)',

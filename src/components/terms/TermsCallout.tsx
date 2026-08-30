@@ -19,11 +19,10 @@ export function TermsCallout({ title, children }: TermsCalloutProps) {
         rounded-3xl overflow-hidden
         border border-maize-bright/35
         bg-white/85 backdrop-blur-xl
-        shadow-[0_2px_12px_oklch(0_0_0/0.04)]
+        shadow-2
       "
       style={{
-        boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 24px color-mix(in oklab, var(--maize-bright) 10%, transparent)',
+        boxShadow: 'var(--shadow-edge), var(--shadow-glow-soft)',
       }}
     >
       {/* Mesh accent */}
@@ -38,7 +37,7 @@ export function TermsCallout({ title, children }: TermsCalloutProps) {
           className="
             shrink-0 w-10 h-10 rounded-2xl
             flex items-center justify-center
-            shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+            shadow-glow-maize
           "
           style={{
             background: 'var(--navy-deep)',

@@ -78,7 +78,7 @@ export function ComingSoonLanding() {
             className={`inline-flex items-center h-9 px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] ${
               scrolled
                 ? 'bg-navy-deep text-white hover:opacity-90'
-                : 'bg-maize text-navy-deep hover:shadow-[0_6px_22px_oklch(0.86_0.17_92/0.45)]'
+                : 'bg-maize text-navy-deep hover:shadow-glow-maize-strong'
             }`}
           >
             List your place
@@ -123,7 +123,7 @@ export function ComingSoonLanding() {
 
       {/* ── Supplier section ───────────────────────────────────────────── */}
       <section className="bg-maize-soft px-6 py-16 sm:py-20">
-        <div className="relative isolate overflow-hidden mx-auto max-w-[30rem] rounded-[1.5rem] text-center px-8 pt-11 pb-9">
+        <div className="relative isolate overflow-hidden mx-auto max-w-[30rem] rounded-3xl text-center px-8 pt-11 pb-9">
           <AtmosphericBackground base={NAVY} variant="panel" />
 
           <div className="relative z-10 flex flex-col items-center">
@@ -147,7 +147,7 @@ export function ComingSoonLanding() {
 
             <Link
               href={SUPPLIER_HREF}
-              className="mt-7 inline-flex w-full max-w-[18rem] items-center justify-center gap-2 h-12 rounded-full bg-maize text-navy-deep font-semibold text-[0.9375rem] shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition active:scale-[0.98]"
+              className="mt-7 inline-flex w-full max-w-[18rem] items-center justify-center gap-2 h-12 rounded-full bg-maize text-navy-deep font-semibold text-[0.9375rem] shadow-glow-maize hover:shadow-glow-maize-strong transition active:scale-[0.98]"
             >
               List it free now
               <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />

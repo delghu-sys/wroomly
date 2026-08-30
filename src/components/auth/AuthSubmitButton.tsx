@@ -60,8 +60,8 @@ export function AuthSubmitButton({
         bg-maize-bright text-navy-deep
         font-semibold text-sm tracking-tight
         disabled:opacity-60 disabled:cursor-not-allowed
-        shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
-        hover:shadow-[0_10px_36px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
+        shadow-glow-maize
+        hover:shadow-glow-maize-strong
         transition-shadow duration-500
         ${className}
       `}
