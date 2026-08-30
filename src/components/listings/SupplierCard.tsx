@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { ShieldCheck, Star, ArrowRight } from 'lucide-react'
+import { Star, ArrowRight } from 'lucide-react'
 import { SocialPill } from '@/components/users/SocialPill'
+import { VerifiedBadge } from '@/components/users/VerifiedBadge'
 
 interface SupplierCardProps {
   user: {
@@ -15,6 +16,9 @@ interface SupplierCardProps {
     created_at: string
     bio: string | null
     instagram_handle?: string | null
+    /** True only for accounts confirmed through UMich Google SSO. Never
+     *  assume it — an unverified host simply gets no badge. */
+    is_verified?: boolean | null
   }
   ratingAvg: number | null
   reviewCount: number
@@ -60,7 +64,9 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
       />
 
       <div className="relative z-10 pointer-events-none flex items-start gap-4">
-        {/* Avatar with animated verified badge */}
+        {/* Avatar. The corner check appears ONLY for a verified UMich account —
+            it used to render unconditionally, which claimed verification for
+            every host on every listing. */}
         <div className="relative">
           <Avatar className="h-14 w-14 ring-1 ring-line">
             <AvatarImage src={user.avatar_url ?? undefined} />
@@ -68,13 +74,11 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
               {initials}
             </AvatarFallback>
           </Avatar>
-          <span className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-[oklch(0.84_0.17_85)] flex items-center justify-center ring-2 ring-white">
-            <ShieldCheck
-              className="w-3.5 h-3.5 text-[oklch(0.22_0.075_256)]"
-              strokeWidth={2.25}
-            />
-            <span className="absolute inset-0 rounded-full bg-[oklch(0.84_0.17_85)] animate-ping opacity-30" />
-          </span>
+          {user.is_verified && (
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-white ring-2 ring-white">
+              <VerifiedBadge size={20} />
+            </span>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
@@ -85,21 +89,22 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
             <ArrowRight className="w-4 h-4 text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-[oklch(0.45_0.13_85)] shrink-0" />
           </div>
 
-          <div className="flex items-center gap-3 text-sm mt-1.5">
-            <span className="inline-flex items-center gap-1 text-[oklch(0.45_0.13_85)] font-medium">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              U of M verified
-            </span>
-            {ratingAvg !== null && (
-              <span className="inline-flex items-center gap-1 text-ink">
-                <Star className="w-3.5 h-3.5 fill-[oklch(0.84_0.17_85)] stroke-[oklch(0.84_0.17_85)]" />
-                <span className="font-medium tabular-nums">
-                  {ratingAvg.toFixed(1)}
+          {/* Nothing to say for an unverified host with no reviews yet — skip
+              the row entirely rather than leaving an empty gap. */}
+          {(user.is_verified || ratingAvg !== null) && (
+            <div className="flex items-center gap-3 text-sm mt-1.5">
+              {user.is_verified && <VerifiedBadge size={13} label />}
+              {ratingAvg !== null && (
+                <span className="inline-flex items-center gap-1 text-ink">
+                  <Star className="w-3.5 h-3.5 fill-[oklch(0.84_0.17_85)] stroke-[oklch(0.84_0.17_85)]" />
+                  <span className="font-medium tabular-nums">
+                    {ratingAvg.toFixed(1)}
+                  </span>
+                  <span className="text-ink-muted">({reviewCount})</span>
                 </span>
-                <span className="text-ink-muted">({reviewCount})</span>
-              </span>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {user.bio && (
             <p className="text-sm text-ink-soft mt-3 line-clamp-2 leading-relaxed">
