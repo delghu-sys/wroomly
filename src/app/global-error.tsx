@@ -74,14 +74,14 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             A page-level error stopped the app from rendering. Reload the page.
             If it keeps happening, mail us at{' '}
             <a
-              href="mailto:help@wroomly.com"
+              href="mailto:delghu@umich.edu"
               style={{
                 color: 'var(--maize-bright)',
                 textDecoration: 'underline',
                 textUnderlineOffset: 4,
               }}
             >
-              help@wroomly.com
+              delghu@umich.edu
             </a>
             .
           </p>
