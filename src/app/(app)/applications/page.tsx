@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'My Applications' }
 
@@ -44,20 +45,14 @@ export default async function ApplicationsPage() {
       </div>
 
       {!inquiries || inquiries.length === 0 ? (
-        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-            <MessageSquare className="w-6 h-6" />
-          </div>
-          <p className="font-display text-2xl text-ink">No applications yet</p>
-          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-            Browse listings and send your first inquiry to start the conversation.
-          </p>
-          <Link href="/listings">
-            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
-              Browse listings
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          className="animate-fade-up delay-100"
+          icon={<MessageSquare className="w-6 h-6" strokeWidth={1.75} />}
+          title="No applications"
+          accent="yet."
+          description="Find a place you like and send an inquiry — the conversation starts there."
+          action={{ label: 'Browse listings', href: '/listings' }}
+        />
       ) : (
         <div className="stagger-reveal space-y-4">
           {inquiries.map(inq => {

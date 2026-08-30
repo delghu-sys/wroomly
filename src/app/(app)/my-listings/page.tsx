@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Pencil, BedDouble } from 'lucide-react'
 import { formatCents, formatDateRange } from '@/lib/utils/listing'
 import type { Listing } from '@/types/database'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'My Listings' }
 
@@ -57,20 +58,14 @@ export default async function MyListingsPage() {
       </div>
 
       {listings.length === 0 ? (
-        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-            <BedDouble className="w-6 h-6" />
-          </div>
-          <p className="font-display text-2xl text-ink">No listings yet</p>
-          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-            Create your first listing and start receiving inquiries from verified students.
-          </p>
-          <Link href="/listings/new">
-            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
-              Create your first listing
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          className="animate-fade-up delay-100"
+          icon={<BedDouble className="w-6 h-6" strokeWidth={1.75} />}
+          title="No listings yet —"
+          accent="your move."
+          description="Post your place and verified students can start asking about it."
+          action={{ label: 'Create your first listing', href: '/listings/new' }}
+        />
       ) : (
         <div className="stagger-reveal space-y-3">
           {listings.map(listing => (

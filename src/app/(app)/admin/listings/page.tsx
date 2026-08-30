@@ -8,8 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { format, parseISO } from 'date-fns'
 import { formatCents } from '@/lib/utils/listing'
 import Link from 'next/link'
-import { ExternalLink, Sparkles, CheckCircle2, XCircle, AlertCircle } from 'lucide-react'
+import { AlertCircle, BedDouble, CheckCircle2, ExternalLink, Sparkles, XCircle } from 'lucide-react'
 import type { Listing, User } from '@/types/database'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'Admin — Listings' }
 
@@ -81,9 +82,12 @@ export default async function AdminListingsPage({
       </div>
 
       {listings.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="font-medium text-gray-600">No listings in this category</p>
-        </div>
+        <EmptyState
+          size="sm"
+          icon={<BedDouble className="w-5 h-5" strokeWidth={1.75} />}
+          title="No listings in this category"
+          description="Switch tabs to see listings in another status."
+        />
       ) : (
         <div className="space-y-4">
           {listings.map(listing => {

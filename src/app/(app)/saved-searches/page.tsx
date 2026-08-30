@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Bookmark, ArrowRight } from 'lucide-react'
+import { Bookmark } from 'lucide-react'
 import { SavedSearchRow } from '@/components/listings/SavedSearchRow'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = {
   title: 'Saved searches',
@@ -41,22 +41,19 @@ export default async function SavedSearchesPage() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-            <Bookmark className="w-6 h-6" />
-          </div>
-          <p className="font-display text-2xl text-ink">No saved searches yet</p>
-          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-            Pick a few filters on Browse, then hit <strong>Save search</strong> to
-            stash the combo and get alerts.
-          </p>
-          <Link
-            href="/listings"
-            className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold tracking-tight hover:bg-navy-deep/90 transition active:scale-[0.98]"
-          >
-            Browse listings <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        <EmptyState
+          className="animate-fade-up delay-100"
+          icon={<Bookmark className="w-6 h-6" strokeWidth={1.75} />}
+          title="No saved searches"
+          accent="yet."
+          description={
+            <>
+              Pick a few filters on Browse, then hit <strong>Save search</strong>{' '}
+              to stash the combo and get alerts.
+            </>
+          }
+          action={{ label: 'Browse listings', href: '/listings', variant: 'secondary' }}
+        />
       ) : (
         <div className="stagger-reveal space-y-3">
           {rows.map(s => (

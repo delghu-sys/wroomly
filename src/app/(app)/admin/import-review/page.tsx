@@ -5,6 +5,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { format, parseISO } from 'date-fns'
 import { ArrowRight, Inbox } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = {
   title: 'AI imports to review',
@@ -54,13 +55,11 @@ export default async function AdminImportReviewIndex() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-            <Inbox className="w-6 h-6" />
-          </div>
-          <p className="font-display text-2xl text-ink">Nothing to review</p>
-          <p className="text-sm text-ink-muted mt-2">New AI imports will show up here.</p>
-        </div>
+        <EmptyState
+          icon={<Inbox className="w-6 h-6" strokeWidth={1.75} />}
+          title="Nothing to review"
+          description="New AI imports will show up here."
+        />
       ) : (
         <div className="space-y-3">
           {rows.map(r => (

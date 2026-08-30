@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { format, parseISO } from 'date-fns'
 import type { Inquiry, User, Listing } from '@/types/database'
 import { fetchConnectStatus } from '@/lib/stripe'
+import { Inbox } from 'lucide-react'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'Inquiries' }
 
@@ -79,12 +81,13 @@ export default async function InquiriesPage() {
       </div>
 
       {inquiries.length === 0 ? (
-        <div className="animate-fade-up delay-100 text-center py-20 rounded-3xl border border-dashed border-line bg-surface/60">
-          <p className="font-display text-2xl text-ink">No inquiries yet</p>
-          <p className="text-sm text-ink-muted mt-2 max-w-sm mx-auto">
-            When students reach out about your listings, you&apos;ll see them here with their message and dates.
-          </p>
-        </div>
+        <EmptyState
+          className="animate-fade-up delay-100"
+          icon={<Inbox className="w-6 h-6" strokeWidth={1.75} />}
+          title="No inquiries"
+          accent="yet."
+          description="When students reach out about your listings, you'll see them here with their message and dates."
+        />
       ) : (
         <div className="stagger-reveal space-y-4">
           {inquiries.map(inq => {

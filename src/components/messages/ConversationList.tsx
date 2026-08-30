@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { motion } from 'motion/react'
 import { Search, X, MessageSquare } from 'lucide-react'
 import { ConversationListItem, type ConversationListItemData } from './ConversationListItem'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 interface ConversationListProps {
   conversations: ConversationListItemData[]
@@ -86,25 +87,21 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
       <div className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-3 pb-4">
         {filtered.length === 0 ? (
           query ? (
-            <div className="text-center py-12">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-navy-deep text-maize-bright">
-                <Search className="w-5 h-5" strokeWidth={1.75} />
-              </div>
-              <p className="font-display text-base text-ink">No matches</p>
-              <p className="text-xs text-ink-muted mt-1.5">
-                Try a different search term.
-              </p>
-            </div>
+            <EmptyState
+              size="sm"
+              className="border-0 bg-transparent backdrop-blur-none"
+              icon={<Search className="w-5 h-5" strokeWidth={1.75} />}
+              title="No matches"
+              description="Try a different search term."
+            />
           ) : (
-            <div className="text-center py-12 px-4">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-navy-deep text-maize-bright">
-                <MessageSquare className="w-5 h-5" strokeWidth={1.75} />
-              </div>
-              <p className="font-display text-base text-ink">No conversations yet</p>
-              <p className="text-xs text-ink-muted mt-1.5 leading-relaxed">
-                Send an inquiry on a listing to start your first chat.
-              </p>
-            </div>
+            <EmptyState
+              size="sm"
+              className="border-0 bg-transparent backdrop-blur-none"
+              icon={<MessageSquare className="w-5 h-5" strokeWidth={1.75} />}
+              title="No conversations yet"
+              description="Send an inquiry on a listing to start your first chat."
+            />
           )
         ) : (
           <motion.ol

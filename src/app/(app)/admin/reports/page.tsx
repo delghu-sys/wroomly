@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { format, parseISO } from 'date-fns'
 import { Flag, ArrowLeft } from '@phosphor-icons/react/dist/ssr'
 import type { Report, User } from '@/types/database'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = {
   title: 'Reports — Admin',
@@ -76,24 +77,11 @@ export default async function AdminReportsPage() {
       </div>
 
       {reports.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-line bg-white/55 backdrop-blur-sm p-10 text-center">
-          <div
-            className="inline-flex w-12 h-12 rounded-2xl items-center justify-center"
-            style={{
-              background: 'var(--navy-deep)',
-              color: 'var(--maize-bright)',
-            }}
-          >
-            <Flag size={20} weight="duotone" />
-          </div>
-          <p className="font-display text-xl text-ink mt-4 leading-tight">
-            No reports right now
-          </p>
-          <p className="text-sm text-ink-muted mt-2 max-w-md mx-auto">
-            New reports from listing flags, message complaints, or user
-            reports will land here.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Flag size={22} weight="duotone" />}
+          title="No reports right now"
+          description="New reports from listing flags, message complaints, or user reports will land here."
+        />
       ) : (
         <ul className="space-y-3">
           {reports.map(r => (

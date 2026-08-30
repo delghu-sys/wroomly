@@ -11,6 +11,7 @@ import type { User, Listing, Inquiry, Transaction } from '@/types/database'
 import { fetchConnectStatus } from '@/lib/stripe'
 import { PayoutSetupBanner } from '@/components/payments/PayoutSetupBanner'
 import { PAYMENTS_ENABLED } from '@/lib/config'
+import { EmptyState } from '@/components/brand/EmptyState'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -163,20 +164,14 @@ export default async function DashboardPage() {
         )}
 
         {listings.length === 0 && (
-          <div className="animate-fade-up delay-200 text-center py-16 rounded-3xl border border-dashed border-line bg-surface/60">
-            <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-              <Home className="w-6 h-6" />
-            </div>
-            <p className="font-display text-2xl text-ink">No listings yet</p>
-            <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-              Create your first listing to start receiving inquiries from verified students.
-            </p>
-            <Link href="/listings/new">
-              <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
-                Create your first listing
-              </Button>
-            </Link>
-          </div>
+          <EmptyState
+            className="animate-fade-up delay-200"
+            icon={<Home className="w-6 h-6" strokeWidth={1.75} />}
+            title="No listings yet —"
+            accent="your move."
+            description="Post your place and verified students can start asking about it."
+            action={{ label: 'Create your first listing', href: '/listings/new' }}
+          />
         )}
       </div>
     )
@@ -355,20 +350,14 @@ export default async function DashboardPage() {
       )}
 
       {inquiries.length === 0 && (
-        <div className="animate-fade-up delay-200 text-center py-16 rounded-3xl border border-dashed border-line bg-surface/60">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-navy-soft text-navy items-center justify-center mb-4">
-            <Search className="w-6 h-6" />
-          </div>
-          <p className="font-display text-2xl text-ink">No applications yet</p>
-          <p className="text-sm text-ink-muted mt-2 mb-6 max-w-sm mx-auto">
-            Browse listings and send your first inquiry to get the conversation started.
-          </p>
-          <Link href="/listings">
-            <Button className="press rounded-full bg-navy text-white hover:bg-navy/90 h-11 px-6">
-              Browse listings
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          className="animate-fade-up delay-200"
+          icon={<Search className="w-6 h-6" strokeWidth={1.75} />}
+          title="No applications"
+          accent="yet."
+          description="Find a place you like and send an inquiry — the conversation starts there."
+          action={{ label: 'Browse listings', href: '/listings' }}
+        />
       )}
     </div>
   )
