@@ -7,7 +7,7 @@ import { ArrowUpRight, Mail } from 'lucide-react'
 export function TermsContactCard() {
   return (
     <a
-      href="mailto:legal@wroomly.com"
+      href="mailto:delghu@umich.edu"
       className="
         group relative block rounded-3xl overflow-hidden
         border border-line bg-white/85 backdrop-blur-xl
@@ -42,9 +42,9 @@ export function TermsContactCard() {
             Questions?
           </p>
           <p className="font-display text-lg sm:text-xl tracking-tight text-ink mt-0.5 leading-tight">
-            Reach our legal team at{' '}
+            For legal questions, write to{' '}
             <span className="italic font-light text-gold-deep">
-              legal@wroomly.com
+              delghu@umich.edu
             </span>
           </p>
         </div>
