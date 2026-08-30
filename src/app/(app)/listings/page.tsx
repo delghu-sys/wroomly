@@ -19,6 +19,7 @@ import {
   PROPERTY_TYPES,
 } from '@/lib/constants'
 import { getListingImageUrl, justListedCutoffISO } from '@/lib/utils/listing'
+import { FilterTransitionProvider, PendingResults, PendingIndicator } from '@/components/listings/FilterTransition'
 
 export const metadata: Metadata = {
   title: 'Browse University of Michigan Sublets in Ann Arbor',
@@ -239,6 +240,10 @@ export default async function ListingsPage({
 
   return (
     <div className="min-h-[100dvh]">
+      {/* Wraps the hero too: the view toggle and the active-filter pills live
+          up there and change the same result set, so they need to share the
+          pending state rather than falling back to their own. */}
+      <FilterTransitionProvider>
       {/* ── Atmospheric hero — dark navy, mesh, noise ── */}
       <BrowseHero
         totalCount={marketTotal}
@@ -275,6 +280,9 @@ export default async function ListingsPage({
             currentFilters={filters}
             totalCount={totalCount}
           />
+          {/* Outside PendingResults on purpose — it has to stay visible and
+              readable while the region below is dimmed. */}
+          <PendingIndicator />
         </div>
 
         <div className="flex gap-8">
@@ -289,7 +297,7 @@ export default async function ListingsPage({
           </aside>
 
           {/* Main grid */}
-          <div className="flex-1 min-w-0">
+          <PendingResults className="flex-1 min-w-0">
             {typedListings.length === 0 ? (
               <EmptyListings />
             ) : view === 'map' ? (
@@ -318,9 +326,10 @@ export default async function ListingsPage({
                 />
               </>
             )}
-          </div>
+          </PendingResults>
         </div>
       </div>
+      </FilterTransitionProvider>
     </div>
   )
 }

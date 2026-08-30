@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { SlidersHorizontal } from '@phosphor-icons/react/dist/ssr'
+import { useFilterNavigation } from './FilterTransition'
 
 interface ListingsFiltersProps {
   neighborhoods: string[]
@@ -22,7 +23,7 @@ export function ListingsFilters({
   propertyTypes,
   currentFilters,
 }: ListingsFiltersProps) {
-  const router = useRouter()
+  const { navigate } = useFilterNavigation()
   const pathname = usePathname()
 
   // `new Date()` in render produces a hydration mismatch when the server
@@ -63,9 +64,9 @@ export function ListingsFilters({
       for (const [k, v] of Object.entries(merged)) {
         if (v) params.set(k, v)
       }
-      router.push(`${pathname}?${params.toString()}`)
+      navigate(`${pathname}?${params.toString()}`)
     },
-    [currentFilters, pathname, router]
+    [currentFilters, pathname, navigate]
   )
 
   const updateFilter = useCallback(
@@ -90,7 +91,7 @@ export function ListingsFilters({
   const selectedNeighborhoods = multiValues('neighborhood')
   const selectedBedrooms = multiValues('bedrooms')
 
-  const clearAll = () => router.push(pathname)
+  const clearAll = () => navigate(pathname)
 
   const hasFilters = Object.values(currentFilters).some(Boolean)
 

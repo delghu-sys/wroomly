@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useCallback, useMemo } from 'react'
 import {
   DollarSign,
@@ -11,6 +11,7 @@ import {
   CalendarDays,
 } from 'lucide-react'
 import { NEAR_CAMPUS_NEIGHBORHOODS } from '@/lib/constants'
+import { useFilterNavigation } from './FilterTransition'
 
 interface QuickFilterChipsProps {
   currentFilters: Record<string, string | undefined>
@@ -29,7 +30,7 @@ interface QuickFilterChipsProps {
  * an awkward two rows.
  */
 export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
-  const router = useRouter()
+  const { navigate } = useFilterNavigation()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -130,9 +131,9 @@ export function QuickFilterChips({ currentFilters }: QuickFilterChipsProps) {
       }
 
       const qs = params.toString()
-      router.push(qs ? `${pathname}?${qs}` : pathname)
+      navigate(qs ? `${pathname}?${qs}` : pathname)
     },
-    [pathname, searchParams, router],
+    [pathname, searchParams, navigate],
   )
 
   return (

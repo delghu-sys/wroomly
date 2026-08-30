@@ -1,13 +1,14 @@
 'use client'
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
+import { useFilterNavigation } from './FilterTransition'
 import { motion } from 'motion/react'
 import { LayoutGrid, Map } from 'lucide-react'
 
 export type BrowseView = 'grid' | 'map'
 
 export function ListingsViewToggle({ view }: { view: BrowseView }) {
-  const router = useRouter()
+  const { navigate } = useFilterNavigation()
   const pathname = usePathname()
   const params = useSearchParams()
 
@@ -16,7 +17,7 @@ export function ListingsViewToggle({ view }: { view: BrowseView }) {
     if (next === 'grid') sp.delete('view')
     else sp.set('view', next)
     const qs = sp.toString()
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    navigate(qs ? `${pathname}?${qs}` : pathname, { scroll: false, replace: true })
   }
 
   const spring = { type: 'spring' as const, stiffness: 400, damping: 32 }
