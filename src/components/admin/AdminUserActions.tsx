@@ -58,7 +58,7 @@ export function AdminUserActions({
         router.refresh()
       }
     } catch {
-      toast.error('Network error — please try again.')
+      toast.error('Network error. Please try again.')
     } finally {
       setBusy(null)
     }

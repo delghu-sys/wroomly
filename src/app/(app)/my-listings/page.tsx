@@ -61,8 +61,8 @@ export default async function MyListingsPage() {
         <EmptyState
           className="animate-fade-up delay-100"
           icon={<BedDouble className="w-6 h-6" strokeWidth={1.75} />}
-          title="No listings yet —"
-          accent="your move."
+          title="No listings yet."
+          accent="Your move."
           description="Post your place and students near U of M can start asking about it."
           action={{ label: 'Create your first listing', href: '/listings/new' }}
         />

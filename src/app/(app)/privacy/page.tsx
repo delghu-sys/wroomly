@@ -72,7 +72,7 @@ export default function PrivacyPage() {
               The short version
             </p>
             <p className="font-display text-lg sm:text-xl tracking-tight text-ink mt-1 leading-tight">
-              We collect what we need to verify you and run the platform — and
+              We collect what we need to verify you and run the platform. And
               nothing else.
             </p>
           </div>
@@ -94,23 +94,23 @@ export default function PrivacyPage() {
             <h2>What we collect</h2>
             <ul>
               <li>
-                <strong>Account info</strong> — your name, email, university
+                <strong>Account info</strong>: your name, email, university
                 affiliation, and password hash.
               </li>
               <li>
-                <strong>Listing content</strong> — photos, descriptions, dates,
+                <strong>Listing content</strong>: photos, descriptions, dates,
                 and pricing that you publish on the platform.
               </li>
               <li>
-                <strong>Messages</strong> — conversations between Suppliers and
+                <strong>Messages</strong>: conversations between Suppliers and
                 Consumers, stored to support disputes and moderation.
               </li>
               <li>
-                <strong>Payment metadata</strong> — billing identifiers from
+                <strong>Payment metadata</strong>: billing identifiers from
                 Stripe, never raw card numbers.
               </li>
               <li>
-                <strong>Usage telemetry</strong> — basic device/browser info
+                <strong>Usage telemetry</strong>: basic device/browser info
                 and pages visited, used for product analytics and abuse
                 detection.
               </li>

@@ -12,7 +12,7 @@ import { AlertCircle, BedDouble, CheckCircle2, ExternalLink, Sparkles, XCircle }
 import type { Listing, User } from '@/types/database'
 import { EmptyState } from '@/components/brand/EmptyState'
 
-export const metadata: Metadata = { title: 'Admin — Listings' }
+export const metadata: Metadata = { title: 'Admin: Listings' }
 
 type AdminListingRow = Listing & {
   listing_images: { id: string }[]

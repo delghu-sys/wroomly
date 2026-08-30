@@ -212,7 +212,7 @@ export function ProfileForm({
       <div className="space-y-2">
         <Label>Bio</Label>
         <Textarea
-          placeholder="A short intro — your major, what you're into, what kind of housemate you are…"
+          placeholder="A short intro: your major, what you're into, what kind of housemate you are…"
           rows={4}
           {...register('bio')}
         />

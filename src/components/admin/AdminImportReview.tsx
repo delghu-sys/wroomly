@@ -39,7 +39,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
         setBusy(null)
         return
       }
-      toast.success(`Approved — claim email sent to ${submitterEmail}.`)
+      toast.success(`Approved. Claim email sent to ${submitterEmail}.`)
       router.push('/admin/import-review')
       router.refresh()
     } catch {
@@ -50,7 +50,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
 
   async function reject() {
     if (busy) return
-    const reason = window.prompt('Reason for rejecting? (optional — the submitter is not emailed)')
+    const reason = window.prompt('Reason for rejecting? (optional, the submitter is not emailed)')
     if (reason === null) return // cancelled
     setBusy('reject')
     try {
@@ -76,7 +76,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
 
   return (
     <div className="space-y-5">
-      <h2 className="font-display text-xl tracking-tight text-ink">AI draft — edit before approving</h2>
+      <h2 className="font-display text-xl tracking-tight text-ink">AI draft: edit before approving</h2>
 
       <div>
         <label className={labelCls}>Title</label>
@@ -107,7 +107,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
         <div className="sm:col-span-2">
           <label className={labelCls}>
             Street address{' '}
-            <span className="text-[oklch(0.55_0.20_25)] font-bold">— required for the map (fill in if AI missed it)</span>
+            <span className="text-[oklch(0.55_0.20_25)] font-bold">(required for the map, fill in if AI missed it)</span>
           </label>
           <input
             className={`${inputCls} ${!draft.address ? 'border-[oklch(0.80_0.12_25)] bg-[oklch(0.99_0.01_25)]' : ''}`}

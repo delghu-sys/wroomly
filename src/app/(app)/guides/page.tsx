@@ -7,14 +7,14 @@ import { JsonLd, faqJsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { BookOpen, ArrowRight, Clock } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Guides — Subletting at the University of Michigan',
+  title: 'Guides: Subletting at the University of Michigan',
   description:
     'Student guides to subletting in Ann Arbor: how to sublet your UMich apartment, summer sublet tips, avoiding scams, and security deposits.',
   alternates: { canonical: '/guides' },
   openGraph: {
-    title: 'Guides — Subletting at the University of Michigan | Wroomly',
+    title: 'Guides: Subletting at the University of Michigan | Wroomly',
     description:
-      'Student guides to subletting in Ann Arbor — how-tos, summer tips, scam avoidance, and deposits.',
+      'Student guides to subletting in Ann Arbor: how-tos, summer tips, scam avoidance, and deposits.',
     images: ['/og-default.png'],
   },
 }
@@ -43,7 +43,7 @@ export default function GuidesIndexPage() {
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
           Straight-talking guides to subletting housing in Ann
-          Arbor — written for U of M students, by people who get the drill.
+          Arbor, written for U of M students, by people who get the drill.
         </p>
       </header>
 
@@ -60,7 +60,7 @@ export default function GuidesIndexPage() {
           What Ann Arbor sublets actually cost right now
         </h2>
         <p className="mt-2 text-[14px] text-white/70 leading-relaxed max-w-xl">
-          Median asking rents by bedroom count and neighborhood — computed from
+          Median asking rents by bedroom count and neighborhood, computed from
           the active listings on Wroomly, not last year&rsquo;s survey.
         </p>
         <span className="mt-4 inline-flex items-center gap-1 text-[13px] text-maize-bright font-medium group-hover:gap-2 transition-all">

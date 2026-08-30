@@ -234,9 +234,9 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         <div className="rounded-2xl border border-[oklch(0.85_0.10_25)] bg-[oklch(0.97_0.04_25)] px-4 py-3 text-[13px] text-[oklch(0.45_0.18_25)] flex items-start gap-2">
           <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
           {addressMissing ? (
-            <span><strong>Street address required.</strong> The AI didn&rsquo;t detect your exact address — search for it below so the map works for interested students.</span>
+            <span><strong>Street address required.</strong> The AI didn&rsquo;t detect your exact address. Search for it below so the map works for interested students.</span>
           ) : (
-            <span><strong>Confirm your exact address.</strong> Pick it from the suggestions below so it shows up correctly on the map — typed text alone isn&rsquo;t enough.</span>
+            <span><strong>Confirm your exact address.</strong> Pick it from the suggestions below so it shows up correctly on the map. Typed text alone isn&rsquo;t enough.</span>
           )}
         </div>
       )}
@@ -359,7 +359,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <p className={`${labelCls} mb-0`}>
-            {personalPhotos.length > 0 ? 'Your photos — pick which to publish' : 'Add photos of your place'}
+            {personalPhotos.length > 0 ? 'Your photos: pick which to publish' : 'Add photos of your place'}
           </p>
           <label className="inline-flex items-center gap-1.5 text-[12px] font-medium text-navy hover:text-ink cursor-pointer">
             {uploadingPhotos ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
@@ -376,7 +376,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
         </div>
         {personalPhotos.length === 0 ? (
           <p className="text-[12px] text-ink-muted">
-            You imported text only — add at least one real photo of your place to publish.
+            You imported text only. Add at least one real photo of your place to publish.
           </p>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -437,7 +437,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
       <button type="button" onClick={publish} disabled={publishing}
         className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition active:scale-[0.98] disabled:opacity-60">
-        {publishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</> : 'Review complete — publish listing'}
+        {publishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</> : 'Review complete, publish listing'}
       </button>
     </div>
   )

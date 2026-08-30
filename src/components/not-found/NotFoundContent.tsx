@@ -52,7 +52,7 @@ export function NotFoundContent() {
 
             <p className="mt-7 text-lg text-white/70 leading-relaxed max-w-lg">
               The listing may have been removed, or the link might be off.
-              Try browsing what&rsquo;s open right now — new places land every day.
+              Try browsing what&rsquo;s open right now. New places land every day.
             </p>
 
             <div className="mt-9 flex flex-col sm:flex-row gap-3 max-w-md">

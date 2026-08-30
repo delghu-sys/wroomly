@@ -75,7 +75,7 @@ export function MatchManage({
       setNote(okNote)
       return true
     } catch {
-      setNote('Network error — please try again.')
+      setNote('Network error. Please try again.')
       return false
     } finally {
       setBusy(false)
@@ -90,7 +90,7 @@ export function MatchManage({
   function togglePause() {
     const next: MatchAlertStatus = status === 'paused' ? 'active' : 'paused'
     setStatus(next)
-    void patch({ status: next }, next === 'paused' ? 'Alerts paused — we won’t email you until you resume.' : 'Alerts resumed.')
+    void patch({ status: next }, next === 'paused' ? 'Alerts paused. We won’t email you until you resume.' : 'Alerts resumed.')
   }
 
   function unsubscribe() {
@@ -106,7 +106,7 @@ export function MatchManage({
   async function saveWeights() {
     const ok = await patch(
       { profile: { ...profile, weights } },
-      'Importance updated — future matches will score with your new weights.',
+      'Importance updated. Future matches will score with your new weights.',
     )
     if (ok) setWeightsDirty(false)
   }

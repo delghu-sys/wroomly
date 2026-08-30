@@ -166,7 +166,7 @@ export function BookingSidebar({
                       <>
                         Secure payments via{' '}
                         <span className="font-semibold text-ink-soft">Stripe</span>
-                        {' '}— rent held in escrow until move-in.
+                        , with rent held in escrow until move-in.
                       </>
                     ) : (
                       <>

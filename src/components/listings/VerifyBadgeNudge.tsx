@@ -51,7 +51,7 @@ export function VerifyBadgeNudge() {
             Add the blue check to your listing
           </p>
           <p className="text-[13px] text-ink-soft leading-relaxed mt-0.5">
-            You can list either way — but verifying with your{' '}
+            You can list either way, but verifying with your{' '}
             <strong>@umich.edu</strong> Google account puts a{' '}
             <span className="text-[#2F6BFF] font-semibold">UMich verified</span>{' '}
             check next to your name, so renters can see your listing is from a

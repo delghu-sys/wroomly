@@ -10,7 +10,7 @@ import { Ban, Search, ShieldCheck, Users } from 'lucide-react'
 import type { User } from '@/types/database'
 import { EmptyState } from '@/components/brand/EmptyState'
 
-export const metadata: Metadata = { title: 'Admin — Users' }
+export const metadata: Metadata = { title: 'Admin: Users' }
 
 export default async function AdminUsersPage({
   searchParams,

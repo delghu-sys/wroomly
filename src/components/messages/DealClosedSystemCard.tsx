@@ -30,7 +30,7 @@ export function DealClosedSystemCard({
 
   const headline = 'Deal confirmed'
   const sub = isConsumer
-    ? 'This place is yours — the listing is now off the market. You can still open it any time for the details.'
+    ? 'This place is yours. The listing is now off the market, but you can still open it any time for the details.'
     : 'You marked this place as taken. It’s off the market and other pending inquiries were declined.'
 
   return (

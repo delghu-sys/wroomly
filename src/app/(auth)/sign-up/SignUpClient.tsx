@@ -35,7 +35,7 @@ const supplierSchema = z.object({
     .email('Invalid email')
     .refine(
       e => !e.trim().toLowerCase().endsWith('@umich.edu'),
-      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+      'UMich students sign up with Google. Pick “Yes, I’m a UMich student” above.',
     ),
   university: z.literal('University of Michigan'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -49,7 +49,7 @@ const consumerSchema = z.object({
     .email('Invalid email')
     .refine(
       e => !e.trim().toLowerCase().endsWith('@umich.edu'),
-      'UMich students sign up with Google — pick “Yes, I’m a UMich student” above.',
+      'UMich students sign up with Google. Pick “Yes, I’m a UMich student” above.',
     ),
   university: z.string().min(2, 'Enter your university name'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -133,7 +133,7 @@ export default function SignUpClient({
     // requires a Google @umich.edu session — so this is the UX half of that.)
     if (data.email.trim().toLowerCase().endsWith('@umich.edu')) {
       setError(
-        'That’s a University of Michigan email — UMich students sign up with Google for secure 2-step verification. Choose “Yes, I’m a UMich student” above and continue with Google.',
+        'That’s a University of Michigan email. UMich students sign up with Google for secure 2-step verification. Choose “Yes, I’m a UMich student” above and continue with Google.',
       )
       return
     }
@@ -171,7 +171,7 @@ export default function SignUpClient({
         <AtmosphericAuthPanel
           headline1="Are you listing"
           headline2="or looking?"
-          subhead="Sublet housing near the University of Michigan. Verified UMich students wear a blue check next to their name — so you can always see whose listing is from a real student."
+          subhead="Sublet housing near the University of Michigan. Verified UMich students wear a blue check next to their name, so you can always see whose listing is from a real student."
         />
 
         <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
@@ -183,7 +183,7 @@ export default function SignUpClient({
               className="mb-10"
             >
               <p className="text-xs uppercase tracking-[0.22em] text-ink-muted font-semibold mb-3">
-                Step 01 — Pick your side
+                Step 01: Pick your side
               </p>
               <h2 className="font-display text-3xl sm:text-[2.5rem] tracking-tight text-ink leading-[1.05]">
                 Are you listing a place
@@ -274,7 +274,7 @@ export default function SignUpClient({
             className="mb-9"
           >
             <p className="text-xs uppercase tracking-[0.22em] text-ink-muted font-semibold mb-3">
-              Step 02 — Your details
+              Step 02: Your details
             </p>
             <h2 className="font-display text-3xl sm:text-[2.25rem] tracking-tight text-ink leading-[1.05]">
               Create your{' '}
@@ -318,7 +318,7 @@ export default function SignUpClient({
                 />
                 <p className="text-center text-[12px] text-ink-muted leading-snug">
                   UMich students sign in with their <strong>@umich.edu</strong>{' '}
-                  Google account — the login runs through the university&rsquo;s
+                  Google account. The login runs through the university&rsquo;s
                   secure 2-step verification, and it gives you the blue{' '}
                   <span className="text-[#2F6BFF] font-semibold">✓ UMich verified</span> check
                   {isSupplier

@@ -50,7 +50,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
           <p className="font-display text-base sm:text-lg tracking-tight text-ink mt-0.5 leading-tight">
             {isStarted
               ? 'Finish your Stripe onboarding to start accepting bookings.'
-              : "You can't accept payments yet — connect Stripe in a couple of minutes."}
+              : "You can't accept payments yet. Connect Stripe in a couple of minutes."}
           </p>
         </div>
 

@@ -7,7 +7,7 @@ import { Camera, PencilLine, ArrowRight } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'List your place | Wroomly',
   description:
-    'List your Ann Arbor sublet — import it from an existing post in seconds, or create it yourself.',
+    'List your Ann Arbor sublet. Import it from an existing post in seconds, or create it yourself.',
 }
 
 const NOISE_SVG =
@@ -97,7 +97,7 @@ export default async function StartListingPage() {
               className="animate-fade-up text-ink-muted mt-4 leading-[1.72] max-w-[30rem] mx-auto"
               style={{ animationDelay: '0.27s', fontSize: '1rem' }}
             >
-              Pick a path — you’ll be live in about a minute either way.
+              Pick a path. You’ll be live in about a minute either way.
             </p>
           </div>
 
@@ -138,8 +138,8 @@ export default async function StartListingPage() {
                 Import from a post
               </h2>
               <p className="text-ink-muted text-sm leading-relaxed mt-2 flex-1">
-                Paste a link or screenshot your existing listing — our AI builds
-                it for you in about a minute.
+                Paste a link or screenshot your existing listing, and our AI
+                builds it for you in about a minute.
               </p>
               <span
                 className="inline-flex items-center gap-1.5 text-sm font-semibold mt-5 transition-all group-hover:gap-2.5"
@@ -167,7 +167,7 @@ export default async function StartListingPage() {
                 Create it yourself
               </h2>
               <p className="text-ink-muted text-sm leading-relaxed mt-2 flex-1">
-                Fill in the details step by step — photos, price, dates, and
+                Fill in the details step by step: photos, price, dates, and
                 amenities. Full control.
               </p>
               <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy-deep mt-5 transition-all group-hover:gap-2.5">

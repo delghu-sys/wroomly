@@ -77,7 +77,7 @@ function SignInForm() {
       <AtmosphericAuthPanel
         headline1="Welcome"
         headline2="back"
-        subhead="Make room for connection — sign in to manage your listings, check messages, and stay on top of your housing."
+        subhead="Make room for connection. Sign in to manage your listings, check messages, and stay on top of your housing."
       />
 
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">

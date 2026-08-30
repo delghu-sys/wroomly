@@ -26,8 +26,8 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://wroomly.app'),
   title: {
     default:
-      'Wroomly — University of Michigan Sublets & Student Housing in Ann Arbor',
-    template: '%s | Wroomly — UMich Student Sublets',
+      'Wroomly · University of Michigan Sublets & Student Housing in Ann Arbor',
+    template: '%s | Wroomly · UMich Student Sublets',
   },
   description:
     'University of Michigan student sublets in Ann Arbor. Verified UMich students carry a blue check, so you can see who is a real student. Find a summer sublet near campus or list your place free.',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   // NOTE: /og-default.png is a placeholder — drop a real 1200×630 OG image
   // (navy background, maize logo, headline) into /public to ship.
   openGraph: {
-    title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
+    title: 'Wroomly · University of Michigan Sublets in Ann Arbor',
     description:
       'UMich student sublets in Ann Arbor. Verified students carry a blue check. Free to list.',
     type: 'website',
@@ -63,13 +63,13 @@ export const metadata: Metadata = {
         url: '/og-default.png',
         width: 1200,
         height: 630,
-        alt: 'Wroomly — University of Michigan student sublets in Ann Arbor',
+        alt: 'Wroomly · University of Michigan student sublets in Ann Arbor',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Wroomly — University of Michigan Sublets in Ann Arbor',
+    title: 'Wroomly · University of Michigan Sublets in Ann Arbor',
     description:
       'UMich student sublets in Ann Arbor. Verified students carry a blue check. Free to list.',
     images: ['/og-default.png'],

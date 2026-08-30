@@ -131,7 +131,7 @@ export default async function HomePage() {
                 Subletting your place?
               </h3>
               <p className="text-[0.9rem] text-ink-muted leading-[1.6] mt-1">
-                List it free in 60 seconds — screenshot your existing post and our AI does the rest.
+                List it free in 60 seconds. Screenshot your existing post and our AI does the rest.
               </p>
             </div>
           </div>

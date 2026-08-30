@@ -69,7 +69,7 @@ export function WaitlistForm() {
           strokeWidth={2}
           aria-hidden
         />
-        You’re on the list — see you soon.
+        You’re on the list. See you soon.
       </div>
     )
   }

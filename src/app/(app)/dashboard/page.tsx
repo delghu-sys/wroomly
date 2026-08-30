@@ -167,8 +167,8 @@ export default async function DashboardPage() {
           <EmptyState
             className="animate-fade-up delay-200"
             icon={<Home className="w-6 h-6" strokeWidth={1.75} />}
-            title="No listings yet —"
-            accent="your move."
+            title="No listings yet."
+            accent="Your move."
             description="Post your place and students near U of M can start asking about it."
             action={{ label: 'Create your first listing', href: '/listings/new' }}
           />
@@ -355,7 +355,7 @@ export default async function DashboardPage() {
           icon={<Search className="w-6 h-6" strokeWidth={1.75} />}
           title="No applications"
           accent="yet."
-          description="Find a place you like and send an inquiry — the conversation starts there."
+          description="Find a place you like and send an inquiry. The conversation starts there."
           action={{ label: 'Browse listings', href: '/listings' }}
         />
       )}

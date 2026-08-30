@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'List your place with photos',
   description:
-    'Upload photos of your room or apartment — and screenshots of your existing post if you have one. Wroomly turns them into a draft listing you can review and publish.',
+    'Upload photos of your room or apartment, plus screenshots of your existing post if you have one. Wroomly turns them into a draft listing you can review and publish.',
   alternates: { canonical: '/import-listing' },
 }
 
@@ -21,7 +21,7 @@ export default function ImportListingPage() {
           <span className="italic font-light text-navy">We’ll draft the listing.</span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          Add photos of your room or apartment — and screenshots of your existing post
+          Add photos of your room or apartment, plus screenshots of your existing post
           if you have one. Wroomly turns them into a draft you can review and publish.
           A written description is optional.
         </p>

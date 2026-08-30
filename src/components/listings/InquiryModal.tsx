@@ -138,7 +138,7 @@ export function InquiryModal({
         onClose()
         reset()
         setPhase('form')
-        toast.success('Thanks — we’ll notify you as listings open up.', {
+        toast.success('Thanks! We’ll notify you as listings open up.', {
           icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
         })
       }, 1400)
@@ -169,7 +169,7 @@ export function InquiryModal({
         onClose()
         reset()
         setPhase('form')
-        toast.success('Message sent — the manager will be in touch.', {
+        toast.success('Message sent. The manager will be in touch.', {
           icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
         })
       }, 1400)
@@ -242,7 +242,7 @@ export function InquiryModal({
       onClose()
       reset()
       setPhase('form')
-      toast.success('Inquiry sent — you’ll hear back soon.', {
+      toast.success('Inquiry sent. You’ll hear back soon.', {
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       })
       router.push(`/messages/${convo.id}`)
@@ -354,7 +354,7 @@ export function InquiryModal({
                       <Textarea
                         rows={5}
                         maxLength={2000}
-                        placeholder="A few sentences about you — your school, dates, why this place is a good fit."
+                        placeholder="A few sentences about you: your school, dates, why this place is a good fit."
                         {...register('message')}
                         className="rounded-2xl border-line focus-visible:ring-4 focus-visible:ring-maize-bright/18 focus-visible:border-gold-deep text-[14px]"
                       />
@@ -501,10 +501,10 @@ export function InquiryModal({
                   {listing.source === 'seed' ? (
                     <>
                       <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
-                        Thanks —
+                        Thanks!
                         <br />
                         <span className="italic font-light text-gold-deep">
-                          we&rsquo;ll notify you as listings open up.
+                          We&rsquo;ll notify you as listings open up.
                         </span>
                       </p>
                       <p className="relative text-sm text-ink-muted mt-3">
@@ -514,10 +514,10 @@ export function InquiryModal({
                   ) : (
                     <>
                       <p className="relative font-display text-2xl tracking-tight text-ink mt-5 leading-tight">
-                        Inquiry sent —
+                        Inquiry sent.
                         <br />
                         <span className="italic font-light text-gold-deep">
-                          you&rsquo;ll hear back soon.
+                          You&rsquo;ll hear back soon.
                         </span>
                       </p>
                       <p className="relative text-sm text-ink-muted mt-3">

@@ -104,7 +104,7 @@ export default async function PayoutsPage() {
           student books your place, Stripe routes the rent straight to your
           connected account at checkout. Stripe pays out to your bank on its
           standard schedule (usually 2 business days). The 5% Wroomly service
-          fee is paid by the consumer on top of the rent — you receive the
+          fee is paid by the consumer on top of the rent, so you receive the
           full amount you listed.
         </p>
       </div>

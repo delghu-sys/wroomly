@@ -129,7 +129,7 @@ export function ComingSoonLanding() {
           <div className="relative z-10 flex flex-col items-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-maize/[0.12] border border-maize/[0.22] px-3 py-1 text-[0.675rem] font-extrabold uppercase tracking-[0.08em] text-maize font-display">
               <span className="w-[5px] h-[5px] rounded-full bg-maize" />
-              Open now — be first
+              Open now. Be first
             </span>
 
             <h2
@@ -141,7 +141,7 @@ export function ComingSoonLanding() {
 
             <p className="text-white/[0.54] mt-4 max-w-[22rem] mx-auto leading-[1.65] text-[0.9375rem]">
               Early suppliers get top placement when renters go live. Screenshot
-              your existing post — our AI builds the listing in about a minute.
+              your existing post and our AI builds the listing in about a minute.
               Free, always.
             </p>
 

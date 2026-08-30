@@ -77,7 +77,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             >
               <Image
                 src={getListingImageUrl(images[current].storage_path)}
-                alt={`${title} — photo ${current + 1}`}
+                alt={`${title}, photo ${current + 1}`}
                 fill
                 quality={92}
                 className="object-cover"
@@ -166,7 +166,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
                   setCurrent(i)
                 }}
                 className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.96] focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/40"
-                aria-label={`View photo ${i + 1} of ${images.length} — ${title}`}
+                aria-label={`View photo ${i + 1} of ${images.length}, ${title}`}
                 aria-current={i === current}
               >
                 <Image
@@ -205,7 +205,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             ref={lightboxRef}
             role="dialog"
             aria-modal="true"
-            aria-label={`Photo lightbox — ${title}`}
+            aria-label={`Photo lightbox: ${title}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -260,7 +260,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
           >
             <Image
               src={getListingImageUrl(images[current].storage_path)}
-              alt={`${title} — photo ${current + 1}`}
+              alt={`${title}, photo ${current + 1}`}
               width={1920}
               height={1080}
               quality={95}

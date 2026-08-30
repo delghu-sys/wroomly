@@ -45,7 +45,7 @@ export function EmptyListings() {
           transition={{ ...spring, delay: 0.2 }}
           className="font-display text-3xl sm:text-4xl tracking-tight text-ink mt-7 leading-[1.05]"
         >
-          Nothing here yet —{' '}
+          Nothing here yet,{' '}
           <span className="italic font-light text-gold-deep">
             but the map is wide open.
           </span>
@@ -58,7 +58,7 @@ export function EmptyListings() {
           className="mt-4 text-ink-soft max-w-md mx-auto leading-relaxed"
         >
           We don&rsquo;t have a listing that matches all your filters right now.
-          New places land every day — try loosening one criterion below.
+          New places land every day. Try loosening one criterion below.
         </motion.p>
 
         {/* Suggestion chips */}

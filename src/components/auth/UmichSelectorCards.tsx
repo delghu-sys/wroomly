@@ -26,7 +26,7 @@ const OPTIONS: {
     value: true,
     icon: GraduationCap,
     title: 'Yes, I’m a UMich student',
-    body: 'Sign in with your @umich.edu Google account — the university’s secure 2-step login.',
+    body: 'Sign in with your @umich.edu Google account, the university’s secure 2-step login.',
     badge: 'Gets the blue verified check',
     accent: true,
   },
