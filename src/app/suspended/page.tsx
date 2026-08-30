@@ -30,13 +30,13 @@ export default function SuspendedPage() {
           <Warning size={24} weight="duotone" />
         </div>
 
-        <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-[oklch(0.84_0.17_85)] font-semibold">
+        <p className="mt-7 text-[11px] uppercase tracking-[0.22em] text-maize-bright font-semibold">
           Account suspended
         </p>
 
         <h1 className="mt-3 font-display text-[clamp(2rem,4.5vw,3.5rem)] tracking-tight text-white leading-[1.02]">
           Your access is{' '}
-          <span className="italic font-light text-[oklch(0.84_0.17_85)]">
+          <span className="italic font-light text-maize-bright">
             paused.
           </span>
         </h1>
@@ -57,12 +57,12 @@ export default function SuspendedPage() {
             href="mailto:help@wroomly.com"
             className="
               group inline-flex items-center gap-2 h-12 px-5 rounded-full
-              bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)]
+              bg-maize-bright text-navy-deep
               text-sm font-semibold tracking-tight
-              shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)]
-              hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.45)]
+              shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]
+              hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]
               transition-shadow duration-500 active:scale-[0.97]
-              focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]
+              focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30
             "
           >
             <EnvelopeSimple size={16} weight="duotone" />

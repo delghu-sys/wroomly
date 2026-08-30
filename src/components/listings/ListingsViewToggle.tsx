@@ -33,18 +33,18 @@ export function ListingsViewToggle({ view }: { view: BrowseView }) {
             type="button"
             onClick={() => setView(opt)}
             aria-pressed={active}
-            className="relative inline-flex items-center gap-1.5 h-9 px-4 text-sm font-medium transition-colors duration-300 active:scale-[0.97] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+            className="relative inline-flex items-center gap-1.5 h-9 px-4 text-sm font-medium transition-colors duration-300 active:scale-[0.97] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
           >
             {active && (
               <motion.span
                 layoutId="view-toggle-active"
                 transition={spring}
-                className="absolute inset-0 rounded-full bg-[oklch(0.84_0.17_85)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.35)]"
+                className="absolute inset-0 rounded-full bg-maize-bright shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_35%,transparent)]"
               />
             )}
             <span
               className={`relative z-10 inline-flex items-center gap-1.5 ${
-                active ? 'text-[oklch(0.22_0.075_256)]' : 'text-white/65 hover:text-white'
+                active ? 'text-navy-deep' : 'text-white/65 hover:text-white'
               }`}
             >
               <Icon className="w-4 h-4" strokeWidth={2} />

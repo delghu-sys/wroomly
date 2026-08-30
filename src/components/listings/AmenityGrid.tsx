@@ -102,7 +102,7 @@ export function AmenityGrid({ amenities }: AmenityGridProps) {
             className="
               group flex items-center gap-3
               px-4 py-3 rounded-2xl bg-white border border-line
-              hover:border-[oklch(0.84_0.17_85/0.40)]
+              hover:border-maize-bright/40
               hover:shadow-[0_4px_18px_oklch(0_0_0/0.04)]
               transition-[border-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
             "
@@ -110,7 +110,7 @@ export function AmenityGrid({ amenities }: AmenityGridProps) {
             <div
               className="
                 w-10 h-10 rounded-xl shrink-0
-                bg-[oklch(0.84_0.17_85/0.12)] text-[oklch(0.45_0.13_85)]
+                bg-maize-bright/12 text-gold-deep
                 flex items-center justify-center
                 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                 group-hover:scale-110 group-hover:-rotate-[4deg]

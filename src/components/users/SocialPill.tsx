@@ -53,17 +53,17 @@ export function SocialPill({ network, handle }: SocialPillProps) {
         bg-white border border-line text-ink-soft
         text-[13px] font-medium tracking-tight
         shadow-[0_1px_2px_oklch(0_0_0/0.04)]
-        hover:shadow-[0_6px_20px_oklch(0.84_0.17_85/0.20)]
+        hover:shadow-[0_6px_20px_color-mix(in_oklab,var(--maize-bright)_20%,transparent)]
         transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
       "
     >
       {/* Directional maize fill from left */}
       <span
         className="absolute inset-0 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-        style={{ background: 'oklch(0.84 0.17 85)' }}
+        style={{ background: 'var(--maize-bright)' }}
         aria-hidden
       />
-      <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-[oklch(0.22_0.075_256)] transition-colors duration-500">
+      <span className="relative z-10 inline-flex items-center gap-2 group-hover:text-navy-deep transition-colors duration-500">
         <InstagramLogo
           size={16}
           weight="duotone"

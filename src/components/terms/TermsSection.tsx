@@ -33,10 +33,10 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
         [&_ul>li]:text-ink-soft [&_ul>li]:leading-relaxed [&_ul>li]:pl-5 [&_ul>li]:relative
         [&_ul>li]:before:content-[''] [&_ul>li]:before:absolute [&_ul>li]:before:left-0 [&_ul>li]:before:top-[0.7em]
         [&_ul>li]:before:w-2 [&_ul>li]:before:h-px
-        [&_ul>li]:before:bg-[oklch(0.84_0.17_85)]
+        [&_ul>li]:before:bg-maize-bright
         [&_ol>li]:text-ink-soft [&_ol>li]:leading-relaxed [&_ol>li]:pl-1
-        [&_ol>li::marker]:text-[oklch(0.45_0.13_85)] [&_ol>li::marker]:font-semibold
-        [&_a]:text-[oklch(0.45_0.13_85)] [&_a]:underline-offset-4 [&_a]:underline
+        [&_ol>li::marker]:text-gold-deep [&_ol>li::marker]:font-semibold
+        [&_a]:text-gold-deep [&_a]:underline-offset-4 [&_a]:underline
       "
     >
       {/* Watermark section number — kept under 10% so it reads as
@@ -47,7 +47,7 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
           font-display tracking-tighter leading-none italic font-light
           text-[clamp(5rem,12vw,9rem)] select-none
         "
-        style={{ color: 'oklch(0.84 0.17 85 / 0.08)' }}
+        style={{ color: 'color-mix(in oklab, var(--maize-bright) 8%, transparent)' }}
         aria-hidden
       >
         {n.padStart(2, '0')}
@@ -57,13 +57,13 @@ export function TermsSection({ id, n, title, children }: TermsSectionProps) {
         <div className="flex items-center gap-3 mb-1">
           <span
             className="text-[10.5px] tabular-nums font-semibold tracking-[0.15em]"
-            style={{ color: 'oklch(0.45 0.13 85)' }}
+            style={{ color: 'var(--gold-deep)' }}
           >
             §{n}
           </span>
           <span
             className="h-px flex-1 max-w-12"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
             aria-hidden
           />
         </div>

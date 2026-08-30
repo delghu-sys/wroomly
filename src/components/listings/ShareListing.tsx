@@ -94,7 +94,7 @@ export function ShareListing({ listingId, title, priceLabel }: ShareListingProps
     <DropdownMenu onOpenChange={open => open && track('share_opened', { listingId })}>
       <DropdownMenuTrigger
         aria-label="Share this listing"
-        className="inline-flex items-center gap-1.5 h-10 px-4 rounded-full border border-line bg-white text-[13px] font-medium text-ink hover:border-[oklch(0.84_0.17_85/0.5)] transition active:scale-[0.98]"
+        className="inline-flex items-center gap-1.5 h-10 px-4 rounded-full border border-line bg-white text-[13px] font-medium text-ink hover:border-maize-bright/50 transition active:scale-[0.98]"
       >
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
         Share

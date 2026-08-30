@@ -108,11 +108,11 @@ export function ListingsFilters({
 
       <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[oklch(0.84_0.17_85/0.12)] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-maize-bright/12 flex items-center justify-center">
             <SlidersHorizontal
               size={14}
               weight="bold"
-              className="text-[oklch(0.45_0.13_85)]"
+              className="text-gold-deep"
             />
           </div>
           <h2 className="font-display text-base text-ink tracking-tight">Filters</h2>
@@ -120,7 +120,7 @@ export function ListingsFilters({
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
+            className="text-xs text-gold-deep font-medium hover:text-ink transition-colors"
           >
             Clear all
           </button>
@@ -203,7 +203,7 @@ export function ListingsFilters({
             <button
               type="button"
               onClick={() => updateFilter('neighborhood', undefined)}
-              className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
+              className="text-xs text-gold-deep font-medium hover:text-ink transition-colors"
             >
               Clear
             </button>
@@ -220,8 +220,8 @@ export function ListingsFilters({
                 onClick={() => toggleMulti('neighborhood', n)}
                 className={`text-sm px-3 py-1.5 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
-                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
+                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-[0_4px_16px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]'
+                    : 'text-ink-soft border-line bg-white/60 hover:border-maize-bright/40 hover:text-ink'
                 }`}
               >
                 {n}
@@ -241,7 +241,7 @@ export function ListingsFilters({
             <button
               type="button"
               onClick={() => updateFilter('available_from', undefined)}
-              className="text-xs text-[oklch(0.45_0.13_85)] font-medium hover:text-ink transition-colors"
+              className="text-xs text-gold-deep font-medium hover:text-ink transition-colors"
             >
               Clear
             </button>
@@ -321,8 +321,8 @@ export function ListingsFilters({
                 }
                 className={`text-sm py-2 rounded-xl border transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.97] ${
                   active
-                    ? 'bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] border-[oklch(0.22_0.075_256)] shadow-[0_4px_16px_oklch(0.22_0.075_256/0.30)]'
-                    : 'text-ink-soft border-line bg-white/60 hover:border-[oklch(0.84_0.17_85/0.40)] hover:text-ink'
+                    ? 'bg-navy-deep text-maize-bright border-navy-deep shadow-[0_4px_16px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]'
+                    : 'text-ink-soft border-line bg-white/60 hover:border-maize-bright/40 hover:text-ink'
                 }`}
               >
                 {opt.label}
@@ -341,7 +341,7 @@ export function ListingsFilters({
             id="furnished"
             checked={currentFilters.furnished === 'true'}
             onCheckedChange={v => updateFilter('furnished', v ? 'true' : undefined)}
-            className="data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
+            className="data-[state=checked]:bg-navy-deep data-[state=checked]:border-navy-deep"
           />
           <Label htmlFor="furnished" className="cursor-pointer text-sm text-ink-soft">Furnished</Label>
         </div>
@@ -350,7 +350,7 @@ export function ListingsFilters({
             id="pets"
             checked={currentFilters.pets === 'true'}
             onCheckedChange={v => updateFilter('pets', v ? 'true' : undefined)}
-            className="data-[state=checked]:bg-[oklch(0.22_0.075_256)] data-[state=checked]:border-[oklch(0.22_0.075_256)]"
+            className="data-[state=checked]:bg-navy-deep data-[state=checked]:border-navy-deep"
           />
           <Label htmlFor="pets" className="cursor-pointer text-sm text-ink-soft">Pets allowed</Label>
         </div>

@@ -47,7 +47,7 @@ export const BrandFormInput = forwardRef<HTMLInputElement, BrandFormInputProps>(
             ${
               error
                 ? 'border-[oklch(0.65_0.20_25)] focus:ring-[oklch(0.65_0.20_25/0.15)]'
-                : 'border-line focus:border-[oklch(0.45_0.13_85)] focus:ring-[oklch(0.84_0.17_85/0.20)]'
+                : 'border-line focus:border-gold-deep focus:ring-maize-bright/20'
             }
             ${className}
           `}

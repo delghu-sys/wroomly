@@ -40,7 +40,7 @@ const LABEL_TEXT: Record<SourceLabel, string> = {
 }
 const LABEL_STYLE: Record<SourceLabel, string> = {
   PERSONAL: 'bg-[oklch(0.55_0.15_142/0.14)] text-[oklch(0.40_0.13_142)]',
-  BUILDING: 'bg-[oklch(0.84_0.17_85/0.18)] text-[oklch(0.40_0.12_85)]',
+  BUILDING: 'bg-maize-bright/18 text-[oklch(0.40_0.12_85)]',
   AI: 'bg-navy-soft text-navy',
   NEEDS_CONFIRMATION: 'bg-[oklch(0.97_0.04_75)] text-[oklch(0.50_0.15_75)]',
   UNKNOWN: 'hidden',
@@ -57,7 +57,7 @@ function Badge({ label }: { label: SourceLabel }) {
 
 const labelCls = 'flex items-center gap-2 text-[13px] font-medium text-ink-soft mb-1.5'
 const inputCls =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition'
+  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
 
 export function ClaimReview({ token, draft: initial, personalPhotos: initialPhotos, buildingPhotos, enrichmentUsed }: ClaimReviewProps) {
   const router = useRouter()
@@ -226,7 +226,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
       </div>
       {enrichmentUsed && (
         <div className="rounded-2xl border border-line bg-surface px-4 py-3 text-[13px] text-ink-soft flex items-start gap-2">
-          <Info className="w-4 h-4 shrink-0 mt-0.5 text-[oklch(0.45_0.13_85)]" />
+          <Info className="w-4 h-4 shrink-0 mt-0.5 text-gold-deep" />
           <span>Some details were enriched from the building or floor plan source you provided. Confirm they apply to your specific unit before publishing.</span>
         </div>
       )}
@@ -297,7 +297,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
           <label className="mt-1.5 flex items-center gap-2 text-[12.5px] text-ink-soft cursor-pointer">
             <input
               type="checkbox"
-              className="h-3.5 w-3.5 accent-[oklch(0.45_0.13_85)]"
+              className="h-3.5 w-3.5 accent-gold-deep"
               checked={openEnded}
               onChange={e => {
                 setOpenEnded(e.target.checked)
@@ -336,10 +336,10 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
 
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2 text-[13px] text-ink-soft">
-          <input type="checkbox" className="h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={!!draft.furnished} onChange={e => set('furnished', e.target.checked)} /> Furnished
+          <input type="checkbox" className="h-4 w-4 accent-gold-deep" checked={!!draft.furnished} onChange={e => set('furnished', e.target.checked)} /> Furnished
         </label>
         <label className="flex items-center gap-2 text-[13px] text-ink-soft">
-          <input type="checkbox" className="h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={!!draft.utilitiesIncluded} onChange={e => set('utilitiesIncluded', e.target.checked)} /> Utilities included
+          <input type="checkbox" className="h-4 w-4 accent-gold-deep" checked={!!draft.utilitiesIncluded} onChange={e => set('utilitiesIncluded', e.target.checked)} /> Utilities included
         </label>
       </div>
 
@@ -384,9 +384,9 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
               const on = selectedPhotos.has(p.path)
               return (
                 <button key={p.path} type="button" onClick={() => togglePhoto(p.path)}
-                  className={`relative aspect-square rounded-xl overflow-hidden border-2 transition ${on ? 'border-[oklch(0.45_0.13_85)]' : 'border-transparent opacity-60'}`}>
+                  className={`relative aspect-square rounded-xl overflow-hidden border-2 transition ${on ? 'border-gold-deep' : 'border-transparent opacity-60'}`}>
                   <Image src={p.url} alt="" fill className="object-cover" sizes="120px" />
-                  {on && <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[oklch(0.45_0.13_85)] text-white text-[11px] flex items-center justify-center">✓</span>}
+                  {on && <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-gold-deep text-white text-[11px] flex items-center justify-center">✓</span>}
                 </button>
               )
             })}
@@ -424,19 +424,19 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
       {/* Confirmations */}
       <div className="space-y-2.5 border-t border-line pt-5">
         <label className="flex items-start gap-2.5 text-[13px] text-ink-soft cursor-pointer">
-          <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={confirmAccuracy} onChange={e => setConfirmAccuracy(e.target.checked)} />
+          <input type="checkbox" className="mt-0.5 h-4 w-4 accent-gold-deep" checked={confirmAccuracy} onChange={e => setConfirmAccuracy(e.target.checked)} />
           <span>I confirm that I reviewed this listing and that the information is accurate for the unit/room I am subletting.</span>
         </label>
         {enrichmentUsed && (
           <label className="flex items-start gap-2.5 text-[13px] text-ink-soft cursor-pointer">
-            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={confirmEnrichment} onChange={e => setConfirmEnrichment(e.target.checked)} />
+            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-gold-deep" checked={confirmEnrichment} onChange={e => setConfirmEnrichment(e.target.checked)} />
             <span>I confirm the building/floor-plan details apply to my specific unit.</span>
           </label>
         )}
       </div>
 
       <button type="button" onClick={publish} disabled={publishing}
-        className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98] disabled:opacity-60">
+        className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition active:scale-[0.98] disabled:opacity-60">
         {publishing ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</> : 'Review complete — publish listing'}
       </button>
     </div>

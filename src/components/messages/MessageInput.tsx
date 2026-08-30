@@ -92,7 +92,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
                 inline-flex items-center px-2.5 py-1 rounded-full
                 bg-white border border-line
                 text-[11px] font-medium text-ink-soft
-                hover:border-[oklch(0.84_0.17_85/0.50)] hover:text-ink
+                hover:border-maize-bright/50 hover:text-ink
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
                 active:scale-95
               "
@@ -125,7 +125,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
               bg-white border border-line
               px-4 py-3 text-[14.5px] leading-[22px] text-ink
               placeholder:text-ink-muted/65
-              focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)]
+              focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep
               transition-all duration-300
               shadow-[0_1px_2px_oklch(0_0_0/0.04)]
             "
@@ -148,7 +148,7 @@ export function MessageInput({ onSend, quickPrompts, disabled }: MessageInputPro
             transition-all duration-300
             ${
               ready
-                ? 'bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.40)] hover:shadow-[0_10px_28px_oklch(0.84_0.17_85/0.50)]'
+                ? 'bg-maize-bright text-navy-deep shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_40%,transparent)] hover:shadow-[0_10px_28px_color-mix(in_oklab,var(--maize-bright)_50%,transparent)]'
                 : 'bg-ink-muted/10 text-ink-muted cursor-not-allowed'
             }
           `}

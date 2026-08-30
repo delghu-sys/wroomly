@@ -60,7 +60,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
                 active && opt.accent
                   ? 'bg-[oklch(0.55_0.22_264/0.06)] border-[2px] border-[#2F6BFF] focus-visible:ring-[oklch(0.55_0.22_264/0.20)]'
                   : active
-                    ? 'bg-white border-[2px] border-navy focus-visible:ring-[oklch(0.22_0.075_256/0.18)]'
+                    ? 'bg-white border-[2px] border-navy focus-visible:ring-navy-deep/18'
                     : 'bg-white/70 backdrop-blur border-[2px] border-line hover:border-[oklch(0.55_0.22_264/0.40)] focus-visible:ring-[oklch(0.55_0.22_264/0.15)]'
               }
             `}
@@ -69,7 +69,7 @@ export function UmichSelectorCards({ selected, onSelect }: Props) {
               <span
                 className="absolute top-3.5 right-3.5 inline-flex w-6 h-6 rounded-full items-center justify-center"
                 style={{
-                  background: opt.accent ? '#2F6BFF' : 'oklch(0.22 0.075 256)',
+                  background: opt.accent ? '#2F6BFF' : 'var(--navy-deep)',
                   color: '#fff',
                 }}
                 aria-hidden

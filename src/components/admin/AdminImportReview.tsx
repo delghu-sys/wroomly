@@ -14,7 +14,7 @@ interface AdminImportReviewProps {
 
 const labelCls = 'block text-[12px] font-medium text-ink-soft mb-1'
 const inputCls =
-  'w-full rounded-lg border border-line bg-white px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-[oklch(0.84_0.17_85/0.3)] focus:border-[oklch(0.45_0.13_85)]'
+  'w-full rounded-lg border border-line bg-white px-3 py-2 text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-maize-bright/30 focus:border-gold-deep'
 
 export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminImportReviewProps) {
   const router = useRouter()
@@ -151,10 +151,10 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
 
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2 text-[13px] text-ink-soft">
-          <input type="checkbox" className="h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={!!draft.furnished} onChange={e => set('furnished', e.target.checked)} /> Furnished
+          <input type="checkbox" className="h-4 w-4 accent-gold-deep" checked={!!draft.furnished} onChange={e => set('furnished', e.target.checked)} /> Furnished
         </label>
         <label className="flex items-center gap-2 text-[13px] text-ink-soft">
-          <input type="checkbox" className="h-4 w-4 accent-[oklch(0.45_0.13_85)]" checked={!!draft.utilitiesIncluded} onChange={e => set('utilitiesIncluded', e.target.checked)} /> Utilities included
+          <input type="checkbox" className="h-4 w-4 accent-gold-deep" checked={!!draft.utilitiesIncluded} onChange={e => set('utilitiesIncluded', e.target.checked)} /> Utilities included
         </label>
       </div>
 
@@ -180,7 +180,7 @@ export function AdminImportReview({ id, draft: initial, submitterEmail }: AdminI
 
       <div className="flex gap-3 border-t border-line pt-5">
         <button type="button" onClick={approve} disabled={busy !== null}
-          className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition disabled:opacity-60">
+          className="flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition disabled:opacity-60">
           {busy === 'approve' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
           Approve & send claim email
         </button>

@@ -17,7 +17,7 @@
   --maize: oklch(0.86 0.17 92);
   --maize-deep: oklch(0.74 0.16 85);
   --maize-soft: oklch(0.96 0.05 92);
-  --navy: oklch(0.22 0.075 256);
+  --navy: var(--navy-deep);
   --blue: #2f6bff;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 

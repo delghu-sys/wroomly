@@ -47,9 +47,9 @@ export function ListingsPagination({
 
   const items = pageWindow(currentPage, totalPages)
   const linkCls =
-    'inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm font-medium border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.6)] hover:text-ink transition'
+    'inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm font-medium border border-line text-ink-soft hover:border-maize-bright/60 hover:text-ink transition'
   const activeCls =
-    'inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm font-semibold bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]'
+    'inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm font-semibold bg-navy-deep text-maize-bright'
   const disabledCls =
     'inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-full text-sm text-ink-muted/40 border border-line/60 cursor-default'
 

@@ -86,7 +86,7 @@ function Tile({
         className="pointer-events-none absolute inset-0 rounded-3xl transition-opacity duration-300"
         style={{
           opacity: hovered ? 1 : 0,
-          background: `radial-gradient(360px at ${mouse.x}px ${mouse.y}px, oklch(0.84 0.17 85 / 0.12), transparent 60%)`,
+          background: `radial-gradient(360px at ${mouse.x}px ${mouse.y}px, color-mix(in oklab, var(--maize-bright) 12%, transparent), transparent 60%)`,
         }}
         aria-hidden
       />
@@ -95,7 +95,7 @@ function Tile({
         <div
           className="
             w-12 h-12 rounded-2xl
-            bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]
+            bg-navy-deep text-maize-bright
             flex items-center justify-center mb-5
             transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
             group-hover:scale-110

@@ -33,7 +33,7 @@ export const FloatingDoor = memo(function FloatingDoor() {
           {/* Gold accent corner glow */}
           <div
             className="pointer-events-none absolute -top-12 -right-10 w-52 h-52 rounded-full blur-3xl opacity-50"
-            style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+            style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
           />
 
           {/* Door icon — gentle floating spring */}
@@ -54,7 +54,7 @@ export const FloatingDoor = memo(function FloatingDoor() {
             <Door
               size={104}
               weight="duotone"
-              style={{ color: 'oklch(0.84 0.17 85)' }}
+              style={{ color: 'var(--maize-bright)' }}
             />
           </motion.div>
 
@@ -85,11 +85,11 @@ export const FloatingDoor = memo(function FloatingDoor() {
       {/* Floating particle dots — pure CSS keyframes via Tailwind utilities */}
       <div
         className="absolute top-10 left-12 w-1.5 h-1.5 rounded-full animate-float"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.50)', animationDelay: '0.5s' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 50%, transparent)', animationDelay: '0.5s' }}
       />
       <div
         className="absolute bottom-16 right-10 w-1 h-1 rounded-full animate-float-slow"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.35)', animationDelay: '2s' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)', animationDelay: '2s' }}
       />
       <div
         className="absolute top-1/3 right-4 w-2 h-2 rounded-full animate-float"

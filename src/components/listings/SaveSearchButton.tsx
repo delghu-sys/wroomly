@@ -97,7 +97,7 @@ export function SaveSearchButton({ currentFilters, authed }: SaveSearchButtonPro
         ${
           saved
             ? 'bg-[oklch(0.55_0.15_142)] text-white shadow-[0_4px_14px_oklch(0.55_0.15_142/0.30)]'
-            : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-[oklch(0.84_0.17_85/0.45)] hover:text-ink'
+            : 'bg-white/85 backdrop-blur border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink'
         }
       `}
       aria-label="Save this search"

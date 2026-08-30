@@ -89,7 +89,7 @@ export default async function HomePage() {
                 group inline-flex items-center gap-2 h-12 px-7 rounded-full
                 bg-navy text-white font-semibold text-[0.9375rem]
                 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-                hover:-translate-y-px hover:shadow-[0_8px_28px_oklch(0.22_0.075_256/0.30)]
+                hover:-translate-y-px hover:shadow-[0_8px_28px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]
               "
             >
               See all listings
@@ -122,7 +122,7 @@ export default async function HomePage() {
           <div className="flex flex-col items-center gap-4 min-[680px]:flex-row min-[680px]:flex-1">
             <span
               className="shrink-0 inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-navy text-maize"
-              style={{ boxShadow: '0 6px 18px oklch(0.22 0.075 256 / 0.25)' }}
+              style={{ boxShadow: '0 6px 18px color-mix(in oklab, var(--navy-deep) 25%, transparent)' }}
             >
               <Sparkles className="w-5 h-5" strokeWidth={2} />
             </span>
@@ -141,7 +141,7 @@ export default async function HomePage() {
               shrink-0 inline-flex items-center gap-[0.45rem] h-[2.875rem] px-6 rounded-full
               bg-navy text-white font-bold text-[0.9375rem] whitespace-nowrap
               transition-[transform,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]
-              hover:-translate-y-px hover:shadow-[0_6px_24px_oklch(0.22_0.075_256/0.28),0_0_18px_oklch(0.86_0.17_92/0.20)]
+              hover:-translate-y-px hover:shadow-[0_6px_24px_color-mix(in_oklab,var(--navy-deep)_28%,transparent),0_0_18px_oklch(0.86_0.17_92/0.20)]
             "
           >
             List my place

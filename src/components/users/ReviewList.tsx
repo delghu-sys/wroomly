@@ -74,8 +74,8 @@ export function ReviewList({ reviews }: ReviewListProps) {
                 <AvatarFallback
                   className="text-xs font-semibold"
                   style={{
-                    background: 'oklch(0.22 0.075 256)',
-                    color: 'oklch(0.84 0.17 85)',
+                    background: 'var(--navy-deep)',
+                    color: 'var(--maize-bright)',
                   }}
                 >
                   {initials(r.reviewer.full_name)}
@@ -87,7 +87,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href={`/users/${r.reviewer.id}`}
-                  className="font-medium text-ink hover:text-[oklch(0.45_0.13_85)] transition-colors"
+                  className="font-medium text-ink hover:text-gold-deep transition-colors"
                 >
                   {r.reviewer?.full_name ?? 'Anonymous'}
                 </Link>

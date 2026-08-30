@@ -13,7 +13,7 @@ export function TermsContactCard() {
         border border-line bg-white/85 backdrop-blur-xl
         p-5 sm:p-6
         shadow-[0_2px_12px_oklch(0_0_0/0.04)]
-        hover:shadow-[0_18px_50px_oklch(0.22_0.075_256/0.10)]
+        hover:shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_10%,transparent)]
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
         hover:-translate-y-0.5
       "
@@ -24,7 +24,7 @@ export function TermsContactCard() {
     >
       <div
         className="pointer-events-none absolute -top-20 -right-12 w-60 h-60 rounded-full blur-3xl opacity-30"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
         aria-hidden
       />
 
@@ -37,8 +37,8 @@ export function TermsContactCard() {
             group-hover:scale-110 group-hover:-rotate-[6deg]
           "
           style={{
-            background: 'oklch(0.22 0.075 256)',
-            color: 'oklch(0.84 0.17 85)',
+            background: 'var(--navy-deep)',
+            color: 'var(--maize-bright)',
           }}
         >
           <EnvelopeSimple size={20} weight="duotone" />
@@ -49,7 +49,7 @@ export function TermsContactCard() {
           </p>
           <p className="font-display text-lg sm:text-xl tracking-tight text-ink mt-0.5 leading-tight">
             Reach our legal team at{' '}
-            <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+            <span className="italic font-light text-gold-deep">
               legal@wroomly.com
             </span>
           </p>
@@ -60,7 +60,7 @@ export function TermsContactCard() {
           className="
             shrink-0 text-ink-muted
             transition-all duration-300
-            group-hover:text-[oklch(0.45_0.13_85)]
+            group-hover:text-gold-deep
             group-hover:translate-x-0.5 group-hover:-translate-y-0.5
           "
         />

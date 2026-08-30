@@ -54,7 +54,7 @@ export function StarRating({
                   <Star
                     size={size}
                     weight="fill"
-                    style={{ color: 'oklch(0.84 0.17 85)' }}
+                    style={{ color: 'var(--maize-bright)' }}
                   />
                 </span>
               )}

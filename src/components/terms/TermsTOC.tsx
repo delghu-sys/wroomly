@@ -95,7 +95,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                       layoutId="terms-toc-indicator"
                       transition={spring}
                       className="absolute left-0 top-1/2 -translate-y-1/2 h-7 w-[3px] rounded-full"
-                      style={{ background: 'oklch(0.84 0.17 85)' }}
+                      style={{ background: 'var(--maize-bright)' }}
                       aria-hidden
                     />
                   )}
@@ -104,14 +104,14 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                       layoutId="terms-toc-bg"
                       transition={spring}
                       className="absolute inset-0 rounded-xl pointer-events-none"
-                      style={{ background: 'oklch(0.84 0.17 85 / 0.06)' }}
+                      style={{ background: 'color-mix(in oklab, var(--maize-bright) 6%, transparent)' }}
                       aria-hidden
                     />
                   )}
                   <span
                     className={`
                       relative text-[10.5px] tabular-nums font-semibold shrink-0
-                      ${isActive ? 'text-[oklch(0.45_0.13_85)]' : 'text-ink-muted/70'}
+                      ${isActive ? 'text-gold-deep' : 'text-ink-muted/70'}
                     `}
                   >
                     §{e.n}
@@ -145,7 +145,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
           <span className="inline-flex items-center gap-2 min-w-0">
             <span
               className="text-[10px] tabular-nums font-semibold"
-              style={{ color: 'oklch(0.45 0.13 85)' }}
+              style={{ color: 'var(--gold-deep)' }}
             >
               §{activeEntry?.n}
             </span>
@@ -170,7 +170,7 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setMobileOpen(false)}
-                className="fixed inset-0 z-40 bg-[oklch(0.22_0.075_256/0.40)] backdrop-blur-sm"
+                className="fixed inset-0 z-40 bg-navy-deep/40 backdrop-blur-sm"
               />
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
@@ -196,14 +196,14 @@ export function TermsTOC({ entries }: TermsTOCProps) {
                         transition-colors duration-200
                         ${
                           isActive
-                            ? 'bg-[oklch(0.84_0.17_85/0.10)] text-ink'
+                            ? 'bg-maize-bright/10 text-ink'
                             : 'text-ink-soft hover:bg-[oklch(0.97_0.008_75)]'
                         }
                       `}
                     >
                       <span
                         className={`text-[10.5px] tabular-nums font-semibold shrink-0 ${
-                          isActive ? 'text-[oklch(0.45_0.13_85)]' : 'text-ink-muted/70'
+                          isActive ? 'text-gold-deep' : 'text-ink-muted/70'
                         }`}
                       >
                         §{e.n}

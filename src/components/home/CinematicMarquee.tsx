@@ -34,18 +34,18 @@ export function CinematicMarquee() {
   return (
     <div
       className="relative overflow-hidden py-7 border-y border-white/[0.04]"
-      style={{ background: 'oklch(0.22 0.075 256)' }}
+      style={{ background: 'var(--navy-deep)' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Gradient fade masks */}
       <div
         className="absolute inset-y-0 left-0 w-32 sm:w-48 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to right, oklch(0.22 0.075 256), transparent)' }}
+        style={{ background: 'linear-gradient(to right, var(--navy-deep), transparent)' }}
       />
       <div
         className="absolute inset-y-0 right-0 w-32 sm:w-48 z-10 pointer-events-none"
-        style={{ background: 'linear-gradient(to left, oklch(0.22 0.075 256), transparent)' }}
+        style={{ background: 'linear-gradient(to left, var(--navy-deep), transparent)' }}
       />
 
       {/* Row 1 */}

@@ -132,7 +132,7 @@ export default async function UserProfilePage({
       {/* Very subtle ambient mesh */}
       <div
         className="pointer-events-none absolute -top-32 right-[-10%] w-[640px] h-[640px] rounded-full blur-[140px] opacity-25"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.30)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 30%, transparent)' }}
         aria-hidden
       />
       <div
@@ -203,7 +203,7 @@ export default async function UserProfilePage({
                 <div className="flex items-baseline justify-between gap-3 mb-5">
                   <h2 className="font-display text-2xl sm:text-3xl tracking-tight text-ink leading-[1.05]">
                     Active{' '}
-                    <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+                    <span className="italic font-light text-gold-deep">
                       listings
                     </span>
                   </h2>

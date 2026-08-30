@@ -38,8 +38,8 @@ export function ListingsSearch({ currentQuery }: ListingsSearchProps) {
 
   return (
     <div className="relative group flex-1 max-w-xl">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-[oklch(0.84_0.17_85/0.15)] flex items-center justify-center pointer-events-none group-focus-within:bg-[oklch(0.84_0.17_85/0.30)] transition-colors">
-        <Search className="w-3.5 h-3.5 text-[oklch(0.84_0.17_85)]" />
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-maize-bright/15 flex items-center justify-center pointer-events-none group-focus-within:bg-maize-bright/30 transition-colors">
+        <Search className="w-3.5 h-3.5 text-maize-bright" />
       </div>
       <input
         type="text"
@@ -49,7 +49,7 @@ export function ListingsSearch({ currentQuery }: ListingsSearchProps) {
         onBlur={submit}
         aria-label="Search listings by name, neighborhood, or residence"
         placeholder="Search by name, neighborhood, residence…"
-        className="h-12 w-full rounded-full border border-white/[0.10] bg-white/[0.05] backdrop-blur pl-12 pr-10 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[oklch(0.84_0.17_85/0.50)] focus:border-[oklch(0.84_0.17_85/0.40)] transition-all duration-300"
+        className="h-12 w-full rounded-full border border-white/[0.10] bg-white/[0.05] backdrop-blur pl-12 pr-10 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-maize-bright/50 focus:border-maize-bright/40 transition-all duration-300"
       />
       {value && (
         <button

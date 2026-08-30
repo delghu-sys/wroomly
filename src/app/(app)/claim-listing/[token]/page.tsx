@@ -100,7 +100,7 @@ export default async function ClaimListingPage({
     const next = encodeURIComponent(`/claim-listing/${token}`)
     return (
       <Shell>
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
           <Sparkles className="w-3.5 h-3.5" /> Your Wroomly draft
         </p>
         <h1 className="font-display text-3xl tracking-tight text-ink leading-tight">
@@ -118,10 +118,10 @@ export default async function ClaimListingPage({
           Sign in or create your account to review every detail and publish. Nothing goes live until you confirm.
         </div>
         <div className="mt-5 flex flex-col sm:flex-row gap-3">
-          <Link href={`/sign-up?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition">
+          <Link href={`/sign-up?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition">
             Create account & claim
           </Link>
-          <Link href={`/sign-in?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full border border-line text-ink font-medium text-sm hover:border-[oklch(0.84_0.17_85/0.5)] transition">
+          <Link href={`/sign-in?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full border border-line text-ink font-medium text-sm hover:border-maize-bright/50 transition">
             Sign in
           </Link>
         </div>
@@ -148,7 +148,7 @@ export default async function ClaimListingPage({
 
   return (
     <Shell>
-      <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-[oklch(0.45_0.13_85)] font-bold mb-3">
+      <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
         <Sparkles className="w-3.5 h-3.5" /> Review your draft
       </p>
       <h1 className="font-display text-3xl tracking-tight text-ink leading-tight mb-6">

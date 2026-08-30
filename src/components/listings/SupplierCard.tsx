@@ -60,7 +60,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
       <Link
         href={`/users/${user.id}`}
         aria-label={`Open ${user.full_name ?? 'profile'}`}
-        className="absolute inset-0 z-0 rounded-3xl focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.30)]"
+        className="absolute inset-0 z-0 rounded-3xl focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/30"
       />
 
       <div className="relative z-10 pointer-events-none flex items-start gap-4">
@@ -70,7 +70,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
         <div className="relative">
           <Avatar className="h-14 w-14 ring-1 ring-line">
             <AvatarImage src={user.avatar_url ?? undefined} />
-            <AvatarFallback className="bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold">
+            <AvatarFallback className="bg-navy-deep text-maize-bright font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -86,7 +86,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
             <p className="font-display text-lg tracking-tight text-ink truncate">
               {user.full_name}
             </p>
-            <ArrowRight className="w-4 h-4 text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-[oklch(0.45_0.13_85)] shrink-0" />
+            <ArrowRight className="w-4 h-4 text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-gold-deep shrink-0" />
           </div>
 
           {/* Nothing to say for an unverified host with no reviews yet — skip
@@ -96,7 +96,7 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
               {user.is_verified && <VerifiedBadge size={13} label />}
               {ratingAvg !== null && (
                 <span className="inline-flex items-center gap-1 text-ink">
-                  <Star className="w-3.5 h-3.5 fill-[oklch(0.84_0.17_85)] stroke-[oklch(0.84_0.17_85)]" />
+                  <Star className="w-3.5 h-3.5 fill-maize-bright stroke-maize-bright" />
                   <span className="font-medium tabular-nums">
                     {ratingAvg.toFixed(1)}
                   </span>
@@ -119,9 +119,9 @@ export function SupplierCard({ user, ratingAvg, reviewCount }: SupplierCardProps
               href={`/users/${user.id}`}
               className="
                 inline-flex items-center gap-1 text-[12.5px] font-medium
-                text-[oklch(0.45_0.13_85)]
+                text-gold-deep
                 underline-offset-4 hover:underline transition-colors
-                focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.25)]
+                focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
                 rounded-full px-1
                 relative z-10
               "

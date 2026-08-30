@@ -64,13 +64,13 @@ export function MagneticLinkCta({
     'group relative inline-flex w-full items-center justify-center gap-2 rounded-full overflow-hidden font-semibold tracking-tight transition-shadow duration-500 active:scale-[0.97]'
 
   const primary =
-    'bg-[oklch(0.84_0.17_85)] text-[oklch(0.22_0.075_256)] shadow-[0_4px_18px_oklch(0.84_0.17_85/0.30)] hover:shadow-[0_12px_36px_oklch(0.84_0.17_85/0.45)]'
+    'bg-maize-bright text-navy-deep shadow-[0_4px_18px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)] hover:shadow-[0_12px_36px_color-mix(in_oklab,var(--maize-bright)_45%,transparent)]'
 
   const ghostLight =
-    'bg-white text-ink-soft border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)] hover:shadow-[0_6px_18px_oklch(0_0_0/0.04)] hover:border-[oklch(0.84_0.17_85/0.40)]'
+    'bg-white text-ink-soft border border-line shadow-[0_1px_2px_oklch(0_0_0/0.04)] hover:shadow-[0_6px_18px_oklch(0_0_0/0.04)] hover:border-maize-bright/40'
 
   const ghostDark =
-    'bg-white/[0.05] backdrop-blur-md text-white/85 border border-white/[0.15] hover:bg-white/[0.10] hover:border-[oklch(0.84_0.17_85/0.45)]'
+    'bg-white/[0.05] backdrop-blur-md text-white/85 border border-white/[0.15] hover:bg-white/[0.10] hover:border-maize-bright/45'
 
   const ghost = tone === 'dark' ? ghostDark : ghostLight
 
@@ -94,10 +94,10 @@ export function MagneticLinkCta({
           style={{
             background:
               variant === 'primary'
-                ? 'oklch(0.22 0.075 256)'
+                ? 'var(--navy-deep)'
                 : tone === 'dark'
-                  ? 'oklch(0.84 0.17 85 / 0.15)'
-                  : 'oklch(0.84 0.17 85 / 0.10)',
+                  ? 'color-mix(in oklab, var(--maize-bright) 15%, transparent)'
+                  : 'color-mix(in oklab, var(--maize-bright) 10%, transparent)',
           }}
           aria-hidden
         />
@@ -107,7 +107,7 @@ export function MagneticLinkCta({
             transition-colors duration-500
             ${
               variant === 'primary'
-                ? 'group-hover:text-[oklch(0.84_0.17_85)]'
+                ? 'group-hover:text-maize-bright'
                 : tone === 'dark'
                   ? 'group-hover:text-white'
                   : 'group-hover:text-ink'

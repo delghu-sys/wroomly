@@ -24,26 +24,26 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
         border bg-white/85 backdrop-blur-xl
         transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
         hover:-translate-y-0.5
-        focus:outline-none focus-visible:ring-4 focus-visible:ring-[oklch(0.84_0.17_85/0.25)]
+        focus:outline-none focus-visible:ring-4 focus-visible:ring-maize-bright/25
       "
       style={{
-        borderColor: 'oklch(0.84 0.17 85 / 0.40)',
+        borderColor: 'color-mix(in oklab, var(--maize-bright) 40%, transparent)',
         boxShadow:
-          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 18px oklch(0.84 0.17 85 / 0.12)',
+          'inset 0 1px 0 oklch(1 0 0 / 0.85), 0 6px 18px color-mix(in oklab, var(--maize-bright) 12%, transparent)',
       }}
     >
       <div
         aria-hidden
         className="pointer-events-none absolute -top-16 -right-12 w-56 h-56 rounded-full blur-3xl opacity-50"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.35)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 35%, transparent)' }}
       />
 
       <div className="relative flex items-center gap-4 p-4 sm:p-5">
         <div
-          className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_oklch(0.84_0.17_85/0.30)]"
+          className="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center shadow-[0_4px_14px_color-mix(in_oklab,var(--maize-bright)_30%,transparent)]"
           style={{
-            background: 'oklch(0.22 0.075 256)',
-            color: 'oklch(0.84 0.17 85)',
+            background: 'var(--navy-deep)',
+            color: 'var(--maize-bright)',
           }}
         >
           <Warning size={18} weight="duotone" />
@@ -63,7 +63,7 @@ export function PayoutSetupBanner({ status }: PayoutSetupBannerProps) {
         <ArrowRight
           size={18}
           weight="bold"
-          className="shrink-0 text-ink-muted transition-all duration-300 group-hover:text-[oklch(0.45_0.13_85)] group-hover:translate-x-0.5"
+          className="shrink-0 text-ink-muted transition-all duration-300 group-hover:text-gold-deep group-hover:translate-x-0.5"
         />
       </div>
     </Link>

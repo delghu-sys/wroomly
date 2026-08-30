@@ -79,7 +79,7 @@ export default async function PaymentSuccessPage({
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink text-balance">
           You&apos;re{' '}
-          <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+          <span className="italic font-light text-gold-deep">
             all set.
           </span>
         </h1>
@@ -101,7 +101,7 @@ export default async function PaymentSuccessPage({
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
           {conversationId && (
             <Link href={`/messages/${conversationId}`}>
-              <Button className="press rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] hover:bg-[oklch(0.22_0.075_256)]/90 h-11 px-6 font-semibold">
+              <Button className="press rounded-full bg-navy-deep text-maize-bright hover:bg-navy-deep/90 h-11 px-6 font-semibold">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Message your host
               </Button>

@@ -35,7 +35,7 @@ function filesValid(files: File[]): string | null {
 
 const labelCls = 'block text-[13px] font-medium text-ink-soft mb-1.5'
 const inputCls =
-  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/60 focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition'
+  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink placeholder:text-ink-muted/60 focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition'
 
 export function ImportListingForm() {
   const [phase, setPhase] = useState<Phase>({ name: 'form' })
@@ -200,7 +200,7 @@ export function ImportListingForm() {
         <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/listings"
-            className="inline-flex items-center justify-center gap-1.5 h-11 px-6 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] text-sm font-semibold hover:bg-[oklch(0.22_0.075_256)]/90 transition"
+            className="inline-flex items-center justify-center gap-1.5 h-11 px-6 rounded-full bg-navy-deep text-maize-bright text-sm font-semibold hover:bg-navy-deep/90 transition"
           >
             Browse listings meanwhile <ArrowRight className="w-4 h-4" />
           </Link>
@@ -211,7 +211,7 @@ export function ImportListingForm() {
               setBuildingFiles([])
               setPhase({ name: 'form' })
             }}
-            className="inline-flex items-center justify-center h-11 px-6 rounded-full border border-line text-ink text-sm font-medium hover:border-[oklch(0.84_0.17_85/0.5)] transition"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-full border border-line text-ink text-sm font-medium hover:border-maize-bright/50 transition"
           >
             Import another place
           </button>
@@ -240,7 +240,7 @@ export function ImportListingForm() {
       </div>
 
       {/* ── PRIMARY: photos + screenshots ── */}
-      <section className="rounded-3xl border-2 border-[oklch(0.84_0.17_85/0.45)] bg-surface p-5 sm:p-7 space-y-4 shadow-[0_8px_30px_oklch(0.84_0.17_85/0.10)]">
+      <section className="rounded-3xl border-2 border-maize-bright/45 bg-surface p-5 sm:p-7 space-y-4 shadow-[0_8px_30px_color-mix(in_oklab,var(--maize-bright)_10%,transparent)]">
         <div>
           <h2 className="font-display text-xl tracking-tight text-ink">
             Add photos of your place
@@ -327,7 +327,7 @@ export function ImportListingForm() {
         />
 
         <label className="flex items-start gap-2.5 text-[13px] text-ink-soft cursor-pointer">
-          <input type="checkbox" name="buildingEnrichmentConsent" value="true" className="mt-0.5 h-4 w-4 accent-[oklch(0.45_0.13_85)]" />
+          <input type="checkbox" name="buildingEnrichmentConsent" value="true" className="mt-0.5 h-4 w-4 accent-gold-deep" />
           <span>I understand that building/floor plan details are used only to enrich the draft, and that I must confirm they apply to my specific unit before publishing.</span>
         </label>
         {fieldErrors.buildingEnrichmentConsent && <p className="text-xs text-[oklch(0.55_0.20_25)]">{fieldErrors.buildingEnrichmentConsent}</p>}
@@ -335,7 +335,7 @@ export function ImportListingForm() {
 
       {/* Consent */}
       <label className="flex items-start gap-2.5 text-[13px] text-ink-soft cursor-pointer">
-        <input type="checkbox" name="consentConfirmed" value="true" className="mt-0.5 h-4 w-4 accent-[oklch(0.45_0.13_85)]" />
+        <input type="checkbox" name="consentConfirmed" value="true" className="mt-0.5 h-4 w-4 accent-gold-deep" />
         <span>I confirm this is my listing or I have permission to import it.</span>
       </label>
       {fieldErrors.consentConfirmed && <p className="text-xs text-[oklch(0.55_0.20_25)]">{fieldErrors.consentConfirmed}</p>}
@@ -350,7 +350,7 @@ export function ImportListingForm() {
       <button
         type="submit"
         disabled={busy}
-        className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] font-semibold text-sm hover:bg-[oklch(0.22_0.075_256)]/90 transition active:scale-[0.98] disabled:opacity-60"
+        className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition active:scale-[0.98] disabled:opacity-60"
       >
         {busy ? (
           <><Loader2 className="w-4 h-4 animate-spin" /> {busyLabel}</>
@@ -421,11 +421,11 @@ function FileField({
       <label
         className={`flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${
           large
-            ? 'border-[oklch(0.84_0.17_85/0.5)] hover:border-[oklch(0.84_0.17_85/0.8)] bg-[oklch(0.84_0.17_85/0.05)] px-4 py-10'
-            : 'border-line hover:border-[oklch(0.84_0.17_85/0.5)] bg-white/60 px-4 py-6'
+            ? 'border-maize-bright/50 hover:border-maize-bright/80 bg-maize-bright/5 px-4 py-10'
+            : 'border-line hover:border-maize-bright/50 bg-white/60 px-4 py-6'
         }`}
       >
-        <Upload className={large ? 'w-8 h-8 text-[oklch(0.45_0.13_85)]' : 'w-5 h-5 text-ink-muted'} />
+        <Upload className={large ? 'w-8 h-8 text-gold-deep' : 'w-5 h-5 text-ink-muted'} />
         <span className={large ? 'text-[15px] font-medium text-ink' : 'text-[13px] text-ink-soft'}>
           {files.length > 0
             ? `${files.length} file${files.length === 1 ? '' : 's'} added — tap to add more`
@@ -455,7 +455,7 @@ function FileField({
                 disabled={disabled}
                 aria-label={`Remove ${f.name}`}
                 onClick={() => onChange(files.filter((_, j) => j !== i))}
-                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-[oklch(0.22_0.075_256/0.85)] text-white flex items-center justify-center hover:bg-[oklch(0.22_0.075_256)] transition"
+                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-navy-deep/85 text-white flex items-center justify-center hover:bg-navy-deep transition"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

@@ -31,7 +31,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           minHeight: '100dvh',
           fontFamily:
             'ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
-          background: 'oklch(0.22 0.075 256)',
+          background: 'var(--navy-deep)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
@@ -45,7 +45,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               fontSize: 11,
               textTransform: 'uppercase',
               letterSpacing: '0.22em',
-              color: 'oklch(0.84 0.17 85)',
+              color: 'var(--maize-bright)',
               fontWeight: 600,
               marginBottom: 16,
             }}
@@ -76,7 +76,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <a
               href="mailto:help@wroomly.com"
               style={{
-                color: 'oklch(0.84 0.17 85)',
+                color: 'var(--maize-bright)',
                 textDecoration: 'underline',
                 textUnderlineOffset: 4,
               }}
@@ -97,9 +97,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: 14,
-              background: 'oklch(0.84 0.17 85)',
-              color: 'oklch(0.22 0.075 256)',
-              boxShadow: '0 4px 18px oklch(0.84 0.17 85 / 0.30)',
+              background: 'var(--maize-bright)',
+              color: 'var(--navy-deep)',
+              boxShadow: '0 4px 18px color-mix(in oklab, var(--maize-bright) 30%, transparent)',
             }}
           >
             Reload

@@ -89,7 +89,7 @@ export function WaitlistForm() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="h-[3.125rem] w-full rounded-[0.875rem] bg-maize text-[oklch(0.22_0.075_256)] font-semibold text-[0.9375rem] inline-flex items-center justify-center gap-2 shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.99]"
+          className="h-[3.125rem] w-full rounded-[0.875rem] bg-maize text-navy-deep font-semibold text-[0.9375rem] inline-flex items-center justify-center gap-2 shadow-[0_4px_18px_oklch(0.86_0.17_92/0.30)] hover:shadow-[0_10px_36px_oklch(0.86_0.17_92/0.45)] transition disabled:opacity-70 disabled:cursor-not-allowed active:scale-[0.99]"
         >
           {status === 'loading' ? (
             'Joining…'

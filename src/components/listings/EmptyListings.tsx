@@ -22,7 +22,7 @@ export function EmptyListings() {
       {/* Subtle atmosphere inside the panel */}
       <div
         className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full blur-3xl opacity-40 pointer-events-none"
-        style={{ background: 'oklch(0.84 0.17 85 / 0.18)' }}
+        style={{ background: 'color-mix(in oklab, var(--maize-bright) 18%, transparent)' }}
         aria-hidden
       />
       <div
@@ -39,12 +39,12 @@ export function EmptyListings() {
           transition={{ ...spring, delay: 0.1 }}
           className="relative inline-flex"
         >
-          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)] shadow-[0_18px_50px_oklch(0.22_0.075_256/0.30)]">
+          <div className="relative w-20 h-20 rounded-2xl flex items-center justify-center bg-navy-deep text-maize-bright shadow-[0_18px_50px_color-mix(in_oklab,var(--navy-deep)_30%,transparent)]">
             <Compass className="w-9 h-9" strokeWidth={1.5} />
             {/* Live pulse */}
             <span className="absolute -top-1.5 -right-1.5 flex h-3 w-3">
               <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50" />
-              <span className="rounded-full h-3 w-3 bg-emerald-400 border-2 border-[oklch(0.22_0.075_256)]" />
+              <span className="rounded-full h-3 w-3 bg-emerald-400 border-2 border-navy-deep" />
             </span>
           </div>
         </motion.div>
@@ -56,7 +56,7 @@ export function EmptyListings() {
           className="font-display text-3xl sm:text-4xl tracking-tight text-ink mt-7 leading-[1.05]"
         >
           Nothing here yet —{' '}
-          <span className="italic font-light text-[oklch(0.45_0.13_85)]">
+          <span className="italic font-light text-gold-deep">
             but the map is wide open.
           </span>
         </motion.h2>
@@ -87,7 +87,7 @@ export function EmptyListings() {
               key={label}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white border border-line text-xs text-ink-soft shadow-[0_1px_2px_oklch(0_0_0/0.04)]"
             >
-              <Icon className="w-3 h-3 text-[oklch(0.45_0.13_85)]" />
+              <Icon className="w-3 h-3 text-gold-deep" />
               {label}
             </span>
           ))}

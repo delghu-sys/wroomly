@@ -49,7 +49,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
             <span
               className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold tabular-nums"
               style={{
-                background: 'oklch(0.84 0.17 85 / 0.18)',
+                background: 'color-mix(in oklab, var(--maize-bright) 18%, transparent)',
                 color: 'oklch(0.32 0.10 85)',
               }}
             >
@@ -60,15 +60,15 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
 
         {/* Search */}
         <div className="relative group">
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-[oklch(0.84_0.17_85/0.12)] flex items-center justify-center pointer-events-none group-focus-within:bg-[oklch(0.84_0.17_85/0.25)] transition-colors">
-            <Search className="w-3.5 h-3.5 text-[oklch(0.45_0.13_85)]" strokeWidth={2} />
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-maize-bright/12 flex items-center justify-center pointer-events-none group-focus-within:bg-maize-bright/25 transition-colors">
+            <Search className="w-3.5 h-3.5 text-gold-deep" strokeWidth={2} />
           </div>
           <input
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search messages…"
-            className="h-11 w-full rounded-2xl bg-white border border-line pl-11 pr-9 text-sm text-ink placeholder:text-ink-muted/65 shadow-[0_1px_2px_oklch(0_0_0/0.04)] focus:outline-none focus:ring-4 focus:ring-[oklch(0.84_0.17_85/0.18)] focus:border-[oklch(0.45_0.13_85)] transition-all duration-300"
+            className="h-11 w-full rounded-2xl bg-white border border-line pl-11 pr-9 text-sm text-ink placeholder:text-ink-muted/65 shadow-[0_1px_2px_oklch(0_0_0/0.04)] focus:outline-none focus:ring-4 focus:ring-maize-bright/18 focus:border-gold-deep transition-all duration-300"
           />
           {query && (
             <button
@@ -87,7 +87,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
         {filtered.length === 0 ? (
           query ? (
             <div className="text-center py-12">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
+              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-navy-deep text-maize-bright">
                 <Search className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <p className="font-display text-base text-ink">No matches</p>
@@ -97,7 +97,7 @@ export function ConversationList({ conversations, activeId }: ConversationListPr
             </div>
           ) : (
             <div className="text-center py-12 px-4">
-              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-[oklch(0.22_0.075_256)] text-[oklch(0.84_0.17_85)]">
+              <div className="inline-flex w-12 h-12 rounded-2xl items-center justify-center mb-3 bg-navy-deep text-maize-bright">
                 <MessageSquare className="w-5 h-5" strokeWidth={1.75} />
               </div>
               <p className="font-display text-base text-ink">No conversations yet</p>
