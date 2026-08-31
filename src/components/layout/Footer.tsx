@@ -63,7 +63,7 @@ export function Footer() {
             title="Company"
             links={[
               { href: '/about', label: 'How it works' },
-              { href: '/about#trust', label: 'Trust & safety' },
+              { href: '/safety', label: 'Trust & safety' },
               { href: '/terms', label: 'Terms' },
               { href: '/privacy', label: 'Privacy' },
               { href: 'mailto:help@wroomly.app', label: 'Contact', external: true },
