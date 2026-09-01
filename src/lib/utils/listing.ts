@@ -14,7 +14,14 @@ export function formatDateRange(from: string, to: string): string {
   const toDate = parseISO(to)
   const fromStr = format(fromDate, 'MMM yyyy')
   const toStr = format(toDate, 'MMM yyyy')
-  return fromStr === toStr ? fromStr : `${fromStr} – ${toStr}`
+  if (fromStr === toStr) return fromStr
+  // Shared year stated once: "May – Aug 2026", not "May 2026 – Aug 2026".
+  // Shorter is what keeps the card's spec row on one line; it's also just
+  // how people write date ranges.
+  if (fromDate.getFullYear() === toDate.getFullYear()) {
+    return `${format(fromDate, 'MMM')} – ${toStr}`
+  }
+  return `${fromStr} – ${toStr}`
 }
 
 /**
