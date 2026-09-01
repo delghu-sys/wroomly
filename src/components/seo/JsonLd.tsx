@@ -167,8 +167,8 @@ export function siteJsonLd(): Record<string, unknown>[] {
       name: 'Wroomly',
       url: ORIGIN,
       // The brand logo (square) — Google reads this for the org logo.
-      // (og-default.png is now a real generated route, but the org logo
-      // should stay the square mark, not the wide share card.)
+      // (og-default.png exists now, but the org logo should stay the square
+      // mark, not the wide 1200x630 share card.)
       logo: {
         '@type': 'ImageObject',
         url: `${ORIGIN}/logo.png`,
