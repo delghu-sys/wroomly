@@ -49,8 +49,9 @@ export const metadata: Metadata = {
   verification: {
     google: 'pWJX73rXPY1_5JM6qjWQq1YT7trlQibJCNcvkJQB1ks',
   },
-  // NOTE: /og-default.png is a placeholder — drop a real 1200×630 OG image
-  // (navy background, maize logo, headline) into /public to ship.
+  // /og-default.png is the designed 1200x630 share card in /public, rendered
+  // from the Wroomly OG canvas artboard. Static on purpose: the design uses
+  // radial gradients and oklch(), which next/og's Satori renderer mangles.
   openGraph: {
     title: 'Wroomly · University of Michigan Sublets in Ann Arbor',
     description:
