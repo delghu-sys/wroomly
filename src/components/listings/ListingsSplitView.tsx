@@ -11,6 +11,8 @@ interface ListingsSplitViewProps {
   userId: string | null
   favoriteIds: Set<string>
   ratingBySupplier: Record<string, { avg: number; count: number }>
+  /** CARTO basemap key, read server-side by the page and forwarded. */
+  cartoKey?: string
 }
 
 /**
@@ -32,6 +34,7 @@ export function ListingsSplitView({
   userId,
   favoriteIds,
   ratingBySupplier,
+  cartoKey,
 }: ListingsSplitViewProps) {
   const missingCoords = listings.length - mapListings.length
 
@@ -63,6 +66,7 @@ export function ListingsSplitView({
         <div className="hidden lg:block lg:sticky lg:top-24">
           <ListingsMap
             listings={mapListings}
+            cartoKey={cartoKey}
             linkHover
             heightClass="h-[calc(100vh-8rem)] min-h-[520px]"
           />

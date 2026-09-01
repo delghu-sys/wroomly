@@ -213,6 +213,10 @@ export default async function ListingsPage({
     }
   }
 
+  // Server-only env var: reaches the browser as a prop on the map, never as a
+  // NEXT_PUBLIC_ build-time inline. See ListingsMap for why.
+  const cartoKey = process.env.CARTO_KEY
+
   const view: 'grid' | 'split' | 'map' =
     filters.view === 'map' ? 'map' : filters.view === 'split' ? 'split' : 'grid'
   const typedListings = (listings ?? []) as ListingWithDetails[]
@@ -310,6 +314,7 @@ export default async function ListingsPage({
                   userId={authUser?.id ?? null}
                   favoriteIds={favoriteIds}
                   ratingBySupplier={ratingBySupplier}
+                  cartoKey={cartoKey}
                 />
                 <ListingsPagination
                   currentPage={page}
@@ -320,7 +325,7 @@ export default async function ListingsPage({
               </div>
             ) : view === 'map' ? (
               <div className="animate-fade-in">
-                <ListingsMap listings={mapListings} />
+                <ListingsMap listings={mapListings} cartoKey={cartoKey} />
                 {mapListings.length !== typedListings.length && (
                   <p className="text-ink-muted text-xs mt-3 text-center">
                     {mapListings.length} of {typedListings.length} listings have map coordinates

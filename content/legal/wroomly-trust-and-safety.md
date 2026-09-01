@@ -1,6 +1,6 @@
 # Trust & Safety
 
-Effective date: August 30, 2026 · Last updated: August 30, 2026
+Effective date: August 30, 2026 · Last updated: August 31, 2026
 
 Wroomly exists because finding housing in Ann Arbor shouldn't mean gambling on a stranger in a Facebook group. This page explains what we do to keep the platform safe, what we can't do, the rules everyone follows, and how to protect yourself.
 
@@ -10,7 +10,7 @@ This policy is part of our Terms of Service.
 
 We want to be straight with you, because misunderstanding this is how people get hurt.
 
-A "verified student" blue check means one thing: at some point, that person clicked a link we emailed to a university address and proved they could receive mail there.
+A "verified student" blue check means one thing: at some point, that person signed in with their university Google account, so we know they controlled a university login at that moment.
 
 It is not:
 
@@ -34,7 +34,7 @@ A verified student can still be dishonest. A blue check lowers the odds you're t
 
 - We do not inspect properties
 - We do not meet or interview users
-- We do not review every listing before it goes live
+- We do not review every listing by hand. An automated moderator screens each new listing before it goes live, and borderline cases go to a person, but that screening reads the words and pictures in a post. It cannot tell you whether a real place exists behind them
 - We never handle, hold, or guarantee any money. Wroomly processes no payments at all.
 
 **A note on AI**

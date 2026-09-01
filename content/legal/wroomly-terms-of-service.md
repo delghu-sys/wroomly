@@ -1,6 +1,6 @@
 # Terms of Service
 
-Effective date: August 30, 2026 · Last updated: August 30, 2026
+Effective date: August 30, 2026 · Last updated: August 31, 2026
 
 These Terms of Service ("Terms") are a binding agreement between you and Wroomly LLC, a Michigan limited liability company ("Wroomly," "we," "us"), governing your use of wroomly.app and related services (the "Service").
 
@@ -39,7 +39,7 @@ If you use the Service on behalf of an organization, you represent that you are 
 
 You are responsible for your account, your password, and all activity under it. Keep your password confidential and notify us immediately at delghu@umich.edu of any unauthorized use.
 
-**The "verified student" blue check has a specific and limited meaning.** It means only that someone demonstrated control of a university email address at the time of verification. It is not a background check, identity check, credit check, criminal-records check, or endorsement of that person's honesty, reliability, or the accuracy of their listing. A verified user can still be dishonest. Do not treat any badge on the Service as a substitute for your own due diligence.
+**The "verified student" blue check has a specific and limited meaning.** It means only that someone signed in with a university Google account at the time of verification. It is not a background check, identity check, credit check, criminal-records check, or endorsement of that person's honesty, reliability, or the accuracy of their listing. A verified user can still be dishonest. Do not treat any badge on the Service as a substitute for your own due diligence.
 
 You may not transfer or sell your account, or create an account using another person's identity.
 
@@ -107,7 +107,7 @@ You agree not to:
 
 ## 8. Interactions between users — your risk
 
-**You are solely responsible for your interactions with other users.** We do not screen, interview, background-check, or vet users or listings, and we do not verify the accuracy of listing information, the condition or legality of any property, or any person's identity beyond the limited email verification described in Section 3.
+**You are solely responsible for your interactions with other users.** We do not screen, interview, background-check, or vet users or listings, and we do not verify the accuracy of listing information, the condition or legality of any property, or any person's identity beyond the limited university sign-in described in Section 3.
 
 Exercise caution: view a property in person or by live video before paying anything; verify that the person offering it has the right to do so; refuse deposits by irreversible payment methods; never share financial credentials.
 

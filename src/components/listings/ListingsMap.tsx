@@ -21,15 +21,23 @@ const AA_CENTER: [number, number] = [42.2780, -83.7430]
 // CARTO now requires a key on their raster basemaps. Unkeyed requests are not
 // blocked — they return a normal 200 PNG — but every tile comes back with
 // "API KEY REQUIRED" burned diagonally across it, which is what you see on the
-// map without this set.
+// map without a key.
+//
+// The key arrives as a PROP, read server-side from CARTO_KEY, rather than from
+// a NEXT_PUBLIC_ variable. It still reaches the browser (it must — the browser
+// is what fetches the tiles), but this keeps it out of the client bundle at
+// build time, so it can be rotated without a rebuild and Vercel doesn't have
+// to accept a public-prefixed name for it.
 //
 // Absent a key we still render the map rather than showing nothing: a
-// watermarked map beats an empty grey box, and this way a missing env var in
-// one environment doesn't take the feature down.
-const CARTO_KEY = process.env.NEXT_PUBLIC_CARTO_KEY
-const CARTO_TILES =
-  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' +
-  (CARTO_KEY ? `?key=${encodeURIComponent(CARTO_KEY)}` : '')
+// watermarked map beats an empty grey box, and a missing env var in one
+// environment never takes the feature down.
+const CARTO_BASE =
+  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+
+function cartoTileUrl(key?: string): string {
+  return key ? `${CARTO_BASE}?key=${encodeURIComponent(key)}` : CARTO_BASE
+}
 
 function priceLabel(cents: number | null): string {
   if (!cents) return '—'
@@ -54,10 +62,13 @@ export function ListingsMap({
   heightClass = 'h-[calc(100vh-260px)] min-h-[480px]',
   /** Standalone map view has no list to talk to, so it skips the wiring. */
   linkHover = false,
+  /** CARTO basemap key, read server-side and passed down (see CARTO_BASE). */
+  cartoKey,
 }: {
   listings: MapListing[]
   heightClass?: string
   linkHover?: boolean
+  cartoKey?: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
@@ -66,6 +77,9 @@ export function ListingsMap({
   // one class instead of re-rendering the marker layer.
   const pinByListingRef = useRef<Map<string, HTMLElement>>(new Map())
   const { hoveredId, setHoveredId } = useHoveredListing()
+  // Held in a ref: the map-init effect runs once and must not re-run (and
+  // rebuild the map) if the prop identity changes.
+  const cartoKeyRef = useRef(cartoKey)
   // Read through refs inside the marker effect so it doesn't re-run (and
   // rebuild every marker) each time the hovered id changes. Kept fresh in an
   // effect rather than assigned during render: a render can be discarded under
@@ -75,6 +89,7 @@ export function ListingsMap({
   useEffect(() => {
     setHoveredRef.current = setHoveredId
     linkHoverRef.current = linkHover
+    cartoKeyRef.current = cartoKey
   })
 
   // Initialize map once
@@ -91,7 +106,7 @@ export function ListingsMap({
       })
 
       L.tileLayer(
-        CARTO_TILES,
+        cartoTileUrl(cartoKeyRef.current),
         {
           maxZoom: 19,
           attribution:
