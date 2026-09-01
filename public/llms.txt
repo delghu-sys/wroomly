@@ -13,6 +13,12 @@
 
 - [Ann Arbor rent prices for students](https://wroomly.app/guides/ann-arbor-rent-prices): Median asking rents by bedroom count and neighborhood, computed live from active verified student sublet listings — recomputed on every visit, with sample sizes shown.
 
+## Safety and policies
+
+- [Trust & Safety](https://wroomly.app/safety): What the blue check does and doesn't mean, community rules, the fair-housing policy, scam red flags with a do-this-instead checklist, and how reports are handled.
+- [Terms of Service](https://wroomly.app/terms) · [Privacy Policy](https://wroomly.app/privacy)
+- [Pricing](https://wroomly.app/pricing.md): Free to browse, list, and message; no fees of any kind today; no payments processed on-platform.
+
 ## Guides
 
 - [How to sublet your apartment at the University of Michigan](https://wroomly.app/guides/how-to-sublet-your-apartment-at-university-of-michigan): Step-by-step on pricing, landlord approval, and finding a subletter as a U-M student.
@@ -72,3 +78,7 @@ Building-by-building sublet pages with verified addresses, floor plans, and amen
 - [All guides](https://wroomly.app/guides): Every Wroomly guide plus a frequently-asked-questions section.
 - [About Wroomly](https://wroomly.app/about): What Wroomly is and who it's for.
 - [Sitemap](https://wroomly.app/sitemap.xml)
+
+## Neighborhoods
+
+Neighborhood guides with live listings for all eleven Ann Arbor areas students actually rent in: [Central Campus](https://wroomly.app/ann-arbor/central-campus), [North Campus](https://wroomly.app/ann-arbor/north-campus), [South University](https://wroomly.app/ann-arbor/south-university), [Kerrytown](https://wroomly.app/ann-arbor/kerrytown), [Downtown](https://wroomly.app/ann-arbor/downtown), [Old West Side](https://wroomly.app/ann-arbor/old-west-side), [Burns Park](https://wroomly.app/ann-arbor/burns-park), [Water Hill](https://wroomly.app/ann-arbor/water-hill), [Eberwhite](https://wroomly.app/ann-arbor/eberwhite), [Pittsfield](https://wroomly.app/ann-arbor/pittsfield), [Lower Town](https://wroomly.app/ann-arbor/lower-town).
