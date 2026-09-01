@@ -42,6 +42,10 @@ export function articleJsonLd(opts: {
   headline: string
   description: string
   datePublished: string
+  /** Last substantive revision. Defaults to datePublished. Keeping these
+      separate matters for AI engines, which weight freshness heavily — a
+      guide revised in August should say so, not claim July. */
+  dateModified?: string
 }): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
@@ -49,10 +53,53 @@ export function articleJsonLd(opts: {
     headline: opts.headline,
     description: opts.description,
     datePublished: opts.datePublished,
-    dateModified: opts.datePublished,
+    dateModified: opts.dateModified ?? opts.datePublished,
     mainEntityOfPage: `${ORIGIN}/guides/${opts.slug}`,
-    author: { '@type': 'Organization', name: 'Wroomly', url: ORIGIN },
+    // Named human author (E-E-A-T): AI engines cite content with a real,
+    // identifiable person behind it markedly more than anonymous org bylines.
+    // Hugo is the publicly named UMich-student founder — that IS the brand's
+    // positioning, so the byline states it.
+    author: {
+      '@type': 'Person',
+      name: 'Hugo Delgado Verdu',
+      url: ORIGIN,
+      jobTitle: 'Founder, Wroomly',
+      affiliation: { '@id': `${ORIGIN}/#organization` },
+    },
     publisher: { '@id': `${ORIGIN}/#organization` },
+  }
+}
+
+/**
+ * Dataset schema for the live rent-price data — Wroomly's single most
+ * citable asset. Original data computed from active listings is exactly what
+ * AI engines prefer to cite over aggregated third-party numbers (the
+ * Princeton GEO study puts statistics at +37% citation visibility).
+ */
+export function rentDatasetJsonLd(opts: {
+  listingCount: number
+  medianCents: number | null
+  computedISO: string
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'Ann Arbor student sublet asking rents',
+    description: `Median asking rents for University of Michigan student sublets in Ann Arbor, by bedroom count and neighborhood. Computed live from ${opts.listingCount} active listings on Wroomly; recomputed on every visit.${opts.medianCents ? ` Current overall median: $${Math.round(opts.medianCents / 100).toLocaleString()}/month.` : ''}`,
+    url: `${ORIGIN}/guides/ann-arbor-rent-prices`,
+    creator: { '@id': `${ORIGIN}/#organization` },
+    dateModified: opts.computedISO,
+    temporalCoverage: opts.computedISO.slice(0, 10),
+    spatialCoverage: {
+      '@type': 'City',
+      name: 'Ann Arbor',
+      containedInPlace: { '@type': 'State', name: 'Michigan' },
+    },
+    variableMeasured: [
+      { '@type': 'PropertyValue', name: 'Median asking rent', unitText: 'USD per month' },
+    ],
+    isAccessibleForFree: true,
+    license: `${ORIGIN}/terms`,
   }
 }
 
@@ -182,6 +229,14 @@ export function siteJsonLd(): Record<string, unknown>[] {
       },
       email: 'help@wroomly.app',
       ...(SOCIAL_PROFILES.length > 0 ? { sameAs: SOCIAL_PROFILES } : {}),
+      founder: { '@type': 'Person', name: 'Hugo Delgado Verdu' },
+      knowsAbout: [
+        'student sublets',
+        'Ann Arbor housing',
+        'University of Michigan off-campus housing',
+        'sublease agreements',
+        'rental scam prevention',
+      ],
     },
     {
       '@context': 'https://schema.org',

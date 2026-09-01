@@ -14,7 +14,8 @@ export interface Guide {
   title: string // page <h1> + SEO title
   description: string // meta description
   excerpt: string // shown on the /guides index
-  updated: string // ISO date for lastModified + display
+  published: string // ISO date of first publication (Article datePublished)
+  updated: string // ISO date of last substantive revision (dateModified + display)
   readingMinutes: number
   sections: GuideSection[]
   // Per-guide Q&As, rendered at the end of the article and marked up as
@@ -35,7 +36,8 @@ export const GUIDES: Guide[] = [
       'A step-by-step guide for UMich students subletting their Ann Arbor apartment: checking your lease, setting a price, finding a verified subletter, and getting paid safely.',
     excerpt:
       "Leaving for the summer, a co-op, or study abroad? Here's how to sublet your Ann Arbor place without losing money or breaking your lease.",
-    updated: '2026-07-03',
+    published: '2026-07-03',
+    updated: '2026-08-30',
     readingMinutes: 6,
     sections: [
       {
@@ -109,7 +111,8 @@ export const GUIDES: Guide[] = [
       'Everything UMich students need to know about finding or filling a summer sublet in Ann Arbor: timing, pricing, neighborhoods, and how to avoid getting scammed.',
     excerpt:
       'When to start looking, what summer rent really costs, and the neighborhoods worth targeting for a May–August sublet.',
-    updated: '2026-07-03',
+    published: '2026-07-03',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -175,7 +178,8 @@ export const GUIDES: Guide[] = [
       'The common student housing scams in Ann Arbor and the exact red flags to watch for, so your UMich sublet search doesn\'t cost you a deposit.',
     excerpt:
       'Wired a deposit and never heard back? Here are the scam patterns that hit Ann Arbor students every year, and how to dodge them.',
-    updated: '2026-07-03',
+    published: '2026-07-03',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -238,7 +242,8 @@ export const GUIDES: Guide[] = [
       'How security deposits work for sublets in Ann Arbor, Michigan: what\'s normal, your rights under Michigan law, and how to actually get yours back.',
     excerpt:
       'How much is normal, what Michigan law says, and the move-in photos that get your deposit back without a fight.',
-    updated: '2026-07-03',
+    published: '2026-07-03',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -298,7 +303,8 @@ export const GUIDES: Guide[] = [
       'Central Campus vs. South U vs. Kerrytown and beyond: an honest comparison of every Ann Arbor neighborhood for University of Michigan students, by walk time, vibe, and value.',
     excerpt:
       'Eleven neighborhoods, one honest comparison: where to live based on your program, budget, and how much quiet you actually want.',
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 7,
     sections: [
       {
@@ -382,7 +388,8 @@ export const GUIDES: Guide[] = [
       "Ann Arbor's leasing calendar is famously early. Here's the month-by-month timeline for finding UMich off-campus housing, and where sublets fit when you missed the wave.",
     excerpt:
       "Ann Arbor leases sign absurdly early. The month-by-month calendar, and what to do if you've already missed the wave.",
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -449,7 +456,8 @@ export const GUIDES: Guide[] = [
       'The difference between subletting, reletting, and a lease takeover in Ann Arbor: who stays on the lease, who holds the risk, and which fits your situation.',
     excerpt:
       "Three words everyone uses interchangeably that mean legally different things. Who's on the lease, who holds the risk, and which to pick.",
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 4,
     sections: [
       {
@@ -513,7 +521,8 @@ export const GUIDES: Guide[] = [
       'How international students at the University of Michigan find housing from abroad: timing, documents, avoiding sight-unseen scams, and why verified sublets beat Facebook groups.',
     excerpt:
       "Signing a lease from another continent, sight-unseen, in a market you've never set foot in. Here's how to do it without getting burned.",
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 6,
     sections: [
       {
@@ -580,7 +589,8 @@ export const GUIDES: Guide[] = [
       'Where University of Michigan grad students actually live: the quiet neighborhoods, medical-campus logistics, 12-month realities, and how sublets fit a defense-date life.',
     excerpt:
       'You want quiet, a reasonable commute to your lab, and neighbors who sleep at night. The grad-student map of Ann Arbor.',
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -648,7 +658,8 @@ export const GUIDES: Guide[] = [
       'How to find (or fill) a January–April sublet at the University of Michigan: who leaves mid-year, when winter listings post, and how to price a spring semester.',
     excerpt:
       'Everyone writes about summer. But December graduations and spring study-abroad create a real January market. Here\'s how it works.',
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 4,
     sections: [
       {
@@ -712,7 +723,8 @@ export const GUIDES: Guide[] = [
       'A practical pricing method for UMich sublets: anchor on live comparables, adjust for furniture and walk time, and understand why an empty room is the real loss.',
     excerpt:
       'The math nobody does: every month your room sits empty costs more than the discount that would have filled it.',
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -777,7 +789,8 @@ export const GUIDES: Guide[] = [
       'Everything to check and set up when moving into your first UMich apartment or sublet: condition photos, utilities, renters insurance, and the Ann Arbor-specific details.',
     excerpt:
       'The unglamorous 90 minutes of move-in day that saves your deposit, your Wi-Fi, and your relationship with your roommates.',
-    updated: '2026-07-07',
+    published: '2026-07-07',
+    updated: '2026-08-30',
     readingMinutes: 5,
     sections: [
       {
@@ -853,7 +866,8 @@ export const GUIDES: Guide[] = [
       'Ann Arbor requires every legal rental to hold a city Certificate of Compliance. Here is how to look one up, what it proves about a listing, and what it does not. It is a scam check almost no student uses.',
     excerpt:
       'The city keeps a public record of every legal rental in Ann Arbor. Most students never check it. Here is how — and exactly what it does and doesn’t prove.',
-    updated: '2026-07-14',
+    published: '2026-07-14',
+    updated: '2026-08-30',
     readingMinutes: 6,
     sections: [
       {

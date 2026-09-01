@@ -55,7 +55,8 @@ export default async function GuidePage({
             slug: g.slug,
             headline: g.title,
             description: g.description,
-            datePublished: g.updated,
+            datePublished: g.published,
+            dateModified: g.updated,
           }),
           faqJsonLd(g.faqs),
           breadcrumbJsonLd([

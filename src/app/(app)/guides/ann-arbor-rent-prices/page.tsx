@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { fetchRentSample } from '@/lib/seo/fetch-listings'
 import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
-import { JsonLd, breadcrumbJsonLd, faqJsonLd, articleJsonLd } from '@/components/seo/JsonLd'
+import { JsonLd, breadcrumbJsonLd, faqJsonLd, articleJsonLd, rentDatasetJsonLd } from '@/components/seo/JsonLd'
 import { BookOpen, ArrowRight } from 'lucide-react'
 
 /**
@@ -111,6 +111,11 @@ export default async function RentPricesPage() {
             datePublished: today,
           }),
           faqJsonLd(faqs),
+          rentDatasetJsonLd({
+            listingCount: priced.length,
+            medianCents: overall,
+            computedISO: new Date().toISOString(),
+          }),
         ]}
       />
 
