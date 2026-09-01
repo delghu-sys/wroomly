@@ -92,19 +92,20 @@ export function BrandListingCard({
               )}
             </div>
 
-            {/* Source provenance (seed or partner) — bottom-left. Plain chip
-                (no link): the whole card is already a <Link>, so the clickable
-                source link lives on the listing detail page instead. */}
-            {listing.source !== 'user' && listing.source_name && (
-              <div className="absolute bottom-3 left-3">
-                <span className="inline-flex items-center rounded-full bg-white/85 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-ink-soft shadow-sm">
+            {/* Bottom-left chip row: source provenance + feature micro-chips
+                share ONE container — as two absolute divs they stacked on top
+                of each other whenever a partner listing was also furnished.
+                The provenance chip is a plain span (no link): the whole card
+                is already a <Link>, so the clickable source link lives on the
+                listing detail page instead. right-3 + flex-wrap so a long
+                source name pushes chips onto another row instead of off the
+                image (anchored at bottom, extra rows grow upward). */}
+            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center gap-1.5">
+              {listing.source !== 'user' && listing.source_name && (
+                <span className="inline-flex items-center whitespace-nowrap rounded-full bg-white/85 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-ink-soft shadow-sm">
                   Listed on {listing.source_name}
                 </span>
-              </div>
-            )}
-
-            {/* Feature micro-chips — bottom-left */}
-            <div className="absolute bottom-3 left-3 flex gap-1.5">
+              )}
               {listing.furnished && (
                 <BrandChip variant="ghost" icon={Sofa}>
                   Furnished
