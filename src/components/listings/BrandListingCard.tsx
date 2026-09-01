@@ -153,21 +153,24 @@ export function BrandListingCard({
               </div>
             )}
 
-            <div className="flex items-center gap-3 text-[13px] text-ink-soft mt-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-soft mt-3">
+              {/* whitespace-nowrap keeps each stat atomic — "1 bed" must
+                  never split into "1" over "bed". When the row runs out of
+                  width, flex-wrap moves the whole date to its own line. */}
               {listing.bedrooms !== null && (
-                <span className="inline-flex items-center gap-1">
-                  <BedDouble className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <BedDouble className="w-3.5 h-3.5 shrink-0" />
                   {listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`}
                 </span>
               )}
               {listing.bathrooms !== null && (
-                <span className="inline-flex items-center gap-1">
-                  <Bath className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <Bath className="w-3.5 h-3.5 shrink-0" />
                   {listing.bathrooms} bath
                 </span>
               )}
-              <span className="inline-flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
                 {formatDateRange(listing.available_from, listing.available_to)}
               </span>
             </div>
