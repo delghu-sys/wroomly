@@ -8,5 +8,5 @@
  * sends a version; the server stamps rows from these constants so a tampered
  * request can't claim acceptance of something else.
  */
-export const TERMS_VERSION = '2026-08-30'
-export const PRIVACY_VERSION = '2026-08-30'
+export const TERMS_VERSION = '2026-08-31'
+export const PRIVACY_VERSION = '2026-08-31'

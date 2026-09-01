@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: August 30, 2026 · Last updated: August 30, 2026
+Effective date: August 30, 2026 · Last updated: August 31, 2026
 
 Wroomly LLC ("Wroomly," "we," "us," or "our") operates the website wroomly.app and related services (the "Service"). This policy explains what personal information we collect, why we collect it, who we share it with, and the choices you have.
 
@@ -21,7 +21,7 @@ You must be 18 or older to create an account. The Service is not directed to chi
 | What | Examples | Why we collect it |
 | --- | --- | --- |
 | Account information | Name, email address, password (stored hashed by our authentication provider), profile photo | To create and secure your account, and to let other users know who they're dealing with |
-| Student verification information | Your university email address (e.g. a .edu address) and the verification code we send to it | To confirm you have access to a university email address, which we display as a "verified student" blue check |
+| Student verification information | Your university Google account: the email address on it, and the fact that the sign-in succeeded | To confirm you control a university login, which we display as a "verified student" blue check |
 | Listing content | Neighborhood or address, rent, dates, bedrooms and bathrooms, description, photographs, amenities | To publish your listing to other users |
 | Listing screenshots | Images you upload to the "list your place" flow so our AI can extract listing details | To pre-fill your listing automatically. See §2.4. |
 | Wroomly Match conversations | What you tell our AI housing concierge about what you're looking for, and the email address you give us for alerts | To understand your search and email you matching listings. No account is required, so sometimes this email is the only information we hold about you. |
@@ -59,7 +59,7 @@ AI output can be wrong. Always check that an auto-filled listing is accurate bef
 ## 3. How we use your information
 
 1. Provide the Service — create your account, publish your listings, deliver your messages, run searches, and send Match alerts
-2. Verify student status — confirm control of a university email address
+2. Verify student status — confirm control of a university Google account
 3. Keep the Service safe — detect, investigate and prevent fraud, scams, spam, harassment, and violations of our Terms of Service or Trust & Safety Policy
 4. Communicate with you — verification codes, listing activity, replies, Match alerts, security notices, and policy changes
 5. Improve the Service — understand which features are used, diagnose errors, develop new features
@@ -163,7 +163,7 @@ Categories collected in the preceding 12 months, using CCPA's statutory categori
 - Internet or network activity — browsing and usage data on our Service
 - Geolocation data — approximate, city-level, derived from IP address
 - Visual information — profile photographs, property photographs, uploaded screenshots
-- Education information — the fact that a university email address was verified
+- Education information — the fact that a university sign-in was verified
 - Inferences — housing preferences you describe to Wroomly Match, used to rank listings for you
 
 You may designate an authorized agent to make a request on your behalf, with proof of authorization.
