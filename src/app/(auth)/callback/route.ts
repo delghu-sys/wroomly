@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { ATTRIBUTION_COOKIE, sanitizeSource } from '@/lib/attribution'
 import { TERMS_VERSION, PRIVACY_VERSION } from '@/lib/legal'
+import { UMICH } from '@/lib/constants'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -119,7 +120,11 @@ export async function GET(request: Request) {
       id: data.user.id,
       email: data.user.email!,
       full_name: googleName,
-      university: meta.university ?? null,
+      // Google OAuth carries no user_metadata, so an SSO signup has no
+      // university to read — but a verified @umich.edu SSO session tells us
+      // exactly which one it is. Without this the best-verified accounts were
+      // the only ones with a blank university.
+      university: meta.university ?? (isUmichSso ? UMICH : null),
       user_type: effectiveType,
       // Only a real UMich Google SSO login earns the badge (see above).
       is_verified: isUmichSso,
@@ -149,7 +154,15 @@ export async function GET(request: Request) {
     // joined with email or a non-umich Google later links/logs-in with their
     // UMich Google account). Only ever an upgrade; a normal re-login never
     // strips verification, and user_type/other fields are untouched.
-    const { error: upErr } = await supabase
+    //
+    // Runs under the SERVICE role, not the session client. Migration 032
+    // revoked UPDATE on `users` from `authenticated` and re-granted only the
+    // profile columns, so is_verified/verification_method are deliberately
+    // unwritable from a user session — the admin route uses the service role
+    // for the same reason. With the session client this update was denied and
+    // the error swallowed, so nobody ever earned the badge by verifying later.
+    const service = createServiceClient()
+    const { error: upErr } = await service
       .from('users')
       .update({ is_verified: true, verification_method: 'umich_sso' })
       .eq('id', data.user.id)
@@ -157,12 +170,23 @@ export async function GET(request: Request) {
     // Deploy-order safety: if verification_method (036) isn't applied yet, retry
     // the upgrade without it so the badge still lands.
     if (upErr) {
-      await supabase
+      const { error: bareErr } = await service
         .from('users')
         .update({ is_verified: true })
         .eq('id', data.user.id)
         .eq('is_verified', false)
+      if (bareErr) console.error('[callback] verification upgrade failed:', bareErr.message)
     }
+
+    // Backfill the university for any UMich SSO account that has none — the
+    // rows created before the insert above learned to set it. Only ever fills
+    // a null, so a value the user typed themselves is never overwritten.
+    const { error: uniErr } = await service
+      .from('users')
+      .update({ university: UMICH })
+      .eq('id', data.user.id)
+      .is('university', null)
+    if (uniErr) console.error('[callback] university backfill failed:', uniErr.message)
   }
 
 

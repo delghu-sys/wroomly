@@ -57,6 +57,15 @@ export default async function AdminUsersPage({
   const { data: usersData } = await query.limit(200)
   const users = (usersData ?? []) as User[]
 
+  // How the blue check was earned. `university` is NOT this — it is free text
+  // the user typed and several unverified accounts have "University of
+  // Michigan" in it, so it must not sit in a column that reads as proof.
+  const VERIFIED_VIA: Record<string, string> = {
+    umich_sso: 'UMich SSO',
+    umich_email_legacy: 'UMich email (legacy)',
+    admin: 'Manual (admin)',
+  }
+
   const TABS = [
     { label: 'All', value: '' },
     { label: 'Consumers', value: 'consumer' },
@@ -127,7 +136,7 @@ export default async function AdminUsersPage({
             <thead className="bg-navy-soft/40 text-ink-muted text-xs uppercase tracking-wide">
               <tr>
                 <th className="text-left px-5 py-3 font-medium">User</th>
-                <th className="text-left px-5 py-3 font-medium">University</th>
+                <th className="text-left px-5 py-3 font-medium">Verified via</th>
                 <th className="text-left px-5 py-3 font-medium">Role</th>
                 <th className="text-left px-5 py-3 font-medium">Status</th>
                 <th className="text-left px-5 py-3 font-medium">Joined</th>
@@ -159,10 +168,20 @@ export default async function AdminUsersPage({
                             {u.full_name ?? '—'}
                           </p>
                           <p className="text-xs text-ink-muted truncate">{u.email}</p>
+                          {u.university && (
+                            <p className="text-xs text-ink-muted/70 truncate">
+                              {u.university}
+                            </p>
+                          )}
                         </div>
                       </Link>
                     </td>
-                    <td className="px-5 py-3 text-ink-soft">{u.university ?? '—'}</td>
+                    <td className="px-5 py-3 text-ink-soft text-xs">
+                      {u.is_verified
+                        ? (VERIFIED_VIA[u.verification_method ?? ''] ??
+                           'Verified (method unrecorded)')
+                        : '—'}
+                    </td>
                     <td className="px-5 py-3">
                       <Badge
                         variant="outline"
