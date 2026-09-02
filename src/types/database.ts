@@ -109,6 +109,8 @@ export interface User {
   stripe_payouts_enabled: boolean
   stripe_details_submitted: boolean
   is_verified: boolean
+  /** How the badge was earned: 'umich_sso' | 'umich_email_legacy' | 'admin'. */
+  verification_method: string | null
   is_suspended: boolean
   created_at: string
 }
