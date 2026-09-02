@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { ATTRIBUTION_COOKIE, sanitizeSource } from '@/lib/attribution'
 import { TERMS_VERSION, PRIVACY_VERSION } from '@/lib/legal'
 import { UMICH } from '@/lib/constants'
+import { computeVerification } from '@/lib/auth/umich-verification'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -75,26 +76,19 @@ export async function GET(request: Request) {
   const effectiveType = claimedRaw === 'supplier' ? 'supplier' : 'consumer'
 
   // ── UMich verification (the blue check) ──────────────────────────────────
-  // Verified ⟺ signed in with Google on an @umich.edu account. @umich.edu is
-  // Google Workspace, so a Google login on that domain necessarily went through
-  // UMich Weblogin + Duo — a live, 2FA-backed SSO session we can trust, far
-  // stronger than "received an email at an @umich.edu address". We check the
-  // provider + email domain server-side and NEVER trust a client claim. Email/
-  // password and non-umich Google accounts are valid users, just unverified.
-  const provider =
-    (data.user.app_metadata?.provider as string | undefined) ??
-    (data.user.app_metadata?.providers?.[0] as string | undefined)
-  const emailDomain = (data.user.email ?? '').toLowerCase().split('@')[1] ?? ''
-  // Primary signal: the login itself is a Google @umich.edu session. Secondary:
-  // a linked Google @umich.edu identity (the "verify later" path, where someone
-  // who joined with email/non-umich Google links their UMich Google — the
-  // primary email may still be the original, so inspect the identities too).
-  const hasUmichGoogleIdentity = (data.user.identities ?? []).some(i => {
-    const idEmail = (i.identity_data?.email as string | undefined)?.toLowerCase() ?? ''
-    return i.provider === 'google' && idEmail.endsWith('@umich.edu')
-  })
-  const isUmichSso =
-    (provider === 'google' && emailDomain === 'umich.edu') || hasUmichGoogleIdentity
+  // Verification is decided from SERVER-OWNED identity data only (the Google
+  // `hd` + `email_verified` claims GoTrue wrote from the validated ID token),
+  // never from the email string or user_metadata. See computeVerification.
+  //
+  // The session `data.user` from exchangeCodeForSession does not reliably carry
+  // identity_data.custom_claims, so we re-read the authoritative user via the
+  // service role. This is also what lets verification be a WRITE the user's own
+  // session can't perform — the whole point, since an authenticated session can
+  // self-INSERT its own row (RLS only stops it setting is_verified now).
+  const service = createServiceClient()
+  const { data: authoritative } = await service.auth.admin.getUserById(data.user.id)
+  const verification = computeVerification(authoritative?.user ?? data.user)
+  const isUmichSso = verification.isVerified
 
   // Critical: only create a `users` row on first login. NEVER overwrite an
   // existing row's `user_type` — that would silently demote admins back to
@@ -115,78 +109,63 @@ export async function GET(request: Request) {
       cookieStore.get(ATTRIBUTION_COOKIE)?.value ?? null
     )
 
-    // Core columns that have existed since 001 — always safe to insert.
+    // First-login row creation runs under the SERVICE role. is_verified and
+    // verification_method are trust columns the user's own session must never
+    // write (RLS + column grants now forbid it — migration 041), so the row is
+    // created server-side with the verification computed above baked in.
     const row = {
       id: data.user.id,
       email: data.user.email!,
       full_name: googleName,
-      // Google OAuth carries no user_metadata, so an SSO signup has no
-      // university to read — but a verified @umich.edu SSO session tells us
-      // exactly which one it is. Without this the best-verified accounts were
-      // the only ones with a blank university.
-      university: meta.university ?? (isUmichSso ? UMICH : null),
+      // A verified UMich SSO session tells us the university even though Google
+      // OAuth carries no signup metadata. Otherwise fall back to what the email
+      // form supplied (only ever set for non-UMich, since UMich must use SSO).
+      university: meta.university ?? verification.university,
       user_type: effectiveType,
-      // Only a real UMich Google SSO login earns the badge (see above).
-      is_verified: isUmichSso,
-    }
-
-    // Deploy-order safety: `signup_source` (migration 030) and
-    // `verification_method` (036) are newer columns — if this code ships before
-    // either migration is applied, an insert naming the missing column would
-    // fail and break every new signup. So progressively degrade: try the full
-    // row, then drop the newest add-ons, then bare. is_verified still lands
-    // correctly on the bare path (the badge just can't record its method until
-    // 036 is applied).
-    const full = {
-      ...row,
+      is_verified: verification.isVerified,
       signup_source: signupSource,
-      verification_method: isUmichSso ? 'umich_sso' : null,
+      verification_method: verification.method,
     }
-    const { error: e1 } = await supabase.from('users').insert(full)
-    if (e1) {
-      console.warn('[callback] full insert failed, retrying without new columns:', e1.message)
-      const { error: e2 } = await supabase.from('users').insert(row)
-      if (e2) console.error('[callback] bare user insert failed:', e2.message)
-    }
-  } else if (isUmichSso) {
-    // Returning login that IS a UMich SSO session — upgrade an existing
-    // unverified account to verified (the "verify to list" path: a user who
-    // joined with email or a non-umich Google later links/logs-in with their
-    // UMich Google account). Only ever an upgrade; a normal re-login never
-    // strips verification, and user_type/other fields are untouched.
+    const { error: e1 } = await service.from('users').insert(row)
+    if (e1) console.error('[callback] user insert failed:', e1.message)
+  } else {
+    // Returning login — reconcile the SSO badge with the current identity, both
+    // ways, under the SERVICE role (the session can't write these columns):
     //
-    // Runs under the SERVICE role, not the session client. Migration 032
-    // revoked UPDATE on `users` from `authenticated` and re-granted only the
-    // profile columns, so is_verified/verification_method are deliberately
-    // unwritable from a user session — the admin route uses the service role
-    // for the same reason. With the session client this update was denied and
-    // the error swallowed, so nobody ever earned the badge by verifying later.
-    const service = createServiceClient()
-    const { error: upErr } = await service
-      .from('users')
-      .update({ is_verified: true, verification_method: 'umich_sso' })
-      .eq('id', data.user.id)
-      .eq('is_verified', false)
-    // Deploy-order safety: if verification_method (036) isn't applied yet, retry
-    // the upgrade without it so the badge still lands.
-    if (upErr) {
-      const { error: bareErr } = await service
+    //  • GRANT: an account that joined by email or non-UMich Google and has now
+    //    linked/logged-in with UMich Google earns the check (the "verify later"
+    //    path).
+    //  • REVOKE: an account whose badge came from SSO but no longer has the
+    //    qualifying identity (unlinked, or Google dropped the Workspace member)
+    //    loses it. Revocation is scoped to verification_method='umich_sso' so a
+    //    legacy @umich.edu account is never stripped by an SSO check it never
+    //    used.
+    //
+    // A UMich SSO session never overwrites user_type or other fields.
+    if (isUmichSso) {
+      const { error: grantErr } = await service
         .from('users')
-        .update({ is_verified: true })
+        .update({ is_verified: true, verification_method: 'umich_sso' })
         .eq('id', data.user.id)
         .eq('is_verified', false)
-      if (bareErr) console.error('[callback] verification upgrade failed:', bareErr.message)
-    }
+      if (grantErr) console.error('[callback] verification grant failed:', grantErr.message)
 
-    // Backfill the university for any UMich SSO account that has none — the
-    // rows created before the insert above learned to set it. Only ever fills
-    // a null, so a value the user typed themselves is never overwritten.
-    const { error: uniErr } = await service
-      .from('users')
-      .update({ university: UMICH })
-      .eq('id', data.user.id)
-      .is('university', null)
-    if (uniErr) console.error('[callback] university backfill failed:', uniErr.message)
+      // Fill a blank university for a freshly-granted SSO account; never
+      // overwrite a value the user typed.
+      const { error: uniErr } = await service
+        .from('users')
+        .update({ university: UMICH })
+        .eq('id', data.user.id)
+        .is('university', null)
+      if (uniErr) console.error('[callback] university backfill failed:', uniErr.message)
+    } else {
+      const { error: revokeErr } = await service
+        .from('users')
+        .update({ is_verified: false, verification_method: null })
+        .eq('id', data.user.id)
+        .eq('verification_method', 'umich_sso')
+      if (revokeErr) console.error('[callback] verification revoke failed:', revokeErr.message)
+    }
   }
 
 

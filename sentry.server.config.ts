@@ -25,7 +25,9 @@ Sentry.init({
   // Enable logs to be sent to Sentry
   enableLogs: true,
 
-  // Enable sending user PII (Personally Identifiable Information)
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  // Do NOT send PII. sendDefaultPii:true attaches the request's IP, headers and
+  // cookies — which for an auth app means Supabase session tokens landing in
+  // Sentry, readable by anyone with project access. The stack traces and our
+  // own explicit context are enough to debug; identity does not belong here.
+  sendDefaultPii: false,
 });

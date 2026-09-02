@@ -1,7 +1,7 @@
-// The one university Wroomly verifies. Also the value stamped on accounts that
-// verify through UMich SSO, where Google supplies no signup metadata to read it
-// from. One token so the signup form, the callback and any backfill agree.
-export const UMICH = 'University of Michigan'
+// The one university Wroomly verifies; the value stamped on accounts that
+// verify through UMich SSO. Canonical definition lives with the verification
+// logic; re-exported here so `@/lib/constants` importers keep working.
+export { UMICH } from './auth/umich-verification'
 
 export const USER_TYPES = {
   SUPPLIER: 'supplier',

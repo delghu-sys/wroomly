@@ -5,6 +5,7 @@ import { PageTransition } from '@/components/layout/PageTransition'
 import { SUPPLY_ONLY_MODE } from '@/lib/config'
 import type { User } from '@/types/database'
 import { LegalReacceptance } from '@/components/legal/LegalReacceptance'
+import { computeVerification } from '@/lib/auth/umich-verification'
 
 export default async function AppLayout({
   children,
@@ -33,42 +34,54 @@ export default async function AppLayout({
 
     profile = profileRes.data as User | null
 
-    // Self-heal: create a profile row from auth metadata if missing (covers
-    // users whose email-verify callback never ran). `user_metadata` is
-    // CLIENT-MUTABLE — never trust it for trust-sensitive fields:
-    //   • `user_type` is forced through the same rule as the callback route:
-    //     any value other than `supplier` is coerced to `consumer`.
-    //   • `is_verified` is set only because reaching this code path means
-    //     Supabase has already verified the email at the auth layer.
-    //   • `admin` is never accepted from metadata.
-    if (!profile) {
+    // Self-heal: create a profile row if one is genuinely missing (covers users
+    // whose /callback insert never ran). We act ONLY on a real "no rows"
+    // result — a transient read ERROR must not be read as "no row", or the
+    // upsert below would overwrite a real user's row (resetting verification
+    // and coercing user_type, which would demote an admin).
+    const rowGenuinelyMissing =
+      !profile && (!profileRes.error || profileRes.error.code === 'PGRST116')
+
+    if (rowGenuinelyMissing) {
       const meta = (authUser.user_metadata ?? {}) as {
         full_name?: string
         university?: string
         user_type?: 'supplier' | 'consumer'
       }
 
+      // `user_metadata` is CLIENT-MUTABLE — never trust it for trust fields.
+      // `user_type` is coerced (anything but 'supplier' → 'consumer'); `admin`
+      // is never accepted. Verification is NOT taken from metadata or assumed
+      // from "the email is confirmed": it is computed from the same server-owned
+      // Google identity data the callback uses, so a self-healed row earns the
+      // badge on exactly the same proof and never merely by existing.
       const effectiveType = meta.user_type === 'supplier' ? 'supplier' : 'consumer'
 
-      // Service-role: the returning `select('*')` includes email/stripe_* which
-      // the authenticated role can no longer read (029). Own row, verified
-      // session email — safe.
-      const upsertRes = await createServiceClient()
+      const service = createServiceClient()
+      const { data: authoritative } = await service.auth.admin.getUserById(authUser.id)
+      const verification = computeVerification(authoritative?.user ?? authUser)
+
+      // insert, not upsert: rowGenuinelyMissing already established there is no
+      // row, and an insert can't clobber an existing one if we raced.
+      const insertRes = await service
         .from('users')
-        .upsert(
-          {
-            id: authUser.id,
-            email: authUser.email!,
-            full_name: meta.full_name ?? null,
-            university: meta.university ?? null,
-            user_type: effectiveType,
-            is_verified: true,
-          },
-          { onConflict: 'id' }
-        )
+        .insert({
+          id: authUser.id,
+          email: authUser.email!,
+          full_name: meta.full_name ?? null,
+          university: meta.university ?? verification.university,
+          user_type: effectiveType,
+          is_verified: verification.isVerified,
+          verification_method: verification.method,
+        })
         .select('*')
         .single()
-      profile = upsertRes.data as User | null
+      profile = insertRes.data as User | null
+      // A raced insert (23505) means the row now exists — read it back.
+      if (!profile) {
+        const reread = await service.from('users').select('*').eq('id', authUser.id).single()
+        profile = reread.data as User | null
+      }
     }
 
     // Conversation IDs the user participates in (for the unread badge).
