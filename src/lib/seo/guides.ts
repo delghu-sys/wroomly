@@ -7,6 +7,9 @@ export interface GuideSection {
   heading: string
   paragraphs: string[]
   bullets?: string[]
+  /** Optional comparison table. Strong for "X vs Y" queries and featured
+   *  snippets; rendered as a real <table> in a horizontal-scroll container. */
+  table?: { caption?: string; columns: string[]; rows: string[][] }
 }
 
 export interface Guide {
@@ -464,25 +467,48 @@ export const GUIDES: Guide[] = [
     title: 'Sublet vs. relet vs. lease takeover: which one do you actually want?',
     seoTitle: 'Sublet vs. Relet vs. Lease Takeover, Explained',
     description:
-      'The difference between subletting, reletting, and a lease takeover in Ann Arbor: who stays on the lease, who holds the risk, and which fits your situation.',
+      'Sublet, sublease, relet, lease takeover, assignment: what each term means, who stays on the lease, who holds the risk, and which one fits your Ann Arbor situation.',
     excerpt:
-      "Three words everyone uses interchangeably that mean legally different things. Who's on the lease, who holds the risk, and which to pick.",
+      "Sublet, sublease, relet, lease takeover, assignment. People use them interchangeably; they mean legally different things. Here is who's on the lease, who holds the risk, and which to pick.",
     published: '2026-07-07',
-    updated: '2026-08-30',
-    readingMinutes: 4,
+    updated: '2026-09-03',
+    readingMinutes: 6,
     sections: [
       {
-        heading: 'The three arrangements, defined',
+        heading: 'The terms, and which ones mean the same thing',
         paragraphs: [
-          "A sublet means the original tenant stays on the lease and rents the place to you. You pay them, they (usually) keep paying the landlord, and they remain responsible to the landlord for the unit. A relet or lease takeover (formally, a lease assignment) means you replace the original tenant on the lease entirely: the landlord approves you, and from then on you're their tenant, not the departing student's.",
-          "People use all three words loosely. Most 'sublets' posted in spring for the summer are true sublets, while most 'someone take my lease!' posts are relets.",
+          "Half the confusion is vocabulary: several of these words are synonyms, and a few are genuinely different arrangements. Sort the synonyms first and the rest is easy.",
+          "Sublet, sublease, subletting, and subleasing all describe the same thing: the original tenant stays on the lease and rents the place to you for a period. “Underlet” is an older legal word for the same arrangement. Relet and re-let (and reletting) are the words Ann Arbor landlords and students use for a lease takeover: you replace the original tenant on the lease. Lease takeover, lease assignment, and lease transfer are all names for that same takeover. So there are really only two arrangements underneath a dozen words.",
         ],
+      },
+      {
+        heading: 'The two arrangements, side by side',
+        paragraphs: [
+          "A sublet (sublease) keeps the original tenant on the hook; a relet (lease takeover, assignment, transfer) moves you onto the lease in their place. Everything else follows from that one difference:",
+        ],
+        table: {
+          caption:
+            'Comparison of a sublet/sublease versus a relet, lease takeover, or assignment',
+          columns: [
+            '',
+            'Sublet / sublease',
+            'Relet / lease takeover / assignment',
+          ],
+          rows: [
+            ['Who is on the lease', 'Original tenant stays on it', 'You replace them on it'],
+            ['Who holds the risk', 'The original tenant', 'You'],
+            ['Landlord approval', 'Usually required, in writing', 'Always required'],
+            ['Your deposit', 'Held by the original tenant', 'Held by the landlord'],
+            ['Relationship with landlord', 'Indirect, through the tenant', 'Direct, you are the tenant'],
+            ['Best for', 'A summer or one semester', 'Staying to lease-end or longer'],
+          ],
+        },
       },
       {
         heading: 'Who holds the risk',
         paragraphs: [
-          "In a sublet, the original tenant carries the risk in both directions: if you trash the place, the landlord comes after them; if they stop forwarding your rent to the landlord, the eviction lands on the unit anyway. That's why written sublease agreements and traceable payments matter so much.",
-          "In a relet, risk transfers cleanly to you: your name, your deposit, your relationship with the landlord. That's better for long stays, and it's why landlords usually charge a fee and vet you like any new applicant.",
+          "In a sublet, the original tenant carries the risk in both directions: if you damage the place, the landlord comes after them; if they stop forwarding your rent to the landlord, the problem lands on the unit anyway. That is why a written sublease agreement and traceable payments matter so much.",
+          "In a relet, risk transfers cleanly to you: your name, your deposit, your relationship with the landlord. That is better for long stays, and it is why landlords usually charge a fee and vet you like any new applicant.",
         ],
       },
       {
@@ -498,7 +524,7 @@ export const GUIDES: Guide[] = [
       {
         heading: 'Paperwork either way',
         paragraphs: [
-          'Whichever route: get it in writing. A sublet needs a sublease agreement (dates, rent, deposit, utilities, condition) plus the landlord\'s written consent. A relet needs the landlord\'s assignment paperwork. On Wroomly, a blue check shows which side has verified as a UMich student, which takes most of the guesswork out of who you are dealing with. The paperwork removes the rest.',
+          "Whichever route: get it in writing. A sublet needs a sublease agreement (dates, rent, deposit, utilities, condition) plus the landlord's written consent. A relet needs the landlord's assignment paperwork. On Wroomly, a blue check shows which side has verified as a UMich student, which takes most of the guesswork out of who you are dealing with. The paperwork removes the rest.",
         ],
       },
     ],
@@ -509,14 +535,39 @@ export const GUIDES: Guide[] = [
     ],
     faqs: [
       {
-        question: 'What is the difference between a sublet and a lease takeover?',
+        question: 'What is the difference between a sublet and a relet?',
         answer:
-          'In a sublet, the original tenant stays on the lease and rents the unit to you; they remain responsible to the landlord. In a lease takeover (relet or assignment), you replace them on the lease entirely with landlord approval, becoming the landlord\'s direct tenant with your own deposit and obligations.',
+          'In a sublet, the original tenant stays on the lease and rents the unit to you; they remain responsible to the landlord. In a relet (also called a lease takeover or assignment), you replace them on the lease entirely with landlord approval, becoming the landlord’s direct tenant with your own deposit and obligations.',
+      },
+      {
+        question: 'Is subletting the same as subleasing?',
+        answer:
+          'Yes. Sublet, sublease, subletting, and subleasing are the same arrangement: the original tenant stays on the lease and rents the place to you for a set period while remaining responsible to the landlord. The words are used interchangeably; there is no legal difference between them.',
+      },
+      {
+        question: 'What does “relet” mean?',
+        answer:
+          'To relet (or re-let) an apartment means to hand your lease to someone who takes your place on it, with the landlord’s approval. In Ann Arbor, “relet” is the common word for a lease takeover or assignment: the new person becomes the landlord’s tenant, and you come off the lease entirely.',
+      },
+      {
+        question: 'What is a lease takeover?',
+        answer:
+          'A lease takeover, also called a lease assignment or transfer, is when a new tenant fully replaces the original one on the lease. The landlord approves the new person, who then holds the lease, the deposit, and the obligations directly. It is the same thing Ann Arbor students mean by a relet.',
+      },
+      {
+        question: 'Sublease vs lease takeover: which is better?',
+        answer:
+          'A sublease is better for a short stay like a summer, because it is faster and needs no lease transfer. A lease takeover is better if you are staying to the end of the term or want the unit in your own name, since it gives you a direct relationship with the landlord and your own deposit.',
+      },
+      {
+        question: 'Is a lease transfer the same as a sublet?',
+        answer:
+          'No. A lease transfer (lease takeover or assignment) moves you onto the lease in place of the original tenant, so you become the landlord’s direct tenant. A sublet keeps the original tenant on the lease; you pay them and they stay responsible to the landlord. A transfer changes who holds the lease; a sublet does not.',
       },
       {
         question: 'Is a sublet or a relet better for a summer stay?',
         answer:
-          'A sublet. For a May-to-August stay, a sublet is faster, more flexible, and doesn\'t require transferring the lease. Relets make sense when you\'re staying through the end of the lease term or want to renew the unit in your own name afterward.',
+          'A sublet. For a May-to-August stay, a sublet is faster, more flexible, and does not require transferring the lease. Relets make sense when you are staying through the end of the lease term or want to renew the unit in your own name afterward.',
       },
       {
         question: 'Does the landlord need to approve a sublet in Ann Arbor?',

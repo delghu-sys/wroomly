@@ -104,6 +104,42 @@ export default async function GuidePage({
                   </p>
                 ))}
               </div>
+              {s.table && (
+                <div className="mt-4 overflow-x-auto rounded-xl border border-line">
+                  <table className="w-full text-left text-[14.5px] border-collapse">
+                    {s.table.caption && (
+                      <caption className="sr-only">{s.table.caption}</caption>
+                    )}
+                    <thead>
+                      <tr className="bg-navy-soft/40">
+                        {s.table.columns.map((c, ci) => (
+                          <th
+                            key={ci}
+                            scope="col"
+                            className="px-4 py-2.5 font-semibold text-ink whitespace-nowrap"
+                          >
+                            {c}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {s.table.rows.map((row, ri) => (
+                        <tr key={ri} className="border-t border-line align-top">
+                          {row.map((cell, cj) => (
+                            <td
+                              key={cj}
+                              className={`px-4 py-2.5 text-ink-soft leading-relaxed ${cj === 0 ? 'font-medium text-ink' : ''}`}
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               {s.bullets && (
                 <ul className="mt-4 space-y-2">
                   {s.bullets.map((b, k) => (
