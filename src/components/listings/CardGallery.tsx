@@ -1,46 +1,49 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 /**
  * In-card image carousel: a horizontal scroll-snap strip so users can swipe /
- * scroll through every photo of a listing without opening it. Lives inside the
- * card's <Link>, so the arrow buttons stop propagation + prevent default to
- * avoid navigating; swiping the strip never fires a click, and tapping a photo
- * still opens the listing.
+ * scroll through every photo without opening the listing.
+ *
+ * Crucially, this gallery is NOT wrapped in the card's <Link> (see
+ * BrandListingCard). A swipe on a photo therefore has no anchor to trigger —
+ * it literally cannot navigate, which is what kept happening on touch when the
+ * strip lived inside the link. Opening the listing is handled here instead:
+ * a genuine TAP (the strip didn't scroll) pushes to `href`; a swipe scrolls and
+ * navigates nothing. The browser already suppresses the click after a scroll,
+ * and the scrollLeft guard is a second belt.
  */
 export function CardGallery({
   images,
   alt,
+  href,
   priority = false,
 }: {
   images: string[]
   alt: string
-  /** Mark the first photo as the page's LCP candidate (above-fold cards
-   * only) — preloads it instead of letting it queue behind the JS. */
+  /** Listing URL — a tap on the photo opens it. */
+  href: string
   priority?: boolean
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
   const [idx, setIdx] = useState(0)
-  // scrollLeft captured when a press begins. If it has moved by the time the
-  // click fires, the finger swiped the strip — so we swallow the click and the
-  // wrapping <Link> doesn't navigate. A still tap (no movement) opens the
-  // listing as before.
+  // scrollLeft when a press begins; if it moved by click time, it was a swipe.
   const pressScrollLeft = useRef(0)
 
   function markPressStart() {
     pressScrollLeft.current = ref.current?.scrollLeft ?? 0
   }
 
-  function onClickCapture(e: React.MouseEvent) {
+  function onClick() {
     const el = ref.current
-    if (el && Math.abs(el.scrollLeft - pressScrollLeft.current) > 6) {
-      // A swipe just happened — cancel the navigation the card's <Link> would do.
-      e.preventDefault()
-      e.stopPropagation()
-    }
+    // A swipe moved the strip → don't open. A still tap → open the listing.
+    if (el && Math.abs(el.scrollLeft - pressScrollLeft.current) > 6) return
+    router.push(href)
   }
 
   function onScroll() {
@@ -69,15 +72,17 @@ export function CardGallery({
         onScroll={onScroll}
         onPointerDownCapture={markPressStart}
         onTouchStartCapture={markPressStart}
-        onClickCapture={onClickCapture}
-        // When there's more than one photo the strip is a horizontally
-        // scrollable region — make it keyboard-focusable and named so it isn't
-        // a pointer-only control (WCAG 2.1.1 / scrollable-region-focusable).
-        // Arrow keys scroll a focused overflow container natively.
+        onClick={onClick}
+        // Horizontally scrollable region: keyboard-focusable + named so it
+        // isn't a pointer-only control (WCAG 2.1.1). Arrow keys scroll it.
         tabIndex={multi ? 0 : undefined}
         role={multi ? 'group' : undefined}
         aria-label={multi ? `${alt}, ${images.length} photos, use arrow keys` : undefined}
-        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory overscroll-x-contain [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
+        // No scroll-smooth class: that smooths USER swipes too and makes them
+        // feel sticky on touch. The arrow buttons still animate via their
+        // scrollTo({behavior:'smooth'}) call. overscroll-x-contain stops a
+        // swipe past the last photo from chaining into the browser back-swipe.
+        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory overscroll-x-contain cursor-pointer [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
         style={{ scrollbarWidth: 'none' }}
       >
         {images.map((src, i) => (
@@ -86,13 +91,12 @@ export function CardGallery({
               src={src}
               alt={i === 0 ? alt : ''}
               fill
-              // q75 is visually indistinguishable at card sizes and cuts
-              // bytes ~35% vs q90 — phones decode + scroll these in bulk.
               quality={75}
               priority={priority && i === 0}
               className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               loading={i === 0 ? undefined : 'lazy'}
+              draggable={false}
             />
           </div>
         ))}

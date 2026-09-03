@@ -59,24 +59,31 @@ export function BrandListingCard({
     .slice(0, 2)
     .toUpperCase()
 
+  const href = `/listings/${listing.id}`
+
   return (
     <TiltCard className="rounded-3xl h-full">
-      <Link
-        href={`/listings/${listing.id}`}
-        className="group block h-full transition-transform duration-200 ease-out active:scale-[0.985] motion-reduce:active:scale-100"
-      >
-        <div className="relative h-full bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden shadow-2 hover:shadow-3 transition-shadow duration-500">
-          {/* Swipeable image gallery — browse all photos without opening */}
-          <div className="relative aspect-[4/3] bg-[oklch(0.95_0.01_85)] overflow-hidden">
-            {imageUrls.length > 0 ? (
-              <CardGallery images={imageUrls} alt={listing.title} priority={priorityImage} />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[oklch(0.95_0.01_85)]">
-                <BedDouble className="w-10 h-10 text-ink-muted/30" />
-              </div>
-            )}
+      {/* The card is a plain container, NOT one big <Link>. The image gallery
+          (which the user swipes) must not live inside an anchor, or a swipe
+          fires navigation. So the gallery sits here as a sibling and opens the
+          listing via its own tap handler, while the CONTENT below is the real
+          <Link> — that keeps keyboard and screen-reader navigation intact. */}
+      <div className="group relative h-full flex flex-col bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 overflow-hidden shadow-2 hover:shadow-3 transition-shadow duration-500">
+        {/* Image area — outside the link. Gallery = swipe to browse, tap to open. */}
+        <div className="relative aspect-[4/3] bg-[oklch(0.95_0.01_85)] overflow-hidden">
+          {imageUrls.length > 0 ? (
+            <CardGallery images={imageUrls} alt={listing.title} href={href} priority={priorityImage} />
+          ) : (
+            <Link
+              href={href}
+              aria-label={listing.title}
+              className="w-full h-full flex items-center justify-center bg-[oklch(0.95_0.01_85)]"
+            >
+              <BedDouble className="w-10 h-10 text-ink-muted/30" />
+            </Link>
+          )}
 
-            <FavoriteButton
+          <FavoriteButton
               listingId={listing.id}
               userId={userId}
               isFavorited={isFavorited}
@@ -117,10 +124,14 @@ export function BrandListingCard({
                 </BrandChip>
               )}
             </div>
-          </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-5">
+        {/* Content is the real navigation target. active:scale gives the whole
+            card the press feedback the old wrapper link had. */}
+        <Link
+          href={href}
+          className="block p-5 flex-1 transition-transform duration-200 ease-out active:scale-[0.985] motion-reduce:active:scale-100"
+        >
             <div className="flex items-start justify-between gap-2">
               {/* h2: each card is a top-level item under the page h1 (home /
                   browse grids have no intervening h2), so h3 skipped a level. */}
@@ -203,9 +214,8 @@ export function BrandListingCard({
                 {listing.users?.is_verified && <VerifiedBadge size={13} />}
               </div>
             </div>
-          </div>
+          </Link>
         </div>
-      </Link>
     </TiltCard>
   )
 }
