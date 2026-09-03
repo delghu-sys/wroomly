@@ -11,7 +11,11 @@ export interface GuideSection {
 
 export interface Guide {
   slug: string
-  title: string // page <h1> + SEO title
+  title: string // page <h1> (human headline, can run long)
+  /** SERP <title> — keyword-first, <=60 chars incl. the ' | Wroomly' suffix.
+   *  Falls back to `title`. Keeps the on-page H1 readable while the tab/SERP
+   *  title stays inside Google's truncation width. */
+  seoTitle?: string
   description: string // meta description
   excerpt: string // shown on the /guides index
   published: string // ISO date of first publication (Article datePublished)
@@ -32,6 +36,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-sublet-your-apartment-at-university-of-michigan',
     title: 'How to sublet your apartment at the University of Michigan',
+    seoTitle: 'How to Sublet Your U-M Apartment in Ann Arbor',
     description:
       'A step-by-step guide for UMich students subletting their Ann Arbor apartment: checking your lease, setting a price, finding a verified subletter, and getting paid safely.',
     excerpt:
@@ -107,6 +112,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'summer-sublets-in-ann-arbor-student-guide',
     title: "Summer sublets in Ann Arbor: a student's guide",
+    seoTitle: 'Summer Sublets in Ann Arbor: Student Guide',
     description:
       'Everything UMich students need to know about finding or filling a summer sublet in Ann Arbor: timing, pricing, neighborhoods, and how to avoid getting scammed.',
     excerpt:
@@ -174,6 +180,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-avoid-sublet-scams-ann-arbor',
     title: 'How to avoid sublet scams in Ann Arbor',
+    seoTitle: 'How to Avoid Sublet Scams in Ann Arbor',
     description:
       'The common student housing scams in Ann Arbor and the exact red flags to watch for, so your UMich sublet search doesn\'t cost you a deposit.',
     excerpt:
@@ -238,6 +245,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'security-deposits-ann-arbor-sublets',
     title: 'Security deposits for Ann Arbor sublets: what to know',
+    seoTitle: 'Security Deposits for Ann Arbor Sublets',
     description:
       'How security deposits work for sublets in Ann Arbor, Michigan: what\'s normal, your rights under Michigan law, and how to actually get yours back.',
     excerpt:
@@ -299,6 +307,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'best-neighborhoods-for-umich-students',
     title: 'The best Ann Arbor neighborhoods for UMich students, compared',
+    seoTitle: 'Best Ann Arbor Neighborhoods for UMich Students',
     description:
       'Central Campus vs. South U vs. Kerrytown and beyond: an honest comparison of every Ann Arbor neighborhood for University of Michigan students, by walk time, vibe, and value.',
     excerpt:
@@ -384,6 +393,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'umich-off-campus-housing-timeline',
     title: 'The UMich off-campus housing timeline: when to look, sign, and sublet',
+    seoTitle: 'UMich Off-Campus Housing Timeline: When to Sign',
     description:
       "Ann Arbor's leasing calendar is famously early. Here's the month-by-month timeline for finding UMich off-campus housing, and where sublets fit when you missed the wave.",
     excerpt:
@@ -452,6 +462,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'sublet-vs-relet-lease-takeover',
     title: 'Sublet vs. relet vs. lease takeover: which one do you actually want?',
+    seoTitle: 'Sublet vs. Relet vs. Lease Takeover, Explained',
     description:
       'The difference between subletting, reletting, and a lease takeover in Ann Arbor: who stays on the lease, who holds the risk, and which fits your situation.',
     excerpt:
@@ -517,6 +528,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'international-student-housing-guide-umich',
     title: 'Housing at UMich as an international student: renting from abroad, safely',
+    seoTitle: 'UMich Housing for International Students',
     description:
       'How international students at the University of Michigan find housing from abroad: timing, documents, avoiding sight-unseen scams, and why verified sublets beat Facebook groups.',
     excerpt:
@@ -585,6 +597,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'grad-student-housing-ann-arbor',
     title: 'Grad student housing in Ann Arbor: quieter, closer to your lab, saner',
+    seoTitle: 'Grad Student Housing in Ann Arbor Near Campus',
     description:
       'Where University of Michigan grad students actually live: the quiet neighborhoods, medical-campus logistics, 12-month realities, and how sublets fit a defense-date life.',
     excerpt:
@@ -654,6 +667,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'winter-semester-sublets-ann-arbor',
     title: 'Winter semester sublets in Ann Arbor: the January move-in playbook',
+    seoTitle: 'Winter Sublets in Ann Arbor: January Move-In',
     description:
       'How to find (or fill) a January–April sublet at the University of Michigan: who leaves mid-year, when winter listings post, and how to price a spring semester.',
     excerpt:
@@ -719,6 +733,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-price-your-sublet',
     title: 'How to price your Ann Arbor sublet (without leaving it empty)',
+    seoTitle: 'How to Price Your Ann Arbor Sublet',
     description:
       'A practical pricing method for UMich sublets: anchor on live comparables, adjust for furniture and walk time, and understand why an empty room is the real loss.',
     excerpt:
@@ -785,6 +800,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'first-apartment-checklist-ann-arbor',
     title: 'Your first Ann Arbor apartment: the move-in checklist',
+    seoTitle: 'Your First Ann Arbor Apartment: Move-In Checklist',
     description:
       'Everything to check and set up when moving into your first UMich apartment or sublet: condition photos, utilities, renters insurance, and the Ann Arbor-specific details.',
     excerpt:
@@ -862,6 +878,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-verify-an-ann-arbor-landlord',
     title: 'How to verify an Ann Arbor landlord before you pay anyone',
+    seoTitle: 'How to Verify an Ann Arbor Landlord',
     description:
       'Ann Arbor requires every legal rental to hold a city Certificate of Compliance. Here is how to look one up, what it proves about a listing, and what it does not. It is a scam check almost no student uses.',
     excerpt:
