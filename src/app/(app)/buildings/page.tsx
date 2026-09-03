@@ -7,7 +7,7 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Building2, ArrowRight, MapPin } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Ann Arbor Student Buildings: Sublets by Building | UMich Housing',
+  title: 'Ann Arbor Student Buildings for UMich Sublets',
   description:
     'Every major student apartment building near the University of Michigan: addresses, floor plans, amenities, and live sublets at Verve, Hub on Campus, Landmark, The Standard, and more.',
   alternates: { canonical: '/buildings' },

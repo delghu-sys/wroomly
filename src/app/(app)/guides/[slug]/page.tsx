@@ -24,11 +24,11 @@ export async function generateMetadata({
   const g = getGuide(slug)
   if (!g) return { title: 'Guide not found' }
   return {
-    title: g.title,
+    title: g.seoTitle ?? g.title,
     description: g.description,
     alternates: { canonical: `/guides/${g.slug}` },
     openGraph: {
-      title: `${g.title} | Wroomly`,
+      title: `${g.seoTitle ?? g.title} | Wroomly`,
       description: g.description,
       type: 'article',
       images: ['/og-default.png'],

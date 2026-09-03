@@ -24,6 +24,24 @@ export function CardGallery({
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [idx, setIdx] = useState(0)
+  // scrollLeft captured when a press begins. If it has moved by the time the
+  // click fires, the finger swiped the strip — so we swallow the click and the
+  // wrapping <Link> doesn't navigate. A still tap (no movement) opens the
+  // listing as before.
+  const pressScrollLeft = useRef(0)
+
+  function markPressStart() {
+    pressScrollLeft.current = ref.current?.scrollLeft ?? 0
+  }
+
+  function onClickCapture(e: React.MouseEvent) {
+    const el = ref.current
+    if (el && Math.abs(el.scrollLeft - pressScrollLeft.current) > 6) {
+      // A swipe just happened — cancel the navigation the card's <Link> would do.
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
 
   function onScroll() {
     const el = ref.current
@@ -49,6 +67,9 @@ export function CardGallery({
       <div
         ref={ref}
         onScroll={onScroll}
+        onPointerDownCapture={markPressStart}
+        onTouchStartCapture={markPressStart}
+        onClickCapture={onClickCapture}
         // When there's more than one photo the strip is a horizontally
         // scrollable region — make it keyboard-focusable and named so it isn't
         // a pointer-only control (WCAG 2.1.1 / scrollable-region-focusable).
@@ -56,7 +77,7 @@ export function CardGallery({
         tabIndex={multi ? 0 : undefined}
         role={multi ? 'group' : undefined}
         aria-label={multi ? `${alt}, ${images.length} photos, use arrow keys` : undefined}
-        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
+        className="flex w-full h-full overflow-x-auto snap-x snap-mandatory overscroll-x-contain [&::-webkit-scrollbar]:hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-maize-bright/60"
         style={{ scrollbarWidth: 'none' }}
       >
         {images.map((src, i) => (
@@ -94,7 +115,7 @@ export function CardGallery({
               type="button"
               onClick={e => go(e, -1)}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-surface"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 transition hover:bg-surface"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -104,7 +125,7 @@ export function CardGallery({
               type="button"
               onClick={e => go(e, 1)}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 transition hover:bg-surface"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-md text-ink opacity-0 group-hover:opacity-100 focus:opacity-100 [@media(hover:none)]:opacity-100 transition hover:bg-surface"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
