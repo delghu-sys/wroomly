@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -51,6 +52,16 @@ interface InquiryModalProps {
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 const popSpring = { type: 'spring' as const, stiffness: 220, damping: 20 }
 
+// Client-only flag for the portal below. useSyncExternalStore (rather than
+// setState inside an effect, which the React Compiler lint rightly rejects for
+// causing cascading renders) is the pattern this codebase already uses for the
+// same job in TiltCard: server snapshot false, client snapshot true, so SSR
+// renders nothing and the client mounts the portal after hydration.
+const subscribeNever = () => () => {}
+function useMounted(): boolean {
+  return useSyncExternalStore(subscribeNever, () => true, () => false)
+}
+
 export function InquiryModal({
   open,
   onClose,
@@ -61,6 +72,9 @@ export function InquiryModal({
   const prefersReducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<'form' | 'success'>('form')
   const dialogRef = useFocusTrap<HTMLDivElement>(open)
+  // The dialog renders through a portal on <body> (see the return below);
+  // that can only happen after mount, since this component is server-rendered.
+  const mounted = useMounted()
 
   // Pre-compute particle layout once per mount so re-renders don't reshuffle.
   // A useState lazy initializer (not useMemo) is the React-sanctioned place
@@ -249,7 +263,21 @@ export function InquiryModal({
     }, 1400)
   }
 
-  return (
+  // Render through a portal on <body>.
+  //
+  // Without this the dialog was trapped inside the booking sidebar: that card
+  // (BookingSidebar) sets `backdrop-blur-xl`, and a backdrop-filter makes an
+  // element the CONTAINING BLOCK for its position:fixed descendants — so
+  // `fixed inset-0` resolved to the card's box, not the viewport, and the
+  // card's `overflow-hidden` then clipped the dialog. It appeared as a
+  // half-visible, unscrollable box inside the sidebar. A portal to <body>
+  // escapes both the containing block and the clip.
+  //
+  // `mounted` guards SSR: 'use client' components are still rendered on the
+  // server, where document does not exist.
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         // Centred at every size. This used to go full-screen on mobile
@@ -272,7 +300,7 @@ export function InquiryModal({
           />
 
           {/* Modal surface — one centred card at every size: w-full up to
-              max-w-xl, capped at 88dvh so it always sits inside the viewport
+              max-w-2xl, capped at 92dvh so it always sits inside the viewport
               with the backdrop visible around it. dvh (not vh) keeps iOS
               Safari's collapsing URL bar from changing the height. The header
               is fixed and the form scrolls inside, so a tall form never grows
@@ -284,7 +312,7 @@ export function InquiryModal({
             exit={{ opacity: 0, scale: 0.97, y: 12 }}
             transition={spring}
             className="
-              relative w-full max-w-xl max-h-[88dvh]
+              relative w-full max-w-2xl max-h-[92dvh]
               flex flex-col overflow-hidden
               rounded-3xl bg-surface border border-line
               shadow-glow-navy-strong
@@ -532,6 +560,7 @@ export function InquiryModal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
