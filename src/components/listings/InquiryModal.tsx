@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -51,6 +52,16 @@ interface InquiryModalProps {
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 const popSpring = { type: 'spring' as const, stiffness: 220, damping: 20 }
 
+// Client-only flag for the portal below. useSyncExternalStore (rather than
+// setState inside an effect, which the React Compiler lint rightly rejects for
+// causing cascading renders) is the pattern this codebase already uses for the
+// same job in TiltCard: server snapshot false, client snapshot true, so SSR
+// renders nothing and the client mounts the portal after hydration.
+const subscribeNever = () => () => {}
+function useMounted(): boolean {
+  return useSyncExternalStore(subscribeNever, () => true, () => false)
+}
+
 export function InquiryModal({
   open,
   onClose,
@@ -61,6 +72,9 @@ export function InquiryModal({
   const prefersReducedMotion = useReducedMotion()
   const [phase, setPhase] = useState<'form' | 'success'>('form')
   const dialogRef = useFocusTrap<HTMLDivElement>(open)
+  // The dialog renders through a portal on <body> (see the return below);
+  // that can only happen after mount, since this component is server-rendered.
+  const mounted = useMounted()
 
   // Pre-compute particle layout once per mount so re-renders don't reshuffle.
   // A useState lazy initializer (not useMemo) is the React-sanctioned place
@@ -249,16 +263,31 @@ export function InquiryModal({
     }, 1400)
   }
 
-  return (
+  // Render through a portal on <body>.
+  //
+  // Without this the dialog was trapped inside the booking sidebar: that card
+  // (BookingSidebar) sets `backdrop-blur-xl`, and a backdrop-filter makes an
+  // element the CONTAINING BLOCK for its position:fixed descendants — so
+  // `fixed inset-0` resolved to the card's box, not the viewport, and the
+  // card's `overflow-hidden` then clipped the dialog. It appeared as a
+  // half-visible, unscrollable box inside the sidebar. A portal to <body>
+  // escapes both the containing block and the clip.
+  //
+  // `mounted` guards SSR: 'use client' components are still rendered on the
+  // server, where document does not exist.
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
-        // On mobile we go full-screen (items-stretch + p-0) so the modal
-        // owns the whole viewport — no grey backdrop visible around the
-        // edges. On sm+ we center it as a card.
-        <div className="fixed inset-0 z-[100] flex items-stretch sm:items-center justify-center p-0 sm:p-6">
-          {/* Backdrop — visible only on sm+ where the modal is a card.
-              On mobile the modal fills the screen so this is invisible
-              anyway, but we keep it for the entrance fade. */}
+        // Centred at every size. This used to go full-screen on mobile
+        // (items-stretch + h-100dvh + no radius), which read as a whole new
+        // screen rather than a dialog and gave a long listing title room to
+        // dominate the view. A centred card with an internal scroll keeps it
+        // recognisably a popup on a phone too.
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          {/* Backdrop — now visible at every size, since the card no longer
+              covers the whole viewport. Also the click-to-dismiss target. */}
           <motion.button
             type="button"
             aria-label="Close inquiry"
@@ -270,12 +299,12 @@ export function InquiryModal({
             className="absolute inset-0 bg-navy-deep/55 backdrop-blur-sm"
           />
 
-          {/* Modal surface.
-              Mobile: w-full + h-[100dvh] = literally the whole screen,
-                no rounded corners (looks like an app screen, not a
-                floating card). dvh keeps iOS Safari's URL bar from
-                eating into our height as it expands/collapses.
-              Desktop: max-w-xl card, max-h-[92dvh], rounded-3xl. */}
+          {/* Modal surface — one centred card at every size: w-full up to
+              max-w-2xl, capped at 92dvh so it always sits inside the viewport
+              with the backdrop visible around it. dvh (not vh) keeps iOS
+              Safari's collapsing URL bar from changing the height. The header
+              is fixed and the form scrolls inside, so a tall form never grows
+              the card past the cap. */}
           <motion.div
             ref={dialogRef}
             initial={{ opacity: 0, scale: 0.95, y: 24 }}
@@ -283,11 +312,10 @@ export function InquiryModal({
             exit={{ opacity: 0, scale: 0.97, y: 12 }}
             transition={spring}
             className="
-              relative w-full h-[100dvh] sm:h-auto sm:max-w-xl sm:max-h-[92dvh]
+              relative w-full max-w-2xl max-h-[92dvh]
               flex flex-col overflow-hidden
-              rounded-none sm:rounded-3xl
-              bg-surface sm:border sm:border-line
-              shadow-none sm:shadow-glow-navy-strong
+              rounded-3xl bg-surface border border-line
+              shadow-glow-navy-strong
             "
             role="dialog"
             aria-modal="true"
@@ -307,18 +335,17 @@ export function InquiryModal({
                   // on a hardcoded subtract-the-header-height calc.
                   className="relative flex flex-col flex-1 min-h-0"
                 >
-                  {/* Header — focused on the action ("Send inquiry")
-                      with the listing context as supporting text below.
-                      The thumbnail was redundant with the listing page
-                      behind the modal; dropping it gives the title room
-                      to breathe and removes the "empty bed-icon" look
-                      when a listing has no photos. */}
+                  {/* Header — the ACTION leads ("Send inquiry"); the listing
+                      title is supporting context, so it is clamped to two
+                      lines. Unclamped at text-2xl, a 60+ character title (we
+                      have several, up to 69 chars) wrapped to three lines and
+                      swallowed the header, pushing the form out of view. */}
                   <div className="shrink-0 px-5 sm:px-7 pt-6 sm:pt-7 pb-5 flex items-start justify-between gap-4 border-b border-line/70">
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-2">
                         Send inquiry
                       </p>
-                      <h2 className="font-display text-[1.35rem] sm:text-2xl tracking-tight text-ink leading-[1.15]">
+                      <h2 className="font-display text-lg sm:text-xl tracking-tight text-ink leading-snug line-clamp-2">
                         {listing.title}
                       </h2>
                     </div>
@@ -533,6 +560,7 @@ export function InquiryModal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
