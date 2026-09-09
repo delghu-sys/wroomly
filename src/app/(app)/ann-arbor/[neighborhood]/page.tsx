@@ -3,7 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { NEIGHBORHOOD_CONTENT, getNeighborhood } from '@/lib/seo/neighborhoods'
 import { BUILDINGS } from '@/lib/seo/buildings'
-import { fetchActiveListings } from '@/lib/seo/fetch-listings'
+import { fetchActiveListings, fetchRentSample } from '@/lib/seo/fetch-listings'
+import { neighborhoodRent, usd } from '@/lib/seo/rent-stats'
 import { BrandListingCard } from '@/components/listings/BrandListingCard'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
@@ -44,6 +45,17 @@ export default async function NeighborhoodPage({
 
   const listings = await fetchActiveListings({ neighborhood: n.name })
 
+  // Live rent for THIS neighborhood. Computed from the full active set rather
+  // than `listings` above, which is capped at 24 — a median over a truncated
+  // sample would be wrong for the busiest neighborhoods (Kerrytown has ~48).
+  const rentSample = await fetchRentSample()
+  const rent = neighborhoodRent(rentSample, n.name)
+  const asOf = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <JsonLd
@@ -72,6 +84,28 @@ export default async function NeighborhoodPage({
           <span className="italic font-light text-navy">University of Michigan.</span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">{n.tagline}</p>
+
+        {/* Live rent figure. Deliberately a self-contained sentence with the
+            number, the sample size and the date in it: that is the form an
+            answer engine can lift and attribute without needing the rest of
+            the page. Hidden entirely when the sample is too thin to report. */}
+        {rent.medianCents != null && (
+          <p className="mt-5 text-[15px] text-ink-soft leading-relaxed border-l-2 border-gold-deep/40 pl-4">
+            The median asking rent for a {n.name} sublet is{' '}
+            <strong className="text-ink font-semibold">
+              {usd(rent.medianCents)} per month
+            </strong>
+            , across {rent.count} active {n.name} listing
+            {rent.count === 1 ? '' : 's'} on Wroomly as of {asOf}.{' '}
+            <Link
+              href="/guides/ann-arbor-rent-prices"
+              className="text-navy underline underline-offset-2 hover:text-gold-deep transition-colors"
+            >
+              Compare every Ann Arbor neighborhood
+            </Link>
+            .
+          </p>
+        )}
       </header>
 
       {/* Area description */}
