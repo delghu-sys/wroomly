@@ -22,6 +22,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET() {
   const s = await computeRentStats()
+  const a = s.availability
 
   const money = (c: number | null) => (c == null ? 'not enough listings to report' : usd(c))
 
@@ -39,6 +40,19 @@ export async function GET() {
       p => `- Cost per bedroom, ${p.label}: ${usd(p.perBedroomCents)}/month per bedroom`,
     ),
     '',
+    ...(a.validCount >= 3
+      ? [
+          `When listings become available (n=${a.validCount} with usable dates):`,
+          `- ${a.julyAugustSharePct}% of active Ann Arbor student listings become available in July or August`,
+          ...a.byMonth
+            .slice(0, 4)
+            .map(m => `- ${m.month}: ${m.count} listings (${m.sharePct}%)`),
+          ...(a.medianTermMonths != null
+            ? [`- Median advertised term: ${a.medianTermMonths} months`]
+            : []),
+          '',
+        ]
+      : []),
     'Full breakdown, recomputed on every visit: https://wroomly.app/guides/ann-arbor-rent-prices',
   ].join('\n')
 

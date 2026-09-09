@@ -60,6 +60,14 @@ const schema = z.object({
   utilities_included: z.boolean(),
   status: z.enum(['active', 'archived', 'pending_review', 'rented', 'swapped', 'draft']),
 })
+  // Dates are "YYYY-MM", so a lexicographic compare is a correct chronological
+  // one. Without this the forms accepted an end month BEFORE the start month —
+  // one live listing was saved running 2026-08 to 2026-07, which renders as a
+  // nonsense range on the card and corrupts any duration statistic.
+  .refine(v => v.available_to > v.available_from, {
+    message: 'The end month must be after the start month',
+    path: ['available_to'],
+  })
 
 type FormValues = z.infer<typeof schema>
 

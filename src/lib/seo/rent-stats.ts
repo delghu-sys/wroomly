@@ -43,6 +43,16 @@ export interface RentBucket {
   medianCents: number
 }
 
+export interface AvailabilityStats {
+  /** Rows with a usable, sane date range (end after start). */
+  validCount: number
+  /** Move-in months, busiest first. */
+  byMonth: { month: string; count: number; sharePct: number }[]
+  /** Share of listings becoming available in July or August combined. */
+  julyAugustSharePct: number
+  medianTermMonths: number | null
+}
+
 export interface RentStats {
   /** ISO date the figures were computed — recency is a citation signal. */
   asOf: string
@@ -59,6 +69,7 @@ export interface RentStats {
   /** Median rent divided by bedroom count — the "is sharing cheaper?" answer,
    *  only for buckets where the divisor is exact (so no 4+ bucket). */
   perBedroom: { label: string; bedrooms: number; perBedroomCents: number }[]
+  availability: AvailabilityStats
 }
 
 function bucketMedian(rows: RentSampleRow[]): number | null {
@@ -75,6 +86,52 @@ export function neighborhoodRent(
     r => r.neighborhood === neighborhoodName && r.price_per_month,
   )
   return { count: bucket.length, medianCents: bucketMedian(bucket) }
+}
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+/**
+ * When listings become available, and for how long.
+ *
+ * Rows whose end date is not after the start date are DISCARDED, not
+ * clamped: at least one listing has been saved with available_to before
+ * available_from (the create/edit forms validated the date format but never
+ * their order — fixed alongside this). A published statistic must never be
+ * computed over data we know is impossible.
+ */
+export function computeAvailability(rows: RentSampleRow[]): AvailabilityStats {
+  const DAY = 1000 * 60 * 60 * 24
+  const valid = rows.flatMap(r => {
+    if (!r.available_from || !r.available_to) return []
+    const from = new Date(r.available_from)
+    const to = new Date(r.available_to)
+    if (Number.isNaN(+from) || Number.isNaN(+to) || to <= from) return []
+    return [{ from, days: Math.round((+to - +from) / DAY) }]
+  })
+
+  const counts = new Map<number, number>()
+  for (const v of valid) counts.set(v.from.getMonth(), (counts.get(v.from.getMonth()) ?? 0) + 1)
+
+  const byMonth = [...counts.entries()]
+    .map(([m, count]) => ({
+      month: MONTH_NAMES[m],
+      count,
+      sharePct: Math.round((count / valid.length) * 100),
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  const julAug = (counts.get(6) ?? 0) + (counts.get(7) ?? 0)
+  const days = valid.map(v => v.days)
+
+  return {
+    validCount: valid.length,
+    byMonth,
+    julyAugustSharePct: valid.length ? Math.round((julAug / valid.length) * 100) : 0,
+    medianTermMonths: days.length >= MIN_SAMPLE ? Math.round(median(days) / 30.44) : null,
+  }
 }
 
 export async function computeRentStats(): Promise<RentStats> {
@@ -122,5 +179,6 @@ export async function computeRentStats(): Promise<RentStats> {
     unfurnishedMedianCents: bucketMedian(unfurnished),
     unfurnishedCount: unfurnished.length,
     perBedroom,
+    availability: computeAvailability(rows),
   }
 }
