@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
+import { useMounted } from '@/lib/hooks/useMounted'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'motion/react'
 import type { ListingImage } from '@/types/database'
@@ -20,6 +22,9 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
   const [direction, setDirection] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const lightboxRef = useFocusTrap<HTMLDivElement>(lightboxOpen)
+  // Must sit above the empty-images early return below: hooks run in the same
+  // order every render.
+  const mounted = useMounted()
 
   const prev = useCallback(() => {
     setDirection(-1)
@@ -198,8 +203,14 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
       </div>
 
       {/* Lightbox — wrapped in AnimatePresence so the open/close fade
-          isn't a hard cut. Backdrop fades, image scales up subtly. */}
-      <AnimatePresence>
+          isn't a hard cut. Backdrop fades, image scales up subtly.
+          Portalled to <body>: a position:fixed overlay is sized by the nearest
+          ancestor carrying a transform/filter/backdrop-filter, not the
+          viewport, which is how the inquiry dialog ended up trapped and
+          clipped inside a backdrop-blur card. Nothing traps this one today;
+          the portal means nothing can later. */}
+      {mounted && createPortal(
+        <AnimatePresence>
         {lightboxOpen && (
           <motion.div
             ref={lightboxRef}
@@ -270,7 +281,9 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
           </motion.div>
         </motion.div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
