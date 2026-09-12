@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { IGNORE_ERRORS, DENY_URLS } from '@/lib/observability/sentry-filters'
 
 Sentry.init({
   dsn: "https://76f6956c17c7bd026e4fab9eaa4763f5@o4511417032310784.ingest.us.sentry.io/4511417035259904",
@@ -25,19 +26,8 @@ Sentry.init({
   // Drop noise thrown by browser extensions / injected scripts rather than our
   // app. These land in Sentry because the global handler catches every uncaught
   // error in the tab. Genuine Wroomly errors (frames in our bundle) still report.
-  ignoreErrors: [
-    // Seen from an extension recursively reading our JSON-LD structured data
-    // and calling .toLowerCase() on objects that have no "@context".
-    /\["@context"\]\.toLowerCase/,
-    // Common extension / cross-origin script noise.
-    "ResizeObserver loop limit exceeded",
-    "ResizeObserver loop completed with undelivered notifications",
-  ],
-  denyUrls: [
-    /^chrome-extension:\/\//,
-    /^moz-extension:\/\//,
-    /^safari-(web-)?extension:\/\//,
-  ],
+  ignoreErrors: IGNORE_ERRORS,
+  denyUrls: DENY_URLS,
   beforeSend(event) {
     // Last-resort guard: drop events whose only stack frame is anonymous
     // "global code" with no reference to our app bundle — i.e. injected scripts.
