@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { fetchRentSample } from '@/lib/seo/fetch-listings'
+import { computeAvailability } from '@/lib/seo/rent-stats'
 import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd, articleJsonLd, rentDatasetJsonLd } from '@/components/seo/JsonLd'
@@ -49,6 +50,7 @@ const BEDROOM_LABELS: [label: string, match: (n: number) => boolean][] = [
 
 export default async function RentPricesPage() {
   const sample = await fetchRentSample()
+  const availability = computeAvailability(sample)
   const priced = sample.filter(r => r.price_per_month != null && r.price_per_month > 0)
   const allPrices = priced.map(r => r.price_per_month!)
 
@@ -234,6 +236,59 @@ export default async function RentPricesPage() {
                 the two biggest pricing levers in the student market. The other
                 is walking distance to Central Campus.
               </p>
+            </section>
+          )}
+
+          {/* When listings become available. This is the one statistic here
+              that isn't about price, and it's the most distinctive: nobody
+              else publishes the Ann Arbor student-housing calendar from live
+              inventory. Rows with an impossible date range are excluded by
+              computeAvailability, so validCount can trail the price sample. */}
+          {availability.byMonth.length > 0 && (
+            <section className="mt-12 max-w-3xl">
+              <h2 className="font-display text-2xl tracking-tight text-ink mb-4">
+                When listings become available
+              </h2>
+              <p className="text-[15px] text-ink-soft leading-relaxed">
+                {availability.julyAugustSharePct}% of the{' '}
+                {availability.validCount} active listings with usable dates
+                become available in July or August
+                {availability.medianTermMonths != null && (
+                  <>
+                    , and the median advertised term is{' '}
+                    {availability.medianTermMonths} months
+                  </>
+                )}
+                . Ann Arbor&rsquo;s student market turns over on the academic
+                calendar, not month to month, which is why searching in
+                February for a February move-in finds so little.
+              </p>
+              <div className="mt-4 overflow-x-auto rounded-xl border border-line">
+                <table className="w-full text-left text-[14.5px] border-collapse">
+                  <thead>
+                    <tr className="bg-navy-soft/40">
+                      <th scope="col" className="px-4 py-2.5 font-semibold text-ink">
+                        Move-in month
+                      </th>
+                      <th scope="col" className="px-4 py-2.5 font-semibold text-ink">
+                        Listings
+                      </th>
+                      <th scope="col" className="px-4 py-2.5 font-semibold text-ink">
+                        Share
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {availability.byMonth.map(m => (
+                      <tr key={m.month} className="border-t border-line">
+                        <td className="px-4 py-3 font-medium text-ink">{m.month}</td>
+                        <td className="px-4 py-3 text-ink-soft">{m.count}</td>
+                        <td className="px-4 py-3 text-ink-soft">{m.sharePct}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
           )}
         </>

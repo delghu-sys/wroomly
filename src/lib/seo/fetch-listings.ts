@@ -45,6 +45,8 @@ export interface RentSampleRow {
   bedrooms: number | null
   neighborhood: string | null
   furnished: boolean
+  available_from: string | null
+  available_to: string | null
 }
 
 /**
@@ -56,7 +58,7 @@ export async function fetchRentSample(): Promise<RentSampleRow[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('listings')
-    .select('price_per_month, bedrooms, neighborhood, furnished')
+    .select('price_per_month, bedrooms, neighborhood, furnished, available_from, available_to')
     .eq('status', 'active')
     .not('price_per_month', 'is', null)
     .limit(1000)

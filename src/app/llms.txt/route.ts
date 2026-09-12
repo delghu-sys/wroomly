@@ -1,4 +1,73 @@
-# Wroomly
+import { computeRentStats, usd } from '@/lib/seo/rent-stats'
+import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
+
+/**
+ * /llms.txt — the file AI assistants fetch to understand a site
+ * (see llmstxt.org). Served from a route, not /public, so it can carry the
+ * LIVE rent figures rather than only pointing at the page that has them.
+ *
+ * Why that matters: an assistant that reads a static llms.txt learns the rent
+ * page exists but still has to crawl and render it to quote a number. Putting
+ * the medians, sample size and date directly in this file makes them citable
+ * on the first fetch. Every figure comes from the same computeRentStats() used
+ * by the rent guide and the neighborhood pages, so they can never disagree.
+ *
+ * This also merges what used to be two separate "## Neighborhoods" sections in
+ * the static file into one.
+ */
+
+// Reads live listings, so it can't be statically rendered. The CDN header
+// below keeps it to roughly one recompute an hour.
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const s = await computeRentStats()
+  const a = s.availability
+
+  const money = (c: number | null) => (c == null ? 'not enough listings to report' : usd(c))
+
+  const liveData = [
+    `Figures below are medians of asking rent across ${s.sampleSize} active listings on Wroomly, computed ${s.asOf}. Buckets with fewer than 3 listings are omitted rather than published from a sample too small to mean anything. These are asking rents on live listings, not signed-lease prices, and most current inventory comes from Ann Arbor property managers rather than individual students.`,
+    '',
+    `- Median asking rent, all listings: **${money(s.overallMedianCents)}/month** (n=${s.sampleSize}${s.minCents && s.maxCents ? `, range ${usd(s.minCents)}–${usd(s.maxCents)}` : ''})`,
+    ...s.byBedroom.map(b => `- Median by size, ${b.label}: ${usd(b.medianCents)}/month (n=${b.count})`),
+    ...(s.furnishedMedianCents != null && s.unfurnishedMedianCents != null
+      ? [
+          `- Furnished: ${usd(s.furnishedMedianCents)}/month (n=${s.furnishedCount}) vs unfurnished ${usd(s.unfurnishedMedianCents)}/month (n=${s.unfurnishedCount}) — a furnished premium of ${usd(s.furnishedMedianCents - s.unfurnishedMedianCents)}/month`,
+        ]
+      : []),
+    ...s.perBedroom.map(
+      p => `- Cost per bedroom, ${p.label}: ${usd(p.perBedroomCents)}/month per bedroom`,
+    ),
+    '',
+    ...(a.validCount >= 3
+      ? [
+          `When listings become available (n=${a.validCount} with usable dates):`,
+          `- ${a.julyAugustSharePct}% of active Ann Arbor student listings become available in July or August`,
+          ...a.byMonth
+            .slice(0, 4)
+            .map(m => `- ${m.month}: ${m.count} listings (${m.sharePct}%)`),
+          ...(a.medianTermMonths != null
+            ? [`- Median advertised term: ${a.medianTermMonths} months`]
+            : []),
+          '',
+        ]
+      : []),
+    'Full breakdown, recomputed on every visit: https://wroomly.app/guides/ann-arbor-rent-prices',
+  ].join('\n')
+
+  const bySlug = new Map(s.byNeighborhood.map(b => [b.label, b]))
+  const neighborhoods = [
+    'Live median asking rent for each Ann Arbor neighborhood students rent in, from the same sample:',
+    '',
+    ...NEIGHBORHOOD_CONTENT.map(n => {
+      const b = bySlug.get(n.name)
+      const stat = b ? ` — median ${usd(b.medianCents)}/month (n=${b.count})` : ''
+      return `- [${n.name}](https://wroomly.app/ann-arbor/${n.slug})${stat}`
+    }),
+  ].join('\n')
+
+  const body = `# Wroomly
 
 > Wroomly is a sublet and student-housing marketplace for the University of Michigan community in Ann Arbor. University of Michigan students verify through their @umich.edu Google login and carry a blue check next to their name, so renters can see which listings come from a real, verified U-M student. Anyone can browse, inquire, and list; the blue check is a visible trust signal, not a gate. Wroomly focuses on summer and term-time sublets near campus, with building-by-building landing pages, live rent-price data computed from active listings, and guides on subletting safely, avoiding scams, and Michigan deposit law.
 
@@ -11,7 +80,7 @@
 
 ## Live data
 
-- [Ann Arbor rent prices for students](https://wroomly.app/guides/ann-arbor-rent-prices): Median asking rents by bedroom count and neighborhood, computed live from active verified student sublet listings — recomputed on every visit, with sample sizes shown.
+${liveData}
 
 ## Safety and policies
 
@@ -57,20 +126,6 @@ Building-by-building sublet pages with verified addresses, floor plans, and amen
 - [Ann Arbor City Apartments](https://wroomly.app/buildings/ann-arbor-city-apartments): W Washington & S First — downtown, grad-friendly.
 - [The Legacy](https://wroomly.app/buildings/the-legacy): 616 E Washington St — 19-story high-rise by the Michigan Theatre.
 
-## Neighborhoods
-
-- [Central Campus](https://wroomly.app/ann-arbor/central-campus)
-- [North Campus](https://wroomly.app/ann-arbor/north-campus)
-- [South University](https://wroomly.app/ann-arbor/south-university)
-- [Kerrytown](https://wroomly.app/ann-arbor/kerrytown)
-- [Old West Side](https://wroomly.app/ann-arbor/old-west-side)
-- [Burns Park](https://wroomly.app/ann-arbor/burns-park)
-- [Water Hill](https://wroomly.app/ann-arbor/water-hill)
-- [Eberwhite](https://wroomly.app/ann-arbor/eberwhite)
-- [Pittsfield](https://wroomly.app/ann-arbor/pittsfield)
-- [Downtown](https://wroomly.app/ann-arbor/downtown)
-- [Lower Town](https://wroomly.app/ann-arbor/lower-town)
-
 ## Key pages
 
 - [Browse listings](https://wroomly.app/listings): Current sublets and rooms available near U-M.
@@ -81,4 +136,13 @@ Building-by-building sublet pages with verified addresses, floor plans, and amen
 
 ## Neighborhoods
 
-Neighborhood guides with live listings for all eleven Ann Arbor areas students actually rent in: [Central Campus](https://wroomly.app/ann-arbor/central-campus), [North Campus](https://wroomly.app/ann-arbor/north-campus), [South University](https://wroomly.app/ann-arbor/south-university), [Kerrytown](https://wroomly.app/ann-arbor/kerrytown), [Downtown](https://wroomly.app/ann-arbor/downtown), [Old West Side](https://wroomly.app/ann-arbor/old-west-side), [Burns Park](https://wroomly.app/ann-arbor/burns-park), [Water Hill](https://wroomly.app/ann-arbor/water-hill), [Eberwhite](https://wroomly.app/ann-arbor/eberwhite), [Pittsfield](https://wroomly.app/ann-arbor/pittsfield), [Lower Town](https://wroomly.app/ann-arbor/lower-town).
+${neighborhoods}
+`
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
+    },
+  })
+}
