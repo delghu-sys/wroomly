@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, useSyncExternalStore } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useMounted } from '@/lib/hooks/useMounted'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap'
@@ -51,16 +52,6 @@ interface InquiryModalProps {
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 const popSpring = { type: 'spring' as const, stiffness: 220, damping: 20 }
-
-// Client-only flag for the portal below. useSyncExternalStore (rather than
-// setState inside an effect, which the React Compiler lint rightly rejects for
-// causing cascading renders) is the pattern this codebase already uses for the
-// same job in TiltCard: server snapshot false, client snapshot true, so SSR
-// renders nothing and the client mounts the portal after hydration.
-const subscribeNever = () => () => {}
-function useMounted(): boolean {
-  return useSyncExternalStore(subscribeNever, () => true, () => false)
-}
 
 export function InquiryModal({
   open,

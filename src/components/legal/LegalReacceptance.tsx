@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { useMounted } from '@/lib/hooks/useMounted'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -41,7 +43,9 @@ export function LegalReacceptance() {
     }
   }, [])
 
-  if (!needed) return null
+  const mounted = useMounted()
+
+  if (!needed || !mounted) return null
 
   async function accept() {
     setSaving(true)
@@ -60,7 +64,12 @@ export function LegalReacceptance() {
     }
   }
 
-  return (
+  // Portal to <body>. A position:fixed overlay is sized by the nearest
+  // ancestor with a transform/filter/backdrop-filter, not the viewport — the
+  // inquiry dialog was trapped and clipped exactly that way by a
+  // backdrop-blur card. This overlay has no such ancestor today, but portalling
+  // makes it immune to one being added later.
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4"
       role="dialog"
@@ -116,6 +125,7 @@ export function LegalReacceptance() {
           Accept and continue
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

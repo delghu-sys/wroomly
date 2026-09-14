@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { useMounted } from '@/lib/hooks/useMounted'
 import { SlidersHorizontal, X } from 'lucide-react'
 import { ListingsFilters } from './ListingsFilters'
 
@@ -49,6 +51,8 @@ export function MobileFilterSheet({
     }
   }, [open])
 
+  const mounted = useMounted()
+
   return (
     <>
       <button
@@ -69,7 +73,12 @@ export function MobileFilterSheet({
         )}
       </button>
 
-      {open && (
+      {/* The sheet is portalled to <body>; the trigger button above stays in
+          place. A position:fixed overlay is sized by the nearest ancestor with
+          a transform/filter/backdrop-filter rather than the viewport — exactly
+          how the inquiry dialog got trapped and clipped inside a backdrop-blur
+          card. Nothing traps this one today; the portal keeps it that way. */}
+      {open && mounted && createPortal(
         <>
           <button
             type="button"
@@ -110,7 +119,8 @@ export function MobileFilterSheet({
               />
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   )
