@@ -25,7 +25,10 @@
     "seed:teardown": "node --env-file=.env.local scripts/teardownSeed.mjs",
     "seed:stats": "node --env-file=.env.local scripts/seedStats.mjs",
     "listings:backfill-geocode": "node --env-file=.env.local scripts/backfillListingGeocode.mjs --dry-run",
-    "metrics": "node --env-file=.env.local scripts/metrics.mjs"
+    "metrics": "node --env-file=.env.local scripts/metrics.mjs",
+    "agents:discover": "node --env-file=.env.local scripts/agents/discover.mjs",
+    "agents:draft": "node --env-file=.env.local scripts/agents/draft.mjs",
+    "agents:outreach": "node --env-file=.env.local scripts/agents/outreach.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
