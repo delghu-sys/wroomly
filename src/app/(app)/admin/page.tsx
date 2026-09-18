@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { Home, Users, Flag, CreditCard, Sparkles, ArrowRight } from 'lucide-react'
+import { Home, Users, Flag, CreditCard, Sparkles, ArrowRight, Bot } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Admin Dashboard' }
 
@@ -58,6 +58,7 @@ export default async function AdminPage() {
     { href: '/admin/users', label: 'Manage users', desc: 'Verify, suspend, or look up an account.', icon: Users, count: 0 },
     { href: '/admin/reports', label: 'Handle reports', desc: 'Flags on listings, messages, and people.', icon: Flag, count: openReports },
     { href: '/admin/import-review', label: 'AI imports', desc: 'Check what the importer extracted before it goes live.', icon: Sparkles, count: pendingImports },
+    { href: '/admin/agents', label: 'Growth agents', desc: 'Find sublets, prepare claimable drafts, send one outreach email.', icon: Bot, count: 0 },
   ]
 
   return (

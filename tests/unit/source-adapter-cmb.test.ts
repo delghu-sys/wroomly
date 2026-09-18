@@ -1,7 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-// @ts-expect-error — .mjs script module, no type declarations
-import { parseSubletTable } from '../../scripts/agents/sources/cmb-resident-sublets.mjs'
+import { parseSubletTable } from '../../src/lib/agents/sources/cmb-resident-sublets.ts'
 
 // Fixture mirrors the real board's column layout (Name, Email/Phone, Property,
 // Dates, Type, Price, Notes) with INVENTED people, so the suite never handles a

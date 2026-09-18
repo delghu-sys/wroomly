@@ -11,11 +11,22 @@ outreach  →  one email, ever         (with a working opt-out)
 
 Run them in that order. Each is dry-run by default.
 
+**From the admin console** — `/admin/agents` (admin accounts only). Each step
+has a **Preview** button (dry run, changes nothing) and a **Run** button. It
+shows the lead queue, counts by status, and how many people have opted out.
+
+**From the terminal** — same logic, same switches:
+
 ```bash
 AGENT_SOURCES=cmb-resident-sublets npm run agents:discover -- --write
 npm run agents:draft -- --write
 OUTREACH_ENABLED=true npm run agents:outreach -- --send
 ```
+
+Both entry points call the one implementation in `src/lib/agents/runner.ts`,
+so they cannot drift apart. The console goes through `/api/admin/agents`,
+which re-verifies the requester is an admin server-side before the service
+role does anything.
 
 ## The rules, and where they are enforced
 
@@ -48,18 +59,20 @@ copy-pasted command cannot start mailing strangers on its own.
 | `AGENT_SOURCES` | Comma-separated adapter keys to run. Empty = fetch nothing. |
 | `OUTREACH_ENABLED` | Must be `true` to send. |
 | `OUTREACH_DAILY_CAP` | Default 25. |
-| `OUTREACH_SECRET` | 32+ random chars. Signs unsubscribe links — **required**, the send will throw without it. |
+| `OUTREACH_SECRET` | 32+ random chars. Signs unsubscribe links — **required**, the send will throw without it. Set it in `.env.local` **and** in Vercel: the console runs on the server, and the unsubscribe endpoint verifies with it. |
 | `AGENT_DRAFT_LIMIT` | Drafts per run, default 25. |
 
 ## Adding a source
 
-Implement `SourceAdapter` (`src/lib/agents/source-adapter.ts`) and register it in
-`discover.mjs`. Two things to get right:
+Implement `SourceAdapter` (`src/lib/agents/source-adapter.ts`) under
+`src/lib/agents/sources/` and add it to `SOURCES` in `runner.ts` — it then
+appears in both the console and `AGENT_SOURCES`. Two things to get right:
 
 - **`contactBasis`** — one sentence on why contacting people from this source is
-  legitimate. It is stored with the data so the justification travels with it.
+  legitimate. It is stored with the data so the justification travels with it,
+  and the console shows it next to the source's checkbox.
 - **Split parse from fetch.** Export a pure parser and test it against a
-  *synthetic* fixture, as `cmb-resident-sublets.mjs` does. The test suite should
+  *synthetic* fixture, as `cmb-resident-sublets.ts` does. The test suite should
   never need real people's contact details to prove parsing works.
 
 Only sources where **posting is itself an invitation to be contacted** qualify.
@@ -74,5 +87,5 @@ outreach email can honestly say "we saw your post".
 - **Bounces and complaints are not fed back.** `outreach_suppressions` supports
   `bounced`/`complaint` reasons but nothing writes them yet — wire a Resend
   webhook before volume grows.
-- **No admin UI for the lead queue.** Inspect via SQL for now; `/admin/import-review`
-  already covers the drafts themselves.
+- **No per-lead actions in the console yet** (e.g. manually skip a lead). The
+  queue is read-only; `/admin/import-review` covers the drafts themselves.

@@ -1,3 +1,5 @@
+import type { RawLead, SourceAdapter } from '../source-adapter.ts'
+
 /**
  * Source: residents' own sublet posts on annarborapartments.net/sublet/.
  *
@@ -19,7 +21,7 @@
 const SOURCE_URL = 'https://annarborapartments.net/sublet/'
 const OFFICE_DOMAIN = 'annarborapartments.net'
 
-const strip = s =>
+const strip = (s: string) =>
   s
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
@@ -33,11 +35,11 @@ const strip = s =>
  * fixture. That keeps the test suite from ever pulling real residents' contact
  * details into memory just to prove the parsing is correct.
  */
-export function parseSubletTable(html) {
+export function parseSubletTable(html: string): RawLead[] {
   const table = (html.match(/<table[\s\S]*?<\/table>/g) ?? []).find(t => t.includes('@'))
   if (!table) return []
 
-  const leads = []
+  const leads: RawLead[] = []
   for (const row of table.match(/<tr[\s\S]*?<\/tr>/g) ?? []) {
     const cells = (row.match(/<t[dh][\s\S]*?<\/t[dh]>/g) ?? []).map(strip)
     if (cells.length < 6) continue
@@ -70,7 +72,7 @@ export function parseSubletTable(html) {
   return leads
 }
 
-export const adapter = {
+export const cmbResidentSublets: SourceAdapter = {
   key: 'cmb-resident-sublets',
   label: 'CMB resident sublet board',
   contactBasis:
@@ -84,5 +86,3 @@ export const adapter = {
     return parseSubletTable(await res.text())
   },
 }
-
-export default adapter

@@ -6,6 +6,11 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // Lets src/lib/agents/runner.ts import './x.ts' with an explicit extension.
+    // Raw Node (the CLI scripts under scripts/agents/) never does extension
+    // resolution, so this is what allows ONE runner to serve both the admin
+    // API route and the terminal. Safe because noEmit is on.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
