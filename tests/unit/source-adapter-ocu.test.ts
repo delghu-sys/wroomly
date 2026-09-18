@@ -5,6 +5,7 @@ import {
   parseListingFacts,
   isSublet,
   toLead,
+  extractContact,
 } from '../../src/lib/agents/sources/offcampus-universe.ts'
 
 // Fixtures mirror the real page shapes (checked 2026-09-18) with INVENTED
@@ -66,11 +67,98 @@ test('a sublet produces a lead with facts and a link', () => {
   assert.equal(lead.extracted?.price, '1200')
 })
 
-test('NEVER carries a contact email — this board gates and meters the reveal', () => {
-  const html = page('Sublease at Landmark', 'Sub Lease apartment at Sublease at Landmark, listed at $1,500  on Ann Arbor Universe Housing')
+// ── contact extraction ───────────────────────────────────────────────────────
+// These fixtures mirror the REAL payload shape, confirmed against a live page
+// on 2026-09-18: records live under recordsByCollectionId → ApartmentListings
+// keyed by id, each carrying its own `slug`; quotes are escaped once (\") while
+// slashes are escaped twice (\\/). All people and addresses are invented.
+
+const esc = (o: Record<string, string>) =>
+  '{' + Object.entries(o).map(([k, v]) => `\\"${k}\\":\\"${v.split('/').join('\\\\/')}\\"`).join(',') + '}'
+
+/** A page with an ApartmentListings block, plus the RoommateProfiles block the
+ *  real pages also carry. */
+const pageWith = (listings: Record<string, string>[], roommates: Record<string, string>[] = []) =>
+  `<html><body>\\"recordsByCollectionId\\":{\\"ApartmentListings\\":{` +
+  listings.map(l => `\\"${l.slug}\\":${esc(l)}`).join(',') +
+  `},\\"RoommateProfiles\\":{` +
+  roommates.map((r, i) => `\\"rp${i}\\":${esc(r)}`).join(',') +
+  `}}</body></html>`
+
+test('reads the poster’s contact from the escaped payload', () => {
+  const html = pageWith([
+    { slug: '1b1b-sublease-beekman', typeOfLease: 'Sub Lease', contactName: 'Ada Lovelace', email: 'Ada@Example.com', formType: 'Student', timingOfLease: 'January - May', bedroom: '1', bathroom: '1' },
+  ])
+  const c = extractContact(html, '1b1b-sublease-beekman')
+  assert.equal(c.email, 'ada@example.com', 'lower-cased for suppression matching')
+  assert.equal(c.contactName, 'Ada Lovelace')
+  assert.equal(c.formType, 'Student')
+  assert.equal(c.timingOfLease, 'January - May')
+  assert.equal(c.bedrooms, '1')
+})
+
+test('handles a slug-bearing record whose values contain escaped slashes', () => {
+  const html = pageWith([
+    { slug: 'verve-3-bed4-bath-sublease-abc', typeOfLease: 'Sub Lease', email: 'grace@example.com', timingOfLease: '9/1 - 8/13' },
+  ])
+  const c = extractContact(html, 'verve-3-bed4-bath-sublease-abc')
+  assert.equal(c.email, 'grace@example.com')
+  assert.equal(c.timingOfLease, '9/1 - 8/13')
+})
+
+test('NEVER takes a neighbouring listing’s address', () => {
+  // Pages embed several listings. Picking the wrong one would mean emailing a
+  // stranger about someone else's flat — the worst failure this pipeline has.
+  const html = pageWith([
+    { slug: 'someone-else', typeOfLease: 'Sub Lease', email: 'victim@example.com', contactName: 'Not Ours' },
+    { slug: 'ours', typeOfLease: 'Sub Lease', email: 'ours@example.com' },
+    { slug: 'another', typeOfLease: 'Year Lease (12 Months)', email: 'other@example.com' },
+  ])
+  const c = extractContact(html, 'ours')
+  assert.equal(c.email, 'ours@example.com')
+})
+
+test('NEVER takes an email from the RoommateProfiles collection', () => {
+  // Those are students LOOKING for a room — they advertised nothing and must
+  // never be contacted from here. Only ApartmentListings carry typeOfLease.
+  const html = pageWith(
+    [{ slug: 'no-contact-listing', typeOfLease: 'Sub Lease' }],
+    [{ slug: 'no-contact-listing', email: 'roommate@example.com', aboutMe: 'Looking for a room', major: 'CS' }],
+  )
+  const c = extractContact(html, 'no-contact-listing')
+  assert.equal(c.email, undefined, 'must not borrow a roommate profile’s address')
+})
+
+test('returns nothing when the record has no email, rather than borrowing one', () => {
+  const html = pageWith([
+    { slug: 'no-contact', typeOfLease: 'Sub Lease' },
+    { slug: 'different', typeOfLease: 'Sub Lease', email: 'someone@example.com' },
+  ])
+  assert.equal(extractContact(html, 'no-contact').email, undefined)
+})
+
+test('returns nothing when the slug is absent or unmatched', () => {
+  assert.deepEqual(extractContact('<html></html>', 'missing'), {})
+  assert.deepEqual(extractContact('<html></html>', ''), {})
+})
+
+test('rejects a malformed address rather than passing it on', () => {
+  const html = pageWith([{ slug: 'x', typeOfLease: 'Sub Lease', email: 'not-an-email' }])
+  assert.equal(extractContact(html, 'x').email, undefined)
+})
+
+test('a sublet lead carries the contact through to the lead', () => {
+  const body = pageWith([
+    { slug: 'sublease-landmark', typeOfLease: 'Sub Lease', email: 'katherine@example.com', contactName: 'Katherine J', formType: 'Student', timingOfLease: 'Jan to Aug 2027' },
+  ])
+  const html =
+    `<html><head><title>Sublease at Landmark | Ann Arbor Universe Housing</title>` +
+    `<meta name="description" content="Sub Lease apartment at Sublease at Landmark, listed at $1,500  on Ann Arbor Universe Housing"/></head>` +
+    body
   const lead = toLead(html, { id: 'sublease-landmark', url: 'https://example.test/l' })
-  assert.equal(lead?.contactEmail, undefined)
-  // The outreach policy must therefore skip it; that is the intended outcome.
+  assert.equal(lead?.contactEmail, 'katherine@example.com')
+  assert.equal(lead?.extracted?.posterType, 'Student')
+  assert.equal(lead?.extracted?.dates, 'Jan to Aug 2027')
 })
 
 test('never carries image data', () => {

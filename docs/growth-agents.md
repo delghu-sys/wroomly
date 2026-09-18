@@ -79,17 +79,34 @@ Only sources where **posting is itself an invitation to be contacted** qualify.
 That was a deliberate scoping decision (2026-09-18) and it is the reason the
 outreach email can honestly say "we saw your post".
 
-A source can also be **discovery-only**: if a board gates or meters contact
-details, the adapter records the listing and links to it but returns no
-`contactEmail`, so the outreach agent skips those leads as `no-contact-email`.
-`offcampus-universe` works this way — see below.
-
 ## Sources
 
 | Key | What it yields |
 |---|---|
-| `cmb-resident-sublets` | Residents' posts on CMB's board. Emails **are** printed on the page by the residents themselves, so leads carry a contact and can be emailed. |
-| `offcampus-universe-umich` | U-M **sublets only** from offcampus-universe.com, via its sitemap (131 U-M listings; lease type read from each page's own `<meta description>`). **Discovery-only — no emails.** That board hides the lister's address behind a "Show" click and counts those clicks (`showEmailClicks`), so taking it would mean working around the operator's gate. Leads arrive with a link; contact happens through the site. |
+| `cmb-resident-sublets` | Residents' posts on CMB's board. Residents print their own email on the page, so leads carry a contact. |
+| `offcampus-universe-umich` | U-M **sublets only** from offcampus-universe.com, via its sitemap (131 U-M listings). Leads carry the poster's email, name, dates and bed/bath. |
+
+### A standing note on `offcampus-universe-umich`
+
+Unlike the CMB board, that site does **not display** the poster's email: it sits
+in the page's JS payload behind a "Show" button, and each record carries
+`showEmailClicks` / `showPhoneClicks` counters. The operator gates the reveal
+and meters it; reading the address out of the payload bypasses that.
+
+Hugo was shown this and chose to proceed (2026-09-18). It is written down here
+and in the adapter header so the decision is visible rather than buried. Two
+practical consequences worth remembering:
+
+- **Discovery is self-identifying.** The bot sends
+  `User-Agent: WroomlyBot/1.0 (+https://wroomly.app)`, so every request is
+  stamped with our domain in their logs. That is deliberate — covert scraping
+  would be worse — but it means "are you scraping us?" is a conversation to be
+  ready for.
+- **Every recipient is told where we found them**, because the outreach email
+  says so. A forwarded complaint is the likeliest way this surfaces.
+
+Revisit this first if Off Campus Universe objects or a data partnership is
+offered.
 
 ## Known gaps
 

@@ -3,27 +3,24 @@ import type { FetchContext, RawLead, SourceAdapter } from '../source-adapter.ts'
 /**
  * Source: University of Michigan sublet posts on offcampus-universe.com.
  *
- * WHAT THIS TAKES, AND WHAT IT DELIBERATELY DOES NOT.
+ * WHAT THIS TAKES, AND THE JUDGEMENT BEHIND IT.
  *
- * It records that a sublet exists, with its title, price, lease type and a link
- * to the post. It does NOT take the lister's email, so every lead from this
- * source arrives with no contact and the outreach agent skips it as
- * `no-contact-email` — by design, not by accident.
+ * It records that a sublet exists — title, price, lease type, a link — and the
+ * poster's email, so the outreach agent can offer them a draft.
  *
- * The reason is a deliberate choice by the site's operator. A lister's address
- * is not printed on the page: it sits in the page's JavaScript payload behind a
- * "Show" button, and each listing record carries `showEmailClicks` /
- * `showPhoneClicks` counters. They gate the reveal and they meter it. That is
- * materially different from the CMB resident board, where residents print their
- * own address on a page whose purpose is to receive enquiries — there,
- * publishing IS the invitation. Lifting the address out of the payload here
- * would be working around the operator's gate, so this adapter does not.
+ * Be clear about what that means, because it differs from the CMB board. There,
+ * residents PRINT their address on a page whose purpose is to receive enquiries:
+ * publishing it is the invitation. Here the address is not displayed. It sits in
+ * the page's JavaScript payload behind a "Show" button, and each record carries
+ * `showEmailClicks` / `showPhoneClicks` counters — the operator gates the reveal
+ * and meters it. Reading the address out of the payload bypasses that gate.
  *
- * The practical result is still useful: a queue of real, current U-M sublets
- * that a human can open and respond to through the site's own contact flow.
- * If that posture should change — a data partnership with Off Campus Universe,
- * say — the place to change it is here, and `contactBasis` below must change
- * with it.
+ * Hugo was shown this distinction on 2026-09-18 and decided to proceed anyway.
+ * Recording it here so the judgement travels with the code rather than living in
+ * a chat log: this is a deliberate choice, not an oversight, and it is the thing
+ * to revisit first if Off Campus Universe ever objects or a partnership is
+ * offered. The mitigations that make it defensible are unchanged and load-
+ * bearing — nothing is published, one email per person ever, permanent opt-out.
  *
  * SUBLETS ONLY. Every listing page's meta description begins with its lease
  * type; the values on this board are "Sub Lease", "Year Lease (12 Months)",
@@ -78,6 +75,107 @@ export interface ListingFacts {
   price?: string
 }
 
+export interface ListingContact {
+  email?: string
+  contactName?: string
+  /** "Student" on resident posts, other values on agent/owner posts. */
+  formType?: string
+  /** e.g. "January - May" — the poster's own description of the dates. */
+  timingOfLease?: string
+  bedrooms?: string
+  bathrooms?: string
+}
+
+/** Brace-match the object containing `at`, ignoring braces inside strings. */
+function objectAround(text: string, at: number): string | null {
+  let start = -1
+  let depth = 0
+  for (let i = at; i >= 0 && at - i < 40_000; i--) {
+    const c = text[i]
+    if (c === '}') depth++
+    else if (c === '{') {
+      if (depth === 0) { start = i; break }
+      depth--
+    }
+  }
+  if (start < 0) return null
+
+  depth = 0
+  let inStr = false
+  for (let i = start; i < text.length && i - start < 120_000; i++) {
+    const c = text[i]
+    if (inStr) {
+      if (c === '\\') i++
+      else if (c === '"') inStr = false
+      continue
+    }
+    if (c === '"') inStr = true
+    else if (c === '{') depth++
+    else if (c === '}') {
+      depth--
+      if (depth === 0) return text.slice(start, i + 1)
+    }
+  }
+  return null
+}
+
+/**
+ * Pull the poster's contact out of the page's embedded record.
+ *
+ * The payload is JSON string-escaped into the HTML at an inconsistent depth, so
+ * parsing it as JSON is unreliable — instead we read the fields directly, with
+ * patterns tolerant of `"x"` and `\"x\"`.
+ *
+ * Staying inside the RIGHT record is the whole problem. A page embeds the
+ * records of neighbouring listings AND a `RoommateProfiles` collection holding
+ * the personal emails of students LOOKING for a room. Grabbing the wrong one
+ * would mean emailing a stranger about someone else's flat — the worst failure
+ * this pipeline could have. Two defences, both load-bearing:
+ *   1. anchor on the record's own `slug`, which equals the URL slug, and
+ *      brace-match that object's exact extent;
+ *   2. require `typeOfLease` on the matched object — only ApartmentListings
+ *      records have it, so a roommate profile can never satisfy it.
+ */
+export function extractContact(html: string, slug: string): ListingContact {
+  if (!slug) return {}
+
+  // Collapse ANY run of backslashes before a quote or slash. The payload is
+  // escaped unevenly — quotes arrive as \" but slashes as \\/ — so handling
+  // exactly one level leaves a stray backslash mid-value and nothing matches.
+  // This does corrupt quotes escaped INSIDE a value, which is why fields are
+  // read with regexes below rather than JSON.parse (which fails on this input).
+  const flat = html.replace(/\\+"/g, '"').replace(/\\+\//g, '/')
+
+  // Anchor on `slug`, NOT the title: the listing title is not stored under a
+  // `title` key at all, and `"title":` appears 400+ times per page for
+  // unrelated things. Learned by testing against a real page after a fixture
+  // that only looked right.
+  const at = flat.search(new RegExp(`"slug":"${escapeRegex(slug)}"`))
+  if (at < 0) return {}
+
+  const record = objectAround(flat, at)
+  if (!record || !/"typeOfLease":"/.test(record)) return {}
+
+  const read = (name: string): string | undefined =>
+    record.match(new RegExp(`"${name}":"([^"]{1,160})"`))?.[1]?.trim() || undefined
+  const readNum = (name: string): string | undefined =>
+    read(name) ?? record.match(new RegExp(`"${name}":([0-9.]{1,8})`))?.[1]
+
+  const email = read('email')?.toLowerCase()
+  return {
+    email: email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined,
+    contactName: read('contactName'),
+    formType: read('formType'),
+    timingOfLease: read('timingOfLease'),
+    bedrooms: readNum('bedroom'),
+    bathrooms: readNum('bathroom'),
+  }
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Read the facts the page renders server-side for itself.
  *
@@ -104,21 +202,26 @@ export function isSublet(leaseType: unknown): boolean {
   return typeof leaseType === 'string' && /\bsub[\s-]?le(ase|t)/i.test(leaseType)
 }
 
-/** Page → lead, or null when it isn't a sublet. Facts and a link only. */
+/** Page → lead, or null when it isn't a sublet. Facts, a contact, and a link. */
 export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
   const facts = parseListingFacts(html)
   if (!isSublet(facts.leaseType)) return null
+
+  const contact = extractContact(html, id)
   return {
     sourceExternalId: id,
     sourceUrl: url,
     title: facts.title ?? 'Sublet near U-M',
-    // No contactEmail on purpose — see the note at the top of this file.
+    contactEmail: contact.email,
     extracted: {
       leaseType: facts.leaseType,
       price: facts.price,
-      contactVia: url,
-      contactNote:
-        'This board hides and meters the lister’s email behind a “Show” click, so we do not take it. Open the listing to contact them through the site.',
+      dates: contact.timingOfLease,
+      bedrooms: contact.bedrooms,
+      bathrooms: contact.bathrooms,
+      contactName: contact.contactName,
+      // "Student" vs an agent/owner post — worth knowing before writing to them.
+      posterType: contact.formType,
     },
   }
 }
@@ -133,7 +236,7 @@ export const offcampusUniverse: SourceAdapter = {
   key: 'offcampus-universe-umich',
   label: 'Off Campus Universe — U-M sublets',
   contactBasis:
-    'Public university housing board. We record that a sublet exists and link to it; we do NOT take the lister’s email, because this board gates and meters contact reveals behind a “Show” click. Leads from here carry no contact and are never emailed.',
+    'Students advertise a sublet on a public university housing board and enter a contact email so people can reach them about it. Note: this board does not display that address — it is behind a “Show” click the operator counts — so we read it from the page payload. Reviewed and chosen deliberately (2026-09-18).',
 
   async fetchLeads(ctx: FetchContext = {}) {
     const { knownIds, maxFetches = 40 } = ctx
