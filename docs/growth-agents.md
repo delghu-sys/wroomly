@@ -79,6 +79,18 @@ Only sources where **posting is itself an invitation to be contacted** qualify.
 That was a deliberate scoping decision (2026-09-18) and it is the reason the
 outreach email can honestly say "we saw your post".
 
+A source can also be **discovery-only**: if a board gates or meters contact
+details, the adapter records the listing and links to it but returns no
+`contactEmail`, so the outreach agent skips those leads as `no-contact-email`.
+`offcampus-universe` works this way — see below.
+
+## Sources
+
+| Key | What it yields |
+|---|---|
+| `cmb-resident-sublets` | Residents' posts on CMB's board. Emails **are** printed on the page by the residents themselves, so leads carry a contact and can be emailed. |
+| `offcampus-universe-umich` | U-M **sublets only** from offcampus-universe.com, via its sitemap (131 U-M listings; lease type read from each page's own `<meta description>`). **Discovery-only — no emails.** That board hides the lister's address behind a "Show" click and counts those clicks (`showEmailClicks`), so taking it would mean working around the operator's gate. Leads arrive with a link; contact happens through the site. |
+
 ## Known gaps
 
 - **No DMCA agent registered.** Deliberate, but it means there is no §512 safe

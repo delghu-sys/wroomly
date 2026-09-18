@@ -8,6 +8,7 @@ import {
   claimTokenExpiry,
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
+import { offcampusUniverse } from './sources/offcampus-universe.ts'
 
 /**
  * The three agents as plain functions, so ONE implementation serves both the
@@ -26,7 +27,7 @@ import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = SupabaseClient<any, 'public', any>
 
-export const SOURCES: SourceAdapter[] = [cmbResidentSublets]
+export const SOURCES: SourceAdapter[] = [cmbResidentSublets, offcampusUniverse]
 
 // ── discover ────────────────────────────────────────────────────────────────
 
@@ -65,9 +66,20 @@ export async function runDiscover(
     }
     results.push(r)
 
+    // Hand the adapter what we already hold so it can skip those BEFORE
+    // fetching. For a sitemap-driven source that is the difference between one
+    // request per run and a hundred.
+    const { data: known } = await db
+      .from('sourced_leads')
+      .select('source_external_id')
+      .eq('source', adapter.key)
+    const knownIds = new Set(
+      (known ?? []).map((r: { source_external_id: string }) => r.source_external_id),
+    )
+
     let raw
     try {
-      raw = await adapter.fetchLeads()
+      raw = await adapter.fetchLeads({ knownIds })
     } catch (err) {
       r.error = err instanceof Error ? err.message : String(err)
       continue
