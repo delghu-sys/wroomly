@@ -20,6 +20,18 @@ export interface RawLead {
   extracted?: Record<string, unknown>
 }
 
+export interface FetchContext {
+  /**
+   * `sourceExternalId`s we already hold for this source. An adapter that can
+   * cheaply tell which posts are new (e.g. from a sitemap) SHOULD skip the
+   * known ones rather than re-fetching them — that is the difference between
+   * hitting someone's site once per run and hitting it a hundred times.
+   */
+  knownIds?: Set<string>
+  /** Upper bound on network requests for one run. Adapters must respect it. */
+  maxFetches?: number
+}
+
 export interface SourceAdapter {
   /** Stable, lowercase; stored on every lead. Changing it orphans dedupe. */
   key: string
@@ -27,7 +39,7 @@ export interface SourceAdapter {
   /** Why contacting people from this source is legitimate. Shown in the admin
    *  queue so the justification travels with the data. */
   contactBasis: string
-  fetchLeads(): Promise<RawLead[]>
+  fetchLeads(ctx?: FetchContext): Promise<RawLead[]>
 }
 
 /** Drop leads an adapter shouldn't have returned, so one bad adapter can't
