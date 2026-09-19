@@ -5,6 +5,8 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { format, parseISO } from 'date-fns'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { AgentDraftEditor } from '@/components/admin/AgentDraftEditor'
+import { leadToExtractedDraft } from '@/lib/agents/to-draft'
+import { SOURCES } from '@/lib/agents/runner'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 
 export const metadata: Metadata = {
@@ -141,12 +143,33 @@ export default async function AdminAgentLeadPage({
         </p>
       ) : (
         <div className="rounded-3xl border border-line bg-surface p-5 sm:p-6 mt-4">
-          <AgentDraftEditor
-            importRequestId={req.id}
-            draft={req.extracted_data as ExtractedListingDraft}
-          />
+          <AgentDraftEditor importRequestId={req.id} draft={toSafeDraft(req.extracted_data, lead)} />
         </div>
       )}
     </div>
   )
+}
+
+/**
+ * Defence in depth against the exact bug this page was built to fix (see
+ * scripts/agents/backfill-stale-drafts.mjs): a draft with no `photos` array
+ * previously crashed here, because AgentDraftEditor/ClaimReview both read it
+ * unconditionally. If the stored data is ever malformed again — a future bug,
+ * a manual DB edit, a row from before this pipeline existed — reconstruct a
+ * valid draft from the lead's own fields on the fly rather than throwing.
+ * Purely a display fallback; nothing is written back unless the admin saves.
+ */
+function toSafeDraft(
+  extracted_data: unknown,
+  lead: { source: string; title: string | null; contact_email: string | null; extracted: unknown },
+): ExtractedListingDraft {
+  if (extracted_data && Array.isArray((extracted_data as { photos?: unknown }).photos)) {
+    return extracted_data as ExtractedListingDraft
+  }
+  return leadToExtractedDraft({
+    title: lead.title,
+    sourceLabel: SOURCES.find(s => s.key === lead.source)?.label ?? lead.source,
+    contactEmail: lead.contact_email ?? '',
+    extracted: (extracted_data ?? lead.extracted ?? {}) as Record<string, unknown>,
+  })
 }
