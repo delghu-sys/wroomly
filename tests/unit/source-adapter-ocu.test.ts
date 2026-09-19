@@ -69,27 +69,34 @@ test('a sublet produces a lead with facts and a link', () => {
 
 // ── contact extraction ───────────────────────────────────────────────────────
 // These fixtures mirror the REAL payload shape, confirmed against a live page
-// on 2026-09-18: records live under recordsByCollectionId → ApartmentListings
-// keyed by id, each carrying its own `slug`; quotes are escaped once (\") while
-// slashes are escaped twice (\\/). All people and addresses are invented.
+// on 2026-09-18 (two earlier fixture-shapes each looked right and were wrong on
+// a real page — see the comment above extractContact for what each got wrong).
+// Records live at a FIXED structural location —
+//   "recordsByCollectionId":{"ApartmentListings":{"<id>":{ ...record... }}}
+// — which Wix populates with exactly the current page's own item (pageSize: 1
+// in the page's routing config). Quotes are escaped once (\") while slashes are
+// escaped twice (\\/). All people and addresses below are invented.
 
 const esc = (o: Record<string, string>) =>
   '{' + Object.entries(o).map(([k, v]) => `\\"${k}\\":\\"${v.split('/').join('\\\\/')}\\"`).join(',') + '}'
 
-/** A page with an ApartmentListings block, plus the RoommateProfiles block the
- *  real pages also carry. */
-const pageWith = (listings: Record<string, string>[], roommates: Record<string, string>[] = []) =>
-  `<html><body>\\"recordsByCollectionId\\":{\\"ApartmentListings\\":{` +
-  listings.map(l => `\\"${l.slug}\\":${esc(l)}`).join(',') +
-  `},\\"RoommateProfiles\\":{` +
-  roommates.map((r, i) => `\\"rp${i}\\":${esc(r)}`).join(',') +
-  `}}</body></html>`
+/** A page whose CURRENT-ITEM record is `record`. `elsewhere` simulates other
+ *  JSON blobs on the page (other collections, "similar listings", etc.) that
+ *  must never be read — only the fixed marker location may be. */
+const pageWith = (record: Record<string, string> | null, elsewhere = '') =>
+  `<html><body>` +
+  (record
+    ? `\\"recordsByCollectionId\\":{\\"ApartmentListings\\":{\\"rec-id\\":${esc(record)}}}`
+    : '') +
+  elsewhere +
+  `</body></html>`
 
 test('reads the poster’s contact from the escaped payload', () => {
-  const html = pageWith([
-    { slug: '1b1b-sublease-beekman', typeOfLease: 'Sub Lease', contactName: 'Ada Lovelace', email: 'Ada@Example.com', formType: 'Student', timingOfLease: 'January - May', bedroom: '1', bathroom: '1' },
-  ])
-  const c = extractContact(html, '1b1b-sublease-beekman')
+  const html = pageWith({
+    typeOfLease: 'Sub Lease', contactName: 'Ada Lovelace', email: 'Ada@Example.com',
+    formType: 'Student', timingOfLease: 'January - May', bedroom: '1', bathroom: '1',
+  })
+  const c = extractContact(html)
   assert.equal(c.email, 'ada@example.com', 'lower-cased for suppression matching')
   assert.equal(c.contactName, 'Ada Lovelace')
   assert.equal(c.formType, 'Student')
@@ -97,60 +104,55 @@ test('reads the poster’s contact from the escaped payload', () => {
   assert.equal(c.bedrooms, '1')
 })
 
-test('handles a slug-bearing record whose values contain escaped slashes', () => {
-  const html = pageWith([
-    { slug: 'verve-3-bed4-bath-sublease-abc', typeOfLease: 'Sub Lease', email: 'grace@example.com', timingOfLease: '9/1 - 8/13' },
-  ])
-  const c = extractContact(html, 'verve-3-bed4-bath-sublease-abc')
+test('handles values containing escaped slashes', () => {
+  const html = pageWith({ typeOfLease: 'Sub Lease', email: 'grace@example.com', timingOfLease: '9/1 - 8/13' })
+  const c = extractContact(html)
   assert.equal(c.email, 'grace@example.com')
   assert.equal(c.timingOfLease, '9/1 - 8/13')
 })
 
-test('NEVER takes a neighbouring listing’s address', () => {
-  // Pages embed several listings. Picking the wrong one would mean emailing a
+test('NEVER reads a record sitting outside the current-item marker', () => {
+  // A page can carry other JSON blobs — other collections, "similar listings",
+  // whatever else Wix bundles. Picking one of those would mean emailing a
   // stranger about someone else's flat — the worst failure this pipeline has.
-  const html = pageWith([
-    { slug: 'someone-else', typeOfLease: 'Sub Lease', email: 'victim@example.com', contactName: 'Not Ours' },
-    { slug: 'ours', typeOfLease: 'Sub Lease', email: 'ours@example.com' },
-    { slug: 'another', typeOfLease: 'Year Lease (12 Months)', email: 'other@example.com' },
-  ])
-  const c = extractContact(html, 'ours')
-  assert.equal(c.email, 'ours@example.com')
+  // Only the fixed recordsByCollectionId.ApartmentListings location may be read.
+  const elsewhere = `,\\"someOtherBlob\\":{\\"typeOfLease\\":\\"Sub Lease\\",\\"email\\":\\"victim@example.com\\"}`
+  const html = pageWith({ typeOfLease: 'Sub Lease', email: 'ours@example.com' }, elsewhere)
+  assert.equal(extractContact(html).email, 'ours@example.com')
 })
 
-test('NEVER takes an email from the RoommateProfiles collection', () => {
-  // Those are students LOOKING for a room — they advertised nothing and must
-  // never be contacted from here. Only ApartmentListings carry typeOfLease.
-  const html = pageWith(
-    [{ slug: 'no-contact-listing', typeOfLease: 'Sub Lease' }],
-    [{ slug: 'no-contact-listing', email: 'roommate@example.com', aboutMe: 'Looking for a room', major: 'CS' }],
-  )
-  const c = extractContact(html, 'no-contact-listing')
-  assert.equal(c.email, undefined, 'must not borrow a roommate profile’s address')
+test('the price cross-check rejects a mismatched record rather than trust it', () => {
+  // Independent safety net: the record's own price must agree with what THIS
+  // page's <meta description> states (parsed separately, from plain HTML). A
+  // mismatch means the structural anchor found the wrong thing.
+  const html = pageWith({ typeOfLease: 'Sub Lease', email: 'x@example.com', price: '1650' })
+  assert.equal(extractContact(html, '1650').email, 'x@example.com', 'matching price is accepted')
+  assert.equal(extractContact(html, '2000').email, undefined, 'mismatched price is rejected')
+  assert.equal(extractContact(html).email, 'x@example.com', 'no expected price = no check, still works')
 })
 
 test('returns nothing when the record has no email, rather than borrowing one', () => {
-  const html = pageWith([
-    { slug: 'no-contact', typeOfLease: 'Sub Lease' },
-    { slug: 'different', typeOfLease: 'Sub Lease', email: 'someone@example.com' },
-  ])
-  assert.equal(extractContact(html, 'no-contact').email, undefined)
+  const html = pageWith({ typeOfLease: 'Sub Lease' }, `,\\"other\\":{\\"email\\":\\"someone@example.com\\"}`)
+  assert.equal(extractContact(html).email, undefined)
 })
 
-test('returns nothing when the slug is absent or unmatched', () => {
-  assert.deepEqual(extractContact('<html></html>', 'missing'), {})
-  assert.deepEqual(extractContact('<html></html>', ''), {})
+test('returns nothing when the marker or the typeOfLease guard is missing', () => {
+  assert.deepEqual(extractContact('<html></html>'), {})
+  // A record at the marker with no typeOfLease (e.g. a malformed/partial
+  // record) must not be treated as a listing.
+  assert.deepEqual(extractContact(pageWith({ email: 'x@example.com' })), {})
 })
 
 test('rejects a malformed address rather than passing it on', () => {
-  const html = pageWith([{ slug: 'x', typeOfLease: 'Sub Lease', email: 'not-an-email' }])
-  assert.equal(extractContact(html, 'x').email, undefined)
+  const html = pageWith({ typeOfLease: 'Sub Lease', email: 'not-an-email' })
+  assert.equal(extractContact(html).email, undefined)
 })
 
 test('a sublet lead carries the contact through to the lead', () => {
-  const body = pageWith([
-    { slug: 'sublease-landmark', typeOfLease: 'Sub Lease', email: 'katherine@example.com', contactName: 'Katherine J', formType: 'Student', timingOfLease: 'Jan to Aug 2027' },
-  ])
+  const body = pageWith({
+    typeOfLease: 'Sub Lease', email: 'katherine@example.com', contactName: 'Katherine J',
+    formType: 'Student', timingOfLease: 'Jan to Aug 2027', price: '1500',
+  })
   const html =
     `<html><head><title>Sublease at Landmark | Ann Arbor Universe Housing</title>` +
     `<meta name="description" content="Sub Lease apartment at Sublease at Landmark, listed at $1,500  on Ann Arbor Universe Housing"/></head>` +
@@ -159,6 +161,19 @@ test('a sublet lead carries the contact through to the lead', () => {
   assert.equal(lead?.contactEmail, 'katherine@example.com')
   assert.equal(lead?.extracted?.posterType, 'Student')
   assert.equal(lead?.extracted?.dates, 'Jan to Aug 2027')
+})
+
+test('a lead is still produced (without contact) when the price cross-check fails', () => {
+  // The listing itself is real — facts come from meta tags independently of
+  // the contact lookup — only the contact is withheld when something looks off.
+  const body = pageWith({ typeOfLease: 'Sub Lease', email: 'x@example.com', price: '999' })
+  const html =
+    `<html><head><title>Mismatch Listing | Ann Arbor Universe Housing</title>` +
+    `<meta name="description" content="Sub Lease apartment at Mismatch Listing, listed at $1,500  on Ann Arbor Universe Housing"/></head>` +
+    body
+  const lead = toLead(html, { id: 'mismatch-listing', url: 'https://example.test/l' })
+  assert.ok(lead, 'the listing itself is still recorded')
+  assert.equal(lead.contactEmail, undefined, 'but the mismatched contact is withheld')
 })
 
 test('never carries image data', () => {
