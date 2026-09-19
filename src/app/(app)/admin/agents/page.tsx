@@ -6,7 +6,9 @@ import { format, parseISO } from 'date-fns'
 import { ArrowLeft, Bot, ExternalLink } from 'lucide-react'
 import { EmptyState } from '@/components/brand/EmptyState'
 import { AgentsConsole } from '@/components/admin/AgentsConsole'
+import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor'
 import { SOURCES } from '@/lib/agents/runner'
+import { DEFAULT_TEMPLATE, type OutreachTemplate } from '@/lib/agents/outreach-template'
 
 export const metadata: Metadata = {
   title: 'Admin: Growth agents',
@@ -52,7 +54,7 @@ export default async function AdminAgentsPage() {
   // Both tables are service-role only (RLS-on, zero policies) — this is the
   // one place they are read for a human.
   const service = createServiceClient()
-  const [leadsRes, supsRes] = await Promise.all([
+  const [leadsRes, supsRes, templateRes] = await Promise.all([
     service
       .from('sourced_leads')
       .select(
@@ -61,6 +63,7 @@ export default async function AdminAgentsPage() {
       .order('discovered_at', { ascending: false })
       .limit(200),
     service.from('outreach_suppressions').select('email', { count: 'exact', head: true }),
+    service.from('outreach_template').select('subject, body').eq('id', 'default').maybeSingle(),
   ])
 
   // Migration 042 not applied yet → the table doesn't exist. Say so instead
@@ -70,6 +73,12 @@ export default async function AdminAgentsPage() {
   const counts = { new: 0, drafted: 0, contacted: 0, skipped: 0 }
   for (const l of leads) counts[l.status] += 1
   const optedOut = supsRes.count ?? 0
+
+  // Migration 043 (outreach_template) is separate and optional to the rest of
+  // this page — falls back to the built-in default rather than blocking
+  // everything else, same fallback loadOutreachTemplate() uses at send time.
+  const missingTemplateTable = templateRes.error?.code === '42P01'
+  const template = (templateRes.data as OutreachTemplate | null) ?? DEFAULT_TEMPLATE
 
   const tiles = [
     { label: 'New leads', value: counts.new },
@@ -127,6 +136,20 @@ export default async function AdminAgentsPage() {
           <AgentsConsole
             sources={SOURCES.map(s => ({ key: s.key, label: s.label, contactBasis: s.contactBasis }))}
           />
+
+          <section className="mt-8">
+            {missingTemplateTable ? (
+              <div className="rounded-3xl border border-dashed border-line bg-surface/60 px-6 py-6 text-[14px] text-ink-soft leading-relaxed">
+                <p className="font-medium text-ink mb-1">Migration 043 hasn&rsquo;t been applied yet.</p>
+                <p>
+                  Paste <code className="font-mono text-[13px]">supabase/migrations/043_outreach_template.sql</code>{' '}
+                  to edit the outreach email here. It sends the built-in default until then.
+                </p>
+              </div>
+            ) : (
+              <EmailTemplateEditor initial={template} />
+            )}
+          </section>
 
           <section className="mt-10">
             <h2 className="font-display text-xl tracking-tight text-ink mb-4">Leads</h2>

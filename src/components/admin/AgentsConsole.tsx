@@ -164,6 +164,15 @@ function ResultPanel({ action, result }: { action: Action; result: AnyResult }) 
             {r.execute && !r.enabled && (
               <p className="text-red-600">Nothing sent: OUTREACH_ENABLED is not &ldquo;true&rdquo; in the server environment.</p>
             )}
+            {r.sample && (
+              <div className="mt-2 rounded-xl border border-line bg-surface p-3">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-ink-muted font-semibold mb-1.5">
+                  {r.execute ? 'What was sent (first recipient)' : 'What would be sent (next up)'}
+                </p>
+                <p className="text-ink font-medium mb-1">{r.sample.subject}</p>
+                <p className="text-ink-soft whitespace-pre-wrap text-[12.5px] leading-relaxed">{r.sample.text}</p>
+              </div>
+            )}
           </>
         )
       })()}

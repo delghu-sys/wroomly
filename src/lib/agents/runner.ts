@@ -10,6 +10,7 @@ import {
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse } from './sources/offcampus-universe.ts'
 import { leadToExtractedDraft, type AnyExtracted } from './to-draft.ts'
+import { buildOutreachEmail, DEFAULT_TEMPLATE, type OutreachTemplate } from './outreach-template.ts'
 
 /**
  * The three agents as plain functions, so ONE implementation serves both the
@@ -253,38 +254,24 @@ export interface OutreachResult {
   sent: number
   skipped: Partial<Record<SkipReason, number>>
   errors: string[]
+  /** The FULL rendered email (subject + text) for the first planned
+   *  recipient, real claim link included — rendered on every call, execute
+   *  or not, so Preview answers "what will this actually say" directly
+   *  rather than just a count. Null when nothing is queued to send. */
+  sample: { subject: string; text: string } | null
 }
 
-// CAN-SPAM requires a real postal address in every commercial message.
-const POSTAL = 'Wroomly LLC, 1912 Geddes Ave, Ann Arbor, MI 48104'
-
-export function outreachBody({
-  title,
-  claimUrl,
-  unsubUrl,
-}: {
-  title: string
-  claimUrl: string
-  unsubUrl: string
-}): string {
-  // Plain, honest, and short. It says where we saw them, what we made, that it
-  // is not public, and how to make it stop — in the first screenful.
-  return `Hi,
-
-We saw your sublet post ("${title}") on the Ann Arbor sublet board.
-
-Wroomly is a free sublet marketplace for the U-M community. We've pre-filled a
-listing draft from your post so you don't have to retype it. It is NOT public —
-nobody can see it unless you claim it and publish it yourself:
-
-${claimUrl}
-
-The link works for 7 days. If you're not interested, ignore this and nothing
-happens: the draft expires unpublished and we won't email you again.
-
-Never want to hear from us? ${unsubUrl}
-
-${POSTAL}`
+/** The template row is service-role only, same as everything else here. Falls
+ *  back to DEFAULT_TEMPLATE when nothing has been saved yet — outreach must
+ *  never fail (or send blank emails) just because no one has visited the
+ *  editor. Exported so the admin API can load the same row the same way. */
+export async function loadOutreachTemplate(db: Db): Promise<OutreachTemplate> {
+  const { data } = await db
+    .from('outreach_template')
+    .select('subject, body')
+    .eq('id', 'default')
+    .maybeSingle()
+  return data ?? DEFAULT_TEMPLATE
 }
 
 type LeadForOutreach = OutreachCandidate & {
@@ -311,7 +298,9 @@ export async function runOutreach(
     sent: 0,
     skipped: {},
     errors: [],
+    sample: null,
   }
+  const template = await loadOutreachTemplate(db)
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const [{ data: candidates, error }, { data: sups }, { count }] = await Promise.all([
@@ -342,6 +331,25 @@ export async function runOutreach(
   out.planned = plan.send.length
   for (const s of plan.skipped) out.skipped[s.reason] = (out.skipped[s.reason] ?? 0) + 1
 
+  // A real preview of the actual next email — computed on EVERY call,
+  // Preview included, so "what will this say" is answered directly rather
+  // than only a count. The claim link is the real one that lead will get.
+  const first = plan.send[0] as LeadForOutreach | undefined
+  const firstToken = first?.extracted?._claimToken
+  if (first && typeof firstToken === 'string' && firstToken) {
+    try {
+      out.sample = buildOutreachEmail(template, {
+        title: first.title ?? 'your sublet',
+        claimUrl: `${origin}/claim-listing/${firstToken}`,
+        unsubUrl: unsubscribeUrl(first.contact_email as string, origin),
+      })
+    } catch (err) {
+      // OUTREACH_SECRET missing — real sends will fail too, but a broken
+      // preview must not hide the counts above it.
+      out.errors.push(err instanceof Error ? err.message : String(err))
+    }
+  }
+
   // Two independent switches before a single email goes out.
   if (!execute || !enabled) return out
 
@@ -361,17 +369,14 @@ export async function runOutreach(
       break
     }
 
+    const email = buildOutreachEmail(template, {
+      title: c.title ?? 'your sublet',
+      claimUrl: `${origin}/claim-listing/${token}`,
+      unsubUrl,
+    })
+
     try {
-      await send({
-        to,
-        subject: 'A listing draft for your Ann Arbor sublet (not published)',
-        text: outreachBody({
-          title: c.title ?? 'your sublet',
-          claimUrl: `${origin}/claim-listing/${token}`,
-          unsubUrl,
-        }),
-        listUnsubscribe: unsubUrl,
-      })
+      await send({ to, subject: email.subject, text: email.text, listUnsubscribe: unsubUrl })
     } catch (err) {
       out.errors.push(`send failed for lead ${c.id}: ${err instanceof Error ? err.message : String(err)}`)
       continue
