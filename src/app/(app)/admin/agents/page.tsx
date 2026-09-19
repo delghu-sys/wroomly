@@ -161,7 +161,18 @@ export default async function AdminAgentsPage() {
                             <p className="text-[11px] text-ink-muted mt-1">{l.skip_reason}</p>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-ink">{l.title ?? '—'}</td>
+                        <td className="px-5 py-3 text-ink">
+                          {l.import_request_id ? (
+                            <Link
+                              href={`/admin/agents/${l.id}`}
+                              className="text-navy hover:text-ink underline underline-offset-2"
+                            >
+                              {l.title ?? 'Untitled'}
+                            </Link>
+                          ) : (
+                            l.title ?? '—'
+                          )}
+                        </td>
                         <td className="px-5 py-3 text-ink-soft">{l.contact_email ?? <span className="text-ink-muted">none published</span>}</td>
                         <td className="px-5 py-3 text-ink-soft">
                           {l.source_url ? (

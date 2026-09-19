@@ -9,6 +9,7 @@ import {
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse } from './sources/offcampus-universe.ts'
+import { leadToExtractedDraft, type AnyExtracted } from './to-draft.ts'
 
 /**
  * The three agents as plain functions, so ONE implementation serves both the
@@ -181,6 +182,12 @@ export async function runDraft(
     }
 
     const token = generateClaimToken()
+    const draft = leadToExtractedDraft({
+      title: lead.title,
+      sourceLabel: SOURCES.find(s => s.key === lead.source)?.label ?? lead.source,
+      contactEmail: lead.contact_email,
+      extracted: lead.extracted as AnyExtracted,
+    })
     const { data: req, error: reqErr } = await db
       .from('listing_import_requests')
       .insert({
@@ -189,8 +196,14 @@ export async function runDraft(
         // Facts only. `consent_confirmed` stays FALSE: the resident has not
         // agreed to anything yet — claiming the draft is that consent.
         consent_confirmed: false,
-        status: 'pending',
-        extracted_data: { ...lead.extracted, sourcedFrom: lead.source, title: lead.title },
+        // 'completed', NOT 'pending': agent-sourced drafts skip the AI
+        // importer's awaiting_admin_review -> approve step entirely (that step
+        // mints its own token and sends its own email — this pipeline already
+        // owns both, via outreach.mjs). The claim page requires status ===
+        // 'completed' before it will render anything; leaving this as
+        // 'pending' meant every claim link this agent ever sent 404'd.
+        status: 'completed',
+        extracted_data: draft,
         claim_token_hash: hashClaimToken(token),
         claim_token_expires_at: claimTokenExpiry().toISOString(),
       })
