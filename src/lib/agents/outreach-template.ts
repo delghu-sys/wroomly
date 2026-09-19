@@ -30,8 +30,8 @@ export const DEFAULT_TEMPLATE: OutreachTemplate = {
 We saw your sublet post ("{{title}}") on the Ann Arbor sublet board.
 
 Wroomly is a free sublet marketplace for the U-M community. We've pre-filled a
-listing draft from your post so you don't have to retype it. It is NOT public —
-nobody can see it unless you claim it and publish it yourself:
+listing draft from your post so you don't have to retype it. It is NOT public,
+and nobody can see it unless you claim it and publish it yourself:
 
 {{claimUrl}}
 

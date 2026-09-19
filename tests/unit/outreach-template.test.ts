@@ -82,6 +82,11 @@ test('the default template uses both placeholders (a template missing claimUrl w
   assert.ok(used.has('claimUrl'))
 })
 
+test('the default template has no em dash — reads like a person wrote it, not an AI', () => {
+  assert.ok(!DEFAULT_TEMPLATE.subject.includes('—'))
+  assert.ok(!DEFAULT_TEMPLATE.body.includes('—'))
+})
+
 test('a body with no {{claimUrl}} still builds an email — link just never appears (the UI warns, not blocks)', () => {
   const email = buildOutreachEmail({ subject: 'x', body: 'Hi {{title}}, no link here.' } satisfies OutreachTemplate, {
     ...vars,
