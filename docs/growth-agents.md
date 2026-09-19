@@ -108,6 +108,18 @@ practical consequences worth remembering:
 Revisit this first if Off Campus Universe objects or a data partnership is
 offered.
 
+### Why discovery fetches only 10 pages by default
+
+Each detail page is ~2.4MB, and the admin console runs discovery inside a
+serverless function capped at 60s (`maxDuration` in
+`api/admin/agents/route.ts`). A batch of 40 measured well over 2 minutes in
+testing — that's what "Run failed" was. `maxFetches` defaults to 10, which
+measured ~33s end to end, and `fetchLeads` also stops itself early past a 45s
+internal budget as a second, independent guard against a slow day. Discovery
+is idempotent (`knownIds`), so a smaller batch just means the backlog clears
+over a few runs instead of one — which is also kinder to someone else's site
+than a 40-page burst every click.
+
 ## Known gaps
 
 - **No DMCA agent registered.** Deliberate, but it means there is no §512 safe

@@ -123,22 +123,46 @@ function objectAround(text: string, at: number): string | null {
  * Pull the poster's contact out of the page's embedded record.
  *
  * The payload is JSON string-escaped into the HTML at an inconsistent depth, so
- * parsing it as JSON is unreliable — instead we read the fields directly, with
- * patterns tolerant of `"x"` and `\"x\"`.
+ * parsing it as JSON is unreliable — instead we read fields directly, with the
+ * escaping collapsed first (see below).
  *
- * Staying inside the RIGHT record is the whole problem. A page embeds the
- * records of neighbouring listings AND a `RoommateProfiles` collection holding
- * the personal emails of students LOOKING for a room. Grabbing the wrong one
- * would mean emailing a stranger about someone else's flat — the worst failure
- * this pipeline could have. Two defences, both load-bearing:
- *   1. anchor on the record's own `slug`, which equals the URL slug, and
- *      brace-match that object's exact extent;
- *   2. require `typeOfLease` on the matched object — only ApartmentListings
- *      records have it, so a roommate profile can never satisfy it.
+ * Staying inside the RIGHT record is the whole problem, and it took two failed
+ * approaches to get right:
+ *
+ *   1st attempt — anchor on the record's own `title` field. Wrong: the listing
+ *   title isn't stored under a `title` key at all; that key appears 400+ times
+ *   per page for unrelated things. Passed a fixture that only *looked* right,
+ *   then extracted nothing from a real page.
+ *
+ *   2nd attempt — anchor on `"slug":"<url-slug>"`. Half right: about half of
+ *   real listings have a URL whose slug differs from the record's own `slug`
+ *   field (the friendly URL and the stored slug can diverge), so this matched
+ *   nothing for that half. Where it DID match something, it could just as
+ *   easily have matched a different `slug` field belonging to a nested image
+ *   object — the guard below caught that (no `typeOfLease` on an image object)
+ *   and correctly returned nothing rather than the wrong contact, but "return
+ *   nothing" for half of real listings is still a bug worth fixing.
+ *
+ * What actually works: Wix embeds the CURRENT dynamic page's own item at a
+ * fixed, structural location — `"recordsByCollectionId":{"ApartmentListings":
+ * {"<id>":{ ...this listing's own record... }}}` — and the page's own routing
+ * config sets `pageSize: 1` for that collection, so exactly one record lives
+ * there. This needs no value to match against; it identifies the record by
+ * WHERE it is, not by hoping some field equals something we already know.
+ *
+ * Two defences remain, both load-bearing:
+ *   1. require `typeOfLease` on the matched object — only ApartmentListings
+ *      records have it, so the `RoommateProfiles` collection (personal emails
+ *      of students LOOKING for a room — must never be contacted) can't satisfy
+ *      it even if the structural anchor were ever wrong;
+ *   2. cross-check the record's own `price` against the price this SAME page
+ *      states in its `<meta description>` (parsed independently, from plain
+ *      HTML, by `parseListingFacts`). A mismatch means the anchor found the
+ *      wrong thing, and we return nothing rather than risk emailing a
+ *      stranger about someone else's flat — the worst failure this pipeline
+ *      could have.
  */
-export function extractContact(html: string, slug: string): ListingContact {
-  if (!slug) return {}
-
+export function extractContact(html: string, expectedPrice?: string): ListingContact {
   // Collapse ANY run of backslashes before a quote or slash. The payload is
   // escaped unevenly — quotes arrive as \" but slashes as \\/ — so handling
   // exactly one level leaves a stray backslash mid-value and nothing matches.
@@ -146,20 +170,23 @@ export function extractContact(html: string, slug: string): ListingContact {
   // read with regexes below rather than JSON.parse (which fails on this input).
   const flat = html.replace(/\\+"/g, '"').replace(/\\+\//g, '/')
 
-  // Anchor on `slug`, NOT the title: the listing title is not stored under a
-  // `title` key at all, and `"title":` appears 400+ times per page for
-  // unrelated things. Learned by testing against a real page after a fixture
-  // that only looked right.
-  const at = flat.search(new RegExp(`"slug":"${escapeRegex(slug)}"`))
-  if (at < 0) return {}
+  const marker = '"recordsByCollectionId":{"ApartmentListings":{"'
+  const markerAt = flat.indexOf(marker)
+  if (markerAt < 0) return {}
+  // Right after the marker is `<id>":{` — the record's own opening brace.
+  const braceAt = flat.indexOf('{', markerAt + marker.length)
+  if (braceAt < 0) return {}
 
-  const record = objectAround(flat, at)
+  const record = objectAround(flat, braceAt)
   if (!record || !/"typeOfLease":"/.test(record)) return {}
 
   const read = (name: string): string | undefined =>
     record.match(new RegExp(`"${name}":"([^"]{1,160})"`))?.[1]?.trim() || undefined
   const readNum = (name: string): string | undefined =>
     read(name) ?? record.match(new RegExp(`"${name}":([0-9.]{1,8})`))?.[1]
+
+  const recordPrice = readNum('price')
+  if (expectedPrice && recordPrice && recordPrice !== expectedPrice) return {}
 
   const email = read('email')?.toLowerCase()
   return {
@@ -170,10 +197,6 @@ export function extractContact(html: string, slug: string): ListingContact {
     bedrooms: readNum('bedroom'),
     bathrooms: readNum('bathroom'),
   }
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 /**
@@ -207,7 +230,7 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
   const facts = parseListingFacts(html)
   if (!isSublet(facts.leaseType)) return null
 
-  const contact = extractContact(html, id)
+  const contact = extractContact(html, facts.price)
   return {
     sourceExternalId: id,
     sourceUrl: url,
@@ -239,7 +262,19 @@ export const offcampusUniverse: SourceAdapter = {
     'Students advertise a sublet on a public university housing board and enter a contact email so people can reach them about it. Note: this board does not display that address — it is behind a “Show” click the operator counts — so we read it from the page payload. Reviewed and chosen deliberately (2026-09-18).',
 
   async fetchLeads(ctx: FetchContext = {}) {
-    const { knownIds, maxFetches = 40 } = ctx
+    // Small on purpose. The admin console runs this inside a serverless
+    // function capped at 60s total (see api/admin/agents/route.ts), and each
+    // detail page is ~2.4MB — a batch of 40 measured well over 2 minutes
+    // locally with no other load, which is exactly the "Run failed" a full
+    // batch produced in practice. Discovery is idempotent (knownIds), so a
+    // smaller batch just means the backlog clears over a few runs instead of
+    // one — which is also kinder to someone else's site than a 40-page burst.
+    const { knownIds, maxFetches = 10 } = ctx
+    // Second, independent guard: stop early if we're approaching the time
+    // budget, so an unusually slow network degrades to fewer results instead
+    // of the whole request being killed with nothing returned.
+    const budgetMs = 45_000
+    const startedAt = Date.now()
 
     const all = umichListingUrls(await getText(SITEMAP_URL))
     // Skip what we already hold BEFORE fetching. Sitemaps list newest last, so
@@ -248,6 +283,7 @@ export const offcampusUniverse: SourceAdapter = {
 
     const leads: RawLead[] = []
     for (const listing of todo) {
+      if (Date.now() - startedAt > budgetMs) break
       try {
         const lead = toLead(await getText(listing.url), listing)
         if (lead) leads.push(lead) // null = not a sublet
