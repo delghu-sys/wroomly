@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { format, parseISO } from 'date-fns'
-import { ArrowLeft, Bot, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Bot, ExternalLink, SquarePen } from 'lucide-react'
 import { EmptyState } from '@/components/brand/EmptyState'
 import { AgentsConsole } from '@/components/admin/AgentsConsole'
 import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor'
@@ -105,11 +105,8 @@ export default async function AdminAgentsPage() {
           <h1 className="font-display text-3xl tracking-tight text-ink">Growth agents</h1>
           <p className="text-ink-muted mt-1 max-w-2xl">
             Find sublets on boards that invite contact, prepare a claimable draft, and tell the person once. Nothing
-            here publishes a listing — only the owner can, by claiming it. Drafts show up in{' '}
-            <Link href="/admin/import-review" className="underline underline-offset-2 hover:text-ink">
-              AI imports
-            </Link>
-            .
+            here publishes a listing — only the owner can, by claiming it. Once a lead is drafted, click its title in
+            the table below to view and edit it.
           </p>
         </div>
       </div>
@@ -188,9 +185,10 @@ export default async function AdminAgentsPage() {
                           {l.import_request_id ? (
                             <Link
                               href={`/admin/agents/${l.id}`}
-                              className="text-navy hover:text-ink underline underline-offset-2"
+                              className="group/draft inline-flex items-center gap-1.5 text-navy hover:text-ink"
                             >
-                              {l.title ?? 'Untitled'}
+                              <span className="underline underline-offset-2">{l.title ?? 'Untitled'}</span>
+                              <SquarePen className="w-3.5 h-3.5 text-ink-muted group-hover/draft:text-ink shrink-0" />
                             </Link>
                           ) : (
                             l.title ?? '—'
