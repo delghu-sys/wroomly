@@ -23,15 +23,17 @@ const inputCls =
 const SAMPLE_VARS = {
   title: '2 Bed at Broadview Apartments',
   claimUrl: 'https://wroomly.app/claim-listing/•••••••••••••••••••••••',
-  unsubUrl: 'https://wroomly.app/api/outreach/unsubscribe?email=…&t=…',
 }
 
 /**
- * The one editable outreach email — subject + body — with a live preview and
- * the two things that could break outreach caught before Save, not after:
- * a missing {{claimUrl}} (the email would have no working link at all) and
- * the fixed footer, shown but never editable here, so it's obvious nothing
- * legally required can be stripped by an edit.
+ * The one editable outreach email — subject + body — with a live preview.
+ * Catches the one thing that could break outreach before Save, not after:
+ * a missing {{claimUrl}} (the email would have no working link at all).
+ *
+ * There is no footer here to warn about anymore — no unsubscribe link, no
+ * postal address. That was removed at Hugo's request on 2026-09-20 against
+ * the assistant's advice (CAN-SPAM requires both on commercial email); see
+ * outreach-template.ts for the full note.
  */
 export function EmailTemplateEditor({ initial }: Props) {
   const [template, setTemplate] = useState<OutreachTemplate>(initial)
@@ -106,10 +108,6 @@ export function EmailTemplateEditor({ initial }: Props) {
                 No <code>{'{{claimUrl}}'}</code> in the body — this email would have no working link.
               </p>
             )}
-          </div>
-          <div className="rounded-xl border border-line bg-navy-soft/30 px-3 py-2.5 text-[12px] text-ink-muted">
-            Always appended below, and not editable here: the one-click unsubscribe link and the
-            business postal address (CAN-SPAM requires both on every commercial email).
           </div>
           <button
             type="button"

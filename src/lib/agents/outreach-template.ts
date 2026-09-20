@@ -1,13 +1,18 @@
 /**
- * The outreach email: an admin-editable subject + body, with a FIXED footer
- * that can never be edited away.
+ * The outreach email: an admin-editable subject + body. No footer is
+ * appended in code.
  *
- * Split on purpose. `body` is what an admin can change from /admin/agents —
- * the actual pitch. The unsubscribe line, the "ignore this and it expires"
- * reassurance, and the CAN-SPAM postal address are appended in code and never
- * stored in the template row, so an edit (or a mistake) can never ship an
- * email missing the parts that are legally required or load-bearing for the
- * "one message, ever, with a working opt-out" promise this pipeline makes.
+ * NOTE: this used to always append an unsubscribe link + CAN-SPAM postal
+ * address, appended in code so an edit couldn't strip them. That footer was
+ * deliberately removed at Hugo's request (2026-09-20), against the
+ * assistant's advice — see the git history for `outreach-template.ts` if it
+ * ever needs restoring. Sending unsolicited commercial email without a
+ * working opt-out and a postal address is a CAN-SPAM violation with
+ * per-email fine exposure; this file no longer enforces either, so that
+ * exposure now sits wherever DEFAULT_TEMPLATE.body is sent from.
+ *
+ * `body` is what an admin can change from /admin/agents — the actual pitch.
+ * May reference {{title}} and {{claimUrl}}.
  *
  * Pure and dependency-free, like outreach-policy.ts: no server-only import,
  * so it can run in the admin API route, the CLI script, AND the client
@@ -19,9 +24,6 @@ export interface OutreachTemplate {
   /** The editable pitch. May reference {{title}} and {{claimUrl}}. */
   body: string
 }
-
-// CAN-SPAM requires a real postal address in every commercial message.
-const POSTAL = 'Wroomly LLC, 1912 Geddes Ave, Ann Arbor, MI 48104'
 
 export const DEFAULT_TEMPLATE: OutreachTemplate = {
   subject: 'A listing draft for your Ann Arbor sublet (not published)',
@@ -50,16 +52,15 @@ export function renderTemplate(
   return template.replace(PLACEHOLDER_PATTERN, (_, key: 'title' | 'claimUrl') => vars[key])
 }
 
-/** Full, ready-to-send email: the admin's body plus the fixed, non-editable
- *  footer (opt-out link + postal address). */
+/** Full, ready-to-send email: just the admin's body, rendered. No footer. */
 export function buildOutreachEmail(
   template: OutreachTemplate,
-  vars: { title: string; claimUrl: string; unsubUrl: string },
+  vars: { title: string; claimUrl: string },
 ): { subject: string; text: string } {
   const body = renderTemplate(template.body, vars).trimEnd()
   return {
     subject: template.subject,
-    text: `${body}\n\nNever want to hear from us? ${vars.unsubUrl}\n\n${POSTAL}`,
+    text: body,
   }
 }
 
