@@ -1,11 +1,17 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { sanitizeLeads, type SourceAdapter } from './source-adapter.ts'
-import { planOutreach, type OutreachCandidate, type SkipReason } from './outreach-policy.ts'
+import {
+  planOutreach,
+  normalizeEmail,
+  type OutreachCandidate,
+  type SkipReason,
+} from './outreach-policy.ts'
 import { unsubscribeUrl } from './unsubscribe-token.ts'
 import {
   generateClaimToken,
   hashClaimToken,
   claimTokenExpiry,
+  isClaimTokenExpired,
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse } from './sources/offcampus-universe.ts'
@@ -392,5 +398,164 @@ export async function runOutreach(
     out.sent += 1
   }
 
+  return out
+}
+
+// ── test send ───────────────────────────────────────────────────────────────
+
+type LeadWithSource = LeadForOutreach & { source: string; source_url: string | null }
+
+export interface TestSendCheck {
+  label: string
+  ok: boolean
+}
+
+export interface TestSendResult {
+  /** The lead whose email was reproduced. `contactDomain` only — the real
+   *  address is never returned to a caller, only its domain. */
+  lead: {
+    id: string
+    title: string | null
+    source: string
+    sourceUrl: string | null
+    contactDomain: string | null
+  } | null
+  /** Everything the claim page will check when the link is clicked, checked
+   *  BEFORE sending so a broken link is never mailed. */
+  linkChecks: TestSendCheck[]
+  email: { to: string; subject: string; text: string; listUnsubscribe: string } | null
+  sent: boolean
+  error?: string
+}
+
+/**
+ * Send ONE real outreach email to an address the caller controls.
+ *
+ * Everything is the real thing: the lead planOutreach() would mail first, the
+ * saved template, the body buildOutreachEmail() produces, that lead's live
+ * claim token, and the same List-Unsubscribe header. Only two things differ
+ * from a production send, both deliberate:
+ *
+ *   1. the recipient is `to`, not the lead's own address
+ *   2. the lead row is NOT mutated — not marked `contacted`, token not
+ *      dropped. A test must never burn a real lead: afterwards that person
+ *      can still be contacted for real, with a link that still works.
+ *
+ * Refuses to mail any address belonging to a lead, any suppressed address, or
+ * a claim link that would not resolve.
+ */
+export async function runTestSend(
+  db: Db,
+  {
+    to,
+    send,
+    execute,
+    leadId,
+    origin = 'https://wroomly.app',
+  }: { to: string; send: SendEmail; execute: boolean; leadId?: string; origin?: string },
+): Promise<TestSendResult> {
+  const out: TestSendResult = { lead: null, linkChecks: [], email: null, sent: false }
+  const target = normalizeEmail(to)
+  if (!target) return { ...out, error: 'No address given.' }
+
+  const [{ data: leads, error }, { data: sups }] = await Promise.all([
+    db
+      .from('sourced_leads')
+      .select(
+        'id, contact_email, status, import_request_id, outreach_sent_at, title, source, source_url, extracted',
+      )
+      .limit(200),
+    db.from('outreach_suppressions').select('email'),
+  ])
+  if (error) return { ...out, error: error.message }
+
+  const all = (leads ?? []) as LeadWithSource[]
+  const suppressed = (sups ?? []).map((s: { email: string }) => s.email)
+
+  // Never let a "test" become a real, unlogged send to a stranger.
+  if (all.some(l => normalizeEmail(l.contact_email) === target)) {
+    return { ...out, error: 'That address belongs to a real lead. Test sends go to your own inbox only.' }
+  }
+  if (suppressed.map(normalizeEmail).includes(target)) {
+    return { ...out, error: 'That address is on the suppression list.' }
+  }
+
+  const plan = planOutreach({
+    candidates: all.filter(l => l.status === 'drafted' && !l.outreach_sent_at),
+    suppressed,
+    sentInLastDay: 0,
+    dailyCap: 1000,
+  })
+  if (plan.send.length === 0) {
+    return { ...out, error: 'Nothing is queued — no drafted lead with a contact email.' }
+  }
+
+  const lead = (leadId ? plan.send.find(l => l.id === leadId) : plan.send[0]) as
+    | LeadWithSource
+    | undefined
+  if (!lead) return { ...out, error: `Lead ${leadId} is not in the send plan.` }
+
+  out.lead = {
+    id: lead.id,
+    title: lead.title,
+    source: lead.source,
+    sourceUrl: lead.source_url,
+    contactDomain: lead.contact_email ? lead.contact_email.split('@').pop() ?? null : null,
+  }
+
+  const token = lead.extracted?._claimToken
+  if (typeof token !== 'string' || !token) {
+    return { ...out, error: `Lead ${lead.id} has no claim token — run the draft agent first.` }
+  }
+
+  // Exactly what /claim-listing/[token] will check when this link is opened.
+  const { data: req } = await db
+    .from('listing_import_requests')
+    .select('id, status, claim_token_expires_at, extracted_data, claimed_by_user_id')
+    .eq('claim_token_hash', hashClaimToken(token))
+    .maybeSingle()
+  const r = req as {
+    status?: string
+    claim_token_expires_at?: string | null
+    extracted_data?: { photos?: unknown } | null
+    claimed_by_user_id?: string | null
+  } | null
+
+  out.linkChecks = [
+    { label: 'import request found', ok: Boolean(r) },
+    { label: "status is 'completed'", ok: r?.status === 'completed' },
+    { label: 'extracted_data present', ok: Boolean(r?.extracted_data) },
+    { label: 'photos is an array', ok: Array.isArray(r?.extracted_data?.photos) },
+    { label: 'token not expired', ok: !isClaimTokenExpired(r?.claim_token_expires_at) },
+    { label: 'not already claimed', ok: !r?.claimed_by_user_id },
+  ]
+
+  const template = await loadOutreachTemplate(db)
+  const built = buildOutreachEmail(template, {
+    title: lead.title ?? 'your sublet',
+    claimUrl: `${origin}/claim-listing/${token}`,
+  })
+  // Header only — nothing in the body depends on this. Still fatal for a
+  // send: a missing OUTREACH_SECRET means the real agent is broken too, and
+  // the console should say so in words rather than throw a 500.
+  let listUnsubscribe: string
+  try {
+    listUnsubscribe = unsubscribeUrl(to, origin)
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) }
+  }
+  out.email = { to, subject: built.subject, text: built.text, listUnsubscribe }
+
+  if (out.linkChecks.some(c => !c.ok)) {
+    return { ...out, error: 'The claim link would not resolve — refusing to send a broken email.' }
+  }
+  if (!execute) return out
+
+  try {
+    await send({ to, subject: built.subject, text: built.text, listUnsubscribe })
+    out.sent = true
+  } catch (err) {
+    out.error = err instanceof Error ? err.message : String(err)
+  }
   return out
 }
