@@ -10,9 +10,9 @@ import { DEFAULT_TEMPLATE } from '@/lib/agents/outreach-template'
  * yet (matches loadOutreachTemplate's own fallback, so the editor always
  * opens showing what a send would actually use).
  *
- * POST upserts it. The unsubscribe line and postal address are NEVER part of
- * this — see outreach-template.ts — so there is nothing here that can strip
- * the legally required parts of the email.
+ * POST upserts it. What is saved here IS the whole email: the unsubscribe
+ * line and postal address that used to be appended in code were removed on
+ * 2026-09-20 at Hugo's request — see the note atop outreach-template.ts.
  */
 
 async function requireAdmin() {

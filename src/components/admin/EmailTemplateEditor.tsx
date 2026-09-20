@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Save, Mail } from 'lucide-react'
+import { Loader2, Save, Mail, Send, Check, X } from 'lucide-react'
 import {
   buildOutreachEmail,
   templatePlaceholders,
@@ -35,13 +35,27 @@ const SAMPLE_VARS = {
  * the assistant's advice (CAN-SPAM requires both on commercial email); see
  * outreach-template.ts for the full note.
  */
+interface TestSendResult {
+  lead: { id: string; title: string | null; source: string; contactDomain: string | null } | null
+  linkChecks: { label: string; ok: boolean }[]
+  email: { to: string; subject: string } | null
+  sent: boolean
+  error?: string
+}
+
 export function EmailTemplateEditor({ initial }: Props) {
   const [template, setTemplate] = useState<OutreachTemplate>(initial)
+  // What's actually in the database. A test send mails the SAVED row, not
+  // whatever is in the textarea, so the button has to say when they differ.
+  const [saved, setSaved] = useState<OutreachTemplate>(initial)
   const [saving, setSaving] = useState(false)
+  const [testing, setTesting] = useState(false)
+  const [test, setTest] = useState<TestSendResult | null>(null)
 
   const preview = useMemo(() => buildOutreachEmail(template, SAMPLE_VARS), [template])
   const placeholders = useMemo(() => templatePlaceholders(template.body), [template.body])
   const missingClaimUrl = !placeholders.has('claimUrl')
+  const unsaved = template.subject !== saved.subject || template.body !== saved.body
 
   async function save() {
     if (saving) return
@@ -57,11 +71,38 @@ export function EmailTemplateEditor({ initial }: Props) {
         toast.error(json.error ?? 'Could not save.')
         return
       }
+      setSaved(template)
       toast.success('Saved. The next outreach run uses this.')
     } catch {
       toast.error('Network error. Please try again.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  /** Mails the real next outreach email to the signed-in admin. The address
+   *  comes from the session on the server — there is nothing to type here. */
+  async function sendTest() {
+    if (testing) return
+    setTesting(true)
+    setTest(null)
+    try {
+      const res = await fetch('/api/admin/agents/test-send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ execute: true }),
+      })
+      const json = (await res.json().catch(() => ({}))) as TestSendResult & { error?: string }
+      setTest(json)
+      if (!res.ok || json.error) {
+        toast.error(json.error ?? 'Test send failed.')
+        return
+      }
+      toast.success(`Sent to ${json.email?.to}. Check your inbox.`)
+    } catch {
+      toast.error('Network error. Please try again.')
+    } finally {
+      setTesting(false)
     }
   }
 
@@ -109,15 +150,81 @@ export function EmailTemplateEditor({ initial }: Props) {
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={save}
-            disabled={saving}
-            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition disabled:opacity-60"
-          >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition disabled:opacity-60"
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={sendTest}
+              disabled={testing}
+              className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full border border-line bg-surface text-ink font-semibold text-sm hover:bg-navy-soft/40 transition disabled:opacity-60"
+            >
+              {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              Send me a test
+            </button>
+          </div>
+          <p className="text-[12px] text-ink-muted leading-relaxed">
+            The test goes to your own account email, with a real lead&rsquo;s live claim link. The lead
+            is not contacted and stays in the queue.
+            {unsaved && (
+              <span className="text-[oklch(0.55_0.18_25)]">
+                {' '}
+                You have unsaved edits — a test sends the <em>saved</em> version. Save first.
+              </span>
+            )}
+          </p>
+
+          {test && (
+            <div className="rounded-2xl border border-line bg-navy-soft/20 p-4 text-[13px] space-y-3">
+              {test.lead && (
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-ink-muted font-semibold mb-1">
+                    Lead used
+                  </p>
+                  <p className="text-ink">{test.lead.title ?? '(untitled)'}</p>
+                  <p className="text-ink-muted text-[12px]">
+                    {test.lead.source}
+                    {test.lead.contactDomain && ` · real contact …@${test.lead.contactDomain} (not emailed)`}
+                  </p>
+                </div>
+              )}
+              {test.linkChecks.length > 0 && (
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-ink-muted font-semibold mb-1.5">
+                    Claim link pre-flight
+                  </p>
+                  <ul className="space-y-1">
+                    {test.linkChecks.map(c => (
+                      <li key={c.label} className="flex items-center gap-2 text-ink-soft">
+                        {c.ok ? (
+                          <Check className="w-3.5 h-3.5 text-[oklch(0.50_0.13_142)] shrink-0" />
+                        ) : (
+                          <X className="w-3.5 h-3.5 text-[oklch(0.55_0.18_25)] shrink-0" />
+                        )}
+                        {c.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {test.error ? (
+                <p className="text-[oklch(0.55_0.18_25)]">{test.error}</p>
+              ) : (
+                test.sent && (
+                  <p className="text-[oklch(0.40_0.13_142)] font-medium">
+                    Delivered to {test.email?.to}.
+                  </p>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         <div>
