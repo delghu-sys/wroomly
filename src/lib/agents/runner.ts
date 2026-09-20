@@ -337,17 +337,10 @@ export async function runOutreach(
   const first = plan.send[0] as LeadForOutreach | undefined
   const firstToken = first?.extracted?._claimToken
   if (first && typeof firstToken === 'string' && firstToken) {
-    try {
-      out.sample = buildOutreachEmail(template, {
-        title: first.title ?? 'your sublet',
-        claimUrl: `${origin}/claim-listing/${firstToken}`,
-        unsubUrl: unsubscribeUrl(first.contact_email as string, origin),
-      })
-    } catch (err) {
-      // OUTREACH_SECRET missing — real sends will fail too, but a broken
-      // preview must not hide the counts above it.
-      out.errors.push(err instanceof Error ? err.message : String(err))
-    }
+    out.sample = buildOutreachEmail(template, {
+      title: first.title ?? 'your sublet',
+      claimUrl: `${origin}/claim-listing/${firstToken}`,
+    })
   }
 
   // Two independent switches before a single email goes out.
@@ -369,10 +362,16 @@ export async function runOutreach(
       break
     }
 
+    // unsubUrl is no longer in the email body/subject — buildOutreachEmail
+    // has no footer — but it's still sent as the List-Unsubscribe header
+    // below: an invisible technical header (not something the recipient
+    // reads as part of the message) that mail providers use for spam
+    // scoring. Dropping it too would risk Gmail/Yahoo bulk-sender filtering
+    // on top of the CAN-SPAM exposure already accepted by removing the
+    // visible footer.
     const email = buildOutreachEmail(template, {
       title: c.title ?? 'your sublet',
       claimUrl: `${origin}/claim-listing/${token}`,
-      unsubUrl,
     })
 
     try {

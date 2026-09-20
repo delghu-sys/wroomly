@@ -27,33 +27,21 @@ test('a template using neither placeholder is unaffected by substitution', () =>
   assert.equal(renderTemplate('No placeholders here.', vars), 'No placeholders here.')
 })
 
-// ── the parts that must NEVER be editable away ───────────────────────────────
+// ── buildOutreachEmail: no footer ────────────────────────────────────────
+//
+// NOTE: this used to assert an unsubscribe link + CAN-SPAM postal address
+// were always appended, unremovable by a template edit. That footer was
+// removed at Hugo's request (2026-09-20), against the assistant's advice —
+// see the note atop outreach-template.ts. These tests now assert the
+// opposite: the built email is exactly the rendered body, nothing more.
 
-test('the unsubscribe link is ALWAYS present, regardless of the template body', () => {
-  const email = buildOutreachEmail({ subject: 'x', body: 'short' }, { ...vars, unsubUrl: 'https://wroomly.app/api/outreach/unsubscribe?x' })
-  assert.ok(email.text.includes('https://wroomly.app/api/outreach/unsubscribe?x'))
-})
-
-test('the CAN-SPAM postal address is ALWAYS present, regardless of the template body', () => {
-  const email = buildOutreachEmail({ subject: 'x', body: 'short' }, { ...vars, unsubUrl: 'u' })
-  assert.ok(email.text.includes('Wroomly LLC'))
-  assert.ok(email.text.includes('Ann Arbor, MI'))
-})
-
-test('an admin cannot remove the footer by writing similar-looking text into the body', () => {
-  // The footer is appended in code, not interpolated from the body — so even
-  // a body that TRIES to look like a real unsubscribe line changes nothing
-  // about whether the real one is present.
-  const email = buildOutreachEmail(
-    { subject: 'x', body: 'Unsubscribe here: (nothing, this is fake)' },
-    { ...vars, unsubUrl: 'https://wroomly.app/api/outreach/unsubscribe?real' },
-  )
-  assert.ok(email.text.includes('https://wroomly.app/api/outreach/unsubscribe?real'), 'the real link still renders')
-  assert.ok(email.text.includes('Wroomly LLC'), 'the real address still renders')
+test('the built email is exactly the rendered body — no footer is appended', () => {
+  const email = buildOutreachEmail({ subject: 'x', body: 'short' }, vars)
+  assert.equal(email.text, 'short')
 })
 
 test('the subject is exactly what was saved — no substitution applied to it', () => {
-  const email = buildOutreachEmail({ subject: 'Hi {{title}}', body: 'x' }, { ...vars, unsubUrl: 'u' })
+  const email = buildOutreachEmail({ subject: 'Hi {{title}}', body: 'x' }, vars)
   assert.equal(email.subject, 'Hi {{title}}', 'subject placeholders are deliberately not rendered')
 })
 
@@ -68,11 +56,9 @@ test('detects which placeholders a template body actually uses', () => {
 // ── the shipped default, since it is what every new install actually sends ──
 
 test('the default template renders cleanly with real variables', () => {
-  const email = buildOutreachEmail(DEFAULT_TEMPLATE, { ...vars, unsubUrl: 'https://wroomly.app/api/outreach/unsubscribe?x' })
+  const email = buildOutreachEmail(DEFAULT_TEMPLATE, vars)
   assert.ok(email.text.includes('A Sublet'))
   assert.ok(email.text.includes('https://wroomly.app/claim-listing/abc123'))
-  assert.ok(email.text.includes('https://wroomly.app/api/outreach/unsubscribe?x'))
-  assert.ok(email.text.includes('Wroomly LLC'))
   assert.equal(email.subject, DEFAULT_TEMPLATE.subject)
 })
 
@@ -88,9 +74,6 @@ test('the default template has no em dash — reads like a person wrote it, not 
 })
 
 test('a body with no {{claimUrl}} still builds an email — link just never appears (the UI warns, not blocks)', () => {
-  const email = buildOutreachEmail({ subject: 'x', body: 'Hi {{title}}, no link here.' } satisfies OutreachTemplate, {
-    ...vars,
-    unsubUrl: 'u',
-  })
+  const email = buildOutreachEmail({ subject: 'x', body: 'Hi {{title}}, no link here.' } satisfies OutreachTemplate, vars)
   assert.ok(!email.text.includes(vars.claimUrl))
 })
