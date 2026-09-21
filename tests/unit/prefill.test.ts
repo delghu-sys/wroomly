@@ -11,21 +11,25 @@ test('reads the real date strings sitting in the lead queue', () => {
     from: '2026-01-01',
     to: '2026-08-31',
     alreadyEnded: true,
+    yearInferred: false,
   })
   assert.deepEqual(parseAvailability('January - August 2026', NOW), {
     from: '2026-01-01',
     to: '2026-08-31',
     alreadyEnded: true,
+    yearInferred: false,
   })
   assert.deepEqual(parseAvailability('January-July 2026', NOW), {
     from: '2026-01-01',
     to: '2026-07-31',
     alreadyEnded: true,
+    yearInferred: false,
   })
   assert.deepEqual(parseAvailability('January-May 2026', NOW), {
     from: '2026-01-01',
     to: '2026-05-31',
     alreadyEnded: true,
+    yearInferred: false,
   })
 })
 
@@ -34,6 +38,7 @@ test('a lone month and year is a START, with no end invented', () => {
     from: '2025-08-01',
     to: null,
     alreadyEnded: false,
+    yearInferred: false,
   })
 })
 
@@ -51,6 +56,7 @@ test('a term crossing new year puts the START in the earlier year', () => {
     from: '2026-09-01',
     to: '2027-05-31',
     alreadyEnded: false,
+    yearInferred: false,
   })
 })
 
@@ -59,11 +65,12 @@ test('a year on each side is taken literally', () => {
     from: '2026-08-01',
     to: '2027-05-31',
     alreadyEnded: false,
+    yearInferred: false,
   })
 })
 
 test('abbreviations, dash styles and casing all read the same', () => {
-  const expected = { from: '2027-01-01', to: '2027-05-31', alreadyEnded: false }
+  const expected = { from: '2027-01-01', to: '2027-05-31', alreadyEnded: false, yearInferred: false }
   for (const s of [
     'Jan to May 2027',
     'JANUARY – MAY 2027',
@@ -176,4 +183,72 @@ test('an undateable post is KEPT — a parsing gap is not evidence of staleness'
   assert.equal(termHasEnded('ask me', NOW), false)
   assert.equal(termHasEnded(null, NOW), false)
   assert.equal(termHasEnded('', NOW), false)
+})
+
+// ── the post date resolves what the text left out ──────────────────────────
+//
+// Off Campus Universe stamps each record with _createdDate. A term with no
+// year ("January to August") is a coin flip on its own, but anchored to the
+// post it becomes unambiguous — and that is what turns a merely unreadable
+// post into a provably stale one.
+
+const POSTED_OCT_2025 = '2025-10-14T22:29:44.149Z'
+const POSTED_SEP_2026 = '2026-09-15T10:00:00.000Z'
+
+test('a year-less range is read as the first term starting after the post', () => {
+  // Posted Oct 2025 → the January that follows is 2026.
+  assert.deepEqual(parseAvailability('January to August', NOW, POSTED_OCT_2025), {
+    from: '2026-01-01',
+    to: '2026-08-31',
+    alreadyEnded: true,
+    yearInferred: true,
+  })
+})
+
+test('the SAME text on a newer post resolves to a different, live term', () => {
+  // Posted Sep 2026 → January 2027. Identical wording, opposite verdict.
+  assert.deepEqual(parseAvailability('January to August', NOW, POSTED_SEP_2026), {
+    from: '2027-01-01',
+    to: '2027-08-31',
+    alreadyEnded: false,
+    yearInferred: true,
+  })
+})
+
+test('a month already past in the posting year rolls to the next', () => {
+  // Posted Oct 2025, term starts in May → May 2026, not May 2025.
+  assert.equal(parseAvailability('May to August', NOW, POSTED_OCT_2025)?.from, '2026-05-01')
+})
+
+test('a month still ahead in the posting year stays in it', () => {
+  // Posted Oct 2025, term starts in December → December 2025.
+  assert.equal(parseAvailability('December to May', NOW, POSTED_OCT_2025)?.from, '2025-12-01')
+  assert.equal(parseAvailability('December to May', NOW, POSTED_OCT_2025)?.to, '2026-05-31')
+})
+
+test('a bare single month anchors too', () => {
+  assert.deepEqual(parseAvailability('January', NOW, POSTED_SEP_2026), {
+    from: '2027-01-01',
+    to: null,
+    alreadyEnded: false,
+    yearInferred: true,
+  })
+})
+
+test('an explicit year always wins over the post date', () => {
+  const r = parseAvailability('January to August 2028', NOW, POSTED_OCT_2025)
+  assert.equal(r?.from, '2028-01-01')
+  assert.equal(r?.yearInferred, false, 'nothing was inferred — the text said so')
+})
+
+test('no post date means no inference, exactly as before', () => {
+  assert.equal(parseAvailability('January to August', NOW), null)
+  assert.equal(parseAvailability('January to August', NOW, null), null)
+  assert.equal(parseAvailability('January to August', NOW, 'not-a-date'), null)
+})
+
+test('termHasEnded uses the post date to expire an otherwise unreadable post', () => {
+  assert.equal(termHasEnded('January to August', NOW), false, 'unknowable alone')
+  assert.equal(termHasEnded('January to August', NOW, POSTED_OCT_2025), true, 'provably over')
+  assert.equal(termHasEnded('January to August', NOW, POSTED_SEP_2026), false, 'upcoming')
 })

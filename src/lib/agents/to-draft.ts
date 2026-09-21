@@ -45,6 +45,8 @@ export interface AnyExtracted {
   bathrooms?: string
   contactName?: string
   posterType?: string
+  /** ISO timestamp the post went up; anchors an undated term to a real year. */
+  postedAt?: string
   [key: string]: unknown
 }
 
@@ -78,7 +80,11 @@ export function leadToExtractedDraft({
   const contactName = extracted.contactName?.trim() || extracted.posterName?.trim() || null
 
   // Read (never invent) the two fields that cost the most to retype.
-  const availability = parseAvailability(extracted.dates)
+  const availability = parseAvailability(
+    extracted.dates,
+    undefined,
+    typeof extracted.postedAt === 'string' ? extracted.postedAt : null,
+  )
   const street = parseStreetAddress(title)
 
   // What we're confident enough to fill vs. what genuinely needs a human.
@@ -109,6 +115,11 @@ export function leadToExtractedDraft({
       availability
         ? `Dates read from the original post's "${extracted.dates}" — check them, especially the exact days.`
         : `The original post's dates were "${extracted.dates}" — set the exact move-in/move-out dates below.`,
+    )
+  }
+  if (availability?.yearInferred) {
+    uncertaintyNotes.push(
+      "The post didn't give a year — these dates assume the first term starting after it was posted. Check them.",
     )
   }
   if (availability?.alreadyEnded) {

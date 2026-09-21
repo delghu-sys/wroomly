@@ -82,6 +82,9 @@ export interface ListingContact {
   formType?: string
   /** e.g. "January - May" — the poster's own description of the dates. */
   timingOfLease?: string
+  /** ISO timestamp the listing was created on the board. The anchor that
+   *  makes a year-less term ("January to August") resolvable. */
+  postedAt?: string
   bedrooms?: string
   bathrooms?: string
 }
@@ -185,11 +188,20 @@ export function extractContact(html: string, expectedPrice?: string): ListingCon
   const readNum = (name: string): string | undefined =>
     read(name) ?? record.match(new RegExp(`"${name}":([0-9.]{1,8})`))?.[1]
 
+  // Wix stamps every record with its creation time, nested as
+  // {"$date":"…"} rather than a plain string, so `read` can't see it. This is
+  // the post date, and it is what makes an undated term readable: "January to
+  // August" on a post from October 2025 is the Jan–Aug 2026 term, i.e. over.
+  // NOTE: _updatedDate is NOT a freshness signal — the record carries a
+  // `views` counter, so it moves every time anyone opens the page.
+  const postedAt = record.match(/"_createdDate":\{"\$date":"([^"]{1,40})"\}/)?.[1]
+
   const recordPrice = readNum('price')
   if (expectedPrice && recordPrice && recordPrice !== expectedPrice) return {}
 
   const email = read('email')?.toLowerCase()
   return {
+    postedAt: postedAt && !Number.isNaN(Date.parse(postedAt)) ? postedAt : undefined,
     email: email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined,
     contactName: read('contactName'),
     formType: read('formType'),
@@ -243,6 +255,9 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
       bedrooms: contact.bedrooms,
       bathrooms: contact.bathrooms,
       contactName: contact.contactName,
+      // Anchors an undated term to a real year, and lets a stale post be
+      // recognised as stale rather than merely unreadable.
+      postedAt: contact.postedAt,
       // "Student" vs an agent/owner post — worth knowing before writing to them.
       posterType: contact.formType,
     },

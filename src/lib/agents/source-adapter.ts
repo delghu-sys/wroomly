@@ -69,7 +69,8 @@ export function sanitizeLeads(
     // undateable post is kept, since a parsing gap is not evidence of
     // staleness (see termHasEnded).
     const dates = typeof l.extracted?.dates === 'string' ? l.extracted.dates : null
-    if (termHasEnded(dates, now)) {
+    const postedAt = typeof l.extracted?.postedAt === 'string' ? l.extracted.postedAt : null
+    if (termHasEnded(dates, now, postedAt)) {
       rejected.push({ lead: l, reason: `term already ended ("${dates}")` })
       continue
     }
