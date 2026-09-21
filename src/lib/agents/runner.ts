@@ -267,6 +267,28 @@ export interface OutreachResult {
   sample: { subject: string; text: string } | null
 }
 
+/**
+ * True only for an origin a stranger could actually open.
+ *
+ * Every outreach email is built around one link, and the token in it is
+ * dropped from the database once sent — so a wrong origin cannot be resent,
+ * it just burns the lead. https-only and no loopback/.local/.internal hosts:
+ * the dev values that would otherwise ride along from a local env file.
+ */
+export function isPublicOrigin(origin: string): boolean {
+  let u: URL
+  try {
+    u = new URL(origin)
+  } catch {
+    return false
+  }
+  if (u.protocol !== 'https:') return false
+  const host = u.hostname.toLowerCase()
+  if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]' || host === '::1') return false
+  if (host.endsWith('.local') || host.endsWith('.localhost') || host.endsWith('.internal')) return false
+  return true
+}
+
 /** The template row is service-role only, same as everything else here. Falls
  *  back to DEFAULT_TEMPLATE when nothing has been saved yet — outreach must
  *  never fail (or send blank emails) just because no one has visited the
@@ -351,6 +373,20 @@ export async function runOutreach(
 
   // Two independent switches before a single email goes out.
   if (!execute || !enabled) return out
+
+  // Third gate, and the reason it exists: the claim link IS the email. A run
+  // started from a laptop inherits NEXT_PUBLIC_APP_URL=http://localhost:3000,
+  // which would mail real strangers a link only that laptop can open — a
+  // one-shot, unrecoverable waste of every lead in the batch, since the token
+  // is dropped after sending. Dry runs still render the localhost link above
+  // so it stays visible; only real sends are refused.
+  if (!isPublicOrigin(origin)) {
+    out.errors.push(
+      `Refusing to send: origin "${origin}" is not a public https URL, so every claim link would be dead. ` +
+        'Set NEXT_PUBLIC_APP_URL to the live site (or pass --origin https://wroomly.app).',
+    )
+    return out
+  }
 
   for (const c of plan.send as LeadForOutreach[]) {
     const token = c.extracted?._claimToken
