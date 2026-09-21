@@ -6,6 +6,8 @@
  *   node --env-file=.env.local scripts/agents/outreach.mjs             (dry run)
  *   OUTREACH_ENABLED=true node --env-file=.env.local scripts/agents/outreach.mjs --send
  *
+ * Claim links point at https://wroomly.app unless --origin says otherwise.
+ *
  * Sending requires BOTH --send here and OUTREACH_ENABLED=true (checked inside
  * the runner, so the console can't bypass it either).
  */
@@ -14,7 +16,14 @@ import { Resend } from 'resend'
 import { runOutreach } from '../../src/lib/agents/runner.ts'
 
 const execute = process.argv.includes('--send')
-const origin = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
+
+// Deliberately NOT NEXT_PUBLIC_APP_URL: in .env.local that is
+// http://localhost:3000, and this script mails real strangers. A claim link
+// pointing at a laptop is a dead link, and the token is dropped once sent, so
+// the lead is burned for good. Default to the live site; override explicitly
+// with --origin (the runner refuses to send to a non-public one anyway).
+const originFlag = process.argv.indexOf('--origin')
+const origin = originFlag === -1 ? 'https://wroomly.app' : process.argv[originFlag + 1]
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -34,6 +43,7 @@ const send = async ({ to, subject, text, listUnsubscribe }) => {
 }
 
 const r = await runOutreach(db, { execute, send, origin })
+console.log(`claim links point at ${origin}`)
 console.log(`cap ${r.dailyCap}/day · ${r.sentInLastDay} sent in last 24h`)
 console.log(`${r.planned} to send`)
 for (const [reason, n] of Object.entries(r.skipped)) console.log(`   skipped ${String(n).padStart(3)} — ${reason}`)
