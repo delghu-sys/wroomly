@@ -97,6 +97,20 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Outreach opt-out. MUST be reachable with no session: it is linked from a
+  // cold email to someone who has no Wroomly account, and it is also fetched
+  // unattended by mail providers via the List-Unsubscribe header. Redirecting
+  // it to /sign-in makes opting out impossible for exactly the people the link
+  // exists for. The route needs no session of its own — the ?t= token is an
+  // HMAC of the address, so it proves we issued the link and cannot be used to
+  // opt somebody else out.
+  //
+  // Deliberately ABOVE the supply-only gate: an opt-out must keep working even
+  // while the rest of the site is gated to /coming-soon.
+  if (pathname === '/api/outreach/unsubscribe') {
+    return supabaseResponse
+  }
+
   // ── Supply-only soft-launch gate ────────────────────────────────────────────
   // No-op unless SUPPLY_ONLY_MODE === 'true'. When on, non-exempt visitors
   // (renters / anon) are redirected to /coming-soon; admins, suppliers, and
