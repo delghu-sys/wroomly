@@ -47,6 +47,10 @@ export interface AnyExtracted {
   posterType?: string
   /** ISO timestamp the post went up; anchors an undated term to a real year. */
   postedAt?: string
+  /** The board's own normalised street line, preferred over the title. */
+  addressLine?: string
+  /** As printed — often ZIP+4. */
+  postalCode?: string
   [key: string]: unknown
 }
 
@@ -85,7 +89,12 @@ export function leadToExtractedDraft({
     undefined,
     typeof extracted.postedAt === 'string' ? extracted.postedAt : null,
   )
-  const street = parseStreetAddress(title)
+  // Prefer the board's own normalised line; fall back to reading the title,
+  // which is how the sources without that field (and CMB) still get one.
+  const street = parseStreetAddress(extracted.addressLine) ?? parseStreetAddress(title)
+  // ZIP+4 arrives as "48104-3982"; the app stores the 5-digit code.
+  const zipFromRecord = extracted.postalCode?.trim().match(/^(\d{5})(?:-\d{4})?$/)?.[1] ?? null
+  const zipCode = zipFromRecord ?? street?.zipCode ?? null
 
   // What we're confident enough to fill vs. what genuinely needs a human.
   const filled = ['title']
@@ -164,7 +173,7 @@ export function leadToExtractedDraft({
     neighborhood: null,
     city: 'Ann Arbor',
     state: 'MI',
-    zipCode: street?.zipCode ?? null,
+    zipCode,
 
     buildingName,
     floorPlanName: null,

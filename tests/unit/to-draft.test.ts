@@ -182,3 +182,36 @@ test('description is still never fabricated, prefill or not', () => {
   assert.equal(d.description, null)
   assert.ok(d.missingFields.includes('description'))
 })
+
+test("the board's normalised address line wins over the title", () => {
+  const d = leadToExtractedDraft({
+    ...base,
+    title: '327 S. Division', // free text as the poster typed it
+    extracted: { addressLine: '327 S Division St', postalCode: '48104-2232' },
+  })
+  assert.equal(d.address, '327 S Division St')
+  assert.equal(d.zipCode, '48104', 'ZIP+4 is narrowed to the 5-digit code')
+  assert.equal(d.lat, null, 'coordinates are still never taken from a scrape')
+  assert.equal(d.lng, null)
+})
+
+test('a record without the address line falls back to reading the title', () => {
+  const d = leadToExtractedDraft({ ...base, title: '611 E University Ave, Ann Arbor, MI 48104' })
+  assert.equal(d.address, '611 E University Ave')
+  assert.equal(d.zipCode, '48104')
+})
+
+test('a plain 5-digit postal code is taken as-is', () => {
+  const d = leadToExtractedDraft({ ...base, extracted: { addressLine: '333 S Division St', postalCode: '48104' } })
+  assert.equal(d.zipCode, '48104')
+})
+
+test('a malformed postal code is dropped rather than stored', () => {
+  const d = leadToExtractedDraft({ ...base, extracted: { addressLine: '333 S Division St', postalCode: '4810' } })
+  assert.equal(d.zipCode, null)
+})
+
+test('an unusable address line still falls back to the title', () => {
+  const d = leadToExtractedDraft({ ...base, title: '721 S Forest Ave', extracted: { addressLine: 'Ann Arbor' } })
+  assert.equal(d.address, '721 S Forest Ave', 'no house number in the line, so the title is used')
+})
