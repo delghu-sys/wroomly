@@ -25,6 +25,15 @@ const SAMPLE_VARS = {
   claimUrl: 'https://wroomly.app/claim-listing/•••••••••••••••••••••••',
 }
 
+interface TestSendResult {
+  lead: { id: string; title: string | null; source: string; contactDomain: string | null } | null
+  linkChecks: { label: string; ok: boolean }[]
+  email: { to: string; subject: string } | null
+  sent: boolean
+  skippedLeads?: number
+  error?: string
+}
+
 /**
  * The one editable outreach email — subject + body — with a live preview.
  * Catches the one thing that could break outreach before Save, not after:
@@ -35,14 +44,6 @@ const SAMPLE_VARS = {
  * the assistant's advice (CAN-SPAM requires both on commercial email); see
  * outreach-template.ts for the full note.
  */
-interface TestSendResult {
-  lead: { id: string; title: string | null; source: string; contactDomain: string | null } | null
-  linkChecks: { label: string; ok: boolean }[]
-  email: { to: string; subject: string } | null
-  sent: boolean
-  error?: string
-}
-
 export function EmailTemplateEditor({ initial }: Props) {
   const [template, setTemplate] = useState<OutreachTemplate>(initial)
   // What's actually in the database. A test send mails the SAVED row, not
@@ -194,6 +195,12 @@ export function EmailTemplateEditor({ initial }: Props) {
                     {test.lead.contactDomain && ` · real contact …@${test.lead.contactDomain} (not emailed)`}
                   </p>
                 </div>
+              )}
+              {(test.skippedLeads ?? 0) > 0 && (
+                <p className="text-ink-muted text-[12px]">
+                  Skipped {test.skippedLeads} lead(s) whose claim link would not have resolved —
+                  usually a draft already claimed by opening its link.
+                </p>
               )}
               {test.linkChecks.length > 0 && (
                 <div>
