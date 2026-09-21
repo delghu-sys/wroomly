@@ -97,6 +97,14 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Resend delivery-event webhook (bounces, complaints). Server-to-server,
+  // so there is no session and never will be; it authenticates itself with a
+  // Svix signature the route verifies before doing anything. A redirect here
+  // would silently swallow every bounce and spam complaint.
+  if (pathname === '/api/resend/webhook') {
+    return supabaseResponse
+  }
+
   // Outreach opt-out. MUST be reachable with no session: it is linked from a
   // cold email to someone who has no Wroomly account, and it is also fetched
   // unattended by mail providers via the List-Unsubscribe header. Redirecting
