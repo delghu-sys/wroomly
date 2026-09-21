@@ -58,7 +58,19 @@ export interface DiscoverResult {
 
 export async function runDiscover(
   db: Db,
-  { sourceKeys, execute }: { sourceKeys: string[]; execute: boolean },
+  {
+    sourceKeys,
+    execute,
+    maxFetches,
+  }: {
+    sourceKeys: string[]
+    execute: boolean
+    /** Page fetches per source. Left undefined, each adapter uses its own
+     *  conservative default — sized for the 60s serverless limit the admin
+     *  console runs under. The CLI has no such ceiling and can ask for more
+     *  when the board needs a proper sweep. */
+    maxFetches?: number
+  },
 ): Promise<DiscoverResult> {
   const results: DiscoverSourceResult[] = []
 
@@ -87,7 +99,7 @@ export async function runDiscover(
 
     let raw
     try {
-      raw = await adapter.fetchLeads({ knownIds })
+      raw = await adapter.fetchLeads({ knownIds, maxFetches })
     } catch (err) {
       r.error = err instanceof Error ? err.message : String(err)
       continue

@@ -153,3 +153,36 @@ export function parseStreetAddress(title: string | null | undefined): StreetAddr
 
   return { address: text, zipCode }
 }
+
+/** A sublet term longer than this doesn't exist; past it, a start date with no
+ *  stated end is a finished term rather than an open-ended offer. */
+const MAX_TERM_MONTHS = 12
+
+/**
+ * Has this term already finished?
+ *
+ * Used to keep expired posts out of the queue entirely — emailing someone
+ * about a sublet they filled months ago is both useless and the fastest way
+ * to collect spam complaints.
+ *
+ * Returns false when the text can't be read: a post we can't date is not
+ * evidence of staleness, and silently dropping leads on a parsing gap would
+ * be worse than reviewing one stale post. Only a term we can PROVE is over
+ * gets rejected.
+ */
+export function termHasEnded(raw: string | null | undefined, now = new Date()): boolean {
+  const parsed = parseAvailability(raw, now)
+  if (!parsed) return false
+
+  const today = now.toISOString().slice(0, 10)
+  if (parsed.to) return parsed.to < today
+
+  // A start with no end: "August 2025" says nothing explicit about the finish,
+  // but a sublet that began more than a year ago is not a current listing.
+  if (parsed.from) {
+    const cutoff = new Date(now)
+    cutoff.setUTCMonth(cutoff.getUTCMonth() - MAX_TERM_MONTHS)
+    return parsed.from < cutoff.toISOString().slice(0, 10)
+  }
+  return false
+}
