@@ -461,7 +461,34 @@ export interface TestSendResult {
   linkChecks: TestSendCheck[]
   email: { to: string; subject: string; text: string; listUnsubscribe: string } | null
   sent: boolean
+  /** Leads passed over because their claim link would not have resolved. */
+  skippedLeads: number
   error?: string
+}
+
+/** Exactly what /claim-listing/[token] checks when the link is opened. Run
+ *  BEFORE mailing a link, so a dead one is never sent. */
+async function claimLinkChecks(db: Db, token: string): Promise<TestSendCheck[]> {
+  const { data: req } = await db
+    .from('listing_import_requests')
+    .select('id, status, claim_token_expires_at, extracted_data, claimed_by_user_id')
+    .eq('claim_token_hash', hashClaimToken(token))
+    .maybeSingle()
+  const r = req as {
+    status?: string
+    claim_token_expires_at?: string | null
+    extracted_data?: { photos?: unknown } | null
+    claimed_by_user_id?: string | null
+  } | null
+
+  return [
+    { label: 'import request found', ok: Boolean(r) },
+    { label: "status is 'completed'", ok: r?.status === 'completed' },
+    { label: 'extracted_data present', ok: Boolean(r?.extracted_data) },
+    { label: 'photos is an array', ok: Array.isArray(r?.extracted_data?.photos) },
+    { label: 'token not expired', ok: !isClaimTokenExpired(r?.claim_token_expires_at) },
+    { label: 'not already claimed', ok: !r?.claimed_by_user_id },
+  ]
 }
 
 /**
@@ -490,7 +517,7 @@ export async function runTestSend(
     origin = 'https://wroomly.app',
   }: { to: string; send: SendEmail; execute: boolean; leadId?: string; origin?: string },
 ): Promise<TestSendResult> {
-  const out: TestSendResult = { lead: null, linkChecks: [], email: null, sent: false }
+  const out: TestSendResult = { lead: null, linkChecks: [], email: null, sent: false, skippedLeads: 0 }
   const target = normalizeEmail(to)
   if (!target) return { ...out, error: 'No address given.' }
 
@@ -526,45 +553,58 @@ export async function runTestSend(
     return { ...out, error: 'Nothing is queued — no drafted lead with a contact email.' }
   }
 
-  const lead = (leadId ? plan.send.find(l => l.id === leadId) : plan.send[0]) as
-    | LeadWithSource
-    | undefined
-  if (!lead) return { ...out, error: `Lead ${leadId} is not in the send plan.` }
-
-  out.lead = {
-    id: lead.id,
-    title: lead.title,
-    source: lead.source,
-    sourceUrl: lead.source_url,
-    contactDomain: lead.contact_email ? lead.contact_email.split('@').pop() ?? null : null,
+  const candidates = (leadId
+    ? plan.send.filter(l => l.id === leadId)
+    : plan.send) as LeadWithSource[]
+  if (candidates.length === 0) {
+    return { ...out, error: `Lead ${leadId} is not in the send plan.` }
   }
 
-  const token = lead.extracted?._claimToken
-  if (typeof token !== 'string' || !token) {
-    return { ...out, error: `Lead ${lead.id} has no claim token — run the draft agent first.` }
+  // Walk the queue until a lead whose claim link actually resolves. A draft
+  // that was already claimed (often by the admin, checking an earlier test)
+  // makes THAT lead unusable, not the whole test — there are usually others
+  // sitting right behind it. An explicit --lead/leadId is never substituted:
+  // asking for one specific lead and silently getting a different one would
+  // be worse than an error. Bounded so a long queue of dead drafts cannot
+  // turn one click into hundreds of round trips.
+  const probeLimit = leadId ? 1 : 25
+  let chosen: { lead: LeadWithSource; token: string } | null = null
+
+  for (const candidate of candidates.slice(0, probeLimit)) {
+    const token = candidate.extracted?._claimToken
+    const checks =
+      typeof token === 'string' && token
+        ? await claimLinkChecks(db, token)
+        : [{ label: 'draft has a claim token', ok: false }]
+
+    // Always report the checks for the lead actually under consideration, so
+    // a total failure explains itself with the LAST thing tried.
+    out.lead = {
+      id: candidate.id,
+      title: candidate.title,
+      source: candidate.source,
+      sourceUrl: candidate.source_url,
+      contactDomain: candidate.contact_email ? candidate.contact_email.split('@').pop() ?? null : null,
+    }
+    out.linkChecks = checks
+
+    if (checks.every(c => c.ok)) {
+      chosen = { lead: candidate, token: token as string }
+      break
+    }
+    out.skippedLeads += 1
   }
 
-  // Exactly what /claim-listing/[token] will check when this link is opened.
-  const { data: req } = await db
-    .from('listing_import_requests')
-    .select('id, status, claim_token_expires_at, extracted_data, claimed_by_user_id')
-    .eq('claim_token_hash', hashClaimToken(token))
-    .maybeSingle()
-  const r = req as {
-    status?: string
-    claim_token_expires_at?: string | null
-    extracted_data?: { photos?: unknown } | null
-    claimed_by_user_id?: string | null
-  } | null
-
-  out.linkChecks = [
-    { label: 'import request found', ok: Boolean(r) },
-    { label: "status is 'completed'", ok: r?.status === 'completed' },
-    { label: 'extracted_data present', ok: Boolean(r?.extracted_data) },
-    { label: 'photos is an array', ok: Array.isArray(r?.extracted_data?.photos) },
-    { label: 'token not expired', ok: !isClaimTokenExpired(r?.claim_token_expires_at) },
-    { label: 'not already claimed', ok: !r?.claimed_by_user_id },
-  ]
+  if (!chosen) {
+    return {
+      ...out,
+      error:
+        out.skippedLeads > 1
+          ? `No sendable draft: checked ${out.skippedLeads} lead(s) and every claim link would break. The last one is shown above.`
+          : 'The claim link would not resolve — refusing to send a broken email.',
+    }
+  }
+  const { lead, token } = chosen
 
   const template = await loadOutreachTemplate(db)
   const built = buildOutreachEmail(template, {

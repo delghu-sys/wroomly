@@ -5,6 +5,7 @@ import assert from 'node:assert/strict'
 process.env.OUTREACH_SECRET ??= 'unit-test-secret-000000000000000000000000'
 
 const { runTestSend } = await import('../../src/lib/agents/runner.ts')
+const { hashClaimToken } = await import('../../src/lib/listing-import/claim-token.ts')
 
 /**
  * runTestSend exists so a human can check the outreach email in a real inbox.
@@ -174,4 +175,106 @@ test('nothing queued is an explicit error, not a silent no-op', async () => {
   })
   assert.equal(r.sent, false)
   assert.match(r.error ?? '', /Nothing is queued/)
+})
+
+// ── choosing a lead whose link actually works ───────────────────────────────
+//
+// Opening a claim page claims the draft (ClaimReview posts /claim on mount),
+// so a lead an admin has previewed is permanently unusable for a test send.
+// One spent draft at the front of the queue must not block the whole test
+// when other leads are sitting right behind it.
+
+const secondLead = {
+  id: '22222222-2222-4222-8222-222222222222',
+  contact_email: 'other@umich.edu',
+  status: 'drafted',
+  import_request_id: 'req-2',
+  outreach_sent_at: null,
+  title: 'Another Sublet',
+  source: 'offcampus-universe-umich',
+  source_url: 'https://example.test/second',
+  extracted: { _claimToken: 'tok_second' },
+}
+
+/** Resolves a different import request per token, so leads can differ. */
+function fakeDbByToken(leads: Record<string, unknown>[], byToken: Record<string, unknown>) {
+  const tables: Record<string, unknown> = { sourced_leads: leads, outreach_suppressions: [] }
+  return {
+    from(table: string) {
+      const rows = tables[table] ?? []
+      let wanted: unknown = null
+      const chain = {
+        select: () => chain,
+        eq: (col: string, val: string) => {
+          if (col === 'claim_token_hash') {
+            const match = Object.entries(byToken).find(([tok]) => hashClaimToken(tok) === val)
+            wanted = match ? match[1] : null
+          }
+          return chain
+        },
+        limit: () => Promise.resolve({ data: rows, error: null }),
+        maybeSingle: () => Promise.resolve({ data: wanted, error: null }),
+        update: () => {
+          throw new Error('a test send must never write')
+        },
+        then: (resolve: (v: unknown) => void) => resolve({ data: rows, error: null }),
+      }
+      return chain
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any
+}
+
+test('skips a lead whose draft was already claimed and uses the next one', async () => {
+  const sent: string[] = []
+  const r = await runTestSend(
+    fakeDbByToken([drafted(), secondLead], {
+      tok_abc: { ...goodRequest, claimed_by_user_id: 'admin-who-opened-the-link' },
+      tok_second: goodRequest,
+    }),
+    {
+      to: 'me@wroomly.app',
+      execute: true,
+      send: async ({ to, text }) => {
+        sent.push(to)
+        assert.ok(text.includes('claim-listing/tok_second'), 'the WORKING link is the one mailed')
+      },
+    },
+  )
+
+  assert.equal(r.sent, true)
+  assert.equal(r.skippedLeads, 1, 'and it says it skipped one')
+  assert.equal(r.lead?.title, 'Another Sublet')
+  assert.ok(r.linkChecks.every(c => c.ok), 'the reported checks belong to the lead actually used')
+  assert.deepEqual(sent, ['me@wroomly.app'])
+})
+
+test('when EVERY draft is spent it fails, and reports how many it tried', async () => {
+  const r = await runTestSend(
+    fakeDbByToken([drafted(), secondLead], {
+      tok_abc: { ...goodRequest, claimed_by_user_id: 'u1' },
+      tok_second: { ...goodRequest, claimed_by_user_id: 'u2' },
+    }),
+    { to: 'me@wroomly.app', send: neverSend, execute: true },
+  )
+  assert.equal(r.sent, false)
+  assert.equal(r.skippedLeads, 2)
+  assert.match(r.error ?? '', /checked 2 lead\(s\)/)
+})
+
+test('an explicitly requested lead is never silently swapped for a different one', async () => {
+  const r = await runTestSend(
+    fakeDbByToken([drafted(), secondLead], {
+      tok_abc: { ...goodRequest, claimed_by_user_id: 'u1' },
+      tok_second: goodRequest,
+    }),
+    {
+      to: 'me@wroomly.app',
+      send: neverSend,
+      execute: true,
+      leadId: '11111111-1111-4111-8111-111111111111',
+    },
+  )
+  assert.equal(r.sent, false, 'asking for one lead and getting another would be worse than failing')
+  assert.equal(r.lead?.id, '11111111-1111-4111-8111-111111111111')
 })

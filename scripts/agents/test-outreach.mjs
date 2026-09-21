@@ -61,6 +61,10 @@ if (r.lead) {
   console.log(`  real contact (NOT used): …@${r.lead.contactDomain}`)
 }
 
+if (r.skippedLeads > 0) {
+  console.log(`\n(skipped ${r.skippedLeads} lead(s) whose claim link would not have resolved)`)
+}
+
 if (r.linkChecks.length > 0) {
   console.log('\nCLAIM LINK PRE-FLIGHT')
   for (const c of r.linkChecks) console.log(`  ${c.ok ? 'OK  ' : 'FAIL'}  ${c.label}`)
