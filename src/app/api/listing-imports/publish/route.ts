@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
+import { ensureClaimedBy } from '@/lib/listing-import/claim-guard'
 import { extractedListingDraftSchema, isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { copyImportFileToPublic } from '@/lib/listing-import/uploads'
 import { normalizeExtractedListing } from '@/lib/listing-import/normalize'
@@ -66,22 +67,10 @@ export async function POST(request: Request) {
       { error: 'This listing was already published.', listingId: req.listing_id },
       { status: 409 },
     )
-  // Auto-claim when unclaimed: the review page's claim call is fire-and-forget,
-  // so a fast publisher (or a dropped claim request) must not dead-end on 403.
-  // Holding the raw token from the email IS the claim credential.
-  if (req.claimed_by_user_id == null) {
-    const { error: claimErr } = await service
-      .from('listing_import_requests')
-      .update({ claimed_by_user_id: user.id, claimed_at: new Date().toISOString() })
-      .eq('id', req.id)
-      .is('claimed_by_user_id', null)
-    if (claimErr) {
-      console.error('[listing-imports/publish] auto-claim failed', claimErr)
-      return NextResponse.json({ error: 'Could not claim the draft.' }, { status: 500 })
-    }
-  } else if (req.claimed_by_user_id !== user.id) {
-    return NextResponse.json({ error: 'You don’t have access to this draft.' }, { status: 403 })
-  }
+  // Publishing claims the draft if nothing has yet. Since the review page no
+  // longer claims on view, this and the photo routes are the only writers.
+  const claim = await ensureClaimedBy(service, req, user.id)
+  if (!claim.ok) return NextResponse.json({ error: claim.error }, { status: claim.status })
 
   // PDFs are AI source material, never listing photos — drop any that slip in.
   const confirmedPhotoPaths = body.confirmedPhotoPaths.filter(isPublishablePhotoPath)

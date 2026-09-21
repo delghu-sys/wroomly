@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-token'
+import { ensureClaimedBy } from '@/lib/listing-import/claim-guard'
 import { UPLOAD_LIMITS } from '@/lib/listing-import/schema'
 import { verifyUploadedPaths, signImportUrls, UploadError } from '@/lib/listing-import/uploads'
 
@@ -49,8 +50,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'This link has expired.' }, { status: 410 })
   if (req.listing_id)
     return NextResponse.json({ error: 'This listing was already published.' }, { status: 409 })
-  if (req.claimed_by_user_id !== user.id)
-    return NextResponse.json({ error: 'You don’t have access to this draft.' }, { status: 403 })
+  // Uploading a photo is a real action on the draft, so this is where an
+  // unclaimed draft becomes this user's — not when they merely opened it.
+  const claim = await ensureClaimedBy(service, req, user.id)
+  if (!claim.ok) return NextResponse.json({ error: claim.error }, { status: claim.status })
 
   // Never trust the client's paths — verify against storage. Images only:
   // these become public listing photos.
