@@ -43,6 +43,9 @@ export interface Availability {
   to: string | null
   /** True when the end is past at `now` — the post is stale and must be fixed. */
   alreadyEnded: boolean
+  /** True when the year came from the post date rather than the text itself.
+   *  Worth saying out loud wherever these dates are shown to a person. */
+  yearInferred: boolean
 }
 
 const iso = (y: number, m: number, d: number) =>
@@ -71,7 +74,15 @@ const lastDayOfMonth = (y: number, m: number) => new Date(Date.UTC(y, m + 1, 0))
  *                                   the year before: Sep 1 2026 – May 31 2027
  *   "January to May+"             → null (no year)
  */
-export function parseAvailability(raw: string | null | undefined, now = new Date()): Availability | null {
+export function parseAvailability(
+  raw: string | null | undefined,
+  now = new Date(),
+  /** When the post was published. A term with no year is read as the first
+   *  one starting on or after this — "January to August" posted in October
+   *  2025 is the Jan–Aug 2026 term, which is how a stale post becomes
+   *  provably stale instead of merely unreadable. */
+  postedAt?: string | Date | null,
+): Availability | null {
   if (!raw) return null
   const text = raw.toLowerCase().trim()
   if (!text) return null
@@ -97,7 +108,34 @@ export function parseAvailability(raw: string | null | undefined, now = new Date
   const single = new RegExp(`${MONTH_WORD}\\s+${YEAR}`).exec(text)
   if (single) {
     const [, m, y] = single
-    return { from: iso(Number(y), MONTHS[m], 1), to: null, alreadyEnded: false }
+    return { from: iso(Number(y), MONTHS[m], 1), to: null, alreadyEnded: false, yearInferred: false }
+  }
+
+  // ── no year in the text ──────────────────────────────────────────────────
+  // Without a post date to anchor to, this stays unreadable: "this January or
+  // next?" is a coin flip, and guessing puts a wrong year on someone's home.
+  const anchor = postedAt ? new Date(postedAt) : null
+  if (!anchor || Number.isNaN(anchor.getTime())) return null
+
+  const anchorYear = anchor.getUTCFullYear()
+  const anchorMonth = anchor.getUTCMonth()
+  /** The first time this month comes round on or after the post. */
+  const yearFor = (month: number) => (month >= anchorMonth ? anchorYear : anchorYear + 1)
+
+  const bare = new RegExp(`${MONTH_WORD}\\s*${DASH}\\s*${MONTH_WORD}`).exec(text)
+  if (bare) {
+    const [, m1, m2] = bare
+    const startYear = yearFor(MONTHS[m1])
+    // The end follows the start, rolling into the next year when it has to.
+    const endYear = MONTHS[m2] >= MONTHS[m1] ? startYear : startYear + 1
+    const r = range(MONTHS[m1], startYear, MONTHS[m2], endYear, now)
+    return r && { ...r, yearInferred: true }
+  }
+
+  const bareSingle = new RegExp(MONTH_WORD).exec(text)
+  if (bareSingle) {
+    const m = MONTHS[bareSingle[1]]
+    return { from: iso(yearFor(m), m, 1), to: null, alreadyEnded: false, yearInferred: true }
   }
 
   return null
@@ -109,7 +147,7 @@ function range(m1: number, y1: number, m2: number, y2: number, now: Date): Avail
   // A range that ends before it starts is a misread, not a term. Refuse it
   // rather than hand someone a draft that can never be valid.
   if (to < from) return null
-  return { from, to, alreadyEnded: to < now.toISOString().slice(0, 10) }
+  return { from, to, alreadyEnded: to < now.toISOString().slice(0, 10), yearInferred: false }
 }
 
 export interface StreetAddress {
@@ -170,8 +208,12 @@ const MAX_TERM_MONTHS = 12
  * be worse than reviewing one stale post. Only a term we can PROVE is over
  * gets rejected.
  */
-export function termHasEnded(raw: string | null | undefined, now = new Date()): boolean {
-  const parsed = parseAvailability(raw, now)
+export function termHasEnded(
+  raw: string | null | undefined,
+  now = new Date(),
+  postedAt?: string | Date | null,
+): boolean {
+  const parsed = parseAvailability(raw, now, postedAt)
   if (!parsed) return false
 
   const today = now.toISOString().slice(0, 10)

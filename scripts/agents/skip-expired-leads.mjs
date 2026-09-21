@@ -38,9 +38,12 @@ let skippedSafe = 0
 for (const lead of leads ?? []) {
   const label = (lead.title ?? '(untitled)').slice(0, 32).padEnd(34)
   const dates = typeof lead.extracted?.dates === 'string' ? lead.extracted.dates : null
+  // The post date is what makes a year-less term readable at all — without it
+  // "January to August" is unknowable and the lead is kept by default.
+  const postedAt = typeof lead.extracted?.postedAt === 'string' ? lead.extracted.postedAt : null
 
-  if (!termHasEnded(dates)) {
-    console.log(`${label} keep    ${dates ?? '(no dates)'}`)
+  if (!termHasEnded(dates, new Date(), postedAt)) {
+    console.log(`${label} keep    ${dates ?? '(no dates)'}${postedAt ? ` (posted ${postedAt.slice(0, 10)})` : ' (no post date)'}`)
     kept += 1
     continue
   }
@@ -60,21 +63,24 @@ for (const lead of leads ?? []) {
   }
 
   if (!write) {
-    console.log(`${label} would skip  term ended: ${dates}`)
+    console.log(`${label} would skip  term ended: ${dates} (posted ${postedAt?.slice(0, 10) ?? '?'})`)
     expired += 1
     continue
   }
 
   const { error: upErr } = await db
     .from('sourced_leads')
-    .update({ status: 'skipped', skip_reason: `term already ended ("${dates}")` })
+    .update({
+      status: 'skipped',
+      skip_reason: `term already ended ("${dates}"${postedAt ? `, posted ${postedAt.slice(0, 10)}` : ''})`,
+    })
     .eq('id', lead.id)
     .is('outreach_sent_at', null)
   if (upErr) {
     console.log(`${label} ERROR   ${upErr.message}`)
     continue
   }
-  console.log(`${label} skipped     term ended: ${dates}`)
+  console.log(`${label} skipped     term ended: ${dates} (posted ${postedAt?.slice(0, 10) ?? '?'})`)
   expired += 1
 }
 
