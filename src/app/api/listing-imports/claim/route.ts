@@ -11,6 +11,13 @@ const bodySchema = z.object({ token: z.string().min(1) })
  * POST /api/listing-imports/claim
  * Associates a completed import draft with the authenticated user.
  * Body: { token } (the raw claim token from the email link).
+ *
+ * NOTE: nothing calls this today. The review page used to fire it from a
+ * useEffect on mount, which meant opening a link claimed the draft for
+ * whoever opened it — see src/lib/listing-import/claim-guard.ts. It is kept
+ * as a valid endpoint for a DELIBERATE user action (an explicit "claim this"
+ * button), and must never be wired to a page view again. The routes that
+ * perform real actions claim through ensureClaimedBy() instead.
  */
 export async function POST(request: Request) {
   const supabase = await createClient()

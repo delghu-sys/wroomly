@@ -141,23 +141,15 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
     }
   }
 
-  // Associate the draft with this account on mount (idempotent). Publish also
-  // auto-claims server-side, so a slow/failed claim here is never a dead end —
-  // but a *conflict* (someone else claimed it) is surfaced immediately.
+  // Viewing a draft must NOT claim it. This used to POST /claim on mount, so
+  // merely opening the link bound the draft to whoever opened it — including a
+  // recipient signed into the wrong account, who was then locked out of it with
+  // the right one. Nothing needed that write: the claim page already refuses to
+  // render a draft owned by someone else (server-side, before this component
+  // exists), and the first real action — a photo upload, or publish — claims it
+  // through ensureClaimedBy().
   useEffect(() => {
     track('claim_viewed')
-    fetch('/api/listing-imports/claim', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    })
-      .then(async res => {
-        if (res.status === 409) {
-          const json = await res.json().catch(() => null)
-          toast.error(json?.error ?? 'This draft has already been claimed.')
-        }
-      })
-      .catch(() => {})
   }, [token])
 
   const attribution = useMemo(() => mapSourceAttribution(draft.sourceAttribution), [draft.sourceAttribution])
