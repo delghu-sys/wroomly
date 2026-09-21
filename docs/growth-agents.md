@@ -61,6 +61,38 @@ copy-pasted command cannot start mailing strangers on its own.
 | `OUTREACH_DAILY_CAP` | Default 25. |
 | `OUTREACH_SECRET` | 32+ random chars. Signs unsubscribe links — **required**, the send will throw without it. Set it in `.env.local` **and** in Vercel: the console runs on the server, and the unsubscribe endpoint verifies with it. |
 | `AGENT_DRAFT_LIMIT` | Drafts per run, default 25. |
+| `RESEND_WEBHOOK_SECRET` | `whsec_…`, from the Resend dashboard. Verifies inbound delivery events. Without it `/api/resend/webhook` refuses every request, so bounces and complaints are never recorded. |
+
+## Bounces and complaints
+
+`outreach_suppressions` is checked before every send. Three things write to it:
+
+1. **Unsubscribe** — a recipient clicking the `List-Unsubscribe` link.
+2. **Hard bounces** — the address does not exist.
+3. **Spam complaints** — the recipient hit "report spam".
+
+The last two arrive as Resend webhooks at `POST /api/resend/webhook`. To turn
+them on:
+
+1. Resend dashboard → **Webhooks** → **Add Webhook**
+2. Endpoint: `https://wroomly.app/api/resend/webhook`
+3. Subscribe to **`email.bounced`** and **`email.complained`** (others are
+   accepted and ignored)
+4. Copy the signing secret (`whsec_…`) into Vercel as `RESEND_WEBHOOK_SECRET`,
+   then redeploy — env vars bind at build time
+
+Every request must carry a valid Svix signature; an unsigned or forged POST is
+rejected with a 400 and writes nothing. Without that check, anyone who learned
+the URL could forge a bounce and silently suppress any address they liked.
+
+**Transient bounces deliberately do NOT suppress.** A full mailbox or a
+greylisting deferral is not a dead address. Only `Permanent` and
+`Undetermined` bounces suppress — the rules live in
+`src/lib/agents/resend-events.ts` and are unit-tested.
+
+The webhook fires for transactional mail too (inquiries, Match alerts). A hard
+bounce there means the same thing, so it suppresses as well; only outreach
+consults this table, so nothing user-facing changes.
 
 ## Adding a source
 
