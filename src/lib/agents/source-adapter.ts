@@ -8,6 +8,8 @@
  * post rather than copying its photos, so nothing is republished.
  */
 
+import { termHasEnded } from './prefill.ts'
+
 export interface RawLead {
   /** Stable id WITHIN this source. With `key` it forms the dedupe key, so
    *  re-running discovery can never duplicate a lead or a message. */
@@ -44,7 +46,10 @@ export interface SourceAdapter {
 
 /** Drop leads an adapter shouldn't have returned, so one bad adapter can't
  *  poison the pipeline. Returns the survivors plus what was rejected. */
-export function sanitizeLeads(leads: RawLead[]): {
+export function sanitizeLeads(
+  leads: RawLead[],
+  { now = new Date() }: { now?: Date } = {},
+): {
   ok: RawLead[]
   rejected: { lead: RawLead; reason: string }[]
 } {
@@ -57,6 +62,16 @@ export function sanitizeLeads(leads: RawLead[]): {
     if (seen.has(l.sourceExternalId)) { rejected.push({ lead: l, reason: 'duplicate sourceExternalId' }); continue }
     if (l.contactEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(l.contactEmail)) {
       rejected.push({ lead: l, reason: 'malformed contactEmail' }); continue
+    }
+    // Expired posts never enter the queue. Contacting someone about a sublet
+    // they filled months ago is useless to them and the quickest route to a
+    // spam complaint. Only a term we can PROVE is over is dropped — an
+    // undateable post is kept, since a parsing gap is not evidence of
+    // staleness (see termHasEnded).
+    const dates = typeof l.extracted?.dates === 'string' ? l.extracted.dates : null
+    if (termHasEnded(dates, now)) {
+      rejected.push({ lead: l, reason: `term already ended ("${dates}")` })
+      continue
     }
     seen.add(l.sourceExternalId)
     ok.push(l)

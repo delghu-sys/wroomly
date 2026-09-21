@@ -14,6 +14,15 @@ import { createClient } from '@supabase/supabase-js'
 import { SOURCES, runDiscover } from '../../src/lib/agents/runner.ts'
 
 const execute = process.argv.includes('--write')
+
+// Page fetches per source. The adapter's own default is tuned for the admin
+// console's 60s serverless budget; from a terminal a deeper sweep is fine.
+// Each page is ~2.4MB and the adapter paces itself, so keep this sane.
+const maxIdx = process.argv.indexOf('--max')
+const maxFetches = maxIdx === -1 ? undefined : Number(process.argv[maxIdx + 1])
+if (maxFetches !== undefined && (!Number.isInteger(maxFetches) || maxFetches < 1)) {
+  throw new Error('--max must be a positive integer')
+}
 const sourceKeys = (process.env.AGENT_SOURCES ?? '')
   .split(',')
   .map(s => s.trim())
@@ -31,7 +40,7 @@ const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 if (!url || !key) throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required')
 const db = createClient(url, key, { auth: { persistSession: false } })
 
-const result = await runDiscover(db, { sourceKeys, execute })
+const result = await runDiscover(db, { sourceKeys, execute, maxFetches })
 for (const s of result.sources) {
   console.log(`\n── ${s.label} (${s.key})`)
   console.log(`   basis: ${s.contactBasis}`)

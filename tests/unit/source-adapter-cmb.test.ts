@@ -54,3 +54,55 @@ test('an empty or table-less page yields nothing rather than throwing', () => {
   assert.deepEqual(parseSubletTable(''), [])
   assert.deepEqual(parseSubletTable('<p>no table here</p>'), [])
 })
+
+// ── sanitizeLeads drops expired terms ──────────────────────────────────────
+
+import { sanitizeLeads } from '../../src/lib/agents/source-adapter.ts'
+
+const AT = new Date('2026-09-21T12:00:00Z')
+const lead = (id: string, dates: string | null) => ({
+  sourceExternalId: id,
+  title: `${id} St`,
+  contactEmail: 'poster@example.com',
+  extracted: dates === null ? {} : { dates },
+})
+
+test('an expired listing never enters the queue, and says why', () => {
+  const { ok, rejected } = sanitizeLeads([lead('100', 'January to August 2026')], { now: AT })
+  assert.equal(ok.length, 0)
+  assert.equal(rejected.length, 1)
+  assert.match(rejected[0].reason, /term already ended/)
+  assert.match(rejected[0].reason, /January to August 2026/, 'the console shows the original text')
+})
+
+test('current, upcoming and undateable listings all pass through', () => {
+  const { ok, rejected } = sanitizeLeads(
+    [
+      lead('200', 'September 2026 to May 2027'),
+      lead('300', 'January to August 2027'),
+      lead('400', 'January to August'),
+      lead('500', null),
+    ],
+    { now: AT },
+  )
+  assert.deepEqual(ok.map(l => l.sourceExternalId), ['200', '300', '400', '500'])
+  assert.deepEqual(rejected, [])
+})
+
+test('the expiry check does not disturb the existing rejections', () => {
+  const { ok, rejected } = sanitizeLeads(
+    [
+      { sourceExternalId: '', title: 'no id' },
+      lead('600', 'January to August 2027'),
+      lead('600', 'January to August 2027'),
+      { sourceExternalId: '700', contactEmail: 'not-an-email' },
+    ],
+    { now: AT },
+  )
+  assert.deepEqual(ok.map(l => l.sourceExternalId), ['600'])
+  assert.deepEqual(rejected.map(r => r.reason), [
+    'missing sourceExternalId',
+    'duplicate sourceExternalId',
+    'malformed contactEmail',
+  ])
+})

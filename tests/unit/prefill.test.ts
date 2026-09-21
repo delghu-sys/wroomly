@@ -132,3 +132,48 @@ test('keeps a unit suffix and normalizes whitespace', () => {
   assert.equal(parseStreetAddress('  721   S Forest Ave  Apt 3B ')?.address, '721 S Forest Ave Apt 3B')
   assert.equal(parseStreetAddress('1300A Packard St')?.address, '1300A Packard St')
 })
+
+// ── termHasEnded: keeping expired posts out of the queue ───────────────────
+//
+// Emailing someone about a sublet they filled months ago is useless to them
+// and the fastest way to collect a spam complaint. But dropping a lead is
+// destructive, so only a term we can PROVE is over may be rejected.
+
+import { termHasEnded } from '../../src/lib/agents/prefill.ts'
+
+test('a term whose end has passed has ended', () => {
+  assert.equal(termHasEnded('January to August 2026', NOW), true, 'ended 3 weeks before NOW')
+  assert.equal(termHasEnded('January-May 2026', NOW), true)
+})
+
+test('a current term has NOT ended', () => {
+  // NOW is 2026-09-21, inside this range.
+  assert.equal(termHasEnded('September 2026 to May 2027', NOW), false)
+})
+
+test('an UPCOMING term has not ended — these are the leads worth having', () => {
+  assert.equal(termHasEnded('January to August 2027', NOW), false)
+  assert.equal(termHasEnded('May 2027 to August 2027', NOW), false)
+})
+
+test('a term ending today still counts as live', () => {
+  assert.equal(termHasEnded('January to September 2026', NOW), false, 'ends 2026-09-30')
+})
+
+test('a long-past start with no stated end is treated as finished', () => {
+  // "August 2025" states no end, but a sublet that began 13 months ago is over.
+  assert.equal(termHasEnded('August 2025', NOW), true)
+})
+
+test('a recent start with no stated end is KEPT — it may well be running', () => {
+  assert.equal(termHasEnded('August 2026', NOW), false)
+  assert.equal(termHasEnded('May 2026', NOW), false, 'four months ago, plausibly a 12-month term')
+})
+
+test('an undateable post is KEPT — a parsing gap is not evidence of staleness', () => {
+  assert.equal(termHasEnded('January to August', NOW), false)
+  assert.equal(termHasEnded('January to May+', NOW), false)
+  assert.equal(termHasEnded('ask me', NOW), false)
+  assert.equal(termHasEnded(null, NOW), false)
+  assert.equal(termHasEnded('', NOW), false)
+})
