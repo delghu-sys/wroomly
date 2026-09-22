@@ -85,6 +85,11 @@ export interface ListingContact {
   /** ISO timestamp the listing was created on the board. The anchor that
    *  makes a year-less term ("January to August") resolvable. */
   postedAt?: string
+  /** The board's own normalised street line, e.g. "327 S Division St" where
+   *  the title reads "327 S. Division". Absent on some records. */
+  addressLine?: string
+  /** As printed — often ZIP+4 ("48104-3982"); narrowed downstream. */
+  postalCode?: string
   bedrooms?: string
   bathrooms?: string
 }
@@ -199,9 +204,20 @@ export function extractContact(html: string, expectedPrice?: string): ListingCon
   const recordPrice = readNum('price')
   if (expectedPrice && recordPrice && recordPrice !== expectedPrice) return {}
 
+  // The board geocodes each listing and keeps the tidied result. Where it
+  // exists this beats reading the title, which is free text: "327 S. Division"
+  // in the title is "327 S Division St" here. Coordinates sit beside these
+  // fields and are deliberately NOT taken — publish-validation requires the
+  // person to pick their address from the geocoding suggestions, precisely so
+  // a scraped location cannot pass as a confirmed one.
+  const addressLine = read('formattedAddressLine')
+  const postalCode = read('postalCode')
+
   const email = read('email')?.toLowerCase()
   return {
     postedAt: postedAt && !Number.isNaN(Date.parse(postedAt)) ? postedAt : undefined,
+    addressLine,
+    postalCode,
     email: email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined,
     contactName: read('contactName'),
     formType: read('formType'),
@@ -258,6 +274,8 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
       // Anchors an undated term to a real year, and lets a stale post be
       // recognised as stale rather than merely unreadable.
       postedAt: contact.postedAt,
+      addressLine: contact.addressLine,
+      postalCode: contact.postalCode,
       // "Student" vs an agent/owner post — worth knowing before writing to them.
       posterType: contact.formType,
     },
