@@ -20,6 +20,14 @@ export interface RawLead {
   contactEmail?: string
   /** Facts the adapter parsed: price, dates, beds, neighborhood… */
   extracted?: Record<string, unknown>
+  /**
+   * Set when the adapter looked at a post and ruled it out — a year lease on
+   * a sublet-only pipeline, say. The lead is rejected, but it is still
+   * RECORDED, which is the point: an adapter that simply returned nothing for
+   * these would have them re-fetched on every future run, and a board that is
+   * mostly ineligible posts would never be worked through.
+   */
+  skip?: string
 }
 
 export interface FetchContext {
@@ -63,6 +71,8 @@ export function sanitizeLeads(
     if (l.contactEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(l.contactEmail)) {
       rejected.push({ lead: l, reason: 'malformed contactEmail' }); continue
     }
+    // Ruled out by the adapter itself, but still worth remembering.
+    if (l.skip) { seen.add(l.sourceExternalId); rejected.push({ lead: l, reason: l.skip }); continue }
     // Expired posts never enter the queue. Contacting someone about a sublet
     // they filled months ago is useless to them and the quickest route to a
     // spam complaint. Only a term we can PROVE is over is dropped — an

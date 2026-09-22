@@ -132,7 +132,12 @@ function ResultPanel({ action, result }: { action: Action; result: AnyResult }) 
           <div key={s.key}>
             <p>
               <span className="font-medium text-ink">{s.label}:</span> {s.found} found, {s.withContact} with a contact
-              {result.execute && <>, <span className="font-medium text-ink">{s.inserted} new</span></>}
+              {result.execute && (
+                <>
+                  , <span className="font-medium text-ink">{s.inserted} new</span>
+                  {s.remembered > 0 && <>, {s.remembered} remembered as skipped</>}
+                </>
+              )}
             </p>
             {s.error && <p className="text-red-600">Error: {s.error}</p>}
             {s.rejected.length > 0 && <p className="text-ink-muted">{s.rejected.length} rejected by sanitizer</p>}

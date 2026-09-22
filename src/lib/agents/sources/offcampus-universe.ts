@@ -256,7 +256,24 @@ export function isSublet(leaseType: unknown): boolean {
 /** Page → lead, or null when it isn't a sublet. Facts, a contact, and a link. */
 export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
   const facts = parseListingFacts(html)
-  if (!isSublet(facts.leaseType)) return null
+  if (!isSublet(facts.leaseType)) {
+    // A page we could not read at all is NOT evidence of anything — a truncated
+    // response or a layout change would otherwise get recorded permanently as
+    // "not a sublet" and never looked at again. Return nothing so it is
+    // retried on a later run.
+    if (!facts.leaseType) return null
+
+    // A lease type we DID read is a durable fact, so it is reported rather
+    // than dropped and discovery records having looked. This board is mostly
+    // year leases; silently returning null meant every run re-downloaded all
+    // of them and never reached anything new.
+    return {
+      sourceExternalId: id,
+      sourceUrl: url,
+      title: facts.title,
+      skip: `not a sublet (${facts.leaseType ?? 'lease type unknown'})`,
+    }
+  }
 
   const contact = extractContact(html, facts.price)
   return {

@@ -47,6 +47,10 @@ for (const s of result.sources) {
   if (s.error) console.log(`   ERROR: ${s.error}`)
   for (const r of s.rejected) console.log(`   rejected: ${r}`)
   console.log(`   found ${s.found} lead(s), ${s.withContact} with a contact`)
-  if (execute) console.log(`   inserted ${s.inserted} new row(s) (duplicates ignored)`)
+  if (execute) {
+    console.log(`   inserted ${s.inserted} new row(s) (duplicates ignored)`)
+    // Remembering a rejection is what stops the next run re-fetching it.
+    console.log(`   remembered ${s.remembered} rejected post(s) so they aren't re-fetched`)
+  }
 }
 console.log(execute ? '\nDone.' : '\nDry run — nothing written. Re-run with --write.')

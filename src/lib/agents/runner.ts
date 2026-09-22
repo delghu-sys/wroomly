@@ -47,6 +47,8 @@ export interface DiscoverSourceResult {
   withContact: number
   /** Rows actually inserted (duplicates from earlier runs are ignored). */
   inserted: number
+  /** Rejected posts recorded as 'skipped' so they are never re-fetched. */
+  remembered: number
   rejected: string[]
   error?: string
 }
@@ -62,9 +64,13 @@ export async function runDiscover(
     sourceKeys,
     execute,
     maxFetches,
+    adapters = SOURCES,
   }: {
     sourceKeys: string[]
     execute: boolean
+    /** Defaults to SOURCES. Injectable so the logic can be tested without a
+     *  network call. */
+    adapters?: SourceAdapter[]
     /** Page fetches per source. Left undefined, each adapter uses its own
      *  conservative default — sized for the 60s serverless limit the admin
      *  console runs under. The CLI has no such ceiling and can ask for more
@@ -74,7 +80,7 @@ export async function runDiscover(
 ): Promise<DiscoverResult> {
   const results: DiscoverSourceResult[] = []
 
-  for (const adapter of SOURCES.filter(a => sourceKeys.includes(a.key))) {
+  for (const adapter of adapters.filter(a => sourceKeys.includes(a.key))) {
     const r: DiscoverSourceResult = {
       key: adapter.key,
       label: adapter.label,
@@ -82,6 +88,7 @@ export async function runDiscover(
       found: 0,
       withContact: 0,
       inserted: 0,
+      remembered: 0,
       rejected: [],
     }
     results.push(r)
@@ -133,6 +140,41 @@ export async function runDiscover(
         break
       }
       r.inserted += data?.length ?? 0
+    }
+
+    // Record what we refused, too. Without this a rejected post never enters
+    // `knownIds`, so the NEXT run fetches it again — and the run after that.
+    // With a board that is mostly expired posts, discovery spends every run
+    // re-downloading the same dead pages and never reaches the newer ones,
+    // which is exactly the "it only ever finds expired listings" symptom.
+    // Stored as 'skipped' with the reason, so it is visible rather than
+    // silently swallowed, and planOutreach (which only sends 'drafted') can
+    // never pick one up.
+    for (const { lead: l, reason } of rejected) {
+      if (!l.sourceExternalId?.trim()) continue // nothing stable to dedupe on
+      const { data, error } = await db
+        .from('sourced_leads')
+        .upsert(
+          {
+            source: adapter.key,
+            source_external_id: l.sourceExternalId,
+            source_url: l.sourceUrl ?? null,
+            title: l.title ?? null,
+            // Deliberately NOT stored: we are not keeping contact details for
+            // someone we have already decided not to write to.
+            contact_email: null,
+            extracted: l.extracted ?? {},
+            status: 'skipped',
+            skip_reason: reason,
+          },
+          { onConflict: 'source,source_external_id', ignoreDuplicates: true },
+        )
+        .select('id')
+      if (error) {
+        r.error = error.message
+        break
+      }
+      r.remembered += data?.length ?? 0
     }
   }
 

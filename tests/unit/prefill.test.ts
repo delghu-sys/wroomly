@@ -252,3 +252,70 @@ test('termHasEnded uses the post date to expire an otherwise unreadable post', (
   assert.equal(termHasEnded('January to August', NOW, POSTED_OCT_2025), true, 'provably over')
   assert.equal(termHasEnded('January to August', NOW, POSTED_SEP_2026), false, 'upcoming')
 })
+
+// ── the formats real posters actually use ──────────────────────────────────
+//
+// Every string below is copied from a live listing. The parser previously
+// read most of them as start-only, because its range pattern expected
+// "Month to Month" and could not see past a day number — so terms that had
+// plainly finished were kept, which is what made the queue look full of
+// current listings when it was not.
+
+test('a month-day range is a RANGE, not just a start', () => {
+  assert.deepEqual(parseAvailability('May 6 to August 20', NOW, '2025-12-30'), {
+    from: '2026-05-06',
+    to: '2026-08-20',
+    alreadyEnded: true,
+    yearInferred: true,
+  })
+})
+
+test('ordinals, abbreviations and stray periods all read the same', () => {
+  for (const s of ['May 1st to August 10', 'May 24th to Aug. 5th', 'May 4 - July 29']) {
+    const r = parseAvailability(s, NOW, '2026-02-11')
+    assert.ok(r?.to, `${s} must yield an end date`)
+    assert.equal(r.alreadyEnded, true, `${s} is over`)
+  }
+})
+
+test('a numeric range is read exactly, two-digit years included', () => {
+  assert.deepEqual(parseAvailability('4/1/25 - 8/7/26', NOW, '2025-11-09'), {
+    from: '2025-04-01',
+    to: '2026-08-07',
+    alreadyEnded: true,
+    yearInferred: false,
+  })
+  assert.equal(parseAvailability('05/28/26-08/20/26', NOW)?.from, '2026-05-28')
+})
+
+test('a range crossing new year takes the start from the year before the end', () => {
+  assert.deepEqual(parseAvailability('December 13 to July 31', NOW, '2025-10-28'), {
+    from: '2025-12-13',
+    to: '2026-07-31',
+    alreadyEnded: true,
+    yearInferred: true,
+  })
+})
+
+test('a stated year is not swallowed by the day pattern', () => {
+  // "august 2026" once read the "20" of the year as a day, losing the year.
+  const r = parseAvailability('January to August 2026', NOW)
+  assert.equal(r?.from, '2026-01-01')
+  assert.equal(r?.to, '2026-08-31')
+  assert.equal(r?.yearInferred, false)
+})
+
+test('an explicit day and year together', () => {
+  assert.equal(parseAvailability('January 1, 2026', NOW)?.from, '2026-01-01')
+  assert.equal(parseAvailability('January 1st', NOW, '2025-12-15')?.from, '2026-01-01')
+})
+
+test('an impossible day is refused rather than rolled over silently', () => {
+  // Date would happily turn Feb 31 into Mar 3.
+  assert.equal(parseAvailability('February 31 2027', NOW), null)
+  assert.equal(parseAvailability('13/45/26 - 1/1/27', NOW), null)
+})
+
+test('prose around the date does not stop it being read', () => {
+  assert.equal(parseAvailability('Starting in January', NOW, '2025-10-28')?.from, '2026-01-01')
+})

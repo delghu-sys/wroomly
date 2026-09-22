@@ -7,6 +7,7 @@ import {
   toLead,
   extractContact,
 } from '../../src/lib/agents/sources/offcampus-universe.ts'
+import { sanitizeLeads as sanitizeLeadsOcu } from '../../src/lib/agents/source-adapter.ts'
 
 // Fixtures mirror the real page shapes (checked 2026-09-18) with INVENTED
 // listings, so the suite never handles a real poster's details.
@@ -52,9 +53,19 @@ test('recognises sublets and rejects the other lease types on this board', () =>
   }
 })
 
-test('a year lease produces NO lead', () => {
+test('a year lease produces no CONTACTABLE lead, but is still reported', () => {
+  // Was `null` until 2026-09-22. Returning nothing meant discovery never
+  // recorded having looked, so it re-downloaded every year-lease listing on
+  // every run — and this board is mostly year leases, which is why it never
+  // got as far as anything new. It is now reported with `skip` set, rejected
+  // by sanitizeLeads, and recorded so it is not fetched again.
   const html = page('Cross Street House', 'Year Lease (12 Months) apartment at Cross Street House, listed at $2,600  on Ann Arbor Universe Housing')
-  assert.equal(toLead(html, { id: 'cross-street-house', url: 'https://example.test/x' }), null)
+  const lead = toLead(html, { id: 'cross-street-house', url: 'https://example.test/x' })
+  assert.ok(lead)
+  assert.equal(lead.sourceExternalId, 'cross-street-house')
+  assert.match(String(lead.skip), /not a sublet/)
+  assert.match(String(lead.skip), /Year Lease/)
+  assert.equal(lead.contactEmail, undefined, 'no contact is carried for a post we ruled out')
 })
 
 test('a sublet produces a lead with facts and a link', () => {
@@ -186,4 +197,24 @@ test('never carries image data', () => {
 test('a page missing its meta description yields no lead rather than a bad one', () => {
   assert.equal(toLead('<html><head><title>X | Ann Arbor Universe Housing</title></head></html>', { id: 'x', url: 'u' }), null)
   assert.deepEqual(parseListingFacts(''), { title: undefined, leaseType: undefined, price: undefined })
+})
+
+// ── a post that is looked at must be remembered, eligible or not ───────────
+
+test('sanitizeLeads rejects a skip-marked lead but keeps its id for dedupe', () => {
+  const { ok, rejected } = sanitizeLeadsOcu([
+    { sourceExternalId: 'year-1', title: '9 Year St', skip: 'not a sublet (Year Lease (12 Months))' },
+    { sourceExternalId: 'sub-1', title: '8 Sub St', contactEmail: 'a@b.com' },
+  ])
+  assert.deepEqual(ok.map(l => l.sourceExternalId), ['sub-1'])
+  assert.equal(rejected.length, 1)
+  assert.match(rejected[0].reason, /not a sublet/)
+})
+
+test('an UNREADABLE page is not recorded as ineligible — it must stay retryable', () => {
+  // The difference that matters: "Year Lease" is a fact about the listing,
+  // while a page we couldn't parse is a fact about the fetch. Recording the
+  // second as a permanent skip would blacklist a listing over one bad
+  // response, or over a layout change, and never look at it again.
+  assert.equal(toLead('<html><head><title>X | Ann Arbor Universe Housing</title></head></html>', { id: 'x', url: 'u' }), null)
 })
