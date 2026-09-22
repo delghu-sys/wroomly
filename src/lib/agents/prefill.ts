@@ -33,8 +33,22 @@ const MONTHS: Record<string, number> = {
 }
 
 const MONTH_WORD = '(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t)?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)'
-const YEAR = '(20\\d{2})'
-const DASH = '(?:to|through|until|till|[-–—])'
+
+/**
+ * One "January", "Jan 6", "August 20th", "January 1, 2026" — month first,
+ * then an optional day (ordinal suffix allowed) and an optional year. Real
+ * boards write terms every one of these ways in the same column.
+ */
+const MONTH_TOKEN = new RegExp(
+  // `(?!\d)` after the day matters: without it "august 2026" reads the "20"
+  // of the year as a day number and the year is then lost entirely.
+  `${MONTH_WORD}\\.?\\s*(?:(\\d{1,2})(?!\\d))?(?:st|nd|rd|th)?,?\\s*(20\\d{2})?`,
+  'g',
+)
+
+/** "4/1/25 - 8/7/26" and "05/28/26-08/20/26". */
+const NUMERIC_RANGE =
+  /\b(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})\s*(?:to|through|until|till|[-–—])\s*(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})\b/
 
 export interface Availability {
   /** ISO yyyy-mm-dd, first of the month unless the text gave a day. */
@@ -79,7 +93,7 @@ export function parseAvailability(
   now = new Date(),
   /** When the post was published. A term with no year is read as the first
    *  one starting on or after this — "January to August" posted in October
-   *  2025 is the Jan–Aug 2026 term, which is how a stale post becomes
+   *  2025 is the Jan-Aug 2026 term, which is how a stale post becomes
    *  provably stale instead of merely unreadable. */
   postedAt?: string | Date | null,
 ): Availability | null {
@@ -87,67 +101,79 @@ export function parseAvailability(
   const text = raw.toLowerCase().trim()
   if (!text) return null
 
-  // Month Year <dash> Month Year — a year on each side, nothing to infer.
-  const both = new RegExp(`${MONTH_WORD}\\s+${YEAR}\\s*${DASH}\\s*${MONTH_WORD}\\s+${YEAR}`).exec(text)
-  if (both) {
-    const [, m1, y1, m2, y2] = both
-    return range(MONTHS[m1], Number(y1), MONTHS[m2], Number(y2), now)
+  const anchorRaw = postedAt ? new Date(postedAt) : null
+  const anchor = anchorRaw && !Number.isNaN(anchorRaw.getTime()) ? anchorRaw : null
+
+  // "4/1/25 - 8/7/26" — unambiguous, so it wins outright.
+  const numeric = NUMERIC_RANGE.exec(text)
+  if (numeric) {
+    const [, m1, d1, y1, m2, d2, y2] = numeric
+    const from = ymd(fullYear(y1), Number(m1) - 1, Number(d1))
+    const to = ymd(fullYear(y2), Number(m2) - 1, Number(d2))
+    if (!from || !to || to < from) return null
+    return { from, to, alreadyEnded: to < today(now), yearInferred: false }
   }
 
-  // Month <dash> Month Year — one year, belonging to the END of the term.
-  const shared = new RegExp(`${MONTH_WORD}\\s*${DASH}\\s*${MONTH_WORD}\\s+${YEAR}`).exec(text)
-  if (shared) {
-    const [, m1, m2, y] = shared
-    const endYear = Number(y)
-    // "September to May 2027" spans a new year, so the start is 2026.
-    const startYear = MONTHS[m1] > MONTHS[m2] ? endYear - 1 : endYear
-    return range(MONTHS[m1], startYear, MONTHS[m2], endYear, now)
+  // Otherwise read every "Month [day] [year]" the text contains, in order.
+  MONTH_TOKEN.lastIndex = 0
+  const tokens: { month: number; day?: number; year?: number }[] = []
+  for (const m of text.matchAll(MONTH_TOKEN)) {
+    const month = MONTHS[m[1]]
+    if (month === undefined) continue
+    const day = m[2] ? Number(m[2]) : undefined
+    tokens.push({
+      month,
+      day: day !== undefined && day >= 1 && day <= 31 ? day : undefined,
+      year: m[3] ? Number(m[3]) : undefined,
+    })
   }
+  if (tokens.length === 0) return null
 
-  // A single Month Year — a start, with no end stated.
-  const single = new RegExp(`${MONTH_WORD}\\s+${YEAR}`).exec(text)
-  if (single) {
-    const [, m, y] = single
-    return { from: iso(Number(y), MONTHS[m], 1), to: null, alreadyEnded: false, yearInferred: false }
-  }
+  // A year stated anywhere applies to whichever end lacks one: boards write
+  // "January to August 2026" far more often than a year on each side.
+  const statedYear = tokens.find(t => t.year !== undefined)?.year
+  const anyYearStated = statedYear !== undefined
 
-  // ── no year in the text ──────────────────────────────────────────────────
-  // Without a post date to anchor to, this stays unreadable: "this January or
-  // next?" is a coin flip, and guessing puts a wrong year on someone's home.
-  const anchor = postedAt ? new Date(postedAt) : null
-  if (!anchor || Number.isNaN(anchor.getTime())) return null
-
-  const anchorYear = anchor.getUTCFullYear()
-  const anchorMonth = anchor.getUTCMonth()
   /** The first time this month comes round on or after the post. */
-  const yearFor = (month: number) => (month >= anchorMonth ? anchorYear : anchorYear + 1)
-
-  const bare = new RegExp(`${MONTH_WORD}\\s*${DASH}\\s*${MONTH_WORD}`).exec(text)
-  if (bare) {
-    const [, m1, m2] = bare
-    const startYear = yearFor(MONTHS[m1])
-    // The end follows the start, rolling into the next year when it has to.
-    const endYear = MONTHS[m2] >= MONTHS[m1] ? startYear : startYear + 1
-    const r = range(MONTHS[m1], startYear, MONTHS[m2], endYear, now)
-    return r && { ...r, yearInferred: true }
+  const inferYear = (month: number): number | null => {
+    if (!anchor) return null
+    const ay = anchor.getUTCFullYear()
+    return month >= anchor.getUTCMonth() ? ay : ay + 1
   }
 
-  const bareSingle = new RegExp(MONTH_WORD).exec(text)
-  if (bareSingle) {
-    const m = MONTHS[bareSingle[1]]
-    return { from: iso(yearFor(m), m, 1), to: null, alreadyEnded: false, yearInferred: true }
+  const first = tokens[0]
+  const second = tokens[1]
+
+  if (second) {
+    // The last year mentioned belongs to the END of the term.
+    const endYear = second.year ?? statedYear ?? inferYear(second.month)
+    if (endYear == null) return null
+    // The start precedes the end, rolling back a year when it must.
+    const startYear = first.year ?? (first.month > second.month ? endYear - 1 : endYear)
+
+    const from = ymd(startYear, first.month, first.day ?? 1)
+    const to = ymd(endYear, second.month, second.day ?? lastDayOfMonth(endYear, second.month))
+    if (!from || !to || to < from) return null
+    return { from, to, alreadyEnded: to < today(now), yearInferred: !anyYearStated }
   }
 
-  return null
+  const year = first.year ?? inferYear(first.month)
+  if (year == null) return null
+  const from = ymd(year, first.month, first.day ?? 1)
+  if (!from) return null
+  return { from, to: null, alreadyEnded: false, yearInferred: first.year === undefined }
 }
 
-function range(m1: number, y1: number, m2: number, y2: number, now: Date): Availability | null {
-  const from = iso(y1, m1, 1)
-  const to = iso(y2, m2, lastDayOfMonth(y2, m2))
-  // A range that ends before it starts is a misread, not a term. Refuse it
-  // rather than hand someone a draft that can never be valid.
-  if (to < from) return null
-  return { from, to, alreadyEnded: to < now.toISOString().slice(0, 10), yearInferred: false }
+const today = (now: Date) => now.toISOString().slice(0, 10)
+
+/** "25" -> 2025, "2026" -> 2026. */
+const fullYear = (raw: string) => (raw.length === 2 ? 2000 + Number(raw) : Number(raw))
+
+/** Guards a nonsense day (Feb 31) rather than letting Date roll it silently. */
+function ymd(year: number, month: number, day: number): string | null {
+  if (!Number.isFinite(year) || month < 0 || month > 11) return null
+  if (day < 1 || day > lastDayOfMonth(year, month)) return null
+  return iso(year, month, day)
 }
 
 export interface StreetAddress {

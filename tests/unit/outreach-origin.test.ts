@@ -1,5 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import type { RawLead, SourceAdapter } from '../../src/lib/agents/source-adapter.ts'
 
 process.env.OUTREACH_SECRET ??= 'unit-test-secret-000000000000000000000000'
 
@@ -128,4 +129,73 @@ test('a dry run still previews the localhost link rather than hiding it', async 
   assert.equal(r.sent, 0)
   assert.ok(r.sample?.text.includes('http://localhost:3000/claim-listing/tok_abc'))
   assert.deepEqual(r.errors, [], 'a dry run is not an error — it is how you see the bad link')
+})
+
+// ── discovery remembers what it rejected ───────────────────────────────────
+//
+// Rejected posts used not to be written anywhere, so they never entered
+// `knownIds` and every run re-fetched them. On a board that is mostly expired
+// posts that means discovery re-downloads the same dead pages forever and
+// never reaches newer ones — the "it only ever finds expired listings" bug.
+
+const { runDiscover } = await import('../../src/lib/agents/runner.ts')
+
+function recordingDb(writes: Record<string, unknown>[]) {
+  const chain: Record<string, unknown> = {}
+  Object.assign(chain, {
+    select: () => chain,
+    eq: () => chain,
+    upsert: (row: Record<string, unknown>) => {
+      writes.push(row)
+      return chain
+    },
+    then: (resolve: (v: unknown) => void) => resolve({ data: [{ id: 'x' }], error: null }),
+  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return { from: () => chain } as any
+}
+
+const fakeAdapter = (leads: RawLead[]): SourceAdapter => ({
+  key: 'test-source',
+  label: 'Test source',
+  contactBasis: 'test',
+  fetchLeads: async () => leads,
+})
+
+test('an expired post is written as skipped, so the next run does not re-fetch it', async () => {
+  const writes: Record<string, unknown>[] = []
+  const r = await runDiscover(recordingDb(writes), {
+    sourceKeys: ['test-source'],
+    execute: true,
+    adapters: [
+      fakeAdapter([
+        { sourceExternalId: 'live-1', title: '1 Live St', contactEmail: 'a@b.com', extracted: { dates: 'January to August 2028' } },
+        { sourceExternalId: 'dead-1', title: '2 Dead St', contactEmail: 'c@d.com', extracted: { dates: 'January to August 2020' } },
+      ]),
+    ],
+  })
+
+  assert.equal(r.sources[0].found, 1, 'only the live one counts as found')
+  assert.equal(r.sources[0].remembered, 1, 'but the dead one is still recorded')
+
+  const dead = writes.find(w => w.source_external_id === 'dead-1')
+  assert.ok(dead, 'the rejected post IS written')
+  assert.equal(dead.status, 'skipped')
+  assert.match(String(dead.skip_reason), /term already ended/)
+  assert.equal(dead.contact_email, null, 'we do not keep an address for someone we refused to write to')
+
+  const live = writes.find(w => w.source_external_id === 'live-1')
+  assert.equal(live?.contact_email, 'a@b.com')
+  assert.equal(live?.status, undefined, 'a normal lead keeps the table default')
+})
+
+test('a post with no stable id is not recorded — there is nothing to dedupe on', async () => {
+  const writes: Record<string, unknown>[] = []
+  const r = await runDiscover(recordingDb(writes), {
+    sourceKeys: ['test-source'],
+    execute: true,
+    adapters: [fakeAdapter([{ sourceExternalId: '', title: 'nameless' }])],
+  })
+  assert.equal(r.sources[0].remembered, 0)
+  assert.deepEqual(writes, [])
 })
