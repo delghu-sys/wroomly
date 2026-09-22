@@ -222,6 +222,18 @@ export function parseStreetAddress(title: string | null | undefined): StreetAddr
  *  stated end is a finished term rather than an open-ended offer. */
 const MAX_TERM_MONTHS = 12
 
+/** A sublet post left up this long, whose start has already passed, is a
+ *  listing nobody has tended rather than an offer still open. Only applied
+ *  when the text gave no end date — an explicit end is always believed. */
+const STALE_POST_MONTHS = 9
+
+/** `n` months before `now`, as yyyy-mm-dd. */
+function monthsBefore(now: Date, n: number): string {
+  const d = new Date(now)
+  d.setUTCMonth(d.getUTCMonth() - n)
+  return d.toISOString().slice(0, 10)
+}
+
 /**
  * Has this term already finished?
  *
@@ -243,14 +255,28 @@ export function termHasEnded(
   if (!parsed) return false
 
   const today = now.toISOString().slice(0, 10)
+
+  // An end date the poster actually wrote is authoritative, whatever else is
+  // true. An old post advertising a genuinely future term is still a real
+  // offer, and must not be thrown away because the post itself is old.
   if (parsed.to) return parsed.to < today
+
+  if (!parsed.from) return false
 
   // A start with no end: "August 2025" says nothing explicit about the finish,
   // but a sublet that began more than a year ago is not a current listing.
-  if (parsed.from) {
-    const cutoff = new Date(now)
-    cutoff.setUTCMonth(cutoff.getUTCMonth() - MAX_TERM_MONTHS)
-    return parsed.from < cutoff.toISOString().slice(0, 10)
+  if (parsed.from < monthsBefore(now, MAX_TERM_MONTHS)) return true
+
+  // Nothing above proves it, so fall back to the age of the POST. A listing
+  // sitting untouched for most of a year, advertising a start that has already
+  // come and gone, is stale even though its end was never written down. Both
+  // halves are required: an old post whose start is still ahead is a real
+  // offer, and a recent post is no evidence of anything.
+  const posted = postedAt ? new Date(postedAt) : null
+  if (posted && !Number.isNaN(posted.getTime())) {
+    const postDay = posted.toISOString().slice(0, 10)
+    if (parsed.from < today && postDay < monthsBefore(now, STALE_POST_MONTHS)) return true
   }
+
   return false
 }
