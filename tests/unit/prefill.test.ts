@@ -319,3 +319,41 @@ test('an impossible day is refused rather than rolled over silently', () => {
 test('prose around the date does not stop it being read', () => {
   assert.equal(parseAvailability('Starting in January', NOW, '2025-10-28')?.from, '2026-01-01')
 })
+
+// ── the stale-post rule ────────────────────────────────────────────────────
+//
+// A start date with no stated end used to survive for a full year. But a post
+// left untouched for most of a year, advertising a start that has already
+// come and gone, is a listing nobody is tending — not an offer still open.
+
+test('an old post whose start has passed is stale, even with no end date', () => {
+  // Posted Sep 2025, "Jan 1" → starts Jan 2026. A year later, that is over.
+  assert.equal(termHasEnded('Jan 1', NOW, '2025-09-19'), true)
+  assert.equal(termHasEnded('January 1st', NOW, '2025-12-15'), true)
+})
+
+test('a RECENT post with a past start is kept — it may well be running', () => {
+  // Posted Mar 2026, "May 1". Six months old; a May–Dec term is plausible.
+  assert.equal(termHasEnded('May 1', NOW, '2026-03-19'), false)
+  assert.equal(termHasEnded('March 2026', NOW, '2026-02-04'), false)
+})
+
+test('an old post whose start is still AHEAD is a real offer, and kept', () => {
+  // Both halves of the rule are required. Posted long ago, but advertising a
+  // term that has not begun — dropping this would discard a live listing.
+  assert.equal(termHasEnded('January 2028', NOW, '2025-01-05'), false)
+})
+
+test('an explicit end date is believed over the age of the post', () => {
+  // A two-year-old post advertising a 2028 term is still a future term. The
+  // stale-post rule must never override a date the poster actually wrote.
+  assert.equal(termHasEnded('January to August 2028', NOW, '2024-06-01'), false)
+  // And the converse: a recent post with a finished term is still finished.
+  assert.equal(termHasEnded('January to May 2026', NOW, '2026-05-01'), true)
+})
+
+test('with no post date the old behaviour is unchanged', () => {
+  // Nothing to age against, so only the 12-month rule applies.
+  assert.equal(termHasEnded('January 2026', NOW), false)
+  assert.equal(termHasEnded('August 2025', NOW), true, 'over a year ago')
+})
