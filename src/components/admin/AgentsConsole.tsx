@@ -151,6 +151,7 @@ function ResultPanel({ action, result }: { action: Action; result: AnyResult }) 
               {result.execute ? 'Drafted' : 'Would draft'}: {(result as DraftResult).drafted}
             </span>
             {(result as DraftResult).skippedSuppressed > 0 && <> · {(result as DraftResult).skippedSuppressed} opted out</>}
+            {(result as DraftResult).photosCopied > 0 && <> · {(result as DraftResult).photosCopied} photos copied privately</>}
           </p>
         </>
       )}

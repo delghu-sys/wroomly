@@ -15,6 +15,7 @@ import {
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse } from './sources/offcampus-universe.ts'
 import { leadToExtractedDraft, type AnyExtracted } from './to-draft.ts'
+import { copySourcePhotos } from './source-photos.ts'
 import { buildOutreachEmail, DEFAULT_TEMPLATE, type OutreachTemplate } from './outreach-template.ts'
 
 /**
@@ -187,6 +188,8 @@ export interface DraftResult {
   candidates: number
   drafted: number
   skippedSuppressed: number
+  /** Photos copied into drafts' PRIVATE storage this run. */
+  photosCopied: number
   errors: string[]
 }
 
@@ -203,7 +206,14 @@ export async function runDraft(
   db: Db,
   { execute, limit = 25 }: { execute: boolean; limit?: number },
 ): Promise<DraftResult> {
-  const out: DraftResult = { execute, candidates: 0, drafted: 0, skippedSuppressed: 0, errors: [] }
+  const out: DraftResult = {
+    execute,
+    candidates: 0,
+    drafted: 0,
+    skippedSuppressed: 0,
+    photosCopied: 0,
+    errors: [],
+  }
 
   // Only leads WITH a contact get drafted: a draft exists so we have something
   // to offer the person, and there is no point preparing one we cannot mention.
@@ -275,6 +285,25 @@ export async function runDraft(
     if (reqErr) {
       out.errors.push(`draft failed for lead ${lead.id}: ${reqErr.message}`)
       continue
+    }
+
+    // The post's own photos, into the draft's PRIVATE storage — the same
+    // place the importer keeps a person's own uploads. Nothing here is
+    // public; a photo is published only if the claimer publishes with it
+    // selected. A failed copy costs a photo, never the draft.
+    const imageUrls = Array.isArray(lead.extracted?.imageUrls)
+      ? (lead.extracted.imageUrls as unknown[]).filter((u): u is string => typeof u === 'string')
+      : []
+    if (imageUrls.length > 0) {
+      const copied = await copySourcePhotos(db, req.id, imageUrls)
+      if (copied.paths.length > 0) {
+        const { error: photoErr } = await db
+          .from('listing_import_requests')
+          .update({ personal_image_paths: copied.paths })
+          .eq('id', req.id)
+        if (photoErr) out.errors.push(`photos not attached for lead ${lead.id}: ${photoErr.message}`)
+        else out.photosCopied += copied.paths.length
+      }
     }
 
     const { error: upErr } = await db

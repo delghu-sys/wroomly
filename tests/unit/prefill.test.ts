@@ -357,3 +357,34 @@ test('with no post date the old behaviour is unchanged', () => {
   assert.equal(termHasEnded('January 2026', NOW), false)
   assert.equal(termHasEnded('August 2025', NOW), true, 'over a year ago')
 })
+
+// ── descriptions read from the post ────────────────────────────────────────
+
+import { htmlToText, findContactDetails } from '../../src/lib/agents/prefill.ts'
+
+test('rich-text HTML becomes the plain text the poster wrote', () => {
+  // Shape copied from a live record: entities, paragraphs, an empty spacer.
+  const html = "<p>I&#x27;m looking for someone to sublease my room.</p><p> </p><p>Gym &amp; pool — close to campus.</p>"
+  assert.equal(htmlToText(html), "I'm looking for someone to sublease my room.\n\nGym & pool — close to campus.")
+})
+
+test('line breaks and lists survive', () => {
+  assert.equal(htmlToText('<p>Line one<br>Line two</p>'), 'Line one\nLine two')
+  assert.equal(htmlToText('<ul><li>Furnished</li><li>Parking</li></ul>'), '• Furnished\n\n• Parking')
+})
+
+test('markup with no actual text is no description at all', () => {
+  assert.equal(htmlToText('<p> </p><p>&nbsp;</p>'), null)
+  assert.equal(htmlToText(''), null)
+  assert.equal(htmlToText(null), null)
+})
+
+test('contact details are COUNTED, so the draft can point them out', () => {
+  assert.deepEqual(findContactDetails('Text me at (734) 555-0199 or a@b.com, photos at www.example.com'), {
+    emails: 1,
+    phones: 1,
+    links: 1,
+  })
+  assert.deepEqual(findContactDetails('2 bed, 1 bath, $1,249/mo, available 7/18'), { emails: 0, phones: 0, links: 0 },
+    'prices and dates are not phone numbers')
+})

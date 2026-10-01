@@ -1,4 +1,6 @@
 import type { FetchContext, RawLead, SourceAdapter } from '../source-adapter.ts'
+import { htmlToText } from '../prefill.ts'
+import { wixImageUrl, MAX_SOURCE_PHOTOS } from '../source-photos.ts'
 
 /**
  * Source: University of Michigan sublet posts on offcampus-universe.com.
@@ -90,6 +92,11 @@ export interface ListingContact {
   addressLine?: string
   /** As printed — often ZIP+4 ("48104-3982"); narrowed downstream. */
   postalCode?: string
+  /** The poster's own description, as plain text (the board stores HTML). */
+  description?: string
+  /** CDN URLs for the post's own photos. Carried as URLs only; they are
+   *  copied into the claimer's PRIVATE draft by copySourcePhotos. */
+  imageUrls?: string[]
   bedrooms?: string
   bathrooms?: string
 }
@@ -213,11 +220,30 @@ export function extractContact(html: string, expectedPrice?: string): ListingCon
   const addressLine = read('formattedAddressLine')
   const postalCode = read('postalCode')
 
+  // The description is rich-text HTML in a field called `details`, and far
+  // longer than `read` allows. Captured up to the next key, then turned into
+  // plain text — reading the poster's words, not writing any.
+  const detailsHtml = record.match(/"details":"([\s\S]*?)","[A-Za-z_$][\w$-]*":/)?.[1]
+  const description = htmlToText(detailsHtml) ?? undefined
+
+  // The post's own photos, as Wix refs. Read only from inside this record, so
+  // images from other listings on the page can never be picked up. Deduped
+  // by media id, since a gallery and its cover often repeat the same image.
+  const imageUrls = [
+    ...new Set(
+      [...record.matchAll(/"(wix:image:\/\/v1\/[^"]+)"/g)]
+        .map(m => wixImageUrl(m[1]))
+        .filter((u): u is string => !!u),
+    ),
+  ].slice(0, MAX_SOURCE_PHOTOS)
+
   const email = read('email')?.toLowerCase()
   return {
     postedAt: postedAt && !Number.isNaN(Date.parse(postedAt)) ? postedAt : undefined,
     addressLine,
     postalCode,
+    description,
+    imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
     email: email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : undefined,
     contactName: read('contactName'),
     formType: read('formType'),
@@ -293,6 +319,8 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
       postedAt: contact.postedAt,
       addressLine: contact.addressLine,
       postalCode: contact.postalCode,
+      description: contact.description,
+      imageUrls: contact.imageUrls,
       // "Student" vs an agent/owner post — worth knowing before writing to them.
       posterType: contact.formType,
     },

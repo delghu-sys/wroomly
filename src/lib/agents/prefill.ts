@@ -280,3 +280,56 @@ export function termHasEnded(
 
   return false
 }
+
+// ── descriptions ───────────────────────────────────────────────────────────
+
+const ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+}
+
+/**
+ * The board stores a listing's description as rich-text HTML ("<p>…</p>",
+ * "&#x27;" for an apostrophe). Turn it into plain text with paragraph breaks
+ * kept, so it reads as the poster wrote it.
+ *
+ * This is READING their words, not writing any: nothing is summarised,
+ * reworded or added. Returns null for markup with no actual text in it.
+ */
+export function htmlToText(html: string | null | undefined): string | null {
+  if (!html) return null
+  const text = html
+    // Block boundaries become line breaks before tags are stripped.
+    .replace(/<\s*br\s*\/?>/gi, '\n')
+    .replace(/<\s*\/\s*(p|div|li|h[1-6])\s*>/gi, '\n\n')
+    .replace(/<\s*li[^>]*>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&([a-z]+);/gi, (m, n) => ENTITIES[n.toLowerCase()] ?? m)
+    .replace(/[ \t ]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+  return text.length > 0 ? text : null
+}
+
+export interface ContactDetails {
+  emails: number
+  phones: number
+  links: number
+}
+
+/**
+ * Count contact details in a description. Deliberately does NOT remove them:
+ * silently editing someone's own words is worse than telling them. The draft
+ * points them out instead, since Wroomly routes enquiries itself and a phone
+ * number in a public description sends renters around it.
+ */
+export function findContactDetails(text: string | null | undefined): ContactDetails {
+  const t = text ?? ''
+  return {
+    emails: (t.match(/[^\s@]+@[^\s@]+\.[a-z]{2,}/gi) ?? []).length,
+    phones: (t.match(/(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g) ?? []).length,
+    links: (t.match(/\bhttps?:\/\/\S+|\bwww\.\S+/gi) ?? []).length,
+  }
+}

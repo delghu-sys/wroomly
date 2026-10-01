@@ -34,8 +34,8 @@ These are enforced in code and schema rather than left to the operator:
 
 | Rule | Enforced by |
 |---|---|
-| A discovered listing is **never published** | `draft.mjs` writes a *pending* `listing_import_requests` row; only claiming it at `/claim-listing/<token>` can make it live |
-| We never copy anyone's **photos** | adapters return facts + a link; `sourced_leads` has no image columns, asserted by a test |
+| A discovered listing is **never published** | `draft.mjs` writes an unpublished `listing_import_requests` row; only the owner, by claiming and publishing at `/claim-listing/<token>`, can make it live |
+| Photos stay **private until the owner publishes them** | copied into the PRIVATE `listing-imports` bucket (`source-photos.ts`); reach the public bucket only if the claimer publishes with them selected. *Changed 2026-10-01 — previously never copied at all; see Known gaps.* |
 | Nobody is discovered twice | unique index on `(source, source_external_id)` |
 | Nobody is emailed twice, ever | `planOutreach` checks `outreach_sent_at`, plus a per-batch dedupe |
 | Opt-outs are permanent | `outreach_suppressions` is a separate table, so deleting or re-discovering a lead cannot resurrect an address |
@@ -154,9 +154,14 @@ than a 40-page burst every click.
 
 ## Known gaps
 
-- **No DMCA agent registered.** Deliberate, but it means there is no §512 safe
-  harbour. Keeping drafts unpublished and photos uncopied is what keeps this
-  clear of that; do not relax either without revisiting.
+- **No DMCA agent registered — and one of the two conditions it relied on
+  has now been relaxed.** Without a registered agent there is no §512 safe
+  harbour. This was originally kept clear by drafts staying unpublished AND
+  photos never being copied. On 2026-10-01 photos started being copied (by
+  Hugo's decision) — privately, and published only if the owner chooses — so
+  only the first condition still fully holds. Some posts carry a building's
+  marketing photos, which aren't the poster's to grant. Registering an agent
+  with the US Copyright Office is the revisit this note always asked for.
 - **Bounces and complaints are not fed back.** `outreach_suppressions` supports
   `bounced`/`complaint` reasons but nothing writes them yet — wire a Resend
   webhook before volume grows.

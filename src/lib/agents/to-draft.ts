@@ -1,6 +1,6 @@
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { normalizeExtractedListing } from '../listing-import/normalize.ts'
-import { parseAvailability, parseStreetAddress } from './prefill.ts'
+import { parseAvailability, parseStreetAddress, findContactDetails } from './prefill.ts'
 
 /**
  * Turn what a discovery adapter scraped into a real ExtractedListingDraft —
@@ -27,8 +27,9 @@ import { parseAvailability, parseStreetAddress } from './prefill.ts'
  *
  * A prefilled address still cannot publish anything on its own: lat/lng stay
  * null, and publish-validation requires them, so the person must pick their
- * address from the geocoding suggestions. `description` is likewise never
- * fabricated — the person writes their own.
+ * address from the geocoding suggestions. `description` is never WRITTEN
+ * here either — when present it is the poster's own text, copied verbatim
+ * from their post, and otherwise left for them to write.
  */
 
 export interface AnyExtracted {
@@ -51,6 +52,10 @@ export interface AnyExtracted {
   addressLine?: string
   /** As printed — often ZIP+4. */
   postalCode?: string
+  /** The poster's own description, already plain text. */
+  description?: string
+  /** The post's own photo URLs; copied privately by copySourcePhotos. */
+  imageUrls?: string[]
   [key: string]: unknown
 }
 
@@ -83,6 +88,11 @@ export function leadToExtractedDraft({
   const buildingName = extracted.property?.trim() || null
   const contactName = extracted.contactName?.trim() || extracted.posterName?.trim() || null
 
+  // Their own words, verbatim. Length is capped once, by the shared
+  // normalizeExtractedListing every draft passes through — not again here.
+  const description = extracted.description?.trim() || null
+  const contact = findContactDetails(description)
+
   // Read (never invent) the two fields that cost the most to retype.
   const availability = parseAvailability(
     extracted.dates,
@@ -103,12 +113,13 @@ export function leadToExtractedDraft({
   if (buildingName) filled.push('buildingName')
   if (bedrooms != null) filled.push('bedrooms')
   if (bathrooms != null) filled.push('bathrooms')
+  if (description) filled.push('description')
   if (street) filled.push('address')
   if (availability?.from) filled.push('availableFrom')
   if (availability?.to) filled.push('availableTo')
 
   const missingFields = [
-    'description',
+    ...(description ? [] : ['description']),
     ...(street ? [] : ['address']),
     ...(availability?.from ? [] : ['availableFrom']),
     ...(availability?.to ? [] : ['availableTo']),
@@ -136,6 +147,28 @@ export function leadToExtractedDraft({
       'Those dates have already passed. Update them to your actual term before publishing.',
     )
   }
+  if (description) {
+    uncertaintyNotes.push(
+      'The description is copied word for word from your original post. Edit it however you like.',
+    )
+  }
+  if (contact.emails + contact.phones + contact.links > 0) {
+    const what = [
+      contact.phones ? 'a phone number' : null,
+      contact.emails ? 'an email address' : null,
+      contact.links ? 'a link' : null,
+    ].filter(Boolean).join(' and ')
+    // Pointed out, never silently removed: editing someone's words without
+    // telling them is worse than the problem.
+    uncertaintyNotes.push(
+      `Your description includes ${what}. Wroomly passes enquiries to you directly, so you may want to remove it before publishing.`,
+    )
+  }
+  if ((extracted.imageUrls?.length ?? 0) > 0) {
+    uncertaintyNotes.push(
+      "Photos from your original post are pre-loaded below. Untick any that aren't of your place before publishing.",
+    )
+  }
   if (street) {
     uncertaintyNotes.push(
       'The address came from the original listing title. Pick it from the suggestions to place it on the map.',
@@ -149,7 +182,7 @@ export function leadToExtractedDraft({
 
   const draft: ExtractedListingDraft = {
     title: title?.trim() || null,
-    description: null, // never fabricated — the person writes their own
+    description, // their own text from the post, or null for them to write
 
     rentMonthly,
     currency: rentMonthly != null ? 'USD' : null,
