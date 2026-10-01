@@ -48,15 +48,11 @@ export default async function AdminAgentLeadPage({
         .maybeSingle()
     : { data: null }
 
-  // The raw claim token only exists ephemerally, on the LEAD, before outreach
-  // sends it (outreach.mjs deletes it from extracted the moment it's used —
-  // that's deliberate, see runner.ts). If it's still there, admin can preview
-  // the exact link the person will eventually get.
-  const previewToken =
-    typeof (lead.extracted as Record<string, unknown> | null)?._claimToken === 'string'
-      ? ((lead.extracted as Record<string, unknown>)._claimToken as string)
-      : null
-  const origin = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
+  // There is deliberately no claim link to show before the email goes out.
+  // The token is minted at send time (see mintClaimToken in runner.ts), so
+  // that the recipient gets its full 7-day life from the moment the message
+  // lands rather than from whenever this draft happened to be built — and so
+  // the raw credential never sits in the database waiting to be read.
 
   const publishedListingId = req?.listing_id ?? null
 
@@ -103,22 +99,10 @@ export default async function AdminAgentLeadPage({
             </>
           )}
         </p>
-        {previewToken && (
-          <p>
-            <span className="text-ink-muted">Claim link</span>{' '}
-            <span className="text-[11px] italic text-ink-muted">
-              (visible here only until outreach sends it — see this exactly as the poster will):
-            </span>{' '}
-            <a
-              href={`${origin}/claim-listing/${previewToken}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-navy hover:text-ink underline underline-offset-2 break-all"
-            >
-              /claim-listing/{previewToken.slice(0, 12)}…
-            </a>
-          </p>
-        )}
+        <p className="text-[12px] text-ink-muted">
+          The claim link is created when the outreach email is sent, so it is good for a full 7 days
+          from the moment it reaches the person. There is nothing to preview until then.
+        </p>
       </div>
 
       <h1 className="font-display text-2xl tracking-tight text-ink mb-1">
