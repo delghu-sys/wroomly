@@ -187,11 +187,34 @@ test('a lead is still produced (without contact) when the price cross-check fail
   assert.equal(lead.contactEmail, undefined, 'but the mismatched contact is withheld')
 })
 
-test('never carries image data', () => {
-  const html = page('Sublease at Six11', 'Sub Lease apartment at Sublease at Six11, listed at $900  on Ann Arbor Universe Housing')
-  const lead = toLead(html, { id: 'six11', url: 'https://example.test/l' })
-  const keys = Object.keys(lead?.extracted ?? {}).join(' ')
-  assert.ok(!/image|photo|img/i.test(keys))
+// DECISION, 2026-10-01 (Hugo): this test used to assert the adapter "never
+// carries image data", enforcing the rule that we never copy anyone's photos.
+// That rule was reversed on purpose: photos are now copied into the claimer's
+// PRIVATE draft, and only become public if they publish with them selected
+// (see src/lib/agents/source-photos.ts). What survives from the old rule, and
+// is asserted here, is that the adapter carries URLs and never image bytes.
+test('carries photo URLs from the record — never image bytes', () => {
+  const html = pageWith({
+    typeOfLease: 'Sub Lease',
+    gallery: 'wix:image://v1/abc123_def456~mv2.jpeg/IMG_1.jpeg#originWidth=800',
+    cover: 'wix:image://v1/abc123_def456~mv2.jpeg/IMG_1.jpeg#originWidth=800',
+    second: 'wix:image://v1/fff111_aaa222~mv2.webp/IMG_2.webp',
+  })
+  const c = extractContact(html)
+  assert.deepEqual(c.imageUrls, [
+    'https://static.wixstatic.com/media/abc123_def456~mv2.jpeg',
+    'https://static.wixstatic.com/media/fff111_aaa222~mv2.webp',
+  ], 'deduped by media id — a gallery and its cover often repeat one image')
+  for (const u of c.imageUrls ?? []) assert.match(u, /^https:\/\/static\.wixstatic\.com\/media\//)
+})
+
+test('photos from ELSEWHERE on the page are never picked up', () => {
+  // Other listings' images sit outside the current-item record.
+  const html = pageWith(
+    { typeOfLease: 'Sub Lease' },
+    '"similar":{"src":"wix:image://v1/zzz999_other~mv2.jpeg/x.jpeg"}',
+  )
+  assert.equal(extractContact(html).imageUrls, undefined)
 })
 
 test('a page missing its meta description yields no lead rather than a bad one', () => {

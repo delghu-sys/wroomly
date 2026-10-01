@@ -215,3 +215,33 @@ test('an unusable address line still falls back to the title', () => {
   const d = leadToExtractedDraft({ ...base, title: '721 S Forest Ave', extracted: { addressLine: 'Ann Arbor' } })
   assert.equal(d.address, '721 S Forest Ave', 'no house number in the line, so the title is used')
 })
+
+// ── description and photos from the post ───────────────────────────────────
+
+test("the poster's own description is used, verbatim, and says so", () => {
+  const d = leadToExtractedDraft({ ...base, extracted: { description: 'Sunny room, 5 min to the Diag.' } })
+  assert.equal(d.description, 'Sunny room, 5 min to the Diag.')
+  assert.ok(!d.missingFields.includes('description'))
+  assert.ok(d.uncertaintyNotes.some(n => /word for word/.test(n)))
+})
+
+test('contact details in a description are pointed out, never removed', () => {
+  const d = leadToExtractedDraft({ ...base, extracted: { description: 'Call 734-555-0199 to view.' } })
+  assert.equal(d.description, 'Call 734-555-0199 to view.', 'their words are untouched')
+  assert.ok(d.uncertaintyNotes.some(n => /phone number/.test(n)))
+})
+
+test('a very long description is capped, so the draft is not unpublishable from the start', () => {
+  // The cap itself belongs to normalizeExtractedListing (4,000 chars), which
+  // every draft passes through; what matters here is that the result is
+  // inside the publish validator's 10,000 limit.
+  const d = leadToExtractedDraft({ ...base, extracted: { description: 'x'.repeat(12_000) } })
+  assert.ok((d.description?.length ?? 0) > 0)
+  assert.ok((d.description?.length ?? 0) <= 10_000)
+})
+
+test('photos from the post come with a note to untick any that are not theirs', () => {
+  const d = leadToExtractedDraft({ ...base, extracted: { imageUrls: ['https://static.wixstatic.com/media/a~mv2.jpg'] } })
+  assert.ok(d.uncertaintyNotes.some(n => /Untick any/.test(n)))
+  assert.ok(Array.isArray(d.photos), 'photos stays a real array for the claim page')
+})

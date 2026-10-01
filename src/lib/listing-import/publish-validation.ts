@@ -24,6 +24,22 @@ export interface PublishCheck {
  * publication. The caller (publish route) re-runs this server-side; the UI
  * shows `missing` as prompts. Never trust the client's own check alone.
  */
+/**
+ * Generous box around Ann Arbor: Ann Arbor itself plus Ypsilanti, Saline and
+ * Dexter. Checked 2026-10-01 against every live listing — all 146 sit well
+ * inside (lat 42.20..42.29, lng -83.78..-83.69), so this rejects nothing real.
+ */
+export const SERVICE_AREA = { minLat: 42.1, maxLat: 42.45, minLng: -84.05, maxLng: -83.45 } as const
+
+export function isInServiceArea(lat: number, lng: number): boolean {
+  return (
+    lat >= SERVICE_AREA.minLat &&
+    lat <= SERVICE_AREA.maxLat &&
+    lng >= SERVICE_AREA.minLng &&
+    lng <= SERVICE_AREA.maxLng
+  )
+}
+
 export function validatePublishRequirements(
   draft: ExtractedListingDraft,
   ctx: PublishContext,
@@ -69,6 +85,12 @@ export function validatePublishRequirements(
     missing.push('Street address — required for the map to work')
   } else if (!Number.isFinite(draft.lat) || !Number.isFinite(draft.lng)) {
     missing.push('Pick your exact address from the suggestions so it shows correctly on the map')
+  } else if (!isInServiceArea(draft.lat as number, draft.lng as number)) {
+    // The address search covers the whole US, so "123 Main St" can resolve to
+    // a Main St in another state — a real, geocoded address that is simply
+    // not here. Coordinates come from the client as well, so this is also
+    // what stops a hand-edited request publishing an arbitrary pin.
+    missing.push('Pick an address in the Ann Arbor area — the one chosen is outside it')
   }
 
   if (ctx.confirmedPhotoCount < 1) missing.push('At least one photo')
