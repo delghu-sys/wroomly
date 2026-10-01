@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import type { ExtractedListingDraft } from '@/types/listing-import'
+import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
 
 interface Props {
   importRequestId: string
@@ -92,14 +93,39 @@ export function AgentDraftEditor({ importRequestId, draft: initial }: Props) {
         <div className="sm:col-span-2">
           <label className={labelCls}>
             Street address{' '}
-            <span className="text-[oklch(0.55_0.20_25)] font-bold">(we never had this — the poster fills it in)</span>
+            <span className="text-[oklch(0.55_0.20_25)] font-bold">(required for the map, fill in if AI missed it)</span>
           </label>
-          <input
-            className={`${inputCls} ${!draft.address ? 'border-[oklch(0.80_0.12_25)] bg-[oklch(0.99_0.01_25)]' : ''}`}
-            placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
+          {/* Search + PICK a suggestion. A typed string alone cannot place a
+              pin: publish-validation requires lat/lng, and those only exist
+              once a real geocoded result is chosen. This used to be a plain
+              text input, so an address typed here was never geocoded and the
+              listing could never appear on the map. */}
+          <AddressAutocomplete
             value={draft.address ?? ''}
-            onChange={e => set('address', e.target.value || null)}
+            hasPick={Number.isFinite(draft.lat) && Number.isFinite(draft.lng)}
+            onChange={v => {
+              set('address', v || null)
+              // Editing the text invalidates any previously picked location.
+              set('lat', null)
+              set('lng', null)
+            }}
+            onPick={p => {
+              set('address', p.address)
+              set('lat', p.lat)
+              set('lng', p.lng)
+            }}
+            placeholder="e.g. 123 E William St, Ann Arbor, MI 48104"
           />
+          {draft.address && !(Number.isFinite(draft.lat) && Number.isFinite(draft.lng)) && (
+            <p className="text-[12px] text-[oklch(0.55_0.18_25)] mt-1.5">
+              Not on the map yet — pick the address from the suggestions. Typed text alone has no coordinates.
+            </p>
+          )}
+          {Number.isFinite(draft.lat) && Number.isFinite(draft.lng) && (
+            <p className="text-[12px] text-[oklch(0.40_0.13_142)] mt-1.5">
+              Located: {Number(draft.lat).toFixed(5)}, {Number(draft.lng).toFixed(5)}
+            </p>
+          )}
         </div>
         <div>
           <label className={labelCls}>Neighborhood</label>
