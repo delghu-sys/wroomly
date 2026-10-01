@@ -73,7 +73,7 @@ const lead = {
   import_request_id: 'req-1',
   outreach_sent_at: null,
   title: 'A Sublet',
-  extracted: { _claimToken: 'tok_abc' },
+  extracted: {},
 }
 
 test('a real send with a localhost origin sends NOTHING, writes nothing, and says why', async () => {
@@ -95,26 +95,30 @@ test('a real send with a localhost origin sends NOTHING, writes nothing, and say
   assert.match(r.errors[0] ?? '', /not a public https URL/)
 })
 
-test('the same run against the live origin does send, and burns the token as designed', async () => {
+test('the same run against the live origin does send, minting the token as it goes', async () => {
   process.env.OUTREACH_ENABLED = 'true'
   const sent: string[] = []
   const writes: Record<string, unknown>[] = []
+  const links: string[] = []
   const r = await runOutreach(fakeDb([lead], writes), {
     execute: true,
     origin: 'https://wroomly.app',
     send: async ({ to, text }) => {
       sent.push(to)
-      assert.ok(text.includes('https://wroomly.app/claim-listing/tok_abc'))
+      links.push(text.match(/https:\/\/wroomly\.app\/claim-listing\/(\S+)/)?.[1] ?? '')
     },
   })
   assert.deepEqual(sent, ['stranger@umich.edu'])
   assert.equal(r.sent, 1)
-  assert.equal(writes[0]?.status, 'contacted')
-  assert.equal(
-    (writes[0]?.extracted as Record<string, unknown>)?._claimToken,
-    undefined,
-    'the raw token is dropped after sending — which is exactly why a bad origin is unrecoverable',
-  )
+  assert.ok(links[0] && links[0].length > 20, 'a real token is in the link')
+
+  // The token is minted for THIS send, so a hash and a fresh expiry are
+  // written before the email goes out — that is what stops a queued draft
+  // being mailed with a link that expired while it waited.
+  const minted = writes.find(w => w.claim_token_hash)
+  assert.ok(minted, 'a token was issued')
+  assert.ok(new Date(String(minted.claim_token_expires_at)) > new Date(), 'with a future expiry')
+  assert.ok(writes.some(w => w.status === 'contacted'), 'and the lead is marked contacted')
 })
 
 test('a dry run still previews the localhost link rather than hiding it', async () => {
@@ -127,7 +131,9 @@ test('a dry run still previews the localhost link rather than hiding it', async 
     },
   })
   assert.equal(r.sent, 0)
-  assert.ok(r.sample?.text.includes('http://localhost:3000/claim-listing/tok_abc'))
+  // The token does not exist until the send, so the preview masks it — but
+  // the ORIGIN is still shown, which is the thing a dry run exists to reveal.
+  assert.ok(r.sample?.text.includes('http://localhost:3000/claim-listing/'))
   assert.deepEqual(r.errors, [], 'a dry run is not an error — it is how you see the bad link')
 })
 

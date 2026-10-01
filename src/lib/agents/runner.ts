@@ -11,7 +11,6 @@ import {
   generateClaimToken,
   hashClaimToken,
   claimTokenExpiry,
-  isClaimTokenExpired,
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse } from './sources/offcampus-universe.ts'
@@ -242,7 +241,6 @@ export async function runDraft(
       continue
     }
 
-    const token = generateClaimToken()
     const draft = leadToExtractedDraft({
       title: lead.title,
       sourceLabel: SOURCES.find(s => s.key === lead.source)?.label ?? lead.source,
@@ -265,8 +263,12 @@ export async function runDraft(
         // 'pending' meant every claim link this agent ever sent 404'd.
         status: 'completed',
         extracted_data: draft,
-        claim_token_hash: hashClaimToken(token),
-        claim_token_expires_at: claimTokenExpiry().toISOString(),
+        // No claim token yet, on purpose. Drafting and sending can be days
+        // apart, so a token minted here starts its 7-day life before anyone
+        // has decided to email it — which is exactly how a whole queue of
+        // drafts came to hold links that were already dead. runOutreach mints
+        // one at the moment it sends, so the recipient always gets the full
+        // window. It also means the raw token never sits in the database.
       })
       .select('id')
       .single()
@@ -275,15 +277,9 @@ export async function runDraft(
       continue
     }
 
-    // The raw token is stored on the lead ONLY until outreach sends it, because
-    // the email is the only place it is ever revealed. runOutreach clears it.
     const { error: upErr } = await db
       .from('sourced_leads')
-      .update({
-        status: 'drafted',
-        import_request_id: req.id,
-        extracted: { ...lead.extracted, _claimToken: token },
-      })
+      .update({ status: 'drafted', import_request_id: req.id })
       .eq('id', lead.id)
     if (upErr) {
       out.errors.push(`lead update failed for ${lead.id}: ${upErr.message}`)
@@ -296,6 +292,32 @@ export async function runDraft(
 }
 
 // ── outreach ────────────────────────────────────────────────────────────────
+
+/**
+ * Issue a fresh claim token for a draft and return the RAW value.
+ *
+ * Only the hash is stored, so the raw token exists in exactly one place: the
+ * email about to be sent. Called at send time rather than at draft time
+ * because the two can be days apart — a token minted when the draft is built
+ * starts its 7-day life before anyone has decided to email it, which is how a
+ * queue of drafts ended up holding links that had already expired.
+ *
+ * Re-minting replaces any previous token for that draft, so an older link
+ * stops working. That is the intended behaviour: at most one live link per
+ * draft, and it belongs to the most recent message.
+ */
+async function mintClaimToken(db: Db, importRequestId: string): Promise<string> {
+  const token = generateClaimToken()
+  const { error } = await db
+    .from('listing_import_requests')
+    .update({
+      claim_token_hash: hashClaimToken(token),
+      claim_token_expires_at: claimTokenExpiry().toISOString(),
+    })
+    .eq('id', importRequestId)
+  if (error) throw new Error(`could not issue a claim token: ${error.message}`)
+  return token
+}
 
 export type SendEmail = (msg: {
   to: string
@@ -417,11 +439,13 @@ export async function runOutreach(
   // Preview included, so "what will this say" is answered directly rather
   // than only a count. The claim link is the real one that lead will get.
   const first = plan.send[0] as LeadForOutreach | undefined
-  const firstToken = first?.extracted?._claimToken
-  if (first && typeof firstToken === 'string' && firstToken) {
+  if (first) {
+    // The link is shown masked because the token does not exist yet: it is
+    // minted at the moment of sending. A preview that displayed a live claim
+    // credential would also be a preview that leaked one.
     out.sample = buildOutreachEmail(template, {
       title: first.title ?? 'your sublet',
-      claimUrl: `${origin}/claim-listing/${firstToken}`,
+      claimUrl: `${origin}/claim-listing/${'•'.repeat(22)}`,
     })
   }
 
@@ -443,9 +467,8 @@ export async function runOutreach(
   }
 
   for (const c of plan.send as LeadForOutreach[]) {
-    const token = c.extracted?._claimToken
-    if (typeof token !== 'string' || !token) {
-      out.errors.push(`lead ${c.id} has no claim token; skipped`)
+    if (!c.import_request_id) {
+      out.errors.push(`lead ${c.id} has no draft; skipped`)
       continue
     }
     const to = c.contact_email as string
@@ -465,6 +488,17 @@ export async function runOutreach(
     // scoring. Dropping it too would risk Gmail/Yahoo bulk-sender filtering
     // on top of the CAN-SPAM exposure already accepted by removing the
     // visible footer.
+    // Minted HERE, immediately before the send, so the recipient gets the
+    // full 7 days from the moment the message lands rather than from whenever
+    // the draft happened to be built.
+    let token: string
+    try {
+      token = await mintClaimToken(db, c.import_request_id)
+    } catch (err) {
+      out.errors.push(`lead ${c.id}: ${err instanceof Error ? err.message : String(err)}`)
+      continue
+    }
+
     const email = buildOutreachEmail(template, {
       title: c.title ?? 'your sublet',
       claimUrl: `${origin}/claim-listing/${token}`,
@@ -477,13 +511,9 @@ export async function runOutreach(
       continue
     }
 
-    // Mark sent AND drop the raw claim token: the email is the only place it is
-    // ever revealed, so it should not linger in our database afterwards.
-    const { _claimToken: _dropped, ...rest } = c.extracted ?? {}
-    void _dropped
     await db
       .from('sourced_leads')
-      .update({ status: 'contacted', outreach_sent_at: new Date().toISOString(), extracted: rest })
+      .update({ status: 'contacted', outreach_sent_at: new Date().toISOString() })
       .eq('id', c.id)
     out.sent += 1
   }
@@ -522,25 +552,25 @@ export interface TestSendResult {
 
 /** Exactly what /claim-listing/[token] checks when the link is opened. Run
  *  BEFORE mailing a link, so a dead one is never sent. */
-async function claimLinkChecks(db: Db, token: string): Promise<TestSendCheck[]> {
+async function claimLinkChecks(db: Db, importRequestId: string): Promise<TestSendCheck[]> {
   const { data: req } = await db
     .from('listing_import_requests')
-    .select('id, status, claim_token_expires_at, extracted_data, claimed_by_user_id')
-    .eq('claim_token_hash', hashClaimToken(token))
+    .select('id, status, extracted_data, claimed_by_user_id')
+    .eq('id', importRequestId)
     .maybeSingle()
   const r = req as {
     status?: string
-    claim_token_expires_at?: string | null
     extracted_data?: { photos?: unknown } | null
     claimed_by_user_id?: string | null
   } | null
 
+  // Expiry is deliberately NOT checked: the token is minted fresh for this
+  // send, so whatever came before is irrelevant.
   return [
     { label: 'import request found', ok: Boolean(r) },
     { label: "status is 'completed'", ok: r?.status === 'completed' },
     { label: 'extracted_data present', ok: Boolean(r?.extracted_data) },
     { label: 'photos is an array', ok: Array.isArray(r?.extracted_data?.photos) },
-    { label: 'token not expired', ok: !isClaimTokenExpired(r?.claim_token_expires_at) },
     { label: 'not already claimed', ok: !r?.claimed_by_user_id },
   ]
 }
@@ -622,14 +652,12 @@ export async function runTestSend(
   // be worse than an error. Bounded so a long queue of dead drafts cannot
   // turn one click into hundreds of round trips.
   const probeLimit = leadId ? 1 : 25
-  let chosen: { lead: LeadWithSource; token: string } | null = null
+  let chosen: LeadWithSource | null = null
 
   for (const candidate of candidates.slice(0, probeLimit)) {
-    const token = candidate.extracted?._claimToken
-    const checks =
-      typeof token === 'string' && token
-        ? await claimLinkChecks(db, token)
-        : [{ label: 'draft has a claim token', ok: false }]
+    const checks = candidate.import_request_id
+      ? await claimLinkChecks(db, candidate.import_request_id)
+      : [{ label: 'lead has a draft', ok: false }]
 
     // Always report the checks for the lead actually under consideration, so
     // a total failure explains itself with the LAST thing tried.
@@ -643,7 +671,7 @@ export async function runTestSend(
     out.linkChecks = checks
 
     if (checks.every(c => c.ok)) {
-      chosen = { lead: candidate, token: token as string }
+      chosen = candidate
       break
     }
     out.skippedLeads += 1
@@ -658,7 +686,17 @@ export async function runTestSend(
           : 'The claim link would not resolve — refusing to send a broken email.',
     }
   }
-  const { lead, token } = chosen
+  const lead = chosen
+  // Mints a real token, which DOES replace any previous one for this draft.
+  // Harmless: a draft has no live link until it is emailed, and a later real
+  // send mints again. It is the one write a test send performs; it still
+  // never marks the lead contacted or consumes it.
+  let token: string
+  try {
+    token = await mintClaimToken(db, lead.import_request_id as string)
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) }
+  }
 
   const template = await loadOutreachTemplate(db)
   const built = buildOutreachEmail(template, {

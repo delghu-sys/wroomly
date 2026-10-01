@@ -5,7 +5,6 @@ import assert from 'node:assert/strict'
 process.env.OUTREACH_SECRET ??= 'unit-test-secret-000000000000000000000000'
 
 const { runTestSend } = await import('../../src/lib/agents/runner.ts')
-const { hashClaimToken } = await import('../../src/lib/listing-import/claim-token.ts')
 
 /**
  * runTestSend exists so a human can check the outreach email in a real inbox.
@@ -20,6 +19,7 @@ function fakeDb({
   suppressions = [] as { email: string }[],
   importRequest = null as Record<string, unknown> | null,
   template = null as Record<string, unknown> | null,
+  writes = [] as Record<string, unknown>[],
 }) {
   const tables: Record<string, unknown> = {
     sourced_leads: leads,
@@ -34,8 +34,15 @@ function fakeDb({
         eq: () => chain,
         limit: () => Promise.resolve({ data: rows, error: null }),
         maybeSingle: () => Promise.resolve({ data: single, error: null }),
-        update: () => {
-          throw new Error(`a test send must never write — update() called on ${table}`)
+        update: (patch: Record<string, unknown>) => {
+          // Minting a token IS a write, and the only one a test send makes.
+          // Writing to sourced_leads would mean consuming the lead, which is
+          // still forbidden.
+          if (table === 'sourced_leads') {
+            throw new Error('a test send must never write to sourced_leads')
+          }
+          writes.push(patch)
+          return chain
         },
         // `.select('email')` is awaited directly in one place.
         then: (resolve: (v: unknown) => void) => resolve({ data: rows, error: null }),
@@ -55,7 +62,7 @@ const drafted = (over: Record<string, unknown> = {}) => ({
   title: '2 Bed on Tappan',
   source: 'offcampus-universe-umich',
   source_url: 'https://example.test/listing',
-  extracted: { _claimToken: 'tok_abc' },
+  extracted: {},
   ...over,
 })
 
@@ -112,17 +119,10 @@ test('an already-claimed draft is refused — that link is spent', async () => {
   assert.ok(r.linkChecks.find(c => c.label === 'not already claimed')?.ok === false)
 })
 
-test('an expired token is refused', async () => {
-  const r = await runTestSend(
-    fakeDb({
-      leads: [drafted()],
-      importRequest: { ...goodRequest, claim_token_expires_at: new Date(Date.now() - 1000).toISOString() },
-    }),
-    { to: 'me@wroomly.app', send: neverSend, execute: true },
-  )
-  assert.equal(r.sent, false)
-  assert.ok(r.linkChecks.find(c => c.label === 'token not expired')?.ok === false)
-})
+// NOTE: there is no longer an "expired token" case to test. The token is
+// minted at send time, so whatever a draft held before is irrelevant — which
+// is the whole point of the change: a queued draft can no longer be mailed
+// with a link that expired while it waited.
 
 test('sends the real email to the test address, and NEVER writes to the lead', async () => {
   const sentTo: string[] = []
@@ -139,9 +139,10 @@ test('sends the real email to the test address, and NEVER writes to the lead', a
 
   assert.equal(r.sent, true)
   assert.deepEqual(sentTo, ['me@wroomly.app'], 'the stranger is never mailed')
-  assert.ok(bodies[0].includes('https://wroomly.app/claim-listing/tok_abc'), 'the real claim link is in the body')
+  assert.ok(/https:\/\/wroomly\.app\/claim-listing\/\S{20,}/.test(bodies[0]), 'a real minted claim link is in the body')
   assert.ok(bodies[0].includes('2 Bed on Tappan'), 'the real lead title is substituted')
-  // fakeDb.update throws — reaching here at all proves nothing was written.
+  // fakeDb throws on any sourced_leads write — reaching here proves the lead
+  // was not consumed, even though a token was minted on the import request.
 })
 
 test('a dry run builds the whole email but sends nothing', async () => {
@@ -153,7 +154,7 @@ test('a dry run builds the whole email but sends nothing', async () => {
   assert.equal(r.sent, false)
   assert.equal(r.error, undefined)
   assert.ok(r.email?.subject)
-  assert.ok(r.email?.text.includes('claim-listing/tok_abc'))
+  assert.ok(/claim-listing\/\S{20,}/.test(r.email?.text ?? ''))
   assert.ok(r.linkChecks.every(c => c.ok))
 })
 
@@ -193,11 +194,11 @@ const secondLead = {
   title: 'Another Sublet',
   source: 'offcampus-universe-umich',
   source_url: 'https://example.test/second',
-  extracted: { _claimToken: 'tok_second' },
+  extracted: {},
 }
 
-/** Resolves a different import request per token, so leads can differ. */
-function fakeDbByToken(leads: Record<string, unknown>[], byToken: Record<string, unknown>) {
+/** Resolves a different import request per request id, so leads can differ. */
+function fakeDbByToken(leads: Record<string, unknown>[], byRequestId: Record<string, unknown>) {
   const tables: Record<string, unknown> = { sourced_leads: leads, outreach_suppressions: [] }
   return {
     from(table: string) {
@@ -206,17 +207,12 @@ function fakeDbByToken(leads: Record<string, unknown>[], byToken: Record<string,
       const chain = {
         select: () => chain,
         eq: (col: string, val: string) => {
-          if (col === 'claim_token_hash') {
-            const match = Object.entries(byToken).find(([tok]) => hashClaimToken(tok) === val)
-            wanted = match ? match[1] : null
-          }
+          if (col === 'id' && val in byRequestId) wanted = byRequestId[val]
           return chain
         },
         limit: () => Promise.resolve({ data: rows, error: null }),
         maybeSingle: () => Promise.resolve({ data: wanted, error: null }),
-        update: () => {
-          throw new Error('a test send must never write')
-        },
+        update: () => chain,
         then: (resolve: (v: unknown) => void) => resolve({ data: rows, error: null }),
       }
       return chain
@@ -229,15 +225,15 @@ test('skips a lead whose draft was already claimed and uses the next one', async
   const sent: string[] = []
   const r = await runTestSend(
     fakeDbByToken([drafted(), secondLead], {
-      tok_abc: { ...goodRequest, claimed_by_user_id: 'admin-who-opened-the-link' },
-      tok_second: goodRequest,
+      'req-1': { ...goodRequest, claimed_by_user_id: 'admin-who-opened-the-link' },
+      'req-2': goodRequest,
     }),
     {
       to: 'me@wroomly.app',
       execute: true,
       send: async ({ to, text }) => {
         sent.push(to)
-        assert.ok(text.includes('claim-listing/tok_second'), 'the WORKING link is the one mailed')
+        assert.ok(/claim-listing\/\S{20,}/.test(text), 'a freshly minted link is mailed')
       },
     },
   )
@@ -252,8 +248,8 @@ test('skips a lead whose draft was already claimed and uses the next one', async
 test('when EVERY draft is spent it fails, and reports how many it tried', async () => {
   const r = await runTestSend(
     fakeDbByToken([drafted(), secondLead], {
-      tok_abc: { ...goodRequest, claimed_by_user_id: 'u1' },
-      tok_second: { ...goodRequest, claimed_by_user_id: 'u2' },
+      'req-1': { ...goodRequest, claimed_by_user_id: 'u1' },
+      'req-2': { ...goodRequest, claimed_by_user_id: 'u2' },
     }),
     { to: 'me@wroomly.app', send: neverSend, execute: true },
   )
@@ -265,8 +261,8 @@ test('when EVERY draft is spent it fails, and reports how many it tried', async 
 test('an explicitly requested lead is never silently swapped for a different one', async () => {
   const r = await runTestSend(
     fakeDbByToken([drafted(), secondLead], {
-      tok_abc: { ...goodRequest, claimed_by_user_id: 'u1' },
-      tok_second: goodRequest,
+      'req-1': { ...goodRequest, claimed_by_user_id: 'u1' },
+      'req-2': goodRequest,
     }),
     {
       to: 'me@wroomly.app',
