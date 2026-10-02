@@ -108,6 +108,12 @@ export default function SignUpClient({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  // Where to send the person once sign-up finishes — e.g. their claim link.
+  // This was never read, so anyone signing up from the claim page ended up on
+  // the home page and had to go back to their email. Same-origin relative
+  // paths only; /callback re-validates it as well.
+  const rawNext = searchParams.get('next') ?? '/'
+  const next = /^\/(?![/\\])/.test(rawNext) ? rawNext : '/'
   // Read ?as=supplier (or consumer) from the URL so deep-links from the
   // landing page's "List your place" CTA skip the role-picker step the
   // user has effectively already answered. Invalid values just fall
@@ -189,7 +195,7 @@ export default function SignUpClient({
       email: data.email,
       password: data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/callback`,
+        emailRedirectTo: `${window.location.origin}/callback?next=${encodeURIComponent(next)}`,
         data: {
           full_name: data.full_name,
           university: data.university,
@@ -357,6 +363,7 @@ export default function SignUpClient({
                 <OauthConsent agreed={oauthAgreed} onChange={setOauthAgreed} />
                 <GoogleAuthButton
                   intendedType={role}
+                  next={next}
                   onError={setError}
                   umich
                   disabled={!oauthAgreed}
@@ -380,6 +387,7 @@ export default function SignUpClient({
                 <OauthConsent agreed={oauthAgreed} onChange={setOauthAgreed} />
                 <GoogleAuthButton
                   intendedType={role}
+                  next={next}
                   onError={setError}
                   disabled={!oauthAgreed}
                   accepted={oauthAgreed}
@@ -387,6 +395,7 @@ export default function SignUpClient({
                 />
                 <AppleAuthButton
                   intendedType={role}
+                  next={next}
                   onError={setError}
                   disabled={!oauthAgreed}
                   accepted={oauthAgreed}
