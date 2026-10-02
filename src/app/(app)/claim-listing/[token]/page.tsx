@@ -97,6 +97,12 @@ export default async function ClaimListingPage({
 
   // Not signed in → preview + auth prompt.
   if (!user) {
+    // Everyone arriving here is about to PUBLISH a listing, so they sign up as
+    // a supplier from the start. Without `as=supplier` the Google/Apple paths
+    // default to `consumer`, and a consumer who publishes owns a live listing
+    // but is bounced away from /my-listings, /inquiries and /payouts — no
+    // inbox for enquiries and no way to be paid. Seen in production on the
+    // first day of outreach.
     const next = encodeURIComponent(`/claim-listing/${token}`)
     return (
       <Shell>
@@ -118,7 +124,7 @@ export default async function ClaimListingPage({
           Sign in or create your account to review every detail and publish. Nothing goes live until you confirm.
         </div>
         <div className="mt-5 flex flex-col sm:flex-row gap-3">
-          <Link href={`/sign-up?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition">
+          <Link href={`/sign-up?as=supplier&next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full bg-navy-deep text-maize-bright font-semibold text-sm hover:bg-navy-deep/90 transition">
             Create account & claim
           </Link>
           <Link href={`/sign-in?next=${next}`} className="flex-1 inline-flex items-center justify-center h-12 rounded-full border border-line text-ink font-medium text-sm hover:border-maize-bright/50 transition">
