@@ -7,7 +7,8 @@ import { ArrowLeft, Bot, ExternalLink, SquarePen } from 'lucide-react'
 import { EmptyState } from '@/components/brand/EmptyState'
 import { AgentsConsole } from '@/components/admin/AgentsConsole'
 import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor'
-import { SOURCES } from '@/lib/agents/runner'
+import { SOURCES, loadActiveSummary } from '@/lib/agents/runner'
+import { ActiveSubletsCard } from '@/components/admin/ActiveSubletsCard'
 import { DEFAULT_TEMPLATE, type OutreachTemplate } from '@/lib/agents/outreach-template'
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default async function AdminAgentsPage() {
   // Both tables are service-role only (RLS-on, zero policies) — this is the
   // one place they are read for a human.
   const service = createServiceClient()
-  const [leadsRes, supsRes, templateRes] = await Promise.all([
+  const [leadsRes, supsRes, templateRes, activeSummary] = await Promise.all([
     service
       .from('sourced_leads')
       .select(
@@ -64,6 +65,9 @@ export default async function AdminAgentsPage() {
       .limit(200),
     service.from('outreach_suppressions').select('email', { count: 'exact', head: true }),
     service.from('outreach_template').select('subject, body').eq('id', 'default').maybeSingle(),
+    // From stored data only (no network), so it is cheap on every page load.
+    // A failure here must never take the whole console down with it.
+    loadActiveSummary(service).catch(() => null),
   ])
 
   // Migration 042 not applied yet → the table doesn't exist. Say so instead
@@ -129,6 +133,8 @@ export default async function AdminAgentsPage() {
               </div>
             ))}
           </div>
+
+          {activeSummary && <ActiveSubletsCard initial={activeSummary} />}
 
           <AgentsConsole
             sources={SOURCES.map(s => ({ key: s.key, label: s.label, contactBasis: s.contactBasis }))}

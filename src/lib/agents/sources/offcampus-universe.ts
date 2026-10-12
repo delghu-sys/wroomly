@@ -92,6 +92,10 @@ export interface ListingContact {
   addressLine?: string
   /** As printed — often ZIP+4 ("48104-3982"); narrowed downstream. */
   postalCode?: string
+  /** The board's own availability state: "Available", "Rented", … This is the
+   *  only reliable availability signal on the record — `live` is `true` on
+   *  every listing, including ones from last year, so it says nothing. */
+  boardStatus?: string
   /** The poster's own description, as plain text (the board stores HTML). */
   description?: string
   /** CDN URLs for the post's own photos. Carried as URLs only; they are
@@ -217,6 +221,7 @@ export function extractContact(html: string, expectedPrice?: string): ListingCon
   // fields and are deliberately NOT taken — publish-validation requires the
   // person to pick their address from the geocoding suggestions, precisely so
   // a scraped location cannot pass as a confirmed one.
+  const boardStatus = readBoardStatus(record)
   const addressLine = read('formattedAddressLine')
   const postalCode = read('postalCode')
 
@@ -240,6 +245,7 @@ export function extractContact(html: string, expectedPrice?: string): ListingCon
   const email = read('email')?.toLowerCase()
   return {
     postedAt: postedAt && !Number.isNaN(Date.parse(postedAt)) ? postedAt : undefined,
+    boardStatus,
     addressLine,
     postalCode,
     description,
@@ -317,6 +323,9 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
       // Anchors an undated term to a real year, and lets a stale post be
       // recognised as stale rather than merely unreadable.
       postedAt: contact.postedAt,
+      // When we last saw the board's availability state, and what it was.
+      boardStatus: contact.boardStatus,
+      boardStatusAt: contact.boardStatus ? new Date().toISOString() : undefined,
       addressLine: contact.addressLine,
       postalCode: contact.postalCode,
       description: contact.description,
@@ -324,6 +333,86 @@ export function toLead(html: string, { id, url }: ListingUrl): RawLead | null {
       // "Student" vs an agent/owner post — worth knowing before writing to them.
       posterType: contact.formType,
     },
+  }
+}
+
+/** `"status":"Available"` from inside a listing's own record. Null when the
+ *  field is absent or oddly shaped, so a layout change reads as "unknown"
+ *  rather than as a value. */
+export function readBoardStatus(record: string): string | undefined {
+  return record.match(/"status":"([A-Za-z][A-Za-z ]{0,19})"/)?.[1]?.trim() || undefined
+}
+
+export interface StatusRefresh {
+  /** id -> the board's current status, for every page that was read. */
+  statuses: Map<string, string>
+  /** Pages we meant to read but did not (fetch failed, or the time ran out). */
+  unread: number
+  /** Listings currently in the sitemap, and how many we have never looked at. */
+  onSite: number
+  unseen: number
+}
+
+/**
+ * Re-read the availability state of specific listings, plus count what the
+ * sitemap holds now. Used by the admin "active sublets" card.
+ *
+ * Deliberately not a full sweep: only the ids passed in are fetched, because
+ * only a listing whose dates have not expired can be active, so re-reading
+ * the rest would be minutes of work that cannot change the answer. Bounded by
+ * a count and a time budget so it fits a 60 second serverless function, and
+ * paced like the discovery run is.
+ */
+export async function refreshListingStatuses(
+  ids: string[],
+  knownIds: Set<string>,
+  { maxPages = 25, budgetMs = 40_000, fetchImpl = getText }: {
+    maxPages?: number
+    budgetMs?: number
+    fetchImpl?: (url: string) => Promise<string>
+  } = {},
+): Promise<StatusRefresh> {
+  const started = Date.now()
+  const listings = umichListingUrls(await fetchImpl(SITEMAP_URL))
+  const byId = new Map(listings.map(l => [l.id, l]))
+
+  const statuses = new Map<string, string>()
+  let unread = 0
+
+  const readOne = async (id: string) => {
+    const listing = byId.get(id)
+    if (!listing) { unread += 1; return }
+    try {
+      const html = await fetchImpl(listing.url)
+      const flat = html.replace(/\\+"/g, '"').replace(/\\+\//g, '/')
+      const marker = '"recordsByCollectionId":{"ApartmentListings":{"'
+      const at = flat.indexOf(marker)
+      const braceAt = at < 0 ? -1 : flat.indexOf('{', at + marker.length)
+      const record = braceAt < 0 ? null : objectAround(flat, braceAt)
+      const status = record ? readBoardStatus(record) : undefined
+      if (status) statuses.set(id, status)
+      else unread += 1
+    } catch {
+      unread += 1
+    }
+  }
+
+  // Two pages at a time. Each page is ~2.4MB, so one at a time took ~3s a
+  // page and 14 listings came to 43s, uncomfortably close to a 60s function
+  // limit. Two in flight is still gentle on the board and roughly halves it.
+  const wanted = ids.slice(0, maxPages)
+  for (let i = 0; i < wanted.length; i += 2) {
+    if (Date.now() - started > budgetMs) { unread += wanted.length - i; break }
+    await Promise.all(wanted.slice(i, i + 2).map(readOne))
+    await new Promise(r => setTimeout(r, 300))
+  }
+  unread += Math.max(0, ids.length - maxPages)
+
+  return {
+    statuses,
+    unread,
+    onSite: listings.length,
+    unseen: listings.filter(l => !knownIds.has(l.id)).length,
   }
 }
 

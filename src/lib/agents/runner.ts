@@ -13,7 +13,9 @@ import {
   claimTokenExpiry,
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
-import { offcampusUniverse } from './sources/offcampus-universe.ts'
+import { offcampusUniverse, refreshListingStatuses } from './sources/offcampus-universe.ts'
+import { summarizeActiveSublets, type ActiveSummary } from './active-sublets.ts'
+import { termHasEnded } from './prefill.ts'
 import { leadToExtractedDraft, type AnyExtracted } from './to-draft.ts'
 import { copySourcePhotos } from './source-photos.ts'
 import { buildOutreachEmail, DEFAULT_TEMPLATE, type OutreachTemplate } from './outreach-template.ts'
@@ -755,4 +757,87 @@ export async function runTestSend(
     out.error = err instanceof Error ? err.message : String(err)
   }
   return out
+}
+
+// ── active sublets ──────────────────────────────────────────────────────────
+
+interface OcuLead {
+  id: string
+  source_external_id: string
+  status: string
+  skip_reason: string | null
+  outreach_sent_at: string | null
+  extracted: Record<string, unknown> | null
+}
+
+async function loadOcuLeads(db: Db): Promise<OcuLead[]> {
+  const { data, error } = await db
+    .from('sourced_leads')
+    .select('id, source_external_id, status, skip_reason, outreach_sent_at, extracted')
+    .eq('source', offcampusUniverse.key)
+  if (error) throw new Error(error.message)
+  return (data ?? []) as OcuLead[]
+}
+
+/** The active-sublets numbers, from stored data alone. No network, so it is
+ *  cheap enough to run on every page load. */
+export async function loadActiveSummary(db: Db): Promise<ActiveSummary> {
+  return summarizeActiveSublets(await loadOcuLeads(db))
+}
+
+export interface ActiveRefreshResult {
+  summary: ActiveSummary
+  /** U-M listings the sitemap holds right now, and how many we have never read. */
+  onSite: number
+  unseen: number
+  /** Pages re-read this time, and ones that could not be. */
+  read: number
+  unread: number
+}
+
+/**
+ * Re-check the board's availability for every listing that could still be
+ * active, store what it says, and return fresh numbers.
+ *
+ * Only listings whose dates have not expired are fetched: an expired one
+ * cannot be active, so reading it would cost time and change nothing. Those
+ * with no stored status, or the oldest check, go first, which matters once
+ * the list outgrows one bounded pass.
+ */
+export async function refreshActiveSublets(db: Db): Promise<ActiveRefreshResult> {
+  const leads = await loadOcuLeads(db)
+  const now = new Date()
+  const str = (v: unknown) => (typeof v === 'string' && v ? v : null)
+
+  const candidates = leads
+    .filter(l => !/not a sublet/.test(l.skip_reason ?? ''))
+    .filter(l => !termHasEnded(str(l.extracted?.dates), now, str(l.extracted?.postedAt)))
+    .sort((a, b) =>
+      (str(a.extracted?.boardStatusAt) ?? '').localeCompare(str(b.extracted?.boardStatusAt) ?? ''),
+    )
+
+  const knownIds = new Set(leads.map(l => l.source_external_id))
+  const r = await refreshListingStatuses(
+    candidates.map(l => l.source_external_id),
+    knownIds,
+  )
+
+  const checkedAt = new Date().toISOString()
+  for (const lead of candidates) {
+    const status = r.statuses.get(lead.source_external_id)
+    if (!status) continue
+    // Merge, never replace: nothing else scraped about this lead may change.
+    await db
+      .from('sourced_leads')
+      .update({ extracted: { ...(lead.extracted ?? {}), boardStatus: status, boardStatusAt: checkedAt } })
+      .eq('id', lead.id)
+  }
+
+  return {
+    summary: await loadActiveSummary(db),
+    onSite: r.onSite,
+    unseen: r.unseen,
+    read: r.statuses.size,
+    unread: r.unread,
+  }
 }
