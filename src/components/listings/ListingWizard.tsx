@@ -26,6 +26,7 @@ import { Upload, X, Check } from 'lucide-react'
 import Image from 'next/image'
 import { AddressAutocomplete } from '@/components/listings/AddressAutocomplete'
 import { monthToFromDate, monthToToDate } from '@/lib/utils/listing'
+import { compressImageFile } from '@/lib/listing-import/client-upload'
 import { checkFairHousing } from '@/lib/fairHousing'
 import { FairHousingWarning, FairHousingNotice, logFairHousing } from './FairHousingGuard'
 
@@ -198,7 +199,8 @@ export function ListingWizard({ userId }: { userId: string }) {
 
       // 2. Upload photos
       for (let i = 0; i < photos.length; i++) {
-        const file = photos[i]
+        // Phone photos are often 3–8MB; downscale to ~1600px like imports do.
+        const file = await compressImageFile(photos[i])
         const ext = file.name.split('.').pop()
         const path = `${userId}/${listingId}/${i}.${ext}`
         const { error: uploadError } = await supabase.storage

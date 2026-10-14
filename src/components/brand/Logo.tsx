@@ -9,6 +9,7 @@ export function LogoMark({ size = 32, className = '' }: LogoMarkProps) {
   return (
     <Image
       src="/logo.png"
+      unoptimized
       alt="Wroomly logo"
       width={size}
       height={size}

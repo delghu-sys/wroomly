@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import Image from '@/components/ui/StorageImage'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 /**
@@ -87,17 +87,24 @@ export function CardGallery({
       >
         {images.map((src, i) => (
           <div key={i} className="relative shrink-0 w-full h-full snap-center">
-            <Image
-              src={src}
-              alt={i === 0 ? alt : ''}
-              fill
-              quality={75}
-              priority={priority && i === 0}
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              loading={i === 0 ? undefined : 'lazy'}
-              draggable={false}
-            />
+            {/* Only the photo on screen and the next one exist as <img>.
+                Browsers lazy-load generously inside horizontal scrollers, so
+                rendering every photo put ~270 <img> on a 24-card page, fetching
+                photos nobody had swiped to. Swiping advances `idx`,
+                which mounts the following photo just ahead of the user. */}
+            {i <= idx + 1 && (
+              <Image
+                src={src}
+                alt={i === 0 ? alt : ''}
+                fill
+                quality={75}
+                priority={priority && i === 0}
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                loading={i === 0 ? undefined : 'lazy'}
+                draggable={false}
+              />
+            )}
           </div>
         ))}
       </div>

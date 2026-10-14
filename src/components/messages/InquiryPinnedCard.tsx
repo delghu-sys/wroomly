@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import type { InquiryStatus } from '@/types/database'
 import { formatCents } from '@/lib/utils/listing'
 import { createClient } from '@/lib/supabase/client'
-import Image from 'next/image'
+import Image from '@/components/ui/StorageImage'
 
 interface InquiryPinnedCardProps {
   inquiry: {
