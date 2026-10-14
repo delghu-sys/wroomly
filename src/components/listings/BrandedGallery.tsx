@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useMounted } from '@/lib/hooks/useMounted'
-import Image from 'next/image'
+import Image from '@/components/ui/StorageImage'
 import { motion, AnimatePresence } from 'motion/react'
 import type { ListingImage } from '@/types/database'
 import { getListingImageUrl } from '@/lib/utils/listing'

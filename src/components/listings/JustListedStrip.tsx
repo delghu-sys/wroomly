@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from '@/components/ui/StorageImage'
 import type { ListingWithDetails } from '@/types/database'
 import { formatCents, getListingImageUrl } from '@/lib/utils/listing'
 import { Clock, BedDouble } from 'lucide-react'

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from '@/components/ui/StorageImage'
 import { motion } from 'motion/react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CreditCard, CheckCircle2, BedDouble } from 'lucide-react'

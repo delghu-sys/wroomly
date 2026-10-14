@@ -377,7 +377,7 @@ export function ClaimReview({ token, draft: initial, personalPhotos: initialPhot
               return (
                 <button key={p.path} type="button" onClick={() => togglePhoto(p.path)}
                   className={`relative aspect-square rounded-xl overflow-hidden border-2 transition ${on ? 'border-gold-deep' : 'border-transparent opacity-60'}`}>
-                  <Image src={p.url} alt="" fill className="object-cover" sizes="120px" />
+                  <Image src={p.url} alt="" fill unoptimized className="object-cover" sizes="120px" />
                   {on && <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-gold-deep text-white text-[11px] flex items-center justify-center">✓</span>}
                 </button>
               )

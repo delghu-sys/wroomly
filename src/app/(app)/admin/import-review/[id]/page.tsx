@@ -101,7 +101,7 @@ export default async function AdminImportReviewPage({
                   <div className="grid grid-cols-3 gap-2">
                     {personalImages.map((url: string, i: number) => (
                       <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-lg overflow-hidden border border-line">
-                        <Image src={url} alt="" fill className="object-cover" sizes="120px" />
+                        <Image src={url} alt="" fill unoptimized className="object-cover" sizes="120px" />
                       </a>
                     ))}
                   </div>
@@ -126,7 +126,7 @@ export default async function AdminImportReviewPage({
                   <div className="grid grid-cols-3 gap-2 pt-1">
                     {buildingImages.map((url: string, i: number) => (
                       <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-lg overflow-hidden border border-line">
-                        <Image src={url} alt="" fill className="object-cover" sizes="120px" />
+                        <Image src={url} alt="" fill unoptimized className="object-cover" sizes="120px" />
                       </a>
                     ))}
                   </div>
