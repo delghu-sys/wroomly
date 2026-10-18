@@ -14,6 +14,7 @@ import {
 } from '../listing-import/claim-token.ts'
 import { cmbResidentSublets } from './sources/cmb-resident-sublets.ts'
 import { offcampusUniverse, refreshListingStatuses } from './sources/offcampus-universe.ts'
+import { redditSublets } from './sources/reddit-sublets.ts'
 import { summarizeActiveSublets, type ActiveSummary } from './active-sublets.ts'
 import { termHasEnded } from './prefill.ts'
 import { leadToExtractedDraft, type AnyExtracted } from './to-draft.ts'
@@ -37,7 +38,7 @@ import { buildOutreachEmail, DEFAULT_TEMPLATE, type OutreachTemplate } from './o
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Db = SupabaseClient<any, 'public', any>
 
-export const SOURCES: SourceAdapter[] = [cmbResidentSublets, offcampusUniverse]
+export const SOURCES: SourceAdapter[] = [cmbResidentSublets, offcampusUniverse, redditSublets]
 
 // ── discover ────────────────────────────────────────────────────────────────
 

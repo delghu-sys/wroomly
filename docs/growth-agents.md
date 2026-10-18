@@ -117,6 +117,17 @@ outreach email can honestly say "we saw your post".
 |---|---|
 | `cmb-resident-sublets` | Residents' posts on CMB's board. Residents print their own email on the page, so leads carry a contact. |
 | `offcampus-universe-umich` | U-M **sublets only** from offcampus-universe.com, via its sitemap (131 U-M listings). Leads carry the poster's email, name, dates and bed/bath. |
+| `reddit-sublets` | Sublet **offers** on r/uofm and r/AnnArbor, via Reddit's public Atom search feeds (one request per subreddit per run). Nobody publishes an email there, so these leads carry a Reddit handle + post link for a **manual** message; the draft and outreach agents skip them. "Looking for a sublet" posts are recorded as skipped so the feed is not re-read for them. Expect about one real offer a month on r/uofm. Reddit rate-limits anonymous feeds (HTTP 429) — a run that hits it says so; wait a few minutes. |
+
+### Sources that were looked at and ruled out (2026-10-18)
+
+| Site | Why not |
+|---|---|
+| U-M Off-Campus Housing (offcampushousing.umich.edu) | The student **sublease board is behind U-M single sign-on**; the public part is landlord inventory, not sublets. |
+| Facebook groups (UMich Housing, Sublets & Roommates) | Login-only, and automated access is against Facebook's terms. The biggest source, and only reachable by posting there as a person. |
+| Craigslist (annarbor.craigslist.org/search/sub) | Its terms forbid scrapers and crawlers outright. Contacts are relay addresses anyway. |
+| SubLeaps, Uloop, CollegeRentals, Michigan Daily classifieds | 0–4 U-M sublets at the time of checking; contact only through the site's own form. |
+| Other Ann Arbor managers' "sublet boards" (Varsity, CMI, Wilson White, Cabrio, Prime…) | None found — CMB is the only manager that publishes residents' own posts. |
 
 ### A standing note on `offcampus-universe-umich`
 
