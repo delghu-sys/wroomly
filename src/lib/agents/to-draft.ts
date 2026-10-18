@@ -56,6 +56,14 @@ export interface AnyExtracted {
   description?: string
   /** The post's own photo URLs; copied privately by copySourcePhotos. */
   imageUrls?: string[]
+  // Reddit (src/lib/agents/sources/reddit-sublets.ts) — no email is ever
+  // published there, so the contact is a handle for a MANUAL message.
+  /** e.g. "u/some_name". */
+  contactHandle?: string
+  /** Where that handle lives, e.g. "reddit". */
+  contactChannel?: string
+  /** Profile URL for the handle. */
+  contactUrl?: string
   [key: string]: unknown
 }
 

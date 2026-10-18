@@ -2,10 +2,11 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { format, parseISO } from 'date-fns'
-import { ArrowLeft, Bot, ExternalLink, SquarePen } from 'lucide-react'
+import { ArrowLeft, Bot } from 'lucide-react'
 import { EmptyState } from '@/components/brand/EmptyState'
 import { AgentsConsole } from '@/components/admin/AgentsConsole'
+import { LeadsTable } from '@/components/admin/LeadsTable'
+import { toLeadTableRow, type LeadDbRow } from '@/lib/agents/leads-table'
 import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor'
 import { SOURCES, loadActiveSummary } from '@/lib/agents/runner'
 import { ActiveSubletsCard } from '@/components/admin/ActiveSubletsCard'
@@ -14,26 +15,6 @@ import { DEFAULT_TEMPLATE, type OutreachTemplate } from '@/lib/agents/outreach-t
 export const metadata: Metadata = {
   title: 'Admin: Growth agents',
   robots: { index: false, follow: false },
-}
-
-interface LeadRow {
-  id: string
-  status: 'new' | 'drafted' | 'contacted' | 'skipped'
-  skip_reason: string | null
-  title: string | null
-  contact_email: string | null
-  source: string
-  source_url: string | null
-  discovered_at: string
-  outreach_sent_at: string | null
-  import_request_id: string | null
-}
-
-const STATUS_TONES: Record<LeadRow['status'], string> = {
-  new: 'text-ink-soft border-line bg-surface',
-  drafted: 'text-[oklch(0.50_0.15_75)] border-[oklch(0.85_0.10_75)] bg-[oklch(0.97_0.04_75)]',
-  contacted: 'text-[oklch(0.40_0.13_142)] border-[oklch(0.85_0.10_142)] bg-[oklch(0.97_0.04_142)]',
-  skipped: 'text-ink-muted border-line bg-surface',
 }
 
 export default async function AdminAgentsPage() {
@@ -59,10 +40,10 @@ export default async function AdminAgentsPage() {
     service
       .from('sourced_leads')
       .select(
-        'id, status, skip_reason, title, contact_email, source, source_url, discovered_at, outreach_sent_at, import_request_id',
+        'id, status, skip_reason, title, contact_email, source, source_url, discovered_at, outreach_sent_at, import_request_id, extracted',
       )
       .order('discovered_at', { ascending: false })
-      .limit(200),
+      .limit(2000),
     service.from('outreach_suppressions').select('email', { count: 'exact', head: true }),
     service.from('outreach_template').select('subject, body').eq('id', 'default').maybeSingle(),
     // From stored data only (no network), so it is cheap on every page load.
@@ -73,7 +54,7 @@ export default async function AdminAgentsPage() {
   // Migration 042 not applied yet → the table doesn't exist. Say so instead
   // of rendering an empty console that silently can't work.
   const missingTable = leadsRes.error?.code === '42P01'
-  const leads = (leadsRes.data ?? []) as LeadRow[]
+  const leads = (leadsRes.data ?? []) as LeadDbRow[]
   const counts = { new: 0, drafted: 0, contacted: 0, skipped: 0 }
   for (const l of leads) counts[l.status] += 1
   const optedOut = supsRes.count ?? 0
@@ -155,77 +136,20 @@ export default async function AdminAgentsPage() {
           </section>
 
           <section className="mt-10">
-            <h2 className="font-display text-xl tracking-tight text-ink mb-4">Leads</h2>
+            <h2 className="font-display text-xl tracking-tight text-ink mb-1">Leads</h2>
+            <p className="text-[13.5px] text-ink-muted mb-4">
+              Everyone found, with or without a contact. Filter, sort by any column, or export what is shown.
+            </p>
             {leads.length === 0 ? (
               <EmptyState
                 title="Nothing discovered yet"
                 description="Run discovery above. A dry run shows what it would find without saving anything."
               />
             ) : (
-              <div className="overflow-x-auto rounded-3xl border border-line bg-surface shadow-1">
-                <table className="w-full text-left text-[14px]">
-                  <thead className="bg-navy-soft/40 text-ink-muted text-xs uppercase tracking-wide">
-                    <tr>
-                      <th className="px-5 py-3 font-medium">Status</th>
-                      <th className="px-5 py-3 font-medium">Listing</th>
-                      <th className="px-5 py-3 font-medium">Contact</th>
-                      <th className="px-5 py-3 font-medium">Source</th>
-                      <th className="px-5 py-3 font-medium">Found</th>
-                      <th className="px-5 py-3 font-medium">Emailed</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map(l => (
-                      <tr key={l.id} className="border-t border-line align-top">
-                        <td className="px-5 py-3">
-                          <span
-                            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${STATUS_TONES[l.status]}`}
-                          >
-                            {l.status}
-                          </span>
-                          {l.skip_reason && (
-                            <p className="text-[11px] text-ink-muted mt-1">{l.skip_reason}</p>
-                          )}
-                        </td>
-                        <td className="px-5 py-3 text-ink">
-                          {l.import_request_id ? (
-                            <Link
-                              href={`/admin/agents/${l.id}`}
-                              className="group/draft inline-flex items-center gap-1.5 text-navy hover:text-ink"
-                            >
-                              <span className="underline underline-offset-2">{l.title ?? 'Untitled'}</span>
-                              <SquarePen className="w-3.5 h-3.5 text-ink-muted group-hover/draft:text-ink shrink-0" />
-                            </Link>
-                          ) : (
-                            l.title ?? '—'
-                          )}
-                        </td>
-                        <td className="px-5 py-3 text-ink-soft">{l.contact_email ?? <span className="text-ink-muted">none published</span>}</td>
-                        <td className="px-5 py-3 text-ink-soft">
-                          {l.source_url ? (
-                            <a
-                              href={l.source_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 hover:text-ink underline underline-offset-2"
-                            >
-                              {l.source} <ExternalLink className="w-3 h-3" />
-                            </a>
-                          ) : (
-                            l.source
-                          )}
-                        </td>
-                        <td className="px-5 py-3 text-ink-muted text-xs whitespace-nowrap">
-                          {format(parseISO(l.discovered_at), 'MMM d, yyyy')}
-                        </td>
-                        <td className="px-5 py-3 text-ink-muted text-xs whitespace-nowrap">
-                          {l.outreach_sent_at ? format(parseISO(l.outreach_sent_at), 'MMM d, yyyy') : '—'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <LeadsTable
+                rows={leads.map(l => toLeadTableRow(l))}
+                sources={SOURCES.map(s => ({ key: s.key, label: s.label }))}
+              />
             )}
           </section>
         </>
