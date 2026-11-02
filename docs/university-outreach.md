@@ -74,6 +74,38 @@ approval can never send a follow-up), and send it. One follow-up per university,
 ever; it counts against the same daily cap; replied/declined/suppressed are never
 followed up. Needs migration 046.
 
+## Replies
+
+`/admin/universities` → **Replies** shows what universities write back and what to
+do about it. Needs migration 047.
+
+**Reading a message is rules, not a model** (`src/lib/universities/replies.ts`):
+an automatic reply, a bounce, a request to stop, or a person — in English,
+French, Spanish and German. A model is only used afterwards, for a person's real
+reply, to summarise it and prepare an answer (`reply-drafter.ts`), and the
+incoming email is treated as untrusted data in that prompt.
+
+| What arrives | What happens, automatically |
+|---|---|
+| **Asks us to stop** ("not interested", "please do not contact us", "ne plus nous contacter"…) | The address is suppressed and the university marked declined **immediately** — our email promised "reply and I won't write again", so this never waits for a person |
+| **Auto-reply / out of office** | Recorded; nothing to answer; the follow-up is held (14 days, longer if they quote a delay — some auto-replies even say "please do not follow up") |
+| **Bounce** | Recorded; nothing to answer |
+| **A person** | University marked replied; lands in your inbox with a summary, a prepared answer, and the best time to send it (09:30 their local time on a weekday; "now" if it is already working hours there) |
+
+**Nothing is ever sent without you.** A prepared answer is only text until you
+approve THE EXACT message (hash of to / from / reply-to / subject / body / thread);
+any edit, or a change of sender, voids the approval. Answers go only to the person
+who wrote, in the same email thread (`In-Reply-To`), from the configured sender,
+and never to a suppressed address. If they ask for the overview, the draft says so
+and flags "attach or link the one-page overview" — there is no attachment ready.
+
+**How replies get in.** Everything lands in your umich mailbox
+(`hugodelgado@wroomly.app` forwards there). `scripts/universities/ingest-replies.mjs`
+takes messages from that mailbox into the dashboard (dry run by default; a message
+is stored once). Claude reads the mailbox through the Gmail connector and feeds it;
+a Resend inbound subdomain would make it fully automatic and independent of any
+laptop (see the PR notes).
+
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.
