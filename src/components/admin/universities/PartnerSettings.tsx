@@ -15,6 +15,7 @@ interface Settings {
   from_name: string
   from_email: string
   reply_to: string
+  notify_email: string
   daily_cap: number
   subject: string
   body: string
@@ -52,6 +53,7 @@ export function PartnerSettings({ initial, sample }: { initial: Settings; sample
         <div className="space-y-1.5"><Label htmlFor="from_name">From name</Label><Input id="from_name" value={s.from_name} onChange={e => set('from_name', e.target.value)} /></div>
         <div className="space-y-1.5"><Label htmlFor="from_email">From address (must be @wroomly.app)</Label><Input id="from_email" value={s.from_email} onChange={e => set('from_email', e.target.value)} /></div>
         <div className="space-y-1.5"><Label htmlFor="reply_to">Reply-to (the inbox you read)</Label><Input id="reply_to" type="email" value={s.reply_to} onChange={e => set('reply_to', e.target.value)} placeholder="you@gmail.com" /></div>
+        <div className="space-y-1.5"><Label htmlFor="notify_email">Notify me at (when a university replies)</Label><Input id="notify_email" type="email" value={s.notify_email} onChange={e => set('notify_email', e.target.value)} placeholder="you@example.com" /></div>
         <div className="space-y-1.5"><Label htmlFor="daily_cap">Daily send cap</Label><Input id="daily_cap" type="number" min={1} max={200} value={s.daily_cap} onChange={e => set('daily_cap', Number(e.target.value))} /></div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">

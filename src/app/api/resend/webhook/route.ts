@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { headers } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase/server'
-import { verifyResendWebhook } from '@/lib/resend'
+import { resend, FROM_EMAIL, verifyResendWebhook } from '@/lib/resend'
 import { planSuppression } from '@/lib/agents/resend-events'
+import { afterInbound, receiveInbound } from '@/lib/universities/inbound-runner'
+import { draftWithClaude } from '@/lib/universities/reply-drafter'
+import type { ReceivedEmail } from '@/lib/universities/inbound'
 
 /**
  * POST /api/resend/webhook — Resend delivery events.
@@ -19,9 +22,31 @@ import { planSuppression } from '@/lib/agents/resend-events'
  * Always returns 200 for an authentic event, even one we ignore: a non-2xx
  * makes Resend retry, and retrying an event we deliberately skipped is noise.
  * A bad signature is the one case that gets a 4xx.
+ *
+ * It also receives `email.received`: a reply to one of our emails, delivered to
+ * the receiving subdomain. That is stored and read here (a failure returns 5xx
+ * so Resend retries), and the slow part — preparing an answer, telling the
+ * operator — runs after the response. Nothing is ever SENT from this route.
  */
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60
+
+async function fetchReceived(id: string): Promise<ReceivedEmail> {
+  const { data, error } = await resend.emails.receiving.get(id)
+  if (error || !data) throw new Error(error?.message ?? 'Could not fetch the received email')
+  return {
+    id: data.id,
+    from: data.from,
+    to: data.to,
+    subject: data.subject,
+    created_at: data.created_at,
+    message_id: data.message_id,
+    text: data.text,
+    html: data.html,
+    headers: data.headers,
+  }
+}
 
 export async function POST(request: Request) {
   const secret = process.env.RESEND_WEBHOOK_SECRET
@@ -65,6 +90,35 @@ export async function POST(request: Request) {
     // Don't drop a real bounce because the dedupe table is unreachable; at
     // worst the suppression upsert below runs twice, which is idempotent.
     console.error('[resend/webhook] dedupe insert failed:', dedupeErr.message)
+  }
+
+  // A reply from a university. Handled before the suppression logic: it is
+  // not a delivery event.
+  if ((event as { type?: unknown })?.type === 'email.received') {
+    try {
+      const r = await receiveInbound(db, event, { fetchEmail: fetchReceived })
+      if (r.handled) {
+        const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://wroomly.app'
+        after(async () => {
+          const res = await afterInbound(db, r, {
+            drafter: i => draftWithClaude(i),
+            notify: async (to, subject, text) => {
+              const { error } = await resend.emails.send({ from: FROM_EMAIL, to, subject, text })
+              if (error) throw new Error(error.message)
+            },
+            dashboardUrl: `${base}/admin/universities`,
+          })
+          if (res.errors.length) console.warn('[resend/webhook] inbound follow-up:', res.errors.join('; '))
+        })
+      }
+      return NextResponse.json({ received: true, inbound: r.handled ? 'stored' : r.why })
+    } catch (err) {
+      // Undo the replay mark: otherwise Resend's retry of THIS event would be
+      // dismissed as a repeat and the reply lost for good.
+      await db.from('webhook_events').delete().eq('id', id)
+      console.error('[resend/webhook] inbound failed:', err instanceof Error ? err.message : err)
+      return NextResponse.json({ error: 'Could not store the reply' }, { status: 500 })
+    }
   }
 
   const plan = planSuppression(event)

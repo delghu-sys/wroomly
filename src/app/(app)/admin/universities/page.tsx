@@ -11,7 +11,7 @@ import { FollowupsPanel } from '@/components/admin/universities/FollowupsPanel'
 import { loadFollowupOverview } from '@/lib/universities/followup-runner'
 import { InboxPanel } from '@/components/admin/universities/InboxPanel'
 import { loadInbox } from '@/lib/universities/replies-runner'
-import { senderProblems } from '@/lib/universities/gate'
+import { isInboundAddress, notifyTarget, senderProblems } from '@/lib/universities/gate'
 import { countSentLastDay, loadSettings } from '@/lib/universities/runner'
 import { formatFrom } from '@/lib/universities/gate'
 
@@ -53,7 +53,7 @@ export default async function AdminUniversitiesPage() {
   // The replies inbox needs migration 047; probe so a missing table shows a notice.
   const inboxProbe = await service.from('university_messages').select('id').limit(1)
   const inboxReady = !inboxProbe.error
-  const inbox = inboxReady ? await loadInbox(service) : { needsYou: [], done: [] }
+  const inbox = inboxReady ? await loadInbox(service) : { needsYou: [], done: [], lastAutomaticAt: null }
   const tiles = [
     { label: 'Universities', value: rows.length },
     { label: 'With an email', value: withEmail },
@@ -131,11 +131,12 @@ export default async function AdminUniversitiesPage() {
               replyTo={settings.reply_to}
               enabled={process.env.UNIVERSITY_OUTREACH_ENABLED === 'true'}
               senderProblem={senderProblems(settings)[0] ?? null}
+              automatic={{ replyToIsInbound: isInboundAddress(settings.reply_to), notifyTo: notifyTarget(settings), lastAt: inbox.lastAutomaticAt }}
             />
           </section>
           <section className="mt-8">
             <PartnerSettings
-              initial={{ from_name: settings.from_name, from_email: settings.from_email, reply_to: settings.reply_to, daily_cap: settings.daily_cap, subject: settings.subject, body: settings.body }}
+              initial={{ from_name: settings.from_name, from_email: settings.from_email, reply_to: settings.reply_to, notify_email: settings.notify_email ?? '', daily_cap: settings.daily_cap, subject: settings.subject, body: settings.body }}
               sample={{ name: sample.name, country: sample.country, umich_units: sample.umich_units, office_name: sample.office_name, contact_name: null }}
             />
           </section>

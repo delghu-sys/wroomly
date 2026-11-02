@@ -7,6 +7,8 @@ import { normalizeEmail } from '../agents/outreach-policy.ts'
  */
 
 export const SENDER_DOMAIN = 'wroomly.app'
+/** The receive-only subdomain Resend delivers replies to (see docs). */
+export const INBOUND_DOMAIN = 'replies.wroomly.app'
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 export type ProspectStatus =
@@ -53,6 +55,23 @@ export function senderProblems(s: SenderSettings): string[] {
     out.push(`Sender email must be an @${SENDER_DOMAIN} address — that is the domain verified for sending.`)
   if (!EMAIL_RE.test(s.reply_to.trim())) out.push('Reply-to is not set. Replies must come to a mailbox you read.')
   return out
+}
+
+/** Is this address one that WE receive on (the automatic inbox)? */
+export const isInboundAddress = (email: string | null | undefined): boolean =>
+  (email ?? '').trim().toLowerCase().endsWith(`@${INBOUND_DOMAIN}`)
+
+/**
+ * Who to tell when a reply arrives. An explicit "notify" address wins; failing
+ * that, the Reply-to — but only if it is a mailbox a person reads, not an
+ * address on the receiving subdomain (that one is read by the server, so
+ * telling it would tell no one).
+ */
+export function notifyTarget(s: { notify_email?: string | null; reply_to: string }): string | null {
+  const explicit = (s.notify_email ?? '').trim()
+  if (EMAIL_RE.test(explicit)) return explicit
+  const rt = s.reply_to.trim()
+  return EMAIL_RE.test(rt) && !isInboundAddress(rt) ? rt : null
 }
 
 export interface SendCheckInput {
@@ -126,6 +145,8 @@ export function settingsFieldMessage(field: string): string {
       return 'Reply-to must be one plain email address, like name@gmail.com — no name in front, no spaces, no <angle brackets>.'
     case 'from_email':
       return `From address must be one plain email address ending in @${SENDER_DOMAIN}.`
+    case 'notify_email':
+      return 'Notify me at must be one plain email address, or left empty.'
     case 'from_name':
       return 'Sender name is empty or longer than 80 characters.'
     case 'daily_cap':
