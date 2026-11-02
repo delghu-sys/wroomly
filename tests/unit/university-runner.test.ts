@@ -1,5 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { loadFollowupOverview, draftFollowups, saveFollowup, approveFollowups, withdrawFollowups, sendFollowup, sendApprovedFollowups, testFollowup } from '../../src/lib/universities/followup-runner.ts'
 import { draftAll, saveDraft, approve, approveAll, unapprove, unapproveMany, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
 
 // A tiny in-memory stand-in for the three tables the runner touches. Only the
@@ -32,6 +33,7 @@ function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]
         select: (_c?: string, o?: { count?: string; head?: boolean }) => { wantCount = !!o?.count; head = !!o?.head; return api },
         eq: (k: string, v: unknown) => (filters.push(r => r[k] === v), api),
         not: (k: string, _o: string, v: unknown) => (filters.push(r => r[k] !== v), api),
+        is: (k: string, v: unknown) => (filters.push(r => (v === null ? r[k] == null : r[k] === v)), api),
         gte: (k: string, v: string) => (filters.push(r => r[k] != null && r[k] >= v), api),
         order: (k: string, o?: { ascending?: boolean }) => ((order = { k, asc: o?.ascending !== false }), api),
         update: (p: Row) => ((op = 'update'), (patch = p), api),
@@ -381,4 +383,160 @@ test('withdrawing never touches a message that has been sent', async () => {
   db.tables.university_prospects[0].status = 'sent'
   assert.equal(await unapproveMany(D(db), ['p1']), 0)
   assert.equal(db.tables.university_prospects[0].status, 'sent')
+})
+
+// ── the follow-up ───────────────────────────────────────────────────────────
+
+const NOW = new Date('2026-11-14T12:00:00Z')
+const sentRow = (n: number, over: Row = {}): Row =>
+  prospect({ id: `s${n}`, slug: `s${n}`, name: `S${n} U`, contact_email: `s${n}@s${n}.edu`, status: 'sent', sent_at: '2026-11-02T22:21:36.000Z', subject: 'first', body: 'first', ...over })
+
+const followupDb = (rows: Row[] = [sentRow(1), sentRow(2)]) => fakeDb({ prospects: rows, settings: [{ ...goodSettings }] })
+
+test('the overview lists who has been emailed and whether each follow-up is due', async () => {
+  const db = followupDb([
+    sentRow(1),
+    sentRow(2, { sent_at: '2026-11-10T09:00:00.000Z' }), // 4 days: waiting
+    sentRow(3, { status: 'replied' }),
+    sentRow(4, { followup_sent_at: '2026-11-13T00:00:00Z' }),
+    prospect({ id: 'r', slug: 'r', name: 'R U', status: 'researched' }),
+  ])
+  const o = await loadFollowupOverview(D(db), NOW)
+  assert.deepEqual(o.items.map(i => [i.name, i.due, i.state]), [['S1 U', true, 'none'], ['S2 U', false, 'none']])
+  assert.equal(o.items[0].daysSince, 11)
+  assert.deepEqual([o.due, o.waiting, o.minDays], [1, 1, 10])
+})
+
+test('drafting writes follow-ups only for those that are due', async () => {
+  const db = followupDb([sentRow(1), sentRow(2, { sent_at: '2026-11-10T09:00:00.000Z' }), sentRow(3, { status: 'declined' })])
+  assert.deepEqual(await draftFollowups(D(db), { now: NOW }), { drafted: 1, skipped: 0 })
+  const [a, b, c] = db.tables.university_prospects
+  assert.match(a.followup_subject, /^Following up: /)
+  assert.match(a.followup_body, /I wrote to you on November 2/)
+  assert.equal(b.followup_subject, undefined, 'not due yet')
+  assert.equal(c.followup_subject, undefined, 'said no')
+})
+
+test('drafting does not overwrite an edited draft unless asked, and never an approved one', async () => {
+  const db = followupDb([sentRow(1)])
+  await draftFollowups(D(db), { now: NOW })
+  await saveFollowup(D(db), 's1', { subject: 'My own subject', body: 'My own body' })
+  assert.deepEqual(await draftFollowups(D(db), { now: NOW }), { drafted: 0, skipped: 1 })
+  assert.equal(db.tables.university_prospects[0].followup_subject, 'My own subject')
+  await approveFollowups(D(db))
+  assert.deepEqual(await draftFollowups(D(db), { now: NOW, redraft: true }), { drafted: 0, skipped: 1 }, 'approved is untouchable')
+})
+
+test('approve → send: the follow-up goes once, from the configured sender, and is frozen on the row', async () => {
+  const db = followupDb([sentRow(1)])
+  await draftFollowups(D(db), { now: NOW })
+  assert.deepEqual(await approveFollowups(D(db)), { approved: 1, skipped: 0 })
+  const { sent, send } = mailer()
+  const o = await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })
+  assert.equal(o.sent, true)
+  assert.equal(sent.length, 1)
+  assert.equal(sent[0].from, 'Hugo from Wroomly <hugo@wroomly.app>')
+  assert.equal(sent[0].replyTo, 'me@example.com')
+  assert.match(sent[0].subject, /^Following up: /)
+  const row = db.tables.university_prospects[0]
+  assert.equal(row.status, 'sent', 'the first email stays "sent"')
+  assert.equal(row.followup_message_id, 'msg_1')
+  assert.equal(row.followup_snapshot.body, sent[0].text)
+  assert.equal((await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })).reason, 'followup-already-sent')
+  assert.equal(sent.length, 1, 'only ever one')
+})
+
+test('a follow-up is refused before ten days, or without approval, or with the switch off', async () => {
+  const db = followupDb([sentRow(1, { sent_at: '2026-11-10T09:00:00.000Z' }), sentRow(2)])
+  await draftFollowups(D(db), { now: new Date('2026-11-30T00:00:00Z') }) // draft both, ignoring the wait
+  await approveFollowups(D(db))
+  const { sent, send } = mailer()
+  assert.equal((await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })).reason, 'too-soon')
+  assert.equal((await sendFollowup(D(db), 's2', { send, enabled: false, now: NOW })).reason, 'sending-disabled')
+  await withdrawFollowups(D(db), ['s2'])
+  assert.equal((await sendFollowup(D(db), 's2', { send, enabled: true, now: NOW })).reason, 'not-approved')
+  assert.equal(sent.length, 0)
+})
+
+test('editing after approving voids it; the follow-up cannot go until approved again', async () => {
+  const db = followupDb([sentRow(1)])
+  await draftFollowups(D(db), { now: NOW })
+  await approveFollowups(D(db))
+  await saveFollowup(D(db), 's1', { subject: 'Changed', body: 'Changed' })
+  const { sent, send } = mailer()
+  assert.equal((await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })).reason, 'not-approved')
+  assert.equal(sent.length, 0)
+})
+
+test('someone who replied or said no after the first email gets no follow-up', async () => {
+  const db = followupDb([sentRow(1)])
+  await draftFollowups(D(db), { now: NOW })
+  await approveFollowups(D(db))
+  await markOutcome(D(db), 's1', 'replied', 'they wrote back')
+  const { sent, send } = mailer()
+  assert.equal((await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })).reason, 'replied-or-declined')
+  assert.equal(sent.length, 0)
+})
+
+test('a failed follow-up send is put back so it can be retried', async () => {
+  const db = followupDb([sentRow(1)])
+  await draftFollowups(D(db), { now: NOW })
+  await approveFollowups(D(db))
+  const o = await sendFollowup(D(db), 's1', { send: async () => { throw new Error('Resend is down') }, enabled: true, now: NOW })
+  assert.equal(o.sent, false)
+  assert.match(o.message ?? '', /Resend is down/)
+  assert.equal(db.tables.university_prospects[0].followup_sent_at, null)
+})
+
+test('follow-ups count against the same daily cap as first emails', async () => {
+  // The cap is counted against the REAL clock, so build every date from it
+  // rather than from a fixed day — otherwise this test would depend on when it runs.
+  const real = new Date()
+  const ago = (ms: number) => new Date(real.getTime() - ms).toISOString()
+  const db = fakeDb({
+    prospects: [
+      sentRow(1, { sent_at: ago(11 * 86_400_000) }),
+      sentRow(2, { sent_at: ago(11 * 86_400_000) }),
+      // a first email that went out an hour ago: it uses one of today's two sends
+      prospect({ id: 'f', slug: 'f', name: 'F U', status: 'sent', sent_at: ago(3_600_000), contact_email: 'f@f.edu' }),
+    ],
+    settings: [{ ...goodSettings, daily_cap: 2 }],
+  })
+  await draftFollowups(D(db), { now: real })
+  await approveFollowups(D(db), ['s1', 's2'])
+  const { sent, send } = mailer()
+  const r = await sendApprovedFollowups(D(db), { send, enabled: true, now: real, pauseMs: 0 })
+  assert.equal(r.sent, 1, 'cap 2, one already used by the first email → only one follow-up')
+  assert.equal(r.outcomes.at(-1)?.reason, 'daily-cap-reached')
+  assert.equal(sent.length, 1)
+})
+
+test('a bulk follow-up send respects its time budget and says how many are left', async () => {
+  const db = followupDb([1, 2, 3, 4].map(n => sentRow(n)))
+  await draftFollowups(D(db), { now: NOW })
+  await approveFollowups(D(db))
+  const { sent, send } = mailer()
+  let clock = 0
+  const slow: MailSender = async m => { clock += 20_000; return send(m) }
+  const r = await sendApprovedFollowups(D(db), { send: slow, enabled: true, now: NOW, pauseMs: 0, budgetMs: 45_000, clock: () => clock })
+  assert.equal(r.sent, 3)
+  assert.equal(r.remaining, 1)
+  assert.equal(sent.length, 3)
+})
+
+test('withdrawing and the test touch only what they name', async () => {
+  const db = followupDb([sentRow(1), sentRow(2)])
+  await draftFollowups(D(db), { now: NOW })
+  await approveFollowups(D(db))
+  assert.equal(await withdrawFollowups(D(db), ['s2', 'nope']), 1)
+  assert.ok(db.tables.university_prospects[0].followup_approval_hash)
+  assert.equal(db.tables.university_prospects[1].followup_approval_hash, null)
+
+  const { sent, send } = mailer()
+  const before = JSON.stringify(db.tables.university_prospects)
+  const e = await testFollowup(D(db), 's1', { to: 'admin@example.com', send })
+  assert.equal(sent[0].to, 'admin@example.com')
+  assert.match(sent[0].subject, /^\[TEST FOLLOW-UP → s1@s1\.edu\] Following up/)
+  assert.equal(e.to, 'admin@example.com')
+  assert.equal(JSON.stringify(db.tables.university_prospects), before, 'a test changes no row')
 })

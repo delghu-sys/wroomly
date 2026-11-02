@@ -63,6 +63,14 @@ export interface Prospect {
   replied_at: string | null
   reply_note: string | null
   created_at: string
+  // The one follow-up (migration 046). Absent until that migration is applied.
+  followup_subject?: string | null
+  followup_body?: string | null
+  followup_approved_at?: string | null
+  followup_approval_hash?: string | null
+  followup_sent_at?: string | null
+  followup_message_id?: string | null
+  followup_snapshot?: (Envelope & { sentAt: string }) | null
 }
 
 export type MailSender = (m: {
@@ -251,21 +259,21 @@ export interface SendOutcome {
 
 /** Sends in the trailing 24 hours — the window the daily cap is counted over. */
 export async function countSentLastDay(db: Db): Promise<number> {
-  const { count } = await db
-    .from('university_prospects')
-    .select('id', { count: 'exact', head: true })
-    .gte('sent_at', new Date(Date.now() - 24 * 3600_000).toISOString())
-  return count ?? 0
+  const since = new Date(Date.now() - 24 * 3600_000).toISOString()
+  const [first, follow] = await Promise.all([
+    db.from('university_prospects').select('id', { count: 'exact', head: true }).gte('sent_at', since),
+    // Follow-ups count against the same daily cap. If migration 046 is not
+    // applied yet this column does not exist; treat that as zero.
+    db.from('university_prospects').select('id', { count: 'exact', head: true }).gte('followup_sent_at', since),
+  ])
+  return (first.count ?? 0) + (follow.error ? 0 : (follow.count ?? 0))
 }
 
 async function sendContext(db: Db) {
   const [suppRes, emailedRes, recentRes] = await Promise.all([
     db.from('outreach_suppressions').select('email'),
     db.from('university_prospects').select('contact_email').not('sent_at', 'is', null),
-    db
-      .from('university_prospects')
-      .select('id', { count: 'exact', head: true })
-      .gte('sent_at', new Date(Date.now() - 24 * 3600_000).toISOString()),
+    countSentLastDay(db).then(count => ({ count })),
   ])
   return {
     suppressed: new Set(((suppRes.data ?? []) as { email: string }[]).map(r => normalizeEmail(r.email))),

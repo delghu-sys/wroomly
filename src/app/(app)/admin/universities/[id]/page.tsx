@@ -4,6 +4,9 @@ import type { Metadata } from 'next'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { UniversityEditor } from '@/components/admin/universities/UniversityEditor'
+import { FollowupEditor } from '@/components/admin/universities/FollowupEditor'
+import { followupEnvelope } from '@/lib/universities/followup-runner'
+import { FOLLOWUP_MIN_DAYS, daysSince, followupApprovalHash, followupState } from '@/lib/universities/followup'
 import { envelopeFor, loadSettings, type Prospect } from '@/lib/universities/runner'
 import { approvalHash, formatFrom, senderProblems } from '@/lib/universities/gate'
 
@@ -66,6 +69,27 @@ export default async function AdminUniversityPage({ params }: { params: Promise<
           replyNote={p.reply_note ?? ''}
         />
       </div>
+
+      {p.status === 'sent' && (
+        <div className="mt-4">
+          <FollowupEditor
+            id={p.id}
+            name={p.name}
+            state={followupState({ followup_subject: p.followup_subject ?? null, followup_approval_hash: p.followup_approval_hash ?? null, followup_sent_at: p.followup_sent_at ?? null })}
+            subject={p.followup_subject ?? ''}
+            body={p.followup_body ?? ''}
+            to={p.contact_email ?? ''}
+            fromDisplay={formatFrom(settings.from_name, settings.from_email)}
+            replyTo={settings.reply_to}
+            approvalCurrent={!!p.followup_approval_hash && p.followup_approval_hash === followupApprovalHash(followupEnvelope(p, settings))}
+            senderProblem={problems[0] ?? null}
+            sendingEnabled={process.env.UNIVERSITY_OUTREACH_ENABLED === 'true'}
+            daysSince={daysSince(p.sent_at, new Date()) ?? 0}
+            minDays={FOLLOWUP_MIN_DAYS}
+            sent={p.followup_snapshot ?? null}
+          />
+        </div>
+      )}
     </div>
   )
 }
