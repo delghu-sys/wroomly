@@ -65,6 +65,15 @@ template); everywhere else that line is blank. The editable settings template is
 the English one; each individual message can still be edited before approving.
 **Redo drafts** regenerates drafted (not approved) messages after a template change.
 
+**Follow-ups.** A university we emailed that hasn't replied or said no becomes
+*due* 10 days after the first email (`FOLLOWUP_MIN_DAYS`). The **Follow-ups** box
+on `/admin/universities` lists everyone with their due date; **Draft** writes a
+short, polite follow-up (French for French schools) naming the date of the first
+email; you approve it as an exact message (separate hash, so a first-email
+approval can never send a follow-up), and send it. One follow-up per university,
+ever; it counts against the same daily cap; replied/declined/suppressed are never
+followed up. Needs migration 046.
+
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.
