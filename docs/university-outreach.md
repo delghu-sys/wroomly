@@ -57,6 +57,14 @@ the real From/Reply-to. It changes nothing.
 | A send claims the row before mailing, so overlapping requests can't both send; a failed send is put back to *approved* | `sendOne` |
 | An address is only stored with the page it was read from; private mailboxes (gmail…) are dropped | `normalizeProspect` |
 
+**Languages.** French universities get a French email (`FRENCH_TEMPLATE` in
+`src/lib/universities/template.ts` — built in, gender-neutral first person,
+formal "Madame, Monsieur,"). Other European universities get the English email
+plus one line, "I'm from France myself…" (`{{origin_line}}` in the English
+template); everywhere else that line is blank. The editable settings template is
+the English one; each individual message can still be edited before approving.
+**Redo drafts** regenerates drafted (not approved) messages after a template change.
+
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.

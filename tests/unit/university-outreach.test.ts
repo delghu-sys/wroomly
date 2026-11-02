@@ -6,6 +6,11 @@ import {
   greeting,
   unknownPlaceholders,
   DEFAULT_SETTINGS,
+  FRENCH_TEMPLATE,
+  languageFor,
+  originLine,
+  partnershipSentenceFr,
+  greetingFr,
 } from '../../src/lib/universities/template.ts'
 import {
   approvalHash,
@@ -299,4 +304,60 @@ test('a bulk action only acts on what is ticked AND still on screen', () => {
   const ticked = new Set(['a', 'c', 'hidden'])
   assert.deepEqual(effectiveSelection(visible, ticked), ['a'])
   assert.deepEqual(effectiveSelection(visible, new Set()), [])
+})
+
+// ── French, and the "from France" line ──────────────────────────────────────
+
+const fr = { ...prospect, name: 'ESSEC Business School', country: 'France', umich_units: ['Ross'], office_name: 'ESSEC Global BBA Study Abroad Office', contact_name: null }
+
+test('only France is written to in French', () => {
+  assert.equal(languageFor('France'), 'fr')
+  assert.equal(languageFor(' france '), 'fr')
+  for (const c of ['Spain', 'Switzerland', 'Belgium', null, '']) assert.equal(languageFor(c as string | null), 'en', String(c))
+})
+
+test('a French university gets the French email, with a formal greeting and French wording', () => {
+  const e = renderEmail(fr, DEFAULT_SETTINGS)
+  assert.equal(e.subject, FRENCH_TEMPLATE.subject)
+  assert.match(e.body, /^Madame, Monsieur,/)
+  assert.match(e.body, /ESSEC Business School est partenaire d'échange de la Ross School of Business, et trouver un logement/)
+  assert.match(e.body, /Je m'appelle Hugo, je suis originaire de France/)
+  assert.match(e.body, /Cordialement,\nHugo/)
+  assert.doesNotMatch(e.body, /\{\{|Dear|exchange partner/)
+})
+
+test('the French first person stays gender-neutral', () => {
+  assert.doesNotMatch(FRENCH_TEMPLATE.body, /français\b|française|\bné\b|\bnée\b/i)
+})
+
+test('French wording for the units, and a named contact is greeted by name', () => {
+  assert.equal(partnershipSentenceFr({ name: 'X', umich_units: ['Ross', 'UMSI'] }), "X est partenaire d'échange de la Ross School of Business et de la School of Information")
+  assert.equal(partnershipSentenceFr({ name: 'X', umich_units: ['LSA (CGIS)'] }), "X est partenaire d'échange du College of LSA")
+  assert.equal(partnershipSentenceFr({ name: 'X', umich_units: [] }), "X a un partenariat d'échange avec l'Université du Michigan")
+  assert.equal(greetingFr({ contact_name: 'Ludivine Tollitte', office_name: 'Bureau' }), 'Bonjour Ludivine Tollitte,')
+  assert.equal(greetingFr({ contact_name: 'A and B', office_name: 'Bureau' }), 'Madame, Monsieur,', 'two people → the formal form, not a joined name')
+  assert.equal(greetingFr({ contact_name: null, office_name: null }), 'Madame, Monsieur,')
+})
+
+test('other European universities get one honest line, and nobody else does', () => {
+  assert.equal(originLine('Germany'), "I'm from France myself, so I know how stressful it is to find a place abroad for a semester.")
+  assert.ok(originLine('United Kingdom'))
+  assert.ok(originLine('Czech Republic'))
+  for (const c of ['Japan', 'Hong Kong', 'Israel', 'Peru', 'Canada', null]) assert.equal(originLine(c as string | null), '', String(c))
+  assert.equal(originLine('France'), '', 'France gets it inside the French email instead')
+})
+
+test('the line lands in the first paragraph for Europe and leaves no gap anywhere else', () => {
+  const de = renderEmail({ ...prospect, country: 'Germany' }, DEFAULT_SETTINGS)
+  assert.match(de.body, /students in Ann Arbor\. I'm from France myself, so I know how stressful it is to find a place abroad for a semester\. I'm writing because/)
+  const jp = renderEmail({ ...prospect, country: 'Japan' }, DEFAULT_SETTINGS)
+  assert.match(jp.body, /students in Ann Arbor\. I'm writing because/, 'no double space where the line would have been')
+  assert.doesNotMatch(jp.body, / {2}|\bFrance\b/)
+  assert.doesNotMatch(de.body, /\{\{/)
+})
+
+test('a saved English template without the new placeholder still renders, just without the line', () => {
+  const old = { subject: 'Hi {{university}}', body: '{{greeting}}\n\n{{partnership}}.' }
+  const e = renderEmail({ ...prospect, country: 'Germany' }, old)
+  assert.equal(e.body, 'Dear International Relations Office,\n\nExample University is an exchange partner of the Ross School of Business and the School of Information.')
 })
