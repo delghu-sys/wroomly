@@ -115,3 +115,26 @@ export function checkSend(i: SendCheckInput): { ok: true } | { ok: false; reason
   if (i.sentInLastDay >= i.dailyCap) return no('daily-cap-reached')
   return { ok: true }
 }
+
+/**
+ * A message naming the field that failed validation. The settings form used to
+ * say only "check the fields", which sends someone hunting through six inputs.
+ */
+export function settingsFieldMessage(field: string): string {
+  switch (field) {
+    case 'reply_to':
+      return 'Reply-to must be one plain email address, like name@gmail.com — no name in front, no spaces, no <angle brackets>.'
+    case 'from_email':
+      return `From address must be one plain email address ending in @${SENDER_DOMAIN}.`
+    case 'from_name':
+      return 'Sender name is empty or longer than 80 characters.'
+    case 'daily_cap':
+      return 'Daily send cap must be a whole number from 1 to 50.'
+    case 'subject':
+      return 'Subject is empty or longer than 200 characters.'
+    case 'body':
+      return 'The message is empty or longer than 6,000 characters.'
+    default:
+      return 'Check the fields: names and addresses must be valid.'
+  }
+}

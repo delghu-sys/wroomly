@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/universities/admin'
 import { loadSettings, saveSettings } from '@/lib/universities/runner'
-import { senderProblems } from '@/lib/universities/gate'
+import { senderProblems, settingsFieldMessage } from '@/lib/universities/gate'
 import { unknownPlaceholders } from '@/lib/universities/template'
 
 const schema = z.object({
@@ -22,12 +22,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   if (!(await requireAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  let s: z.infer<typeof schema>
+  let json: unknown
   try {
-    s = schema.parse(await request.json())
+    json = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Check the fields: names and addresses must be valid.' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
   }
+  const parsed = schema.safeParse(json)
+  if (!parsed.success) {
+    return NextResponse.json({ error: settingsFieldMessage(String(parsed.error.issues[0]?.path[0] ?? '')) }, { status: 400 })
+  }
+  const s = parsed.data
   const problems = senderProblems(s)
   if (problems.length) return NextResponse.json({ error: problems[0] }, { status: 400 })
   const bad = unknownPlaceholders(`${s.subject}\n${s.body}`)

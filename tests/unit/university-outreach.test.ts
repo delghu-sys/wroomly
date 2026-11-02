@@ -12,6 +12,7 @@ import {
   checkSend,
   formatFrom,
   senderProblems,
+  settingsFieldMessage,
   type SendCheckInput,
   type Envelope,
 } from '../../src/lib/universities/gate.ts'
@@ -261,4 +262,12 @@ test('table sorting: approved first by status, blanks last, input untouched', ()
   assert.deepEqual(sortProspects(rows, 'country', 'desc').map(r => r.id), ['a', 'b', 'c', 'd'])
   assert.deepEqual(sortProspects(rows, 'sent_at', 'desc').map(r => r.id), ['c', 'a', 'b', 'd'])
   assert.deepEqual(rows.map(r => r.id), ['a', 'b', 'c', 'd'])
+})
+
+test('a rejected settings form names the field, so nobody hunts through six inputs', () => {
+  assert.match(settingsFieldMessage('reply_to'), /^Reply-to must be one plain email address/)
+  assert.match(settingsFieldMessage('from_email'), /@wroomly\.app/)
+  assert.match(settingsFieldMessage('daily_cap'), /1 to 50/)
+  assert.match(settingsFieldMessage('body'), /message/i)
+  assert.match(settingsFieldMessage('something_else'), /Check the fields/)
 })
