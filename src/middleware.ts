@@ -12,7 +12,10 @@ import { withAttribution } from '@/lib/attribution'
 // /list-place is public: it's the "List your place" CTA target and does its own
 // auth routing (anon → the public /start-listing chooser; supplier → /listings/new).
 // Auth-walling it here would dead-end prospective suppliers on a sign-IN page.
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/safety', '/guides', '/buildings', '/coming-soon', '/start-listing', '/list-place']
+// /exchange is the one-page overview we send to universities' exchange offices
+// (it is the link in our outreach emails). Its readers have no Wroomly account
+// and never will, so it must NOT sit behind sign-in or the coming-soon gate.
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/safety', '/guides', '/buildings', '/coming-soon', '/start-listing', '/list-place', '/exchange']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback

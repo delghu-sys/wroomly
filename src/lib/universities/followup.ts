@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { normalizeEmail } from '../agents/outreach-policy.ts'
 import {
+  OVERVIEW_URL,
   fill,
   greeting,
   greetingFr,
@@ -31,7 +32,7 @@ export const FOLLOWUP_EN: TemplateSettings = {
 
 I wrote to you on {{sent_date}} about Wroomly (wroomly.app), a housing marketplace where current U-M students sublet their rooms and apartments, so exchange students can find a place for just the semester they are in Ann Arbor. I know inboxes fill up, so I wanted to follow up once.
 
-If it would help, I can send a one-page overview you could forward to the students you nominate to Michigan. And if this isn't relevant to your office, just let me know and I won't write again.
+If it would help, there is a one-page overview you can forward to the students you nominate to Michigan: ${OVERVIEW_URL}. And if this isn't relevant to your office, just let me know and I won't write again.
 
 Thank you,
 Hugo
@@ -45,7 +46,7 @@ export const FOLLOWUP_FR: TemplateSettings = {
 
 Je vous ai écrit le {{sent_date}} au sujet de Wroomly (wroomly.app), une plateforme où des étudiants de Michigan sous-louent leur chambre ou leur appartement, afin que les étudiants en échange trouvent un logement uniquement pour le semestre passé à Ann Arbor. Je sais que les boîtes de réception se remplissent vite, je me permets donc de vous relancer une seule fois.
 
-Si cela peut vous être utile, je peux vous envoyer une présentation d'une page à transmettre aux étudiants que vous nommez pour Michigan. Et si ce sujet ne concerne pas votre service, dites-le-moi simplement et je ne vous écrirai plus.
+Si cela peut vous être utile, une présentation d'une page à transmettre aux étudiants que vous nommez pour Michigan est disponible ici : ${OVERVIEW_URL}. Et si ce sujet ne concerne pas votre service, dites-le-moi simplement et je ne vous écrirai plus.
 
 Je vous remercie,
 

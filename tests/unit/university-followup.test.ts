@@ -125,3 +125,8 @@ test('a hold only blocks until its date', () => {
   assert.equal(isHeld('garbage', NOW), false)
   assert.deepEqual(checkFollowupSend(base({ heldUntil: '2026-11-10T00:00:00Z' })), { ok: true }, 'an expired hold is no hold')
 })
+
+test('both follow-ups point to the overview page', () => {
+  assert.match(renderFollowup(en, FIRST).body, /there is a one-page overview you can forward to the students you nominate to Michigan: https:\/\/wroomly\.app\/exchange\./)
+  assert.match(renderFollowup(fr, FIRST).body, /est disponible ici : https:\/\/wroomly\.app\/exchange\./)
+})
