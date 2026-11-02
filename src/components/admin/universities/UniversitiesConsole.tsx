@@ -47,6 +47,13 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
     }
   }
 
+  function redo() {
+    const ok = window.confirm(
+      `Rewrite ${drafted} drafted email${drafted === 1 ? '' : 's'} from the current templates?\n\nAny edits you made to those drafts will be replaced. Approved emails are not touched.`,
+    )
+    if (ok) void call('draft-all', { redraft: true })
+  }
+
   function approveAll() {
     const ok = window.confirm(
       `Approve ${drafted} drafted email${drafted === 1 ? '' : 's'}?\n\nFrom: ${fromDisplay}\nReplies go to: ${replyTo || '(not set)'}\n\nEach one is approved exactly as it is now. Edit any of them afterwards and its approval is withdrawn.\nNothing is sent by approving.`,
@@ -67,9 +74,16 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
         <div className="w-10 h-10 rounded-2xl bg-navy-deep text-maize-bright flex items-center justify-center mb-4"><FileText className="w-5 h-5" strokeWidth={1.75} /></div>
         <h2 className="font-display text-lg tracking-tight text-ink">1. Draft</h2>
         <p className="text-[13.5px] text-ink-muted leading-relaxed mt-1.5">Fill the email for every university that has an address. Only writes text — nothing is approved or sent.</p>
-        <Button size="sm" className="mt-5" disabled={busy !== null || researched === 0} onClick={() => call('draft-all')}>
-          {busy === 'draft-all' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Draft ${researched} email${researched === 1 ? '' : 's'}`}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2 mt-5">
+          <Button size="sm" disabled={busy !== null || researched === 0} onClick={() => call('draft-all')}>
+            {busy === 'draft-all' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Draft ${researched} email${researched === 1 ? '' : 's'}`}
+          </Button>
+          {drafted > 0 && (
+            <Button variant="outline" size="sm" disabled={busy !== null} onClick={redo} title="Rewrite the drafted emails from the current template. Approved ones are left alone.">
+              Redo {drafted} draft{drafted === 1 ? '' : 's'}
+            </Button>
+          )}
+        </div>
       </div>
       <div className="bg-surface border border-line rounded-3xl p-6 shadow-1">
         <div className="w-10 h-10 rounded-2xl bg-navy-deep text-maize-bright flex items-center justify-center mb-4"><Send className="w-5 h-5" strokeWidth={1.75} /></div>

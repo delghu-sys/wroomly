@@ -47,7 +47,9 @@ export default async function AdminUniversitiesPage() {
     { label: 'Sent', value: count('sent') + count('replied') + count('declined') },
     { label: 'Replied', value: count('replied') },
   ]
-  const sample = rows.find(r => r.contact_email && r.umich_units.length) ?? rows[0]
+  // The preview is of the editable English template, so never sample a French
+  // university (those use the built-in French one).
+  const sample = rows.find(r => r.contact_email && r.umich_units.length && r.country !== 'France') ?? rows[0]
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
