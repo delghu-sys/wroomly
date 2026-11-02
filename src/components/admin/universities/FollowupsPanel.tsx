@@ -14,6 +14,7 @@ interface Item {
   sentAt: string
   daysSince: number
   due: boolean
+  heldUntil: string | null
   state: 'none' | 'drafted' | 'approved' | 'sent'
 }
 
@@ -146,7 +147,7 @@ export function FollowupsPanel({ ready, items, due, waiting, minDays, fromDispla
                     </td>
                     <td className="px-3 py-2 border-t border-line/60"><Link href={`/admin/universities/${i.id}`} className="text-navy underline underline-offset-2 hover:text-ink">{i.name}</Link><span className="text-ink-muted"> {i.country ?? ''}</span></td>
                     <td className="px-3 py-2 border-t border-line/60 text-ink-muted tabular-nums whitespace-nowrap">{i.sentAt.slice(0, 10)} · {i.daysSince}d ago</td>
-                    <td className={`px-3 py-2 border-t border-line/60 whitespace-nowrap ${i.due ? 'text-[oklch(0.40_0.13_142)] font-medium' : 'text-ink-muted'}`}>{i.due ? 'due now' : `in ${minDays - i.daysSince} day${minDays - i.daysSince === 1 ? '' : 's'}`}</td>
+                    <td className={`px-3 py-2 border-t border-line/60 whitespace-nowrap ${i.due ? 'text-[oklch(0.40_0.13_142)] font-medium' : 'text-ink-muted'}`}>{i.heldUntil ? `on hold until ${i.heldUntil.slice(0, 10)} (auto-reply)` : i.due ? 'due now' : `in ${Math.max(0, minDays - i.daysSince)} day${minDays - i.daysSince === 1 ? '' : 's'}`}</td>
                     <td className="px-3 py-2 border-t border-line/60"><span className={`inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide ${STATE_TONE[i.state]}`}>{STATE_LABEL[i.state]}</span></td>
                   </tr>
                 ))}

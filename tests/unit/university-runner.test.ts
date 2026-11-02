@@ -8,11 +8,13 @@ import { draftAll, saveDraft, approve, approveAll, unapprove, unapproveMany, sen
 
 type Row = Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[] }) {
+function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]; messages?: Row[] }) {
   const tables: Record<string, Row[]> = {
     university_prospects: seed.prospects,
     outreach_suppressions: seed.suppressions ?? [],
     partner_outreach_settings: seed.settings ?? [],
+    // Only present when a test seeds it — like production before migration 047.
+    ...(seed.messages ? { university_messages: seed.messages } : {}),
   }
   const db = {
     tables,
@@ -24,6 +26,8 @@ function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]
       let head = false
       let wantCount = false
       const run = () => {
+        // A table that does not exist answers with an error, as PostgREST does.
+        if (!tables[name]) return { data: null, error: { code: 'PGRST205', message: `no table ${name}` }, count: null }
         let rows = tables[name].filter(r => filters.every(f => f(r)))
         if (order) rows = [...rows].sort((a, b) => (a[order!.k] < b[order!.k] ? -1 : 1) * (order!.asc ? 1 : -1))
         if (op === 'update') for (const r of rows) Object.assign(r, patch)
@@ -539,4 +543,52 @@ test('withdrawing and the test touch only what they name', async () => {
   assert.match(sent[0].subject, /^\[TEST FOLLOW-UP → s1@s1\.edu\] Following up/)
   assert.equal(e.to, 'admin@example.com')
   assert.equal(JSON.stringify(db.tables.university_prospects), before, 'a test changes no row')
+})
+
+// ── auto-reply holds ────────────────────────────────────────────────────────
+
+test('a university whose auto-reply asked us to wait is not due, not drafted, and not sent', async () => {
+  const db = fakeDb({
+    prospects: [sentRow(1), sentRow(2)],
+    settings: [{ ...goodSettings }],
+    messages: [{ id: 'm1', prospect_id: 's1', kind: 'auto_reply', hold_followup_until: '2026-11-30T00:00:00Z' }],
+  })
+  const o = await loadFollowupOverview(D(db), NOW)
+  assert.deepEqual(o.items.map(i => [i.name, i.due, i.heldUntil]), [['S1 U', false, '2026-11-30T00:00:00Z'], ['S2 U', true, null]])
+  assert.deepEqual([o.due, o.waiting], [1, 1])
+
+  assert.deepEqual(await draftFollowups(D(db), { now: NOW }), { drafted: 1, skipped: 0 }, 'only S2')
+  assert.equal(db.tables.university_prospects[0].followup_subject, undefined)
+
+  // even forced past the draft step, the gate refuses
+  await saveFollowup(D(db), 's1', { subject: 'Forced', body: 'Forced' })
+  await approveFollowups(D(db))
+  const { sent, send } = mailer()
+  const r = await sendFollowup(D(db), 's1', { send, enabled: true, now: NOW })
+  assert.equal(r.reason, 'on-hold')
+  assert.equal(sent.length, 0)
+})
+
+test('once the hold has passed the follow-up is due again', async () => {
+  const db = fakeDb({
+    prospects: [sentRow(1)],
+    settings: [{ ...goodSettings }],
+    messages: [{ id: 'm1', prospect_id: 's1', kind: 'auto_reply', hold_followup_until: '2026-11-10T00:00:00Z' }],
+  })
+  assert.equal((await loadFollowupOverview(D(db), NOW)).due, 1)
+})
+
+test('the latest hold wins, and a person\'s message or another university never holds', async () => {
+  const db = fakeDb({
+    prospects: [sentRow(1), sentRow(2)],
+    settings: [{ ...goodSettings }],
+    messages: [
+      { id: 'a', prospect_id: 's1', kind: 'auto_reply', hold_followup_until: '2026-11-20T00:00:00Z' },
+      { id: 'b', prospect_id: 's1', kind: 'auto_reply', hold_followup_until: '2026-11-25T00:00:00Z' },
+      { id: 'c', prospect_id: 's2', kind: 'human_reply', hold_followup_until: null },
+    ],
+  })
+  const o = await loadFollowupOverview(D(db), NOW)
+  assert.equal(o.items[0].heldUntil, '2026-11-25T00:00:00Z')
+  assert.equal(o.items[1].heldUntil, null)
 })

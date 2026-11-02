@@ -97,6 +97,13 @@ export function isFollowupDue(r: FollowupRow, now: Date, minDays = FOLLOWUP_MIN_
   return d !== null && d >= minDays
 }
 
+/** Is a follow-up still being held back by an auto-reply that asked us to wait? */
+export function isHeld(heldUntil: string | null | undefined, now: Date): boolean {
+  if (!heldUntil) return false
+  const t = new Date(heldUntil).getTime()
+  return !Number.isNaN(t) && t > now.getTime()
+}
+
 export type FollowupState = 'none' | 'drafted' | 'approved' | 'sent'
 
 export function followupState(r: { followup_subject: string | null; followup_approval_hash: string | null; followup_sent_at: string | null }): FollowupState {
@@ -116,6 +123,7 @@ export type FollowupRefusal =
   | 'not-approved'
   | 'edited-since-approval'
   | 'too-soon'
+  | 'on-hold'
   | 'suppressed'
   | 'daily-cap-reached'
 
@@ -130,6 +138,7 @@ export const FOLLOWUP_REFUSAL_TEXT: Record<FollowupRefusal, string> = {
   'not-approved': 'Approve the follow-up first.',
   'edited-since-approval': 'The message, recipient or sender changed after you approved it. Approve it again.',
   'too-soon': `It is too soon: a follow-up waits at least ${FOLLOWUP_MIN_DAYS} days after the first email.`,
+  'on-hold': 'They sent an automatic reply asking us to wait — no follow-up until the hold ends.',
   suppressed: 'This address is on the do-not-contact list.',
   'daily-cap-reached': 'Daily send cap reached. The rest can go tomorrow.',
 }
@@ -143,6 +152,8 @@ export interface FollowupCheckInput {
   envelope: Envelope
   now: Date
   minDays?: number
+  /** An auto-reply asked us to wait: no follow-up before this (ISO). */
+  heldUntil?: string | null
   suppressed: Set<string>
   sentInLastDay: number
   dailyCap: number
@@ -164,6 +175,7 @@ export function checkFollowupSend(i: FollowupCheckInput): { ok: true } | { ok: f
   if (followupApprovalHash(i.envelope) !== i.approvalHash) return no('edited-since-approval')
   const d = daysSince(i.sentAt, i.now)
   if (d === null || d < (i.minDays ?? FOLLOWUP_MIN_DAYS)) return no('too-soon')
+  if (isHeld(i.heldUntil, i.now)) return no('on-hold')
   if (i.suppressed.has(normalizeEmail(i.contactEmail))) return no('suppressed')
   if (i.sentInLastDay >= i.dailyCap) return no('daily-cap-reached')
   return { ok: true }
