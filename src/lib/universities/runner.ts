@@ -28,6 +28,8 @@ export interface Settings {
   from_name: string
   from_email: string
   reply_to: string
+  /** Where to tell the operator a university replied. Blank = fall back to reply_to. */
+  notify_email?: string
   subject: string
   body: string
   daily_cap: number
@@ -88,7 +90,17 @@ export async function loadSettings(db: Db): Promise<Settings> {
 
 export async function saveSettings(db: Db, s: Settings): Promise<void> {
   const { error } = await db.from('partner_outreach_settings').upsert({ id: 'default', ...s })
-  if (error) throw new Error(error.message)
+  if (!error) return
+  // Migration 048 (notify_email) may not be applied yet. Saving everything else
+  // must not break because of it, so retry without that one column.
+  if (error.code === 'PGRST204' || /notify_email/.test(error.message)) {
+    const { notify_email: _dropped, ...rest } = s
+    void _dropped
+    const retry = await db.from('partner_outreach_settings').upsert({ id: 'default', ...rest })
+    if (!retry.error) return
+    throw new Error(retry.error.message)
+  }
+  throw new Error(error.message)
 }
 
 export function envelopeFor(p: Pick<Prospect, 'contact_email' | 'subject' | 'body'>, s: Settings): Envelope {

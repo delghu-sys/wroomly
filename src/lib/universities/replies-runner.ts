@@ -163,10 +163,13 @@ export interface InboxMessage {
 export interface Inbox {
   needsYou: InboxMessage[]
   done: InboxMessage[]
+  /** When a reply last arrived through the automatic inbox (Resend inbound), if ever. */
+  lastAutomaticAt: string | null
 }
 
 interface MessageRow {
   id: string
+  source?: string
   prospect_id: string | null
   from_email: string
   from_name: string | null
@@ -227,8 +230,9 @@ export async function loadInbox(db: Db): Promise<Inbox> {
       approvalCurrent: m.status === 'approved' && !!m.approval_hash && m.approval_hash === replyApprovalHash(env),
     }
   })
+  const lastAutomaticAt = ((mData ?? []) as MessageRow[]).filter(m => m.source === 'resend_inbound').map(m => m.received_at).sort().pop() ?? null
   const open = (m: InboxMessage) => m.status === 'new' || m.status === 'drafted' || m.status === 'approved'
-  return { needsYou: all.filter(open).sort((a, b) => (a.receivedAt < b.receivedAt ? -1 : 1)), done: all.filter(m => !open(m)).slice(0, 40) }
+  return { needsYou: all.filter(open).sort((a, b) => (a.receivedAt < b.receivedAt ? -1 : 1)), done: all.filter(m => !open(m)).slice(0, 40), lastAutomaticAt }
 }
 
 // ── preparing, approving and sending our answer ─────────────────────────────

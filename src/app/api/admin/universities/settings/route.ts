@@ -3,13 +3,14 @@ import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/server'
 import { requireAdmin } from '@/lib/universities/admin'
 import { loadSettings, saveSettings } from '@/lib/universities/runner'
-import { senderProblems, settingsFieldMessage } from '@/lib/universities/gate'
+import { isInboundAddress, notifyTarget, senderProblems, settingsFieldMessage } from '@/lib/universities/gate'
 import { unknownPlaceholders } from '@/lib/universities/template'
 
 const schema = z.object({
   from_name: z.string().trim().min(1).max(80),
   from_email: z.string().trim().email().max(120),
   reply_to: z.string().trim().email().max(120),
+  notify_email: z.union([z.literal(''), z.string().trim().email().max(120)]).default(''),
   daily_cap: z.number().int().min(1).max(200),
   subject: z.string().trim().min(1).max(200),
   body: z.string().trim().min(1).max(6000),
@@ -35,6 +36,11 @@ export async function POST(request: Request) {
   const s = parsed.data
   const problems = senderProblems(s)
   if (problems.length) return NextResponse.json({ error: problems[0] }, { status: 400 })
+  // If replies come to the receiving subdomain nobody reads it: there must be a
+  // real address to be told at, or new replies would arrive unnoticed.
+  if (isInboundAddress(s.reply_to) && !notifyTarget(s)) {
+    return NextResponse.json({ error: 'Reply-to is on the automatic inbox, so set "Notify me at" to an inbox you read.' }, { status: 400 })
+  }
   const bad = unknownPlaceholders(`${s.subject}\n${s.body}`)
   if (bad.length) return NextResponse.json({ error: `Unknown placeholder: {{${bad[0]}}}` }, { status: 400 })
   try {

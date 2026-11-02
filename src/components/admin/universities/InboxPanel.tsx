@@ -18,6 +18,7 @@ interface Props {
   replyTo: string
   enabled: boolean
   senderProblem: string | null
+  automatic: { replyToIsInbound: boolean; notifyTo: string | null; lastAt: string | null }
 }
 
 const KIND_LABEL: Record<InboxMessage['kind'], string> = { human_reply: 'Reply', auto_reply: 'Auto-reply', opt_out: 'Asked us to stop', bounce: 'Bounce' }
@@ -41,7 +42,7 @@ async function post(body: object): Promise<{ ok: boolean; data: Record<string, u
  * has read it, prepared an answer, and suggested when to send it — you read it,
  * approve the exact text, and send.
  */
-export function InboxPanel({ ready, needsYou, done, fromDisplay, replyTo, enabled, senderProblem }: Props) {
+export function InboxPanel({ ready, needsYou, done, fromDisplay, replyTo, enabled, senderProblem, automatic }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -80,6 +81,20 @@ export function InboxPanel({ ready, needsYou, done, fromDisplay, replyTo, enable
           <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => run('draft-all', { action: 'draft-all' }, d => `Prepared ${d.drafted}.${Number(d.remaining) ? ` ${d.remaining} more — click again.` : ''}`)}>
             {busy === 'draft-all' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles data-icon="inline-start" />} Prepare {unprepared} repl{unprepared === 1 ? 'y' : 'ies'}
           </Button>
+        )}
+      </div>
+
+      <div className={`mt-4 rounded-2xl border px-4 py-3 text-[13px] leading-relaxed ${automatic.replyToIsInbound ? 'border-[oklch(0.85_0.10_142)] bg-[oklch(0.97_0.04_142)] text-ink' : 'border-line bg-navy-soft/30 text-ink-soft'}`}>
+        {automatic.replyToIsInbound ? (
+          <>
+            <strong>Automatic inbox is on.</strong> Replies to your emails arrive here by themselves, are read, and get a prepared answer.{' '}
+            {automatic.lastAt ? <>Last one arrived {utc(automatic.lastAt)}.</> : <>None has arrived yet.</>}{' '}
+            {automatic.notifyTo ? <>You are told at <strong>{automatic.notifyTo}</strong>.</> : <span className="text-red-600">No notification address is set — set &ldquo;Notify me at&rdquo; below, or new replies will arrive unnoticed.</span>}
+          </>
+        ) : (
+          <>
+            <strong>Automatic inbox is off.</strong> Replies currently go to <strong>{replyTo || 'your Reply-to address'}</strong>, an inbox I only see when asked to sync it. To have them arrive here by themselves, set Reply-to (below) to an address on <code className="font-mono text-[12px]">replies.wroomly.app</code> once that subdomain is verified in Resend — see the setup steps in docs/university-outreach.md.
+          </>
         )}
       </div>
 

@@ -106,6 +106,47 @@ is stored once). Claude reads the mailbox through the Gmail connector and feeds 
 a Resend inbound subdomain would make it fully automatic and independent of any
 laptop (see the PR notes).
 
+### Automatic inbox (Resend inbound)
+
+Replies reach the dashboard by themselves — no laptop, no syncing:
+
+```
+university replies → hugo@replies.wroomly.app → Resend → POST /api/resend/webhook (email.received)
+  → stored + read by the rules → university marked replied / opt-out suppressed
+  → (after the response) answer prepared by the assistant → you are emailed a notice
+```
+
+Nothing is sent by this path. The slow part (the assistant, the notice) runs after
+the webhook has answered, and a failure there never loses the stored message; if
+storing fails the webhook answers 5xx so Resend retries (the replay mark is
+undone first, otherwise the retry would be dismissed as a repeat). Our own
+`@wroomly.app` mail is ignored so tests and notices can't become "replies".
+Auto-drafting stops after 20 people's replies in an hour (a flood of mail to the
+address can't run up model calls); they still arrive and wait for a click.
+
+**One-time setup**
+
+1. Resend → **Domains → Add domain**: `replies.wroomly.app`, region US East,
+   **Receiving on, Sending off**. It shows one **MX** record.
+2. Vercel → the `wroomly.app` domain → **DNS Records** → add that MX record
+   (name `replies`, the value Resend shows, priority 10). Back in Resend, **Verify**.
+3. Resend → **Webhooks** → the existing `https://wroomly.app/api/resend/webhook`
+   → add the event **`email.received`** (keep `email.bounced`, `email.complained`).
+4. Apply migration 048, then on `/admin/universities` set **Notify me at** (an inbox
+   you read) and save.
+5. **Test before switching:** set Reply-to to `hugo@replies.wroomly.app`, save, click
+   **Send me a test** on any university, and reply to it from your own inbox. Within a
+   minute the reply appears under **Replies** (as "unknown sender") and you get a notice.
+   The Replies panel says "Automatic inbox is on" with the time of the last arrival.
+6. Optional: in ImprovMX add `hugo@replies.wroomly.app` as a second destination of
+   the `hugodelgado` alias, so automatic replies (sent to the From address) are
+   captured too.
+
+If nothing arrives: the Resend API key must be **Full access** (reading a received
+email is not a sending permission), and the MX record must show as verified.
+Emails already sent keep Reply-to `delghu@umich.edu`; their replies still land in
+that inbox and can be loaded with `ingest-replies.mjs`.
+
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.
