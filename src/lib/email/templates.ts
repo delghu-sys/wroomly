@@ -52,7 +52,7 @@ function shell(opts: { preheader: string; bodyHtml: string }): string {
                 <p style="margin:0; font-size:12px; line-height:1.5; color:#6b6b7a;">
                   You're receiving this because you have a Wroomly account.
                   Questions? Email
-                  <a href="mailto:help@wroomly.app" style="color:#4a4a5a; text-decoration:underline;">help@wroomly.app</a>.
+                  <a href="mailto:support@wroomly.app" style="color:#4a4a5a; text-decoration:underline;">support@wroomly.app</a>.
                 </p>
                 <p style="margin:8px 0 0 0; font-size:11px; line-height:1.5; color:#a0a0aa;">
                   Wroomly · U of M student housing · Ann Arbor, MI
