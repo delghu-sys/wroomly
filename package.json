@@ -27,6 +27,7 @@
     "listings:backfill-geocode": "node --env-file=.env.local scripts/backfillListingGeocode.mjs --dry-run",
     "metrics": "node --env-file=.env.local scripts/metrics.mjs",
     "agents:discover": "node --env-file=.env.local scripts/agents/discover.mjs",
+    "universities:import": "node --env-file=.env.local scripts/universities/import.mjs",
     "agents:draft": "node --env-file=.env.local scripts/agents/draft.mjs",
     "agents:outreach": "node --env-file=.env.local scripts/agents/outreach.mjs"
   },
