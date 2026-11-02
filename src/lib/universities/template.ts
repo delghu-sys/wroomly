@@ -24,10 +24,9 @@ export interface ProspectForEmail {
 
 export const DEFAULT_SETTINGS = {
   from_name: 'Hugo from Wroomly',
-  from_email: 'hugo@wroomly.app',
-  // Deliberately blank: nobody should send before choosing where replies go.
-  reply_to: '',
-  daily_cap: 10,
+  from_email: 'hugodelgado@wroomly.app',
+  reply_to: 'delghu@umich.edu',
+  daily_cap: 100,
   subject: 'Housing in Ann Arbor for your students on exchange at Michigan',
   body: `{{greeting}}
 

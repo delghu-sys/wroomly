@@ -94,7 +94,8 @@ test('sender must be on the verified domain and replies must have somewhere to g
   assert.deepEqual(senderProblems(ok), [])
   assert.match(senderProblems({ ...ok, from_email: 'hugo@gmail.com' })[0], /@wroomly\.app/)
   assert.match(senderProblems({ ...ok, reply_to: '' })[0], /Reply-to is not set/)
-  assert.match(senderProblems(DEFAULT_SETTINGS)[0], /Reply-to is not set/, 'the default cannot send until a reply-to is chosen')
+  assert.deepEqual(senderProblems(DEFAULT_SETTINGS), [], 'the defaults are a valid sender')
+  assert.match(senderProblems({ ...DEFAULT_SETTINGS, reply_to: '' })[0], /Reply-to is not set/, 'but a blank reply-to is still refused')
 })
 
 // ── the gate ────────────────────────────────────────────────────────────────
@@ -267,7 +268,14 @@ test('table sorting: approved first by status, blanks last, input untouched', ()
 test('a rejected settings form names the field, so nobody hunts through six inputs', () => {
   assert.match(settingsFieldMessage('reply_to'), /^Reply-to must be one plain email address/)
   assert.match(settingsFieldMessage('from_email'), /@wroomly\.app/)
-  assert.match(settingsFieldMessage('daily_cap'), /1 to 50/)
+  assert.match(settingsFieldMessage('daily_cap'), /1 to 200/)
   assert.match(settingsFieldMessage('body'), /message/i)
   assert.match(settingsFieldMessage('something_else'), /Check the fields/)
+})
+
+test('the default settings are the ones chosen: sender, reply-to and a cap of 100', () => {
+  assert.equal(DEFAULT_SETTINGS.from_email, 'hugodelgado@wroomly.app')
+  assert.equal(DEFAULT_SETTINGS.reply_to, 'delghu@umich.edu')
+  assert.equal(DEFAULT_SETTINGS.daily_cap, 100)
+  assert.equal(formatFrom(DEFAULT_SETTINGS.from_name, DEFAULT_SETTINGS.from_email), 'Hugo from Wroomly <hugodelgado@wroomly.app>')
 })

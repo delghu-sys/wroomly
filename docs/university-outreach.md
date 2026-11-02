@@ -34,9 +34,8 @@ Set in **Sender and template** on `/admin/universities` and shown on every
 message page, in the confirm dialogs, and frozen onto the row when sent:
 
 - **From** — a name and an `@wroomly.app` address (the domain verified in Resend;
-  anything else is refused).
-- **Reply-to** — the inbox you actually read. Required; the default is blank so
-  nothing can be approved before you choose.
+  anything else is refused). Default: `hugodelgado@wroomly.app`.
+- **Reply-to** — the inbox you actually read. Required. Default: `delghu@umich.edu`.
 
 **Send me a test** mails the draft to *your own* account email (taken from your
 session, not from a request field) with `[TEST → recipient]` in the subject and
@@ -50,7 +49,8 @@ the real From/Reply-to. It changes nothing.
 | Approval is bound to the exact envelope | `approvalHash` |
 | Never the same address twice (even under two entries) | `checkSend` |
 | Opt-outs: "Said no — never write again" adds the address to `outreach_suppressions`; hard bounces/complaints from the Resend webhook land there too | `markOutcome`, `/api/resend/webhook` |
-| Daily cap (default 10, max 50) over a rolling 24h | `checkSend` |
+| Daily cap (default 100, max 200) over a rolling 24h | `checkSend` |
+| A bulk send stops starting new sends after ~45s (the request is killed at 60s, and a row is claimed before it is mailed) and says how many are left | `sendApproved` |
 | A send claims the row before mailing, so overlapping requests can't both send; a failed send is put back to *approved* | `sendOne` |
 | An address is only stored with the page it was read from; private mailboxes (gmail…) are dropped | `normalizeProspect` |
 

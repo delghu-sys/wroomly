@@ -35,8 +35,9 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
       else if (action === 'approve-all') toast.success(`Approved ${data.approved}.${data.skipped ? ` ${data.skipped} skipped (no address or text).` : ''}`)
       else {
         const refused = (data.outcomes ?? []).filter((o: { sent: boolean; message?: string }) => !o.sent)
-        toast.success(`Sent ${data.sent} of ${data.outcomes.length}.`)
+        toast.success(`Sent ${data.sent}.${data.remaining ? ` ${data.remaining} approved ${data.remaining === 1 ? 'is' : 'are'} still waiting.` : ''}`)
         if (refused[0]) toast.error(`${refused[0].name}: ${refused[0].message}`)
+        else if (data.remaining) toast.message('Click Send again to continue — each click sends for up to about 45 seconds.')
       }
       router.refresh()
     } catch {

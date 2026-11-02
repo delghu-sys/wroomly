@@ -10,7 +10,7 @@ const schema = z.object({
   from_name: z.string().trim().min(1).max(80),
   from_email: z.string().trim().email().max(120),
   reply_to: z.string().trim().email().max(120),
-  daily_cap: z.number().int().min(1).max(50),
+  daily_cap: z.number().int().min(1).max(200),
   subject: z.string().trim().min(1).max(200),
   body: z.string().trim().min(1).max(6000),
 })
