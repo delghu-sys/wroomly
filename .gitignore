@@ -60,3 +60,7 @@ next-env.d.ts
 # Scraped CMB Management partner photos — reproducible via scripts/scrapeCMB.mjs,
 # and uploaded to Supabase storage at import time. Kept out of git to avoid bloat.
 /public/cmb-photos/
+
+# Researched partner-university contacts (office addresses, some named staff).
+# The repo is public, so this stays local; the database is the source of truth.
+/data/
