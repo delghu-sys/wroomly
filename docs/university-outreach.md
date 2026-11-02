@@ -147,6 +147,16 @@ email is not a sending permission), and the MX record must show as verified.
 Emails already sent keep Reply-to `delghu@umich.edu`; their replies still land in
 that inbox and can be loaded with `ingest-replies.mjs`.
 
+**The overview page.** `wroomly.app/exchange` (`src/app/(app)/exchange/page.tsx`) is the
+one-page overview for exchange offices and students, and the link in the emails
+(`OVERVIEW_URL` in `template.ts`; the French emails and both follow-ups use it too, and
+the reply assistant includes it when someone asks for "the overview"). It prints as
+one A4 page. It must stay **public** (`/exchange` is in `PUBLIC_ROUTES` in
+`src/middleware.ts`, guarded by `tests/e2e/exchange.spec.ts`): its readers have no
+Wroomly account. It makes only claims the site already makes elsewhere, and says
+nothing about prices or listing counts, which it cannot keep current.
+
+The email includes who is writing,
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.

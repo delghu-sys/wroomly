@@ -7,6 +7,7 @@ import {
   unknownPlaceholders,
   DEFAULT_SETTINGS,
   FRENCH_TEMPLATE,
+  OVERVIEW_URL,
   languageFor,
   originLine,
   partnershipSentenceFr,
@@ -360,4 +361,15 @@ test('a saved English template without the new placeholder still renders, just w
   const old = { subject: 'Hi {{university}}', body: '{{greeting}}\n\n{{partnership}}.' }
   const e = renderEmail({ ...prospect, country: 'Germany' }, old)
   assert.equal(e.body, 'Dear International Relations Office,\n\nExample University is an exchange partner of the Ross School of Business and the School of Information.')
+})
+
+// ── the overview link ───────────────────────────────────────────────────────
+
+test('every first email points to the one-page overview, in its own language', () => {
+  assert.equal(OVERVIEW_URL, 'https://wroomly.app/exchange')
+  const en = renderEmail(prospect, DEFAULT_SETTINGS).body
+  assert.match(en, /one-page overview you can forward or print here: https:\/\/wroomly\.app\/exchange\./)
+  assert.doesNotMatch(en, /I can send a short one-page overview/, 'we no longer promise to send it')
+  const frBody = renderEmail(fr, DEFAULT_SETTINGS).body
+  assert.match(frBody, /Une présentation d'une page, à transmettre ou à imprimer, est disponible ici : https:\/\/wroomly\.app\/exchange\./)
 })

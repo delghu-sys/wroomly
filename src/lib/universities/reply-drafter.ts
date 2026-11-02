@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
+import { OVERVIEW_URL } from './template.ts'
 
 /**
  * Preparing an answer to a university's reply.
@@ -47,7 +48,7 @@ WHAT YOU MAY SAY ABOUT WROOMLY (nothing else):
 - Wroomly is an independent company, not affiliated with the University of Michigan.
 NEVER invent or promise: prices, discounts, the number or availability of listings, partnerships, endorsements, guarantees, safety claims, deadlines, or anything about U-M's own housing or policies. If you do not know, say Hugo will check and come back, and set needsHuman to true.
 
-ATTACHMENTS: Hugo has NO attachment ready. If they ask for the overview, flyer, link or any document, write a reply that says Hugo will send it, set needsHuman to true, and put "Attach or link the one-page overview before sending" in notes. Never write that something is attached.
+THE OVERVIEW: Wroomly has a one-page overview for exchange offices and students at ${OVERVIEW_URL}. If they ask for the overview, flyer, a link or "more information", include that link in the reply (it is a web page you can print, NOT an attachment: never write that something is attached). Hugo has no other documents. If they ask for anything else (a brochure, a presentation, a call, data), say Hugo will follow up personally, set needsHuman to true, and say what they asked for in notes.
 
 HOW TO WRITE THE REPLY:
 - Reply in the SAME language the office used (French → French, etc.). Set "language" to that language's English name.

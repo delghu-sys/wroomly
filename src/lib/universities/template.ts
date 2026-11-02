@@ -6,6 +6,9 @@
  * literal "{{university}}" can never reach an inbox.
  */
 
+/** The one-page overview for exchange offices (src/app/(app)/exchange). The link our emails point to. */
+export const OVERVIEW_URL = 'https://wroomly.app/exchange'
+
 export const PLACEHOLDERS = ['greeting', 'university', 'partnership', 'country', 'origin_line'] as const
 export type Placeholder = (typeof PLACEHOLDERS)[number]
 
@@ -34,7 +37,7 @@ I'm Hugo, and I run Wroomly (wroomly.app), a housing marketplace built for Unive
 
 Wroomly lists rooms and apartments that current U-M students sublet while they are away, so the dates match an exchange semester instead of a full lease, and the rent is often below the market rate. Many are furnished, renters message the host directly, and hosts can verify themselves with their U-M sign-in. Browsing is free for students.
 
-Would you be open to adding Wroomly to the housing resources you share with students you nominate to Michigan? I can send a short one-page overview to forward, or answer any questions.
+Would you be open to adding Wroomly to the housing resources you share with students you nominate to Michigan? There is a one-page overview you can forward or print here: ${OVERVIEW_URL}. I'm also happy to answer any questions.
 
 If this isn't relevant to your office, just reply and I won't write again.
 
@@ -59,7 +62,7 @@ Je m'appelle Hugo, je suis originaire de France et je dirige Wroomly (wroomly.ap
 
 Wroomly propose des chambres et des appartements que des étudiants actuels de Michigan sous-louent pendant leur absence : les dates correspondent donc à un semestre d'échange plutôt qu'à un bail annuel, et le loyer est souvent inférieur à celui du marché. Beaucoup de logements sont meublés, les locataires écrivent directement à l'hôte, et les hôtes peuvent se faire vérifier avec leur compte U-M. La consultation est gratuite pour les étudiants.
 
-Accepteriez-vous d'ajouter Wroomly aux ressources logement que vous transmettez aux étudiants que vous nommez pour Michigan ? Je peux vous envoyer une courte présentation d'une page à faire suivre, ou répondre à toutes vos questions.
+Accepteriez-vous d'ajouter Wroomly aux ressources logement que vous transmettez aux étudiants que vous nommez pour Michigan ? Une présentation d'une page, à transmettre ou à imprimer, est disponible ici : ${OVERVIEW_URL}. Je reste également à votre disposition pour toute question.
 
 Si ce message ne concerne pas votre service, répondez simplement et je ne vous écrirai plus.
 
