@@ -8,6 +8,7 @@ import {
   followupState,
   formatSentDate,
   isFollowupDue,
+  isHeld,
   renderFollowup,
   type FollowupCheckInput,
 } from '../../src/lib/universities/followup.ts'
@@ -101,6 +102,7 @@ test('every way a follow-up must NOT go is refused, with the real reason', () =>
   refuse({ contactEmail: null }, 'no-contact-email')
   refuse({ approvalHash: null }, 'not-approved')
   refuse({ sentAt: '2026-11-08T12:00:00Z' }, 'too-soon')
+  refuse({ heldUntil: '2026-11-30T00:00:00Z' }, 'on-hold')
   refuse({ suppressed: new Set(['x@example.edu']) }, 'suppressed')
   refuse({ sentInLastDay: 100 }, 'daily-cap-reached')
 })
@@ -114,4 +116,12 @@ test('changing anything after approving the follow-up voids the approval', () =>
 test('a first-email approval can never be used to send a follow-up', () => {
   assert.notEqual(approvalHash(env), followupApprovalHash(env))
   assert.deepEqual(checkFollowupSend(base({ approvalHash: approvalHash(env) })), { ok: false, reason: 'edited-since-approval' })
+})
+
+test('a hold only blocks until its date', () => {
+  assert.equal(isHeld('2026-11-30T00:00:00Z', NOW), true)
+  assert.equal(isHeld('2026-11-10T00:00:00Z', NOW), false)
+  assert.equal(isHeld(null, NOW), false)
+  assert.equal(isHeld('garbage', NOW), false)
+  assert.deepEqual(checkFollowupSend(base({ heldUntil: '2026-11-10T00:00:00Z' })), { ok: true }, 'an expired hold is no hold')
 })

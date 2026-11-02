@@ -9,6 +9,9 @@ import { UniversitiesConsole } from '@/components/admin/universities/Universitie
 import { PartnerSettings } from '@/components/admin/universities/PartnerSettings'
 import { FollowupsPanel } from '@/components/admin/universities/FollowupsPanel'
 import { loadFollowupOverview } from '@/lib/universities/followup-runner'
+import { InboxPanel } from '@/components/admin/universities/InboxPanel'
+import { loadInbox } from '@/lib/universities/replies-runner'
+import { senderProblems } from '@/lib/universities/gate'
 import { countSentLastDay, loadSettings } from '@/lib/universities/runner'
 import { formatFrom } from '@/lib/universities/gate'
 
@@ -47,6 +50,10 @@ export default async function AdminUniversitiesPage() {
   const probe = await service.from('university_prospects').select('followup_subject').limit(1)
   const followupsReady = !probe.error
   const followups = followupsReady ? await loadFollowupOverview(service) : { items: [], due: 0, waiting: 0, minDays: 10 }
+  // The replies inbox needs migration 047; probe so a missing table shows a notice.
+  const inboxProbe = await service.from('university_messages').select('id').limit(1)
+  const inboxReady = !inboxProbe.error
+  const inbox = inboxReady ? await loadInbox(service) : { needsYou: [], done: [] }
   const tiles = [
     { label: 'Universities', value: rows.length },
     { label: 'With an email', value: withEmail },
@@ -55,6 +62,7 @@ export default async function AdminUniversitiesPage() {
     { label: 'Sent', value: count('sent') + count('replied') + count('declined') },
     { label: 'Replied', value: count('replied') },
     { label: 'Follow-ups due', value: followups.due },
+    { label: 'Replies waiting', value: inbox.needsYou.length },
   ]
   // The preview is of the editable English template, so never sample a French
   // university (those use the built-in French one).
@@ -84,7 +92,7 @@ export default async function AdminUniversitiesPage() {
         <EmptyState title="No universities yet" description="Run npm run universities:import -- --write to load the researched list." />
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
             {tiles.map(t => (
               <div key={t.label} className="bg-surface border border-line rounded-3xl p-5 shadow-1">
                 <p className="font-display text-3xl tracking-tight text-ink tabular-nums">{t.value}</p>
@@ -112,6 +120,17 @@ export default async function AdminUniversitiesPage() {
               fromDisplay={formatFrom(settings.from_name, settings.from_email)}
               replyTo={settings.reply_to}
               enabled={process.env.UNIVERSITY_OUTREACH_ENABLED === 'true'}
+            />
+          </section>
+          <section className="mt-8">
+            <InboxPanel
+              ready={inboxReady}
+              needsYou={inbox.needsYou}
+              done={inbox.done}
+              fromDisplay={formatFrom(settings.from_name, settings.from_email)}
+              replyTo={settings.reply_to}
+              enabled={process.env.UNIVERSITY_OUTREACH_ENABLED === 'true'}
+              senderProblem={senderProblems(settings)[0] ?? null}
             />
           </section>
           <section className="mt-8">

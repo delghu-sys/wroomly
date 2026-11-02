@@ -10,6 +10,7 @@ import {
   followupApprovalHash,
   followupState,
   isFollowupDue,
+  isHeld,
   renderFollowup,
   type FollowupRefusal,
   type FollowupState,
@@ -35,6 +36,23 @@ async function getProspect(db: Db, id: string): Promise<Prospect> {
   return data as Prospect
 }
 
+/**
+ * The latest "please wait" from an auto-reply, per university. Returns an
+ * empty map if the replies table does not exist yet, so follow-ups still work
+ * before migration 047 is applied.
+ */
+export async function loadHolds(db: Db): Promise<Map<string, string>> {
+  const { data, error } = await db.from('university_messages').select('prospect_id, hold_followup_until').eq('kind', 'auto_reply')
+  const holds = new Map<string, string>()
+  if (error) return holds
+  for (const r of (data ?? []) as { prospect_id: string | null; hold_followup_until: string | null }[]) {
+    if (!r.prospect_id || !r.hold_followup_until) continue
+    const have = holds.get(r.prospect_id)
+    if (!have || r.hold_followup_until > have) holds.set(r.prospect_id, r.hold_followup_until)
+  }
+  return holds
+}
+
 export interface FollowupItem {
   id: string
   name: string
@@ -43,6 +61,8 @@ export interface FollowupItem {
   sentAt: string
   daysSince: number
   due: boolean
+  /** Set while an auto-reply asked us to wait. */
+  heldUntil: string | null
   state: FollowupState
 }
 
@@ -61,9 +81,11 @@ export interface FollowupOverview {
 export async function loadFollowupOverview(db: Db, now = new Date()): Promise<FollowupOverview> {
   const { data, error } = await db.from('university_prospects').select('*').eq('status', 'sent').order('sent_at', { ascending: true })
   if (error) throw new Error(error.message)
+  const holds = await loadHolds(db)
   const items: FollowupItem[] = []
   for (const p of (data ?? []) as Prospect[]) {
     if (p.followup_sent_at || !p.sent_at) continue
+    const held = isHeld(holds.get(p.id), now) ? holds.get(p.id)! : null
     items.push({
       id: p.id,
       name: p.name,
@@ -71,7 +93,8 @@ export async function loadFollowupOverview(db: Db, now = new Date()): Promise<Fo
       email: p.contact_email,
       sentAt: p.sent_at,
       daysSince: daysSince(p.sent_at, now) ?? 0,
-      due: isFollowupDue({ status: p.status, sent_at: p.sent_at, followup_sent_at: p.followup_sent_at ?? null }, now),
+      due: !held && isFollowupDue({ status: p.status, sent_at: p.sent_at, followup_sent_at: p.followup_sent_at ?? null }, now),
+      heldUntil: held,
       state: followupState({ followup_subject: p.followup_subject ?? null, followup_approval_hash: p.followup_approval_hash ?? null, followup_sent_at: p.followup_sent_at ?? null }),
     })
   }
@@ -89,8 +112,10 @@ export interface DraftFollowupsResult {
 export async function draftFollowups(db: Db, { redraft = false, now = new Date() }: { redraft?: boolean; now?: Date } = {}): Promise<DraftFollowupsResult> {
   const { data, error } = await db.from('university_prospects').select('*').eq('status', 'sent')
   if (error) throw new Error(error.message)
+  const holds = await loadHolds(db)
   const r: DraftFollowupsResult = { drafted: 0, skipped: 0 }
   for (const p of (data ?? []) as Prospect[]) {
+    if (isHeld(holds.get(p.id), now)) continue
     if (!p.sent_at || !isFollowupDue({ status: p.status, sent_at: p.sent_at, followup_sent_at: p.followup_sent_at ?? null }, now)) continue
     const state = followupState({ followup_subject: p.followup_subject ?? null, followup_approval_hash: p.followup_approval_hash ?? null, followup_sent_at: p.followup_sent_at ?? null })
     if (state === 'approved' || (state === 'drafted' && !redraft)) { r.skipped++; continue }
@@ -183,9 +208,10 @@ export async function sendFollowup(
   { send, enabled, now = new Date() }: { send: MailSender; enabled: boolean; now?: Date },
   ctxIn?: Awaited<ReturnType<typeof sendContext>>,
 ): Promise<FollowupOutcome> {
-  const [p, s, ctx] = await Promise.all([getProspect(db, id), loadSettings(db), ctxIn ?? sendContext(db)])
+  const [p, s, ctx, holds] = await Promise.all([getProspect(db, id), loadSettings(db), ctxIn ?? sendContext(db), loadHolds(db)])
   const envelope = followupEnvelope(p, s)
   const v = checkFollowupSend({
+    heldUntil: holds.get(id) ?? null,
     status: p.status,
     sentAt: p.sent_at,
     followupSentAt: p.followup_sent_at ?? null,
