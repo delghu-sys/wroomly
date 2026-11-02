@@ -176,8 +176,9 @@ test('the daily cap stops a bulk send partway, and says so', async () => {
   await draftAll(D(db))
   for (const p of db.tables.university_prospects) await approve(D(db), p.id)
   const { sent, send } = mailer()
-  const r = await sendApproved(D(db), { send, enabled: true })
+  const r = await sendApproved(D(db), { send, enabled: true, pauseMs: 0 })
   assert.equal(r.sent, 2)
+  assert.equal(r.remaining, 0, 'the third was attempted and refused by the cap, not skipped')
   assert.equal(sent.length, 2)
   assert.equal(r.outcomes.at(-1)?.reason, 'daily-cap-reached')
   assert.equal(db.tables.university_prospects.filter(p => p.status === 'approved').length, 1, 'the third waits for tomorrow')
@@ -298,4 +299,29 @@ test('the template test refuses without a reply-to, and mails no one', async () 
   const { sent, send } = mailer()
   await assert.rejects(testTemplate(D(db), { to: 'admin@example.com', send }), /Reply-to is not set/)
   assert.equal(sent.length, 0)
+})
+
+test('a bulk send stops starting new sends when its time budget is spent, and says how many are left', async () => {
+  const db = fakeDb({
+    prospects: [1, 2, 3, 4].map(n => prospect({ id: `p${n}`, slug: `u${n}`, name: `U${n}`, contact_email: `u${n}@u${n}.edu` })),
+    settings: [{ ...goodSettings }],
+  })
+  await draftAll(D(db))
+  for (const p of db.tables.university_prospects) await approve(D(db), p.id)
+  const { sent, send } = mailer()
+  let clock = 0
+  // every send "takes" 20s of the budget
+  const slow: MailSender = async m => { clock += 20_000; return send(m) }
+  const r = await sendApproved(D(db), { send: slow, enabled: true, pauseMs: 0, budgetMs: 45_000, now: () => clock })
+  assert.equal(sent.length, 3, 'starts at 0s, 20s and 40s; at 60s it is out of budget')
+  assert.equal(r.sent, 3)
+  assert.equal(r.remaining, 1)
+  assert.equal(db.tables.university_prospects.filter(p => p.status === 'approved').length, 1, 'the unsent one is still approved, not lost')
+
+  // clicking again carries on and finishes
+  clock = 0
+  const again = await sendApproved(D(db), { send, enabled: true, pauseMs: 0, now: () => clock })
+  assert.equal(again.sent, 1)
+  assert.equal(again.remaining, 0)
+  assert.equal(sent.length, 4)
 })

@@ -129,7 +129,7 @@ export function settingsFieldMessage(field: string): string {
     case 'from_name':
       return 'Sender name is empty or longer than 80 characters.'
     case 'daily_cap':
-      return 'Daily send cap must be a whole number from 1 to 50.'
+      return 'Daily send cap must be a whole number from 1 to 200.'
     case 'subject':
       return 'Subject is empty or longer than 200 characters.'
     case 'body':

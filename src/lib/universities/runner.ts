@@ -305,25 +305,45 @@ export async function sendOne(
   }
 }
 
-/** Send every approved message, oldest approval first, until the cap. */
+export interface SendApprovedResult {
+  outcomes: SendOutcome[]
+  sent: number
+  /** Approved messages not attempted this time (budget or cap) — click again. */
+  remaining: number
+}
+
+/**
+ * Send approved messages, oldest approval first, until the daily cap or the
+ * time budget.
+ *
+ * The budget exists because this runs inside a serverless request that is
+ * killed at 60 seconds, and a row is claimed BEFORE it is mailed: dying
+ * between the two would leave a message marked sent that never went out. So
+ * it stops STARTING new sends well before the limit and reports how many are
+ * left; clicking again carries on.
+ */
 export async function sendApproved(
   db: Db,
-  opts: { send: MailSender; enabled: boolean },
-): Promise<{ outcomes: SendOutcome[]; sent: number }> {
+  opts: { send: MailSender; enabled: boolean; pauseMs?: number; budgetMs?: number; now?: () => number },
+): Promise<SendApprovedResult> {
+  const { pauseMs = 700, budgetMs = 45_000, now = Date.now } = opts
   const { data } = await db
     .from('university_prospects')
     .select('id')
     .eq('status', 'approved')
     .order('approved_at', { ascending: true })
+  const ids = ((data ?? []) as { id: string }[]).map(r => r.id)
   const ctx = await sendContext(db)
+  const started = now()
   const outcomes: SendOutcome[] = []
-  for (const { id } of (data ?? []) as { id: string }[]) {
+  for (const id of ids) {
+    if (now() - started > budgetMs) break
     const o = await sendOne(db, id, opts, ctx)
     outcomes.push(o)
     if (o.reason === 'daily-cap-reached' || o.reason === 'sending-disabled' || o.reason === 'sender-misconfigured') break
-    if (o.sent) await new Promise(r => setTimeout(r, 1500))
+    if (o.sent && pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs))
   }
-  return { outcomes, sent: outcomes.filter(o => o.sent).length }
+  return { outcomes, sent: outcomes.filter(o => o.sent).length, remaining: ids.length - outcomes.length }
 }
 
 /** Mail the draft to the admin's own address. Changes nothing in the table. */
