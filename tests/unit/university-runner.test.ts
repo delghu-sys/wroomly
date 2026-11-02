@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { draftAll, saveDraft, approve, unapprove, sendOne, sendApproved, testSend, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
+import { draftAll, saveDraft, approve, approveAll, unapprove, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
 
 // A tiny in-memory stand-in for the three tables the runner touches. Only the
 // query shapes the runner actually uses are implemented. All data is INVENTED.
@@ -218,4 +218,84 @@ test('a test goes only to the address given, is marked as a test, and changes no
   assert.equal(sent[0].from, 'Hugo from Wroomly <hugo@wroomly.app>', 'the test shows the real sender')
   assert.equal(e.to, 'admin@example.com')
   assert.equal(db.tables.university_prospects[0].status, 'approved', 'a test neither sends nor un-approves')
+})
+
+// ── approve all ─────────────────────────────────────────────────────────────
+
+const threeDrafted = () => fakeDb({
+  prospects: [
+    prospect({ id: 'p1', slug: 'a', name: 'A U', contact_email: 'a@a.edu' }),
+    prospect({ id: 'p2', slug: 'b', name: 'B U', contact_email: 'b@b.edu' }),
+    prospect({ id: 'p3', slug: 'c', name: 'C U', contact_email: null, confidence: 'not_found' }),
+  ],
+  settings: [{ ...goodSettings }],
+})
+
+test('approve all approves every drafted message, each bound to its own text', async () => {
+  const db = threeDrafted()
+  await draftAll(D(db))
+  const r = await approveAll(D(db))
+  assert.deepEqual(r, { approved: 2, skipped: 0 })
+  const [a, b, c] = db.tables.university_prospects
+  assert.equal(a.status, 'approved')
+  assert.equal(b.status, 'approved')
+  assert.equal(c.status, 'researched', 'no address, so never drafted and never approved')
+  assert.notEqual(a.approval_hash, b.approval_hash, 'a hash per message, not one shared approval')
+})
+
+test('approve all still lets each message be voided by an edit, and still gates the send', async () => {
+  const db = threeDrafted()
+  await draftAll(D(db))
+  await approveAll(D(db))
+  await saveDraft(D(db), 'p1', { subject: 'Changed after approving', body: 'Changed' })
+  assert.equal(db.tables.university_prospects[0].status, 'drafted', 'edited → approval gone')
+  const { sent, send } = mailer()
+  assert.equal((await sendOne(D(db), 'p1', { send, enabled: true })).reason, 'not-approved')
+  assert.equal((await sendOne(D(db), 'p2', { send, enabled: true })).sent, true, 'the untouched one is fine')
+  assert.equal(sent.length, 1)
+})
+
+test('approve all refuses outright without a valid sender, approving nothing', async () => {
+  const db = fakeDb({ prospects: [prospect()], settings: [{ ...goodSettings, reply_to: '' }] })
+  await draftAll(D(db))
+  await assert.rejects(approveAll(D(db)), /Reply-to is not set/)
+  assert.equal(db.tables.university_prospects[0].status, 'drafted')
+})
+
+test('approve all leaves sent, declined and already-approved messages alone', async () => {
+  const db = fakeDb({
+    prospects: [
+      prospect({ id: 's', slug: 's', name: 'S U', contact_email: 's@s.edu', status: 'sent', subject: 's', body: 'b' }),
+      prospect({ id: 'd', slug: 'd', name: 'D U', contact_email: 'd@d.edu', status: 'declined', subject: 's', body: 'b' }),
+      prospect({ id: 'x', slug: 'x', name: 'X U', contact_email: 'x@x.edu', status: 'approved', subject: 's', body: 'b', approval_hash: 'keep-me' }),
+    ],
+    settings: [{ ...goodSettings }],
+  })
+  assert.deepEqual(await approveAll(D(db)), { approved: 0, skipped: 0 })
+  assert.deepEqual(db.tables.university_prospects.map(p => p.status), ['sent', 'declined', 'approved'])
+  assert.equal(db.tables.university_prospects[2].approval_hash, 'keep-me')
+})
+
+// ── template test ───────────────────────────────────────────────────────────
+
+test('the template test goes only to the address given, from the real sender, and changes nothing', async () => {
+  const db = threeDrafted()
+  const before = JSON.stringify(db.tables.university_prospects)
+  const { sent, send } = mailer()
+  const r = await testTemplate(D(db), { to: 'admin@example.com', send })
+  assert.equal(sent.length, 1)
+  assert.equal(sent[0].to, 'admin@example.com')
+  assert.equal(sent[0].from, 'Hugo from Wroomly <hugo@wroomly.app>')
+  assert.equal(sent[0].replyTo, 'me@example.com')
+  assert.match(sent[0].subject, /^\[TEST TEMPLATE → A U\] Housing for A U students$/)
+  assert.match(sent[0].text, /^Dear Exchange Office,/)
+  assert.equal(r.university, 'A U')
+  assert.equal(JSON.stringify(db.tables.university_prospects), before, 'no row changed')
+})
+
+test('the template test refuses without a reply-to, and mails no one', async () => {
+  const db = fakeDb({ prospects: [prospect()], settings: [{ ...goodSettings, reply_to: '' }] })
+  const { sent, send } = mailer()
+  await assert.rejects(testTemplate(D(db), { to: 'admin@example.com', send }), /Reply-to is not set/)
+  assert.equal(sent.length, 0)
 })

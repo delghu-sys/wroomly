@@ -83,6 +83,7 @@ export default async function AdminUniversitiesPage() {
           </div>
           <UniversitiesConsole
             researched={rows.filter(r => r.status === 'researched' && r.contact_email).length}
+            drafted={rows.filter(r => r.status === 'drafted' && r.contact_email).length}
             approved={count('approved')}
             fromDisplay={formatFrom(settings.from_name, settings.from_email)}
             replyTo={settings.reply_to}
