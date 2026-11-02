@@ -2,13 +2,17 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowDown, ArrowUp, ChevronsUpDown, ExternalLink, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ArrowDown, ArrowUp, Check, ChevronsUpDown, ExternalLink, Loader2, Undo2, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   EMPTY_PROSPECT_FILTERS,
   contactKindOf,
+  effectiveSelection,
   filterProspects,
+  isSelectable,
   sortProspects,
   type ProspectFilters,
   type ProspectRowLite,
@@ -40,6 +44,9 @@ const selectClass =
 export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
   const [filters, setFilters] = useState<ProspectFilters>(EMPTY_PROSPECT_FILTERS)
   const [sort, setSort] = useState<{ key: ProspectSortKey; dir: 'asc' | 'desc' }>({ key: 'status', dir: 'asc' })
+  const router = useRouter()
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [busy, setBusy] = useState<'approve-selected' | 'withdraw-selected' | null>(null)
 
   const countries = useMemo(() => [...new Set(rows.map(r => r.country).filter((c): c is string => !!c))].sort(), [rows])
   const units = useMemo(() => [...new Set(rows.flatMap(r => r.umich_units))].sort(), [rows])
@@ -47,7 +54,42 @@ export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
     () => sortProspects(filterProspects(rows, filters), sort.key, sort.dir) as TableRow[],
     [rows, filters, sort],
   )
+  const selectableVisible = visible.filter(isSelectable)
+  // Only what is ticked AND still on screen — a row hidden by a filter after
+  // being ticked is never acted on.
+  const chosen = effectiveSelection(visible, selected)
+  const chosenRows = visible.filter(r => chosen.includes(r.id))
+  const toApprove = chosenRows.filter(r => r.status === 'drafted').map(r => r.id)
+  const toWithdraw = chosenRows.filter(r => r.status === 'approved').map(r => r.id)
+  const allTicked = selectableVisible.length > 0 && selectableVisible.every(r => selected.has(r.id))
   const filtering = JSON.stringify(filters) !== JSON.stringify(EMPTY_PROSPECT_FILTERS)
+  function toggle(id: string) {
+    setSelected(prev => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n })
+  }
+  function toggleAll() {
+    setSelected(prev => {
+      const n = new Set(prev)
+      if (allTicked) for (const r of selectableVisible) n.delete(r.id)
+      else for (const r of selectableVisible) n.add(r.id)
+      return n
+    })
+  }
+  async function run(action: 'approve-selected' | 'withdraw-selected', ids: string[]) {
+    if (ids.length === 0) return
+    setBusy(action)
+    try {
+      const res = await fetch('/api/admin/universities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ids }) })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) return toast.error(data.error ?? 'Failed.')
+      toast.success(action === 'approve-selected' ? `Approved ${data.approved}. Nothing was sent.` : `Withdrew approval from ${data.withdrawn}.`)
+      setSelected(new Set())
+      router.refresh()
+    } catch {
+      toast.error('Network error. Please try again.')
+    } finally {
+      setBusy(null)
+    }
+  }
   const set = <K extends keyof ProspectFilters>(k: K, v: ProspectFilters[K]) => setFilters(f => ({ ...f, [k]: v }))
 
   const columns: { key: ProspectSortKey | null; label: string }[] = [
@@ -92,10 +134,27 @@ export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
         </p>
       </div>
 
+      {chosen.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-navy-soft/40 px-4 py-2.5" role="region" aria-label="Selected universities">
+          <p className="text-[13px] text-ink tabular-nums"><strong>{chosen.length}</strong> selected</p>
+          <Button size="sm" disabled={busy !== null || toApprove.length === 0} onClick={() => run('approve-selected', toApprove)}>
+            {busy === 'approve-selected' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check data-icon="inline-start" />} Approve {toApprove.length}
+          </Button>
+          <Button variant="outline" size="sm" disabled={busy !== null || toWithdraw.length === 0} onClick={() => run('withdraw-selected', toWithdraw)}>
+            {busy === 'withdraw-selected' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Undo2 data-icon="inline-start" />} Withdraw approval ({toWithdraw.length})
+          </Button>
+          <Button variant="ghost" size="sm" disabled={busy !== null} onClick={() => setSelected(new Set())}>Clear</Button>
+          <p className="ml-auto text-[12px] text-ink-muted">Approving sends nothing. Send happens separately.</p>
+        </div>
+      )}
+
       <div className="overflow-auto max-h-[75vh] rounded-3xl border border-line bg-surface shadow-1">
         <table className="w-full text-left text-[13px] border-separate border-spacing-0">
           <thead className="sticky top-0 z-10 bg-navy-soft text-ink-muted text-[11px] uppercase tracking-wide">
             <tr>
+              <th className="px-3 py-2.5 border-b border-line w-8">
+                <input type="checkbox" aria-label="Select all shown that can be approved" className="accent-navy-deep" checked={allTicked} disabled={selectableVisible.length === 0} onChange={toggleAll} />
+              </th>
               {columns.map(c => {
                 const active = c.key !== null && sort.key === c.key
                 const Icon = active ? (sort.dir === 'asc' ? ArrowUp : ArrowDown) : ChevronsUpDown
@@ -114,10 +173,13 @@ export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
           </thead>
           <tbody>
             {visible.length === 0 && (
-              <tr><td colSpan={columns.length} className="px-4 py-8 text-center text-ink-muted">No universities match these filters.</td></tr>
+              <tr><td colSpan={columns.length + 1} className="px-4 py-8 text-center text-ink-muted">No universities match these filters.</td></tr>
             )}
             {visible.map((r, i) => (
-              <tr key={r.id} className={`align-top ${i % 2 ? 'bg-navy-soft/20' : ''}`}>
+              <tr key={r.id} className={`align-top ${selected.has(r.id) && isSelectable(r) ? 'bg-maize-bright/10' : i % 2 ? 'bg-navy-soft/20' : ''}`}>
+                <td className="px-3 py-2 border-b border-line/60">
+                  <input type="checkbox" aria-label={`Select ${r.name}`} className="accent-navy-deep" checked={selected.has(r.id) && isSelectable(r)} disabled={!isSelectable(r)} onChange={() => toggle(r.id)} />
+                </td>
                 <td className="px-3 py-2 border-b border-line/60">
                   <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide ${STATUS_TONES[r.status]}`}>{r.status}</span>
                 </td>

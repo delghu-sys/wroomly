@@ -66,3 +66,17 @@ export function sortProspects(rows: ProspectRowLite[], key: ProspectSortKey, dir
     })
     .map(x => x.r)
 }
+
+/** Only a drafted message can be approved and only an approved one withdrawn —
+ *  and either needs an address. Everything else has nothing to select. */
+export const isSelectable = (r: Pick<ProspectRowLite, 'status' | 'contact_email'>): boolean =>
+  (r.status === 'drafted' || r.status === 'approved') && !!r.contact_email
+
+/**
+ * The ids a bulk action will really act on: selected AND currently visible
+ * AND still selectable. A row hidden by a filter after being ticked is left
+ * out, so nothing is approved that you cannot see on screen.
+ */
+export function effectiveSelection(visible: ProspectRowLite[], selected: ReadonlySet<string>): string[] {
+  return visible.filter(r => selected.has(r.id) && isSelectable(r)).map(r => r.id)
+}

@@ -175,7 +175,8 @@ export interface ApproveAllResult {
 }
 
 /**
- * Approve every drafted message that has an address and text.
+ * Approve every drafted message that has an address and text — or, given
+ * `only`, just those ids.
  *
  * This is the same approval as the single button — each row gets its own hash
  * of its own To/From/Reply-to/subject/body — so editing any of them afterwards
@@ -183,7 +184,7 @@ export interface ApproveAllResult {
  * Refuses outright if the sender setup is not valid, rather than approving
  * messages that could never be sent.
  */
-export async function approveAll(db: Db): Promise<ApproveAllResult> {
+export async function approveAll(db: Db, only?: string[]): Promise<ApproveAllResult> {
   const s = await loadSettings(db)
   const problems = senderProblems(s)
   if (problems.length) throw new Error(problems[0])
@@ -192,7 +193,10 @@ export async function approveAll(db: Db): Promise<ApproveAllResult> {
   if (error) throw new Error(error.message)
 
   const r: ApproveAllResult = { approved: 0, skipped: 0 }
-  for (const p of (data ?? []) as Prospect[]) {
+  // `only` narrows this to a chosen set. Ids that are unknown or not drafted
+  // are simply not in `data`, so they cannot be approved by naming them.
+  const chosen = only ? new Set(only) : null
+  for (const p of ((data ?? []) as Prospect[]).filter(p => !chosen || chosen.has(p.id))) {
     if (!p.contact_email || !p.subject?.trim() || !p.body?.trim()) { r.skipped++; continue }
     const { error: upErr } = await db
       .from('university_prospects')
@@ -203,6 +207,26 @@ export async function approveAll(db: Db): Promise<ApproveAllResult> {
     r.approved++
   }
   return r
+}
+
+/**
+ * Withdraw the approval of each chosen id that is currently approved. One
+ * update per id, filtered on that id AND status — there is no query here that
+ * can match a row you did not name.
+ */
+export async function unapproveMany(db: Db, ids: string[]): Promise<number> {
+  let withdrawn = 0
+  for (const id of new Set(ids)) {
+    const { data, error } = await db
+      .from('university_prospects')
+      .update({ status: 'drafted', approved_at: null, approval_hash: null })
+      .eq('id', id)
+      .eq('status', 'approved')
+      .select('id')
+    if (error) throw new Error(error.message)
+    withdrawn += data?.length ?? 0
+  }
+  return withdrawn
 }
 
 export async function unapprove(db: Db, id: string): Promise<void> {

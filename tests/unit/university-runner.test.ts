@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { draftAll, saveDraft, approve, approveAll, unapprove, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
+import { draftAll, saveDraft, approve, approveAll, unapprove, unapproveMany, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
 
 // A tiny in-memory stand-in for the three tables the runner touches. Only the
 // query shapes the runner actually uses are implemented. All data is INVENTED.
@@ -324,4 +324,61 @@ test('a bulk send stops starting new sends when its time budget is spent, and sa
   assert.equal(again.sent, 1)
   assert.equal(again.remaining, 0)
   assert.equal(sent.length, 4)
+})
+
+// ── approving a selection ───────────────────────────────────────────────────
+
+const fourDrafted = async () => {
+  const db = fakeDb({
+    prospects: [1, 2, 3, 4].map(n => prospect({ id: `p${n}`, slug: `u${n}`, name: `U${n}`, contact_email: `u${n}@u${n}.edu` })),
+    settings: [{ ...goodSettings }],
+  })
+  await draftAll(D(db))
+  return db
+}
+const statuses = (db: ReturnType<typeof fakeDb>) => db.tables.university_prospects.map(p => p.status)
+
+test('approving a selection approves exactly those, and nothing else', async () => {
+  const db = await fourDrafted()
+  const r = await approveAll(D(db), ['p1', 'p3'])
+  assert.deepEqual(r, { approved: 2, skipped: 0 })
+  assert.deepEqual(statuses(db), ['approved', 'drafted', 'approved', 'drafted'])
+})
+
+test('naming an id that is unknown, or not a draft, approves nothing extra', async () => {
+  const db = await fourDrafted()
+  db.tables.university_prospects[3].status = 'sent'
+  const r = await approveAll(D(db), ['p2', 'p4', 'no-such-id'])
+  assert.deepEqual(r, { approved: 1, skipped: 0 })
+  assert.deepEqual(statuses(db), ['drafted', 'approved', 'drafted', 'sent'], 'a sent one cannot be re-approved by naming it')
+})
+
+test('an empty selection approves nothing (it is not "all")', async () => {
+  const db = await fourDrafted()
+  assert.deepEqual(await approveAll(D(db), []), { approved: 0, skipped: 0 })
+  assert.deepEqual(statuses(db), ['drafted', 'drafted', 'drafted', 'drafted'])
+})
+
+test('a selected message is still bound to its own text: editing it later voids just that one', async () => {
+  const db = await fourDrafted()
+  await approveAll(D(db), ['p1', 'p2'])
+  await saveDraft(D(db), 'p1', { subject: 'Edited', body: 'Edited' })
+  assert.deepEqual(statuses(db), ['drafted', 'approved', 'drafted', 'drafted'])
+})
+
+test('withdrawing a selection touches only the named, approved ones', async () => {
+  const db = await fourDrafted()
+  await approveAll(D(db))
+  const n = await unapproveMany(D(db), ['p2', 'p3', 'p3', 'no-such-id'])
+  assert.equal(n, 2, 'a duplicated id is counted once; an unknown id is ignored')
+  assert.deepEqual(statuses(db), ['approved', 'drafted', 'drafted', 'approved'])
+  assert.equal(db.tables.university_prospects[1].approval_hash, null)
+  assert.ok(db.tables.university_prospects[0].approval_hash, 'the others keep their approval')
+})
+
+test('withdrawing never touches a message that has been sent', async () => {
+  const db = await fourDrafted()
+  db.tables.university_prospects[0].status = 'sent'
+  assert.equal(await unapproveMany(D(db), ['p1']), 0)
+  assert.equal(db.tables.university_prospects[0].status, 'sent')
 })

@@ -3,12 +3,14 @@ import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/server'
 import { resend } from '@/lib/resend'
 import { requireAdmin, outreachEnabled } from '@/lib/universities/admin'
-import { approveAll, draftAll, sendApproved, testTemplate } from '@/lib/universities/runner'
+import { approveAll, draftAll, sendApproved, testTemplate, unapproveMany } from '@/lib/universities/runner'
 
 /**
  * POST /api/admin/universities
  *   { action: 'draft-all', redraft?: boolean }   fill drafts from the template
  *   { action: 'approve-all', confirm: true }     approve every drafted message
+ *   { action: 'approve-selected', ids }           approve only these
+ *   { action: 'withdraw-selected', ids }          withdraw approval of only these
  *   { action: 'test-template' }                  mail the template to YOUR address
  *   { action: 'send-approved', confirm: true }   send every approved message
  *
@@ -21,6 +23,8 @@ export const maxDuration = 60
 const schema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('draft-all'), redraft: z.boolean().optional() }),
   z.object({ action: z.literal('approve-all'), confirm: z.literal(true) }),
+  z.object({ action: z.literal('approve-selected'), ids: z.array(z.string().uuid()).min(1).max(500) }),
+  z.object({ action: z.literal('withdraw-selected'), ids: z.array(z.string().uuid()).min(1).max(500) }),
   z.object({ action: z.literal('test-template') }),
   z.object({ action: z.literal('send-approved'), confirm: z.literal(true) }),
 ])
@@ -38,6 +42,8 @@ export async function POST(request: Request) {
   try {
     if (body.action === 'draft-all') return NextResponse.json(await draftAll(db, { redraft: body.redraft }))
     if (body.action === 'approve-all') return NextResponse.json(await approveAll(db))
+    if (body.action === 'approve-selected') return NextResponse.json(await approveAll(db, body.ids))
+    if (body.action === 'withdraw-selected') return NextResponse.json({ withdrawn: await unapproveMany(db, body.ids) })
 
     const send = async (m: { from: string; to: string; replyTo: string; subject: string; text: string }) => {
       const { data, error } = await resend.emails.send({ from: m.from, to: m.to, replyTo: m.replyTo, subject: m.subject, text: m.text })
