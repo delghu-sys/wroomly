@@ -156,7 +156,6 @@ one A4 page. It must stay **public** (`/exchange` is in `PUBLIC_ROUTES` in
 Wroomly account. It makes only claims the site already makes elsewhere, and says
 nothing about prices or listing counts, which it cannot keep current.
 
-The email includes who is writing,
 The email includes who is writing, that Wroomly is independent of U-M, and one
 line to reply and be left alone. Replies arrive in the Reply-to inbox; mark them
 with **They replied** so the table shows where each university stands.
