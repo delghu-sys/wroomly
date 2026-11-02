@@ -231,7 +231,7 @@ test('slugs fold accents and symbols', () => {
 
 // ── the table ───────────────────────────────────────────────────────────────
 
-import { filterProspects, sortProspects, EMPTY_PROSPECT_FILTERS, type ProspectRowLite } from '../../src/lib/universities/table.ts'
+import { filterProspects, sortProspects, isSelectable, effectiveSelection, EMPTY_PROSPECT_FILTERS, type ProspectRowLite } from '../../src/lib/universities/table.ts'
 
 const row = (o: Partial<ProspectRowLite> & { id: string; name: string }): ProspectRowLite => ({
   country: 'Sweden', umich_units: [], office_name: null, contact_email: null, contact_form_url: null,
@@ -278,4 +278,25 @@ test('the default settings are the ones chosen: sender, reply-to and a cap of 10
   assert.equal(DEFAULT_SETTINGS.reply_to, 'delghu@umich.edu')
   assert.equal(DEFAULT_SETTINGS.daily_cap, 100)
   assert.equal(formatFrom(DEFAULT_SETTINGS.from_name, DEFAULT_SETTINGS.from_email), 'Hugo from Wroomly <hugodelgado@wroomly.app>')
+})
+
+test('only drafted or approved universities with an address can be ticked', () => {
+  const r = (status: ProspectRowLite['status'], contact_email: string | null) => row({ id: status, name: status, status, contact_email })
+  assert.equal(isSelectable(r('drafted', 'a@a.edu')), true)
+  assert.equal(isSelectable(r('approved', 'a@a.edu')), true)
+  assert.equal(isSelectable(r('drafted', null)), false)
+  for (const status of ['researched', 'sent', 'replied', 'declined', 'skipped'] as const)
+    assert.equal(isSelectable(r(status, 'a@a.edu')), false, status)
+})
+
+test('a bulk action only acts on what is ticked AND still on screen', () => {
+  const visible = [
+    row({ id: 'a', name: 'A', status: 'drafted', contact_email: 'a@a.edu' }),
+    row({ id: 'b', name: 'B', status: 'approved', contact_email: 'b@b.edu' }),
+    row({ id: 'c', name: 'C', status: 'sent', contact_email: 'c@c.edu' }),
+  ]
+  // 'hidden' was ticked, then a filter hid it; 'c' can no longer be selected
+  const ticked = new Set(['a', 'c', 'hidden'])
+  assert.deepEqual(effectiveSelection(visible, ticked), ['a'])
+  assert.deepEqual(effectiveSelection(visible, new Set()), [])
 })

@@ -13,6 +13,9 @@ send      →  one email, from the sender you chose (button; or "send approved",
 ```
 
 Nothing is automatic past *draft*. A person approves, and a person presses send.
+**Tick the checkboxes** in the table (or the header box for everything shown,
+e.g. after filtering to one country) and use **Approve N** / **Withdraw approval**
+to act on just those; a ticked row hidden by a filter is never acted on.
 **Approve all** approves every drafted message in one click — each still gets its
 own hash of its own text, so editing any of them afterwards withdraws just that
 approval — and it refuses outright until the sender and Reply-to are valid.
