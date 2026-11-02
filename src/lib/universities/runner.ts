@@ -169,6 +169,42 @@ export async function approve(db: Db, id: string): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+export interface ApproveAllResult {
+  approved: number
+  skipped: number
+}
+
+/**
+ * Approve every drafted message that has an address and text.
+ *
+ * This is the same approval as the single button — each row gets its own hash
+ * of its own To/From/Reply-to/subject/body — so editing any of them afterwards
+ * still voids that approval. What it removes is the clicking, not the check.
+ * Refuses outright if the sender setup is not valid, rather than approving
+ * messages that could never be sent.
+ */
+export async function approveAll(db: Db): Promise<ApproveAllResult> {
+  const s = await loadSettings(db)
+  const problems = senderProblems(s)
+  if (problems.length) throw new Error(problems[0])
+
+  const { data, error } = await db.from('university_prospects').select('*').eq('status', 'drafted')
+  if (error) throw new Error(error.message)
+
+  const r: ApproveAllResult = { approved: 0, skipped: 0 }
+  for (const p of (data ?? []) as Prospect[]) {
+    if (!p.contact_email || !p.subject?.trim() || !p.body?.trim()) { r.skipped++; continue }
+    const { error: upErr } = await db
+      .from('university_prospects')
+      .update({ status: 'approved', approved_at: new Date().toISOString(), approval_hash: approvalHash(envelopeFor(p, s)) })
+      .eq('id', p.id)
+      .eq('status', 'drafted')
+    if (upErr) throw new Error(upErr.message)
+    r.approved++
+  }
+  return r
+}
+
 export async function unapprove(db: Db, id: string): Promise<void> {
   const p = await getProspect(db, id)
   if (p.status !== 'approved') return
@@ -300,6 +336,32 @@ export async function testSend(db: Db, id: string, { to, send }: { to: string; s
   const preview: Envelope = { ...e, to, subject: `[TEST → ${p.contact_email ?? 'no address'}] ${e.subject}` }
   await send({ from: preview.from, to, replyTo: preview.replyTo, subject: preview.subject, text: preview.body })
   return preview
+}
+
+/**
+ * Mail the TEMPLATE to the admin's own address, filled in for one real
+ * university (the first with an address and a Michigan program) — so the
+ * layout, sender and reply-to can be checked in a real inbox before opening
+ * any single university. Uses the SAVED settings, and changes nothing.
+ */
+export async function testTemplate(db: Db, { to, send }: { to: string; send: MailSender }): Promise<{ envelope: Envelope; university: string }> {
+  const s = await loadSettings(db)
+  const problems = senderProblems(s)
+  if (problems.length) throw new Error(problems[0])
+  const { data } = await db.from('university_prospects').select('*').not('contact_email', 'is', null).order('name', { ascending: true })
+  const rows = (data ?? []) as Prospect[]
+  const sample = rows.find(p => p.umich_units.length > 0) ?? rows[0]
+  if (!sample) throw new Error('No university with an email address yet.')
+  const email = renderEmail(sample, s)
+  const envelope: Envelope = {
+    from: formatFrom(s.from_name, s.from_email),
+    to,
+    replyTo: s.reply_to,
+    subject: `[TEST TEMPLATE → ${sample.name}] ${email.subject}`,
+    body: email.body,
+  }
+  await send({ from: envelope.from, to, replyTo: envelope.replyTo, subject: envelope.subject, text: envelope.body })
+  return { envelope, university: sample.name }
 }
 
 // ── outcomes ────────────────────────────────────────────────────────────────

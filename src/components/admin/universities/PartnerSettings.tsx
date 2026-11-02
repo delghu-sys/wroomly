@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { renderEmail } from '@/lib/universities/template'
+import { TestTemplateButton } from './TestTemplateButton'
 
 interface Settings {
   from_name: string
@@ -71,9 +72,13 @@ export function PartnerSettings({ initial, sample }: { initial: Settings; sample
           </div>
         </div>
       </div>
-      <Button size="sm" className="mt-5" disabled={!dirty || saving} onClick={save}>
-        {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save data-icon="inline-start" />} Save
-      </Button>
+      <div className="flex flex-wrap items-center gap-2 mt-5">
+        <Button size="sm" disabled={!dirty || saving} onClick={save}>
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save data-icon="inline-start" />} Save
+        </Button>
+        <TestTemplateButton disabled={dirty || saving || !initial.reply_to} hint={dirty ? 'Save first — the test uses the saved settings' : undefined} />
+        {dirty && <span className="text-[12.5px] text-ink-muted">Save first: the test uses the saved settings.</span>}
+      </div>
     </div>
   )
 }

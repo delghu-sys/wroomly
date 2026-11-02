@@ -12,8 +12,12 @@ approve   →  you approve THIS exact message       (voided by any later change)
 send      →  one email, from the sender you chose (button; or "send approved", capped)
 ```
 
-Nothing is automatic past *draft*. A person approves every message, and a person
-presses send.
+Nothing is automatic past *draft*. A person approves, and a person presses send.
+**Approve all** approves every drafted message in one click — each still gets its
+own hash of its own text, so editing any of them afterwards withdraws just that
+approval — and it refuses outright until the sender and Reply-to are valid.
+**Send me a test** (main page and each university) mails the template, or that
+university's draft, to the signed-in admin's own address only.
 
 ## What "approved" means
 

@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileText, Loader2, Send } from 'lucide-react'
+import { Check, FileText, Loader2, Send } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { TestTemplateButton } from './TestTemplateButton'
 
 interface Props {
   researched: number
+  /** Drafted, with an address and text — what "Approve all" would approve. */
+  drafted: number
   approved: number
   fromDisplay: string
   replyTo: string
@@ -18,17 +21,18 @@ interface Props {
 
 /** Two bulk steps. Drafting only writes text. Sending asks you to confirm the
  *  sender and count first, and still passes every message through the gate. */
-export function UniversitiesConsole({ researched, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday }: Props) {
+export function UniversitiesConsole({ researched, drafted, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
 
-  async function call(action: 'draft-all' | 'send-approved', extra: object = {}) {
+  async function call(action: 'draft-all' | 'approve-all' | 'send-approved', extra: object = {}) {
     setBusy(action)
     try {
       const res = await fetch('/api/admin/universities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...extra }) })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) return toast.error(data.error ?? 'Failed.')
       if (action === 'draft-all') toast.success(`Drafted ${data.drafted}. ${data.skippedNoEmail} skipped (no address).`)
+      else if (action === 'approve-all') toast.success(`Approved ${data.approved}.${data.skipped ? ` ${data.skipped} skipped (no address or text).` : ''}`)
       else {
         const refused = (data.outcomes ?? []).filter((o: { sent: boolean; message?: string }) => !o.sent)
         toast.success(`Sent ${data.sent} of ${data.outcomes.length}.`)
@@ -40,6 +44,13 @@ export function UniversitiesConsole({ researched, approved, fromDisplay, replyTo
     } finally {
       setBusy(null)
     }
+  }
+
+  function approveAll() {
+    const ok = window.confirm(
+      `Approve ${drafted} drafted email${drafted === 1 ? '' : 's'}?\n\nFrom: ${fromDisplay}\nReplies go to: ${replyTo || '(not set)'}\n\nEach one is approved exactly as it is now. Edit any of them afterwards and its approval is withdrawn.\nNothing is sent by approving.`,
+    )
+    if (ok) void call('approve-all', { confirm: true })
   }
 
   function sendApproved() {
@@ -63,12 +74,19 @@ export function UniversitiesConsole({ researched, approved, fromDisplay, replyTo
         <div className="w-10 h-10 rounded-2xl bg-navy-deep text-maize-bright flex items-center justify-center mb-4"><Send className="w-5 h-5" strokeWidth={1.75} /></div>
         <h2 className="font-display text-lg tracking-tight text-ink">2. Review, approve, send</h2>
         <p className="text-[13.5px] text-ink-muted leading-relaxed mt-1.5">
-          Open a university to read and approve its exact message. Approved messages can be sent one at a time there, or all together here.
+          Open a university to read and approve its exact message, or approve every draft here once you have checked a few. Approved messages can be sent one at a time or all together.
         </p>
         {!enabled && <p className="text-[12.5px] text-red-600 mt-2">Real sending is off: UNIVERSITY_OUTREACH_ENABLED is not &ldquo;true&rdquo; on the server.</p>}
-        <Button size="sm" className="mt-4" disabled={busy !== null || approved === 0} onClick={sendApproved}>
-          {busy === 'send-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Send ${approved} approved`}
-        </Button>
+        {!replyTo && <p className="text-[12.5px] text-red-600 mt-2">Set the Reply-to below and save it before approving.</p>}
+        <div className="flex flex-wrap items-center gap-2 mt-4">
+          <TestTemplateButton disabled={busy !== null || !replyTo} hint={replyTo ? undefined : 'Set and save the Reply-to first'} />
+          <Button variant="outline" size="sm" disabled={busy !== null || drafted === 0 || !replyTo} onClick={approveAll}>
+            {busy === 'approve-all' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check data-icon="inline-start" />} Approve all {drafted}
+          </Button>
+          <Button size="sm" disabled={busy !== null || approved === 0} onClick={sendApproved}>
+            {busy === 'send-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Send ${approved} approved`}
+          </Button>
+        </div>
       </div>
     </div>
   )
