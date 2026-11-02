@@ -19,7 +19,8 @@ test('shows the overview, with a way to browse and a note that it is independent
   expect(res?.status()).toBe(200)
   await expect(page).toHaveURL(/\/exchange$/)
   await expect(page.getByRole('heading', { level: 1 })).toContainText(/exchange students/i)
-  await expect(page.getByRole('link', { name: /browse sublets/i })).toBeVisible()
+  // One in the hero and one at the end of the page.
+  await expect(page.getByRole('link', { name: /browse sublets/i }).first()).toBeVisible()
   // The site footer says it too; this checks the page's own footnote.
   await expect(page.locator('article').getByText(/not affiliated with the University of Michigan/i)).toBeVisible()
 })
@@ -28,4 +29,13 @@ test('says nothing about prices or numbers it cannot keep current', async ({ pag
   await page.goto('/exchange')
   const text = (await page.locator('article').innerText()).toLowerCase()
   expect(text).not.toMatch(/below market|cheapest|\$\d/)
+})
+
+test('the animated headline keeps real spaces between words', async ({ page }) => {
+  await page.goto('/exchange')
+  // A margin instead of a space reads as "Exchangestudents" to a screen reader
+  // and to a search crawler.
+  const h1 = (await page.getByRole('heading', { level: 1 }).textContent()) ?? ''
+  expect(h1).toMatch(/Exchange students,/)
+  expect(h1).toMatch(/make room/)
 })

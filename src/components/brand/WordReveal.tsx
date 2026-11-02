@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 interface WordRevealProps {
   text: string
   /** Render each word in this class — supports italic accent words */
@@ -39,16 +41,17 @@ export function WordReveal({
         const clean = word.toLowerCase().replace(/[.,!?]/g, '')
         const isAccent = accentSet.has(clean)
         return (
-          <span
-            key={`${word}-${i}`}
-            className={`inline-block animate-word-rise ${isAccent ? 'italic font-light text-maize-bright' : ''}`}
-            style={{
-              animationDelay: `${delay + i * stagger}s`,
-              marginRight: i < words.length - 1 ? '0.25em' : 0,
-            }}
-          >
-            {word}
-          </span>
+          <Fragment key={`${word}-${i}`}>
+            <span
+              className={`inline-block animate-word-rise ${isAccent ? 'italic font-light text-maize-bright' : ''}`}
+              style={{ animationDelay: `${delay + i * stagger}s` }}
+            >
+              {word}
+            </span>
+            {/* A real space, not a margin: the heading's text is read by screen
+                readers and search crawlers, and margins leave "Exchangestudents". */}
+            {i < words.length - 1 ? ' ' : null}
+          </Fragment>
         )
       })}
     </span>
