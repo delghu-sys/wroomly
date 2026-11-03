@@ -1017,6 +1017,173 @@ export const GUIDES: Guide[] = [
       { label: 'Browse buildings', href: '/buildings' },
     ],
   },
+  {
+    slug: 'where-to-find-a-sublet-umich',
+    title: 'Where to find a sublet at UMich, every channel compared',
+    seoTitle: 'Where to Find a Sublet in Ann Arbor at UMich',
+    description:
+      'Where to find a sublet in Ann Arbor: the U-M housing site, Facebook groups, Craigslist, word of mouth and Wroomly, compared on who can post and how to stay safe.',
+    excerpt:
+      'Every place Ann Arbor sublets get posted, what each one tells you about the person on the other end, and which to use for a summer, fall or winter search.',
+    published: '2026-10-12',
+    updated: '2026-10-12',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'Where do UMich students actually post sublets?',
+        paragraphs: [
+          "Ann Arbor sublets get posted in five places: the university's off campus housing site, Facebook groups and Marketplace, Craigslist, word of mouth, and sublet marketplaces like Wroomly. All of them have listings. What differs is who is allowed to post, whether you can tell who that person is, and where you stand if the deal goes wrong. Pick the channel for the risk, not just the selection.",
+          "The university's off campus housing site has a sublease section, and opening it sends you to a U-M sign in, so the people posting there have a U-M login. Facebook groups are where a lot of student to student posts land, and anyone the group admins let in can post. Craigslist has an Ann Arbor sublets and temporary section that anyone can post to. Word of mouth runs through classmates, your department and student groups, and some programs keep their own sublet lists for their students.",
+          'Wroomly is a sublet marketplace for the UMich community in Ann Arbor. It is independent and not run by the university. Anyone can browse, inquire and list, and students who sign in with their umich Google account carry a blue check.',
+        ],
+      },
+      {
+        heading: 'Which channels tell you who is posting?',
+        paragraphs: [
+          'This is the question that matters most, because a sublet scam depends on you not knowing who is on the other end. The classic move: someone copies the photos and description from a real listing, swaps in their own contact details, and reposts it. That works anywhere a stranger can post.',
+          'Here is how the channels compare on the things that decide your risk:',
+        ],
+        table: {
+          caption:
+            'Where to find a sublet in Ann Arbor, compared by who can post and how you can check them',
+          columns: [
+            'Channel',
+            'Who can post',
+            'Can you tell who is posting?',
+            'Where you talk',
+            'What to watch for',
+            'Best fit',
+          ],
+          rows: [
+            [
+              'U-M off campus housing site, sublease section',
+              'People with a U-M login',
+              'The poster signed in with a U-M account',
+              'Whatever contact the poster shares',
+              'A real student can still misdescribe a place, so vet the unit and the lease',
+              'Any term, if you have a U-M login',
+            ],
+            [
+              'Facebook groups and Marketplace',
+              'Anyone the group admins let in, or anyone with a Facebook account',
+              'A profile name only, which is not proof of a student',
+              'Messenger, outside any housing platform',
+              'Copied listings and pressure to pay a deposit before a viewing',
+              'A wide summer search, with extra vetting',
+            ],
+            [
+              'Craigslist sublets',
+              'Anyone',
+              'Not from the post itself',
+              'The Craigslist mail relay, then email or phone',
+              "Requests to wire money, pay with gift cards or deposit a cashier's check, which Craigslist itself calls scams",
+              'A last resort, and only if you can see the place in person',
+            ],
+            [
+              'Word of mouth and program lists',
+              'Classmates, friends, your department or program',
+              'Yes, you know them or someone who does',
+              'Text, email or in person',
+              'Handshake deals with nothing in writing',
+              'Fall only or winter stays, when fewer places get posted publicly',
+            ],
+            [
+              'Wroomly',
+              'Anyone can browse, inquire and list',
+              'A blue check shows a person who signed in with a umich Google account, and nothing more',
+              'Wroomly messages, which keep a record',
+              'A verified student can still be dishonest, and Wroomly never handles payments',
+              'Any term: filter by your dates',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'Does knowing who posted make a listing safe?',
+        paragraphs: [
+          "No. A channel that ties the poster to a real account narrows the risk; it does not remove it. Wroomly's own safety page says it plainly: a verified student can still be dishonest. New Wroomly listings are screened before they go live, but screening reads the words and photos, so it cannot prove the place exists. Whatever channel you use, run the same checks.",
+        ],
+      },
+      {
+        heading: 'Which channel fits a summer, fall or winter sublet?',
+        paragraphs: [
+          'Summer is the easy one. Lots of students leave Ann Arbor from May through August for internships, co-ops and home, so every channel fills up in spring. Cast the widest net: set a saved search on a marketplace, watch the Facebook groups, and check the university site.',
+          'Fall only places are scarcer, because fewer people leave for just September to December. The ones who do are usually heading out for a fall study abroad term, a co-op or an internship. Word of mouth and program lists matter more here, and a saved search catches the rare post the day it appears.',
+          'Winter sublets come from students leaving for a winter term abroad, a co-op, or graduating in December, and they tend to post during the fall semester. Some programs run their own winter sublet lists, so ask your department or program office before you go public.',
+        ],
+        bullets: [
+          'Summer: every channel, starting in spring, with a saved search running',
+          'Fall only: word of mouth, program lists, and a saved search for September to December dates',
+          'Winter: program lists first, then student posts during the fall semester',
+        ],
+      },
+      {
+        heading: 'How do you vet a listing whatever channel it came from?',
+        paragraphs: [
+          'Same routine, every channel. You are confirming three things: the place exists, the person is allowed to sublet it, and the price is real.',
+        ],
+        bullets: [
+          'See the place in person, or on a live video call where they walk you through it and open the doors you ask about',
+          "Search the address together with the poster's name and the management company; an owner name that does not match is a warning sign",
+          'Reverse image search the photos to catch a copied listing',
+          'Reach the landlord or leasing office through contact details you find yourself, not ones the poster gives you, and ask whether the sublet is approved',
+          'Compare the rent with similar places nearby; a price far below everything else is a red flag',
+          'Keep the conversation in writing, ideally somewhere that keeps a record',
+        ],
+      },
+      {
+        heading: 'What has to be true before you send any money?',
+        paragraphs: [
+          'Money is the point of no return, so make it the last step. Never pay by wire transfer, gift card or cryptocurrency: those work like cash, and the money is usually gone for good. Payment apps are not much safer with a stranger, because once the money is sent it is hard to get back. If something already went wrong, stop paying, call your bank, and report it to the site where you found the listing and to the FTC.',
+          'Do not pay anything until all of these are true:',
+        ],
+        bullets: [
+          'You have seen the place, in person or on a live walkthrough',
+          'You know who the person is, and they hold the lease or own the place',
+          'The landlord or leasing office has confirmed the sublet in writing',
+          'You have a written sublease agreement covering dates, rent, deposit, utilities and the condition of the place',
+          'You are paying by a method that leaves a record tied to that person',
+        ],
+      },
+      {
+        heading: 'Where should you start looking today?',
+        paragraphs: [
+          'Start with the channels that tell you who is posting, then widen out. Browse current sublets on Wroomly filtered to your dates, check the university site if you have a U-M login, and ask your program and your friends. Then run every listing you like through the same checks above, whichever channel it came from.',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'What is the best website for UMich sublets?',
+        answer:
+          "There is no single best one; it depends on how much you can verify. The university's off campus housing site requires a U-M login, and on Wroomly a blue check marks a student who signed in with a umich account. Facebook groups and Craigslist have volume but let almost anyone post. Use more than one channel and vet every listing.",
+      },
+      {
+        question: 'Are Facebook groups safe for finding an Ann Arbor sublet?',
+        answer:
+          'They can work, but treat every post as unverified. Anyone the admins let in can post, a profile name is not proof of a student, and scammers copy real listings and repost them with their own contact details. See the place, confirm the sublet with the landlord, and never pay a deposit before a viewing.',
+      },
+      {
+        question: 'Does the university list sublets?',
+        answer:
+          "Yes. The University of Michigan's off campus housing site has a sublease section where students can find or post a sublease, and it asks for a U-M sign in. The Dean of Students office also points students to a sublease contract template on that site. A listing there still needs the same vetting as any other.",
+      },
+      {
+        question: 'Can someone who is not a student find a sublet in Ann Arbor?',
+        answer:
+          "Yes. The university's sublease section needs a U-M login, but Facebook groups, Craigslist and Wroomly are open to anyone. On Wroomly anyone can browse, inquire and list, and the blue check only marks people who verified as UMich students. Each lease sets its own rules on subletting, so read it and ask the landlord.",
+      },
+    ],
+    links: [
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Summer sublet guide', href: '/guides/summer-sublets-in-ann-arbor-student-guide' },
+      { label: 'Verify an Ann Arbor landlord', href: '/guides/how-to-verify-an-ann-arbor-landlord' },
+      { label: 'Browse current sublets', href: '/listings' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
+      { label: 'FTC advice on payment app scams', href: 'https://consumer.ftc.gov/articles/mobile-payment-apps-how-avoid-scam-when-you-use-one' },
+      { label: 'Report a scam to the FTC', href: 'https://reportfraud.ftc.gov/' },
+    ],
+  },
 ]
 
 export function getGuide(slug: string): Guide | undefined {
