@@ -1184,6 +1184,1051 @@ export const GUIDES: Guide[] = [
       { label: 'Report a scam to the FTC', href: 'https://reportfraud.ftc.gov/' },
     ],
   },
+  {
+    slug: 'how-to-pay-for-a-sublet-safely',
+    title: 'How to pay for a sublet without getting burned',
+    seoTitle: 'How to Pay for a Sublet Safely in Ann Arbor',
+    description:
+      'How to pay for a sublet safely: what to confirm before money moves, which payment methods leave a record, and what to do if a payment goes wrong.',
+    excerpt:
+      'Pay last, and pay in a way that leaves a record tied to a real person and a signed sublease. Here is what to confirm first and how each payment method compares.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'Why does the way you pay matter so much on a sublet?',
+        paragraphs: [
+          "Pay for a sublet last, and pay in a way that leaves a record tied to a real person and a signed sublease. The payment method is your last line of defense, not your first. Seeing the place, knowing who holds the lease and getting the landlord's okay in writing protect you more than any app or card does.",
+          'The method still matters, because some of them cannot be undone. The FTC says that wiring money, sending gift cards or paying by cryptocurrency is the same as sending cash, and that you probably cannot get it back. Its advice on payment apps says scammers know that once you send money, it is hard for you to get it back.',
+          "The amounts are not small. Wroomly's live rent data (the Ann Arbor rent prices guide, read 2026-11-03) puts the median asking rent at $1,900 a month across 151 active sublets. If the deposit is one month's rent, a deposit plus first month is $3,800 in one move.",
+          'Wroomly processes no payments, never holds or guarantees money, and cannot recover money sent between users. Whatever channel you found the place on, the payment is between you and the person you pay. That is why the checks come first.',
+        ],
+      },
+      {
+        heading: 'What has to be true before you pay anything?',
+        paragraphs: [
+          'Get all of these done first. If any one is missing, the answer to a request for money is not yet.',
+          'One more rule sits above the list: if anyone pressures you to decide fast, walk away. The FTC gives the same advice for rental listings, and a real sublet survives a day of checking.',
+        ],
+        bullets: [
+          'You have seen the place, in person or on a live video walkthrough where the person opens the rooms and doors you ask about',
+          'You know who the person is and that they hold the lease or own the place. A blue check on Wroomly shows someone signed in with a umich Google account, and nothing more',
+          'The landlord or leasing office has approved the sublet in writing, and you reached them through contact details you found yourself',
+          'You have a written sublease with the dates, the rent, the deposit amount, who holds the deposit and when it comes back',
+          'The name on the payment matches the name on the sublease. A request to pay a friend, a relative or a business partner instead is a stop sign',
+          'The payment method is one you can explain in a sentence, and it is not the only one the person will accept',
+        ],
+      },
+      {
+        heading: 'Which payment methods leave a record and which do not?',
+        paragraphs: [
+          "Two questions sort the methods: can the payment be reversed if it turns out to be fraud, and what proof does it leave of who got your money and why. The table uses the FTC's own pages on what to do if you were scammed. Where those pages say nothing, the table says so rather than guessing.",
+          "Where does Zelle fit? The FTC's payment app advice names Cash App, Venmo and PayPal, and it does not name Zelle. Reversal rules for bank to bank apps depend on your bank, so read your bank's own terms before you rely on a refund. Until your bank tells you otherwise in writing, treat Zelle like any other app.",
+        ],
+        table: {
+          caption: 'Sublet payment methods compared by whether they can be reversed, the record they leave and when they are acceptable',
+          columns: [
+            'Method',
+            'Can it be reversed? (as the FTC describes it)',
+            'The record it leaves',
+            'When it is acceptable',
+          ],
+          rows: [
+            [
+              'Cash',
+              'The FTC describes one rescue: mailed cash that has not yet been delivered may be intercepted by the Postal Inspection Service. Cash handed over in person has no route back',
+              'Only a receipt, and the person writes it',
+              'Rarely. Only in person, after every check above, against a signed receipt',
+            ],
+            [
+              'Wire transfer',
+              'The FTC says to report it to the wire transfer company right away and ask for a refund, but the money might be gone already. It also says wiring money is the same as sending cash',
+              'A bank record of the transfer, to an account you cannot vet',
+              'Not with anyone you have not met and checked',
+            ],
+            [
+              'Gift card or cryptocurrency',
+              'The FTC says crypto payments do not have the same legal protections as credit and debit cards, and a gift card issuer may or may not refund you',
+              'Almost nothing you can use',
+              'Never for a sublet. The FTC lists insisting on crypto as a sign of a scam',
+            ],
+            [
+              'Payment app (Venmo, Cash App, PayPal and similar)',
+              'The FTC says to report it to the app and ask for a reversal and a refund, and it does not promise one',
+              "A transaction history with the payee's name and a note you write",
+              'Only after every check above, to the person named on the sublease, with a note that says what it is for',
+            ],
+            [
+              'Personal check',
+              'The FTC pages do not describe how to reverse a check you wrote',
+              'A paper trail: payee, date, memo line and your bank statement',
+              'After every check above, made out to the name on the sublease, with the purpose in the memo. Never deposit a check someone sends you and send money back',
+            ],
+            [
+              'Debit or credit card',
+              'The FTC says to report it to the card issuer or bank right away and ask for a refund. Its legal protection covers unauthorized use of your card, which is not the same as a payment you were tricked into making',
+              'A statement with the merchant or payee',
+              'Best record of the lot, when the person can take one',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'How should the deposit and first month be documented?',
+        paragraphs: [
+          'Treat the paperwork as part of the payment. The record is what lets you prove what you paid, to whom and for what, and it is what you will lean on when the deposit comes back. Your lease and your sublease decide the terms, so ask the landlord or a lawyer what a clause means rather than guessing.',
+          'The security deposits guide covers move-in photos and getting a deposit returned. Here is the paperwork for the payment itself:',
+        ],
+        bullets: [
+          'Pay the deposit and the first month as two payments, each with its own note naming the sublet address and what the money is for',
+          'Get a written receipt with the date, the amount, who paid, who received it, what it covers, who holds the deposit and when and how it comes back',
+          'Make sure the amounts on the receipt match the signed sublease',
+          'Keep screenshots of the listing, the messages and the payment confirmation in one folder',
+          'Never pay a deposit and then ask for the sublease later',
+        ],
+      },
+      {
+        heading: 'What should you do if money already went to a scammer?',
+        paragraphs: [
+          'Stop paying right away, even if the person has a new reason to ask for more. Then work through the list below, and keep every screenshot and receipt. Recovery is not promised on any method, so move quickly and ask plainly.',
+          "The FTC's steps depend on how you paid. For a card, call the issuer or your bank. For a wire, call the wire transfer company. For a gift card, call the issuer and keep the card and receipt. For crypto, contact the exchange or ATM operator. For a payment app, report it inside the app. For mailed cash, call the Postal Inspection Service at once.",
+        ],
+        bullets: [
+          'Contact the company you paid with, tell them it was fraud and ask them to reverse the payment',
+          'Report the scam to the FTC at ReportFraud on the FTC site',
+          'Report the listing to the website or group where you found it',
+          'Tell your local police and your state attorney general',
+          'Warn the group or friends who might see the same listing',
+        ],
+      },
+      {
+        heading: 'Where should you go from here?',
+        paragraphs: [
+          'Read the Wroomly safety page for what the blue check and listing screening do and do not prove, then browse current sublets and run every one through the checklist above before any money moves.',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is it safe to pay a sublet deposit with Zelle or Venmo?',
+        answer:
+          'Only after you have seen the place, confirmed the person holds the lease and signed a sublease, and only to the name on that sublease. The FTC says money sent through a payment app is hard to get back. With a stranger, or before a viewing, the answer is no.',
+      },
+      {
+        question: 'Can you get money back from Venmo if a sublet was fake?',
+        answer:
+          'Maybe, but nothing guarantees it. The FTC says to report the payment to the app right away, ask for a reversal and a refund, and report the scam to the FTC. Move fast, keep screenshots of the listing and messages, and do not count on the money returning.',
+      },
+      {
+        question: 'Should you ever pay for a sublet in cash?',
+        answer:
+          "Rarely. Cash handed over in person leaves no record unless you insist on a signed receipt, and the FTC describes no route to get it back. If it happens at all, do it in person after you have seen the place, checked the landlord's approval and signed the sublease.",
+      },
+      {
+        question: 'What receipt should you get for a sublet deposit?',
+        answer:
+          'A written receipt showing the date, amount, who paid, who received it, what it covers, who holds the deposit and when and how it comes back. The amounts should match the signed sublease. Keep it with your payment confirmation and move-in photos in one folder.',
+      },
+    ],
+    links: [
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Security deposits for sublets', href: '/guides/security-deposits-ann-arbor-sublets' },
+      { label: 'Verify an Ann Arbor landlord', href: '/guides/how-to-verify-an-ann-arbor-landlord' },
+      { label: 'Where to find a sublet', href: '/guides/where-to-find-a-sublet-umich' },
+      { label: 'Ann Arbor rent prices', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'Wroomly safety page', href: '/safety' },
+      { label: 'Browse current sublets', href: '/listings' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
+      { label: 'FTC steps if you were scammed, by payment method', href: 'https://consumer.ftc.gov/articles/what-do-if-you-were-scammed' },
+      { label: 'FTC advice on payment app scams', href: 'https://consumer.ftc.gov/articles/mobile-payment-apps-how-avoid-scam-when-you-use-one' },
+    ],
+  },
+  {
+    slug: 'find-a-roommate-umich-off-campus',
+    title: 'How to find a roommate at UMich, and check them before you sign together',
+    seoTitle: 'Find a Roommate at the University of Michigan',
+    description:
+      'How to find a roommate at the University of Michigan: where students look, the questions to ask, how to check a stranger, and what to settle before you sign.',
+    excerpt:
+      'Where Ann Arbor students find roommates, the questions that decide whether you can live together, and the order to check, agree and sign in.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'Where do UMich students find roommates?',
+        paragraphs: [
+          'Start with people you already know. Friends from class, your lab or department, student groups and your current housemates are the lowest risk source, because someone can vouch for them. Ask around before you post anywhere.',
+          "After that, strangers come from three places. The university's off campus housing site lets you find a roommate or a sublease through a portal that asks for a U-M sign in. Group chats and social media groups for your class, program or student org are where a lot of student to student matches happen. Roommate boards and listing sites let almost anyone post a profile, so treat a match there as an introduction, not a reference.",
+          'Wroomly is independent and not run by the university. Browse current places on the listings page, where students who signed in with a umich Google account carry a blue check. The check shows a university Google login and nothing more, so it is a place to start a conversation, not a reason to skip the steps below.',
+        ],
+      },
+      {
+        heading: 'What should you ask before you decide?',
+        paragraphs: [
+          'Finding the person is the easy half. The harder half is learning whether you can live together, and a few direct questions settle most of it. Ask them in your first real conversation, before anyone falls in love with a floor plan.',
+          'Choose on how someone lives, not who they are: their schedule, budget, habits and house rules. Nothing else belongs in the decision.',
+          'Here are the questions that decide it, and which answers are deal breakers:',
+        ],
+        table: {
+          caption: 'First conversation questions for a potential roommate, and which answers should end the search',
+          columns: [
+            'Topic',
+            'Ask',
+            'Deal breaker if',
+          ],
+          rows: [
+            [
+              'Schedule',
+              'When do you usually sleep, study and have people over? Do you work early or late?',
+              'Your sleep schedules collide and neither of you can adjust',
+            ],
+            [
+              'Rent ceiling',
+              'What is the most you can pay each month, including utilities?',
+              'Their ceiling is well below the places you can both stand to live in',
+            ],
+            [
+              'Paying on time',
+              'How do you pay your share, and what happens if you are ever late?',
+              'They get vague, or say money is never a problem so there is no need to plan',
+            ],
+            [
+              'Guests',
+              'How often do you have people over, and do overnight guests need a heads up?',
+              'Your answers are far apart and neither wants to compromise',
+            ],
+            [
+              'Cleaning',
+              'What does clean mean to you, and how do you want to handle shared spaces and shared supplies?',
+              'One of you wants a chore plan and the other will not discuss one',
+            ],
+            [
+              'Quiet hours',
+              'When do you need quiet, and how do you feel about noise and parties?',
+              'You need quiet on school nights and they host most nights',
+            ],
+            [
+              'Summer plans',
+              'Will you stay through the summer, sublet, or leave? Are you open to a sublet?',
+              'One of you needs the lease to run all year and the other will be gone',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'How do you check a stranger who is also looking for a roommate?',
+        paragraphs: [
+          'Treat a stranger the way you would treat a stranger offering you a place: friendly, and verified. Scammers copy real listings, swap in their own contact details and rush you to decide, and a fake roommate post uses the same moves.',
+          'Run these checks in order, and stop if any one of them goes wrong:',
+        ],
+        bullets: [
+          'Talk first in writing, then get on a video call before you meet or commit to anything',
+          'Ask for a mutual contact, a friend, a former housemate or someone from your program, and actually message that person',
+          'Meet in a public place or bring a friend the first time you meet in person',
+          'Search their name along with the address of the place and the management company; an owner name that does not match is a warning sign',
+          'Keep your Social Security number, ID photos, bank details and paystubs to yourself; a prospective roommate has no reason to ask for them',
+          'Walk away from pressure to decide today or to send a deposit before you have seen the place',
+        ],
+      },
+      {
+        heading: 'When is it safe to commit to a lease together?',
+        paragraphs: [
+          "Money and signatures come last. The university's off campus guide says to never send money before seeing the property in person, and the FTC warns that wire transfers, gift cards and cryptocurrency work like cash and are usually impossible to recover.",
+          'Here is the order that keeps you safe, from first message to signing:',
+          "Read how the lease is set up before you sign. The university's guide describes an individual lease as one where you rent a bedroom and share common areas, and a joint and several lease as one where each tenant can be held responsible for the full amount, not just their share. What that means for you depends on your lease, so ask the landlord, and a lawyer if you are unsure.",
+        ],
+        bullets: [
+          'First message, then a written back and forth about schedule, budget and habits',
+          'A video call, then a meeting in person',
+          'A walk through the actual place together, with the doors open and the kitchen and bathroom seen',
+          'A written agreement between roommates on quiet hours, guests, cleaning, how rent and bills are split and what happens when someone pays late, plus summer plans',
+          'Confirmation from the landlord or leasing office, through contact details you found yourself, of who is on the lease and how rent is collected',
+          'Read the lease together before anyone signs, then sign and pay through a method that leaves a record',
+        ],
+      },
+      {
+        heading: "What if you find a room in someone else's place instead?",
+        paragraphs: [
+          'Joining a place that already has a lease changes the questions. Find out whose name is on the lease, whether the landlord knows about you and approves of you living there, and whether you would be a subtenant or a tenant on the lease. Leases commonly say something about subletting and extra occupants, so read it, ask the landlord, and get anything that matters in writing.',
+          'The roommate checks above still apply, plus one: confirm that the person offering the room actually holds the lease. Search the address, contact the landlord or leasing office yourself, and never pay a deposit to hold a room you have not seen.',
+        ],
+      },
+      {
+        heading: 'Where should you start today?',
+        paragraphs: [
+          "Message two people you already know, then check the university's off campus housing site if you have a U-M login. Browse current places on Wroomly to get a feel for what exists and what it costs to share, and save a search so new places come to you. When someone looks promising, start with the question list and the video call, and keep money for last.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Where can I find a roommate at the University of Michigan?',
+        answer:
+          "Start with friends, classmates and student groups. Then try the university's off campus housing site, which has a roommate and sublease search behind a U-M sign in, plus class and program group chats. Roommate boards and listings let almost anyone post, so verify strangers by video call and a mutual contact before committing.",
+      },
+      {
+        question: 'Is it safe to live with a roommate you found online?',
+        answer:
+          'It can be, if you check before you commit. Talk in writing, get on a video call, ask for a mutual contact, and meet in public. Do not send money before seeing the place, and never pay by wire, gift card or cryptocurrency. A profile is not proof of who someone is, so verify first.',
+      },
+      {
+        question: 'Should I pick a friend or a stranger as a roommate?',
+        answer:
+          'Either can work, and neither is automatic. A friend knows you but may not share your habits around money, cleaning and guests. A stranger starts from nothing and needs more checking. Judge both the same way: schedule, budget, habits and house rules, and put your agreement in writing.',
+      },
+      {
+        question: 'When should I start looking for roommates for next year?',
+        answer:
+          "Start as soon as you know which term you need, because Ann Arbor's market moves early and many students commit to a lease for the following fall during the autumn before. Wroomly's timeline guide walks through the usual rhythm. If you miss that window, sublets and relets stay active through spring and summer.",
+      },
+    ],
+    links: [
+      { label: 'First apartment checklist', href: '/guides/first-apartment-checklist-ann-arbor' },
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Where to find a sublet', href: '/guides/where-to-find-a-sublet-umich' },
+      { label: 'UMich off campus housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
+      { label: 'Browse current places', href: '/listings' },
+      { label: 'Safety on Wroomly', href: '/safety' },
+      { label: 'U-M Dean of Students guide to living on your own', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/off-campus-living-guide/living-on-your-own/' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
+      { label: 'Report a scam to the FTC', href: 'https://reportfraud.ftc.gov/' },
+    ],
+  },
+  {
+    slug: 'individual-lease-vs-joint-lease-ann-arbor',
+    title: 'Individual lease vs joint lease in Ann Arbor, side by side',
+    seoTitle: 'Individual vs Joint Lease in Ann Arbor',
+    description:
+      'Individual lease vs joint lease in Ann Arbor: what each commonly means for a missed payment, damage, a roommate leaving early and a sublet, and what to ask first.',
+    excerpt:
+      'The lease type decides who is on the hook when a roommate stops paying or leaves. Here is how the two compare in four real situations, and what to confirm before you sign.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'What is the difference between an individual lease and a joint lease?',
+        paragraphs: [
+          'Half the confusion is vocabulary, so sort it first. On an individual lease, each roommate signs for their own bedroom plus a share of the common areas. On a joint lease, everyone signs one lease for the whole unit. Same address, very different answer to the question: whose problem is it when someone stops paying?',
+          "The university's off campus living guide describes an individual lease this way: you rent a bedroom and share common areas, you are usually responsible for your own rent, and you may still be charged for damage to the common areas. Joint leases usually come with joint and several liability, which is the next section.",
+          'Everything here describes what leases commonly say. Yours may say something different, so the lease itself, your landlord, the city or a lawyer has the final word.',
+        ],
+      },
+      {
+        heading: 'What does joint and several liability mean for you?',
+        paragraphs: [
+          "Short version: on a joint and several lease, the landlord can ask any one tenant for the whole amount, not just that person's share. The university's off campus living guide puts it as each tenant being held responsible for the full amount of rent or damages, not only their own portion.",
+          'Say four of you split a house and one roommate stops paying. Under this kind of clause, the landlord is commonly allowed to look to you for the missing share. Whether you can then collect it back from your roommate is a separate matter between the two of you.',
+          'Look for the words joint and several, jointly and severally, or each tenant is liable for all obligations. If you cannot find them, ask the landlord directly and get the answer in writing.',
+        ],
+      },
+      {
+        heading: 'What happens if a roommate stops paying or moves out?',
+        paragraphs: [
+          'Run both lease types through four situations and the pattern shows up fast. An individual lease tends to wall each person off from the others. A joint lease ties the whole group together. Neither is better by default: it depends on how well you know your roommates and how much risk you can carry.',
+          'Every cell below says what the arrangement commonly means, not what your lease says. Use it as a list of things to check.',
+        ],
+        table: {
+          caption: 'Individual lease vs joint lease in four situations, with what each commonly means',
+          columns: [
+            'Situation',
+            'Individual lease',
+            'Joint lease',
+          ],
+          rows: [
+            [
+              'A roommate misses a payment',
+              "Commonly, each tenant owes only their own rent, so a missed payment is that roommate's problem. Confirm that wording in the lease.",
+              'Commonly, the landlord can ask any tenant for the full rent, not just a share. Confirm the joint and several wording in the lease.',
+            ],
+            [
+              'A shared room or common area gets damaged',
+              'Commonly, you owe for damage you cause, and common areas can still be charged to the group. Ask how the lease splits them.',
+              'Commonly, every tenant can be held responsible for the full amount of damage, even if someone else caused it. Check the damage clause.',
+            ],
+            [
+              'A roommate leaves early',
+              'Commonly, your lease is unaffected, and the landlord finds or approves a replacement for that bedroom. Ask who picks the new person.',
+              'Commonly, the lease keeps running and the remaining tenants stay responsible unless the landlord agrees to a change. Ask what the landlord requires.',
+            ],
+            [
+              'A roommate wants to sublet',
+              'Commonly, one bedroom is sublet and the original tenant often stays responsible to the landlord. Check the sublet clause and get written approval.',
+              'Commonly, the other tenants have to agree, and the original tenant often stays responsible to the landlord. Check the sublet clause and get written approval.',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'How does each type work with a sublet?',
+        paragraphs: [
+          "Subletting is where lease type bites hardest. The university's off campus living guide says that in a sublease, the original tenant often remains responsible to the landlord. It also says that if you plan to sublet, you should check your lease for restrictions and make sure everyone in the unit agrees.",
+          "On a joint lease, that agreement matters more, because the person you bring in becomes a housemate for everyone on the lease. On an individual lease, one bedroom changes hands, but the landlord's written approval is still the thing to get. A few leases prohibit subletting outright.",
+          "If you want to hand the whole lease to someone, that is a lease takeover, which works differently from a sublet. The same guide notes that after a completed transfer you generally are not responsible any more, but only the landlord's paperwork makes that true. Our sublet vs relet guide untangles the two words.",
+        ],
+        bullets: [
+          'Sublet: you stay on the lease and usually stay answerable to the landlord',
+          "Lease takeover: the new person replaces you on the lease, with the landlord's sign off",
+          'Either way: get approval in writing before anyone moves in',
+        ],
+      },
+      {
+        heading: 'Which questions should you ask the landlord before you sign?',
+        paragraphs: [
+          'Ask these before you sign, and keep the answers in an email so you have a record. A good landlord or leasing office answers them without fuss.',
+          "If you are still hunting for a place, you can browse current places on Wroomly and ask these questions about any lease you are handed. For anything about your rights, Michigan Legal Help keeps a free housing section that includes tenant's rights and leases, and a lawyer can read your actual lease.",
+        ],
+        bullets: [
+          'Is this an individual lease or a joint lease, and where does the lease say so?',
+          'Does the lease say joint and several, and what does it say if one tenant stops paying?',
+          'If a roommate leaves, who finds the replacement, and does the landlord have to approve them?',
+          'Can I sublet or hand off my lease, and what is the process, fee and deadline?',
+          'Who is charged for damage in shared rooms, and how is it split?',
+          'Is the rent the same on an individual lease and a joint lease for this unit?',
+          'Are all roommates listed on every document, including the deposit receipt?',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is it better to have an individual lease or a joint lease?',
+        answer:
+          'Neither is better by default. An individual lease commonly limits you to your own rent and bedroom, while a joint lease ties all tenants together, often with joint and several liability. Pick based on how well you know your roommates and how much risk you can carry, then confirm what the lease actually says.',
+      },
+      {
+        question: 'What does joint and several mean on an apartment lease?',
+        answer:
+          "It commonly means the landlord can ask any one tenant for the full rent or damages, not just that tenant's share. The university's off campus living guide describes it this way. Look for the wording in your lease, and ask the landlord or a lawyer if it is unclear.",
+      },
+      {
+        question: 'Can I leave a joint lease if my roommate stays?',
+        answer:
+          'That depends on your lease and your landlord. Commonly, you stay responsible until the landlord agrees to a change, a sublet usually leaves you answerable, and a takeover needs written approval. Ask the landlord what the lease allows, and see Michigan Legal Help or a lawyer for your rights.',
+      },
+      {
+        question: 'Can a landlord charge more for individual leases?',
+        answer:
+          'Landlords set their own pricing, and the lease or the leasing office is the only source for it. Ask for the monthly rent under both lease types for the same unit, in writing, and compare. We do not quote a difference here because it varies by building.',
+      },
+    ],
+    links: [
+      { label: 'Sublet vs relet vs lease takeover', href: '/guides/sublet-vs-relet-lease-takeover' },
+      { label: 'First apartment checklist', href: '/guides/first-apartment-checklist-ann-arbor' },
+      { label: 'How to sublet your apartment', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
+      { label: 'Browse current places', href: '/listings' },
+      { label: 'Off campus living guide: living on your own', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/off-campus-living-guide/living-on-your-own/' },
+      { label: 'Michigan Legal Help: housing', href: 'https://michiganlegalhelp.org/self-help-tools/housing' },
+    ],
+  },
+  {
+    slug: 'roommate-agreement-checklist-off-campus',
+    title: 'A roommate agreement checklist for an off campus house or apartment',
+    seoTitle: 'Roommate Agreement for Off Campus Housing',
+    description:
+      'A printable roommate agreement checklist for off campus housing in Ann Arbor: rent and utilities, house rules, and what to settle about leaving early or subletting.',
+    excerpt:
+      'Fill in the blanks together: the money, the house rules and the exit plan every off campus household needs, kept next to your lease.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 5,
+    sections: [
+      {
+        heading: 'Why does an off campus household need a roommate agreement?',
+        paragraphs: [
+          "Because you share a lease and a bank balance, not just a room. In a dorm the worst case is a noisy hallway. In an off campus house or apartment, one late share of the rent or one roommate who leaves in March becomes everyone's problem. A roommate agreement is the set of house rules you write for yourselves, and it sits next to the lease. It does not replace the lease, and your landlord is not part of it.",
+          "Even when everyone is on the lease, the lease rarely says who buys the trash bags, whose name is on the internet account, or what happens to a bedroom in July. The University of Michigan's Dean of Students tells students living off campus to sit down with their roommates before signing and agree on quiet hours, cleaning and how to split costs. That page also tells you to decide early how payments will be made and to keep records. The checklist below turns that advice into blanks you can fill in together.",
+          'Print this, grab a pen, and fill one blank per line. Write down the answer everyone can live with, not the one the loudest person wants.',
+        ],
+      },
+      {
+        heading: 'Which money items belong in it?',
+        paragraphs: [
+          'Money first, because money is where friendships bend. Your lease sets what the household owes the landlord. Read it before you fill anything in, because many leases make each tenant responsible for the full rent, not just a share, and your landlord can tell you how yours works. The agreement covers what happens between the roommates.',
+          'Fill in each blank:',
+        ],
+        bullets: [
+          'Monthly rent share for each person: ______',
+          'Who collects the shares and pays the landlord, and by what day of the month: ______',
+          'How shares get paid to that person (bank transfer, payment app, check): ______',
+          'What happens if a share is late, and how many days before the others speak up: ______',
+          'Whose name is on each utility account (electric, gas, water, internet): ______',
+          'How each utility bill gets split, and the day everyone else pays the account holder: ______',
+          'How you handle a winter heating bill that runs high: ______',
+          'Who buys shared supplies like soap and trash bags, and how you settle up: ______',
+          'How the security deposit was paid and how any deduction for damage gets shared: ______',
+        ],
+      },
+      {
+        heading: 'Which house rules prevent the most arguments?',
+        paragraphs: [
+          'Small daily stuff causes more fights than big money stuff, mostly because nobody said it out loud. Pick numbers and times, not vibes. Clean enough is a fight waiting to happen. Dishes washed within a day is a rule.',
+          'Fill in each blank:',
+        ],
+        bullets: [
+          'Cleaning: who does the kitchen, bathrooms, living room and trash, and how often: ______',
+          'Quiet hours on weeknights and weekends, including exam weeks: ______',
+          'Guests: how much notice for overnight guests, and how many nights in a row is too many: ______',
+          'Shared items: what is fair game and what is off limits (food, kitchen gear, speakers, the TV): ______',
+          'Parking, bikes and storage: who gets which space: ______',
+          'Smoking, vaping, pets and alcohol in the common areas: ______',
+          'Winter chores such as shoveling the walk, if the lease leaves it to the tenants: ______',
+          'How you raise a problem (a house meeting, a group chat, a monthly check in): ______',
+        ],
+      },
+      {
+        heading: 'What should it say about leaving early or subletting?',
+        paragraphs: [
+          'This is the section a dorm era checklist skips, and it is the one that matters most off campus. Someone will get an internship, go abroad for a semester or graduate in December. Decide how that works while nobody is leaving.',
+          'Start with the lease. Many Ann Arbor leases allow subletting only with written landlord approval, and some prohibit it. The Dean of Students page says to check your lease for restrictions and make sure everyone in the unit agrees, and that the original tenant often remains responsible to the landlord. Your landlord can tell you how your lease handles all of this. For a lease dispute or a question about what you are owed, the Housing section of Michigan Legal Help is a place to start looking for free legal information, and a lawyer can answer what a general guide cannot.',
+          'Fill in each blank:',
+        ],
+        bullets: [
+          'How much notice a roommate gives before moving out: ______',
+          "Who covers that person's share until someone takes the room: ______",
+          'Who finds a replacement, and how the others get a say before anyone signs: ______',
+          'Whether a roommate may sublet their bedroom in summer, and who must approve in writing: ______',
+          'Who talks to the landlord about any change to the lease or the people on it: ______',
+          'How a leaving roommate hands back keys, clears out and settles bills: ______',
+          'How summer is handled if some roommates stay and some go: ______',
+        ],
+      },
+      {
+        heading: 'How do you keep it from gathering dust?',
+        paragraphs: [
+          'Write it before anyone moves in, or in the first week at the latest. Money topics go easiest while everyone still likes each other and nobody has missed a payment. If you already live together, do it this weekend. A late agreement beats none.',
+          'Keep it short enough to read in five minutes, have every roommate sign or reply yes in the group chat, and store a copy next to the lease. Put a date on your calendar to review it, once in September and again around winter break. When someone new joins through a sublet, hand them the page first. Browse current places on Wroomly and bring this checklist to the first conversation. Wroomly is independent of the university, and a blue check on a profile shows only a umich Google sign in.',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Do I need a roommate agreement if we are all on the lease?',
+        answer:
+          'Yes, it is still worth writing. The lease covers what the household owes the landlord. It rarely says who pays which utility, how cleaning works, or what happens when one person leaves in March. A short agreement fills those gaps. Keep it next to the lease, and read the lease first.',
+      },
+      {
+        question: 'What should a roommate agreement say about utilities?',
+        answer:
+          'Settle four things: whose name is on each account, how each bill gets split, who pays the company, and the day everyone else pays that person. Add what happens when a bill runs late or the winter heating bill jumps. Your lease should say who is responsible for utilities, so check it first.',
+      },
+      {
+        question: 'Is a roommate agreement legally binding?',
+        answer:
+          'It is house rules the roommates write for themselves, and it sits next to the lease rather than replacing it. Your landlord is not part of it. Whether anyone could enforce one is a question for a lawyer, and the lease still governs what you owe the landlord. Treat it as a way to avoid fights.',
+      },
+      {
+        question: 'When should roommates write the agreement?',
+        answer:
+          'Before anyone moves in, or in the first week at the latest. Money topics are easiest to settle while everyone still gets along and nobody has missed a payment. If you already live together, do it this weekend and add a review date for the fall and for winter break.',
+      },
+    ],
+    links: [
+      { label: 'Your first Ann Arbor apartment checklist', href: '/guides/first-apartment-checklist-ann-arbor' },
+      { label: 'Security deposits for sublets', href: '/guides/security-deposits-ann-arbor-sublets' },
+      { label: 'Where to find a sublet', href: '/guides/where-to-find-a-sublet-umich' },
+      { label: 'Browse current places', href: '/listings' },
+      { label: 'UMich Dean of Students off campus living guide', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/off-campus-living-guide/living-on-your-own/' },
+      { label: 'Michigan Legal Help housing information', href: 'https://michiganlegalhelp.org/self-help-tools/housing' },
+    ],
+  },
+  {
+    slug: 'split-rent-with-roommates-different-bedrooms',
+    title: 'How to split rent when the bedrooms are different sizes',
+    seoTitle: 'Split Rent With Different Size Bedrooms | Wroomly',
+    description:
+      'Split rent with roommates when bedrooms differ: a shared share for common space, a share by bedroom size, a worked three bedroom example, and a one line fairness test.',
+    excerpt:
+      'An equal split rarely feels fair when one bedroom is huge and another is a closet. Split the rent in two layers, check it, and write it down.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'Why is an equal split not always fair?',
+        paragraphs: [
+          'An equal split is the easiest math and the easiest argument. Three people, one rent, divide by three. It works when the bedrooms are close to the same. It stops working the day one roommate has the big room with the window seat and another has a room that barely fits a desk.',
+          'The fix is not to haggle over every square foot. Split the rent in two layers: one share for the parts of the home everyone uses equally, and one share for the bedrooms, priced by size and features. Then test the result and write it down. The rest of this guide walks through that, with numbers you can swap for your own.',
+          'One scope note: this is about dividing the money among roommates. What your lease says about who owes the landlord is a separate question, covered near the end.',
+        ],
+      },
+      {
+        heading: 'How do you split by bedroom size?',
+        paragraphs: [
+          'Start with the total monthly rent on the lease, then work in four steps. Do them on paper or in a shared note before anyone signs.',
+          'Pick the split between the two layers first. Half and half is a good starting point: half of the rent covers the kitchen, living room, hallways and any shared bathroom, which everyone uses the same, and half is the bedroom pool. If your common space is a tiny galley kitchen and a closet of a living room, move more weight to the bedrooms. If the common space is the best part of the place, move more weight to it. Agree on the number out loud.',
+        ],
+        bullets: [
+          'Step 1: Write the total monthly rent, and the share you give to common space (for example 50 percent).',
+          'Step 2: Divide the common space share equally by the number of roommates. Everyone pays this part.',
+          'Step 3: Measure each bedroom, length times width, in the same way for every room. Add the bedroom sizes together, then divide each room by the total to get its percentage of the bedroom pool.',
+          "Step 4: Multiply the bedroom pool by each percentage, then add the equal common space share. That is each person's monthly rent.",
+        ],
+      },
+      {
+        heading: 'What does the math look like for a three bedroom?',
+        paragraphs: [
+          "Here is a worked example. A three bedroom in Ann Arbor has a median asking rent of $3,000 a month across 24 active listings, per Wroomly's live rent prices guide (https://wroomly.app/guides/ann-arbor-rent-prices), computed 2026-11-03. That is a market median, not your rent, so use it only to follow the math and swap in the number from your own lease.",
+          'The bedroom sizes below (150, 120 and 110 square feet) are made up for the example. They are blanks for you to fill in with your own measurements. The split is half common space, half bedrooms: $1,500 shared three ways is $500 each, and the other $1,500 is divided by bedroom size.',
+          "Fill in the same columns with your own numbers: bedroom size, that room's share of the bedroom total, its piece of the bedroom pool, the equal common space share, and the monthly total.",
+        ],
+        table: {
+          caption: 'Worked example: $3,000 three bedroom rent, half common space and half bedroom size (bedroom sizes are made up, fill in your own)',
+          columns: [
+            'Roommate',
+            'Bedroom size (sq ft)',
+            'Share of bedroom total',
+            'Bedroom pool share',
+            'Common space share',
+            'Monthly rent',
+            'Share of total rent',
+          ],
+          rows: [
+            [
+              'Roommate A (example)',
+              '150',
+              '39.5%',
+              '$592',
+              '$500',
+              '$1,092',
+              '36.4%',
+            ],
+            [
+              'Roommate B (example)',
+              '120',
+              '31.6%',
+              '$474',
+              '$500',
+              '$974',
+              '32.5%',
+            ],
+            [
+              'Roommate C (example)',
+              '110',
+              '28.9%',
+              '$434',
+              '$500',
+              '$934',
+              '31.1%',
+            ],
+            [
+              'Total (example)',
+              '380',
+              '100%',
+              '$1,500',
+              '$1,500',
+              '$3,000',
+              '100%',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'What about a private bathroom, a bigger closet or a parking spot?',
+        paragraphs: [
+          'Square footage does not capture everything. A room with its own bathroom, a walk in closet, a balcony door or a spot in the driveway is worth more than the same size room without them. A room with no window, or one you walk through to get to another room, is worth less.',
+          'Handle these as a flat dollar adjustment you agree on, not a new formula. Add or subtract it after the bedroom math, then spread the opposite amount across the other roommates so the total still matches the rent. A parking spot is the simplest case: if only one person uses it, that person pays for it.',
+          'Pick adjustments you could explain to a stranger by looking at the room. Features of the room and the lease, never anything about the person who takes it.',
+        ],
+      },
+      {
+        heading: 'How do you test that the split feels fair?',
+        paragraphs: [
+          'Numbers can be correct and still feel wrong. Run one test before you lock it in:',
+          'Would you swap bedrooms with either roommate at the price they would pay for it? If everyone says no, the split holds. If someone says yes, that room is priced too low or yours is priced too high, so move a few dollars and ask again.',
+          'Decide who picks rooms before you see the prices: lowest price first, a draw, or the order people joined the lease. Rooms get assigned by that agreed rule, so nobody has to defend why one person got the big one.',
+        ],
+      },
+      {
+        heading: 'How do you write it down and handle utilities?',
+        paragraphs: [
+          "Write the split down the day you agree, with the date and everyone's initials or a reply of agreed in a shared chat. A one page note is enough: the total rent, the percentage or dollar amount for each person, the adjustments, who pays the landlord, and what happens if someone is late.",
+          "The university's off campus living guide, which is published by the university and separate from Wroomly, suggests deciding early how costs will be split and how and when payments are made. It also suggests keeping records of who pays what, especially when an account is in one person's name. Do both.",
+          'For utilities, the simple default is an equal split, because the kitchen, the lights and the heat in the common rooms serve everyone. If one person works from home all day or runs a space heater, talk about it before the first bill, not after. Whoever holds the account fronts the money, and everyone else pays them back by a set day each month.',
+        ],
+      },
+      {
+        heading: 'What if a roommate moves out mid lease?',
+        paragraphs: [
+          "Nothing in your split changes what the landlord can ask for. Some Ann Arbor leases are joint and several, which commonly means each tenant can be held responsible for the full rent and not just their share. The university's off campus guide describes this, and Michigan Legal Help says that when roommates are all on a lease, a private agreement to split the rent does not limit what the landlord can demand from each of them.",
+          "So treat your split as a deal among friends that the lease sits on top of. Before you sign, ask the landlord how a roommate can leave or be replaced, and what approval and paperwork that takes. If a roommate stops paying, read your lease first, then talk to your landlord, the university's Student Legal Services if you are a student there, or a lawyer. This guide cannot tell you what your lease means or what you are owed.",
+          'In your written split, add one line for this case: how much notice a leaving roommate gives, who finds the replacement, and who covers the share in the gap.',
+        ],
+      },
+      {
+        heading: 'Where do you go from here?',
+        paragraphs: [
+          'Measure the rooms this week, run the four steps, and send the table to your roommates before anyone puts a name on a lease. If you are still comparing places, you can compare current shared places on Wroomly and run the same math on any three bedroom you like.',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'How do you split rent fairly with different size bedrooms?',
+        answer:
+          "Split it in two layers. Half the rent covers shared space and is divided equally, and the other half is divided by each bedroom's share of the total bedroom square footage. Add the two amounts for each person, adjust for features like a private bathroom, and write the result down before anyone signs.",
+      },
+      {
+        question: 'Should the roommate with the bigger room pay more?',
+        answer:
+          'Usually yes, because a bigger room is worth more to the person who has it. A common way to do it is to price bedrooms by their share of the total bedroom square footage, and split the shared space equally. Agree on room features like a bathroom or closet up front.',
+      },
+      {
+        question: 'Should utilities be split evenly?',
+        answer:
+          'Evenly is the simple default, because everyone uses the kitchen, lights and heat in the shared rooms. If one person uses far more, such as working from home all day, talk about it before the first bill. Whoever holds the account fronts the money, and everyone pays them back by a set day.',
+      },
+      {
+        question: 'What if a roommate moves out mid lease?',
+        answer:
+          'Your split among roommates does not change what the landlord can ask. Some leases make each tenant responsible for the full rent, so read yours, ask the landlord in writing how a roommate can leave or be replaced, and get advice from the landlord, a campus legal service or a lawyer. Add the process to your written split.',
+      },
+    ],
+    links: [
+      { label: 'Ann Arbor rent prices (live)', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'How to price your sublet', href: '/guides/how-to-price-your-sublet' },
+      { label: 'Roommate agreement checklist', href: '/guides/roommate-agreement-checklist-off-campus' },
+      { label: 'Compare current shared places', href: '/listings' },
+      { label: 'Off campus living guide: living on your own', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/off-campus-living-guide/living-on-your-own/' },
+      { label: 'Michigan Legal Help: problems with a roommate', href: 'https://michiganlegalhelp.org/node/14993' },
+    ],
+  },
+  {
+    slug: 'sublet-apartment-while-studying-abroad',
+    title: 'How to sublet your Ann Arbor apartment while you study abroad',
+    seoTitle: 'Sublet Your Apartment While Studying Abroad',
+    description:
+      'How to sublet your apartment while studying abroad: a countdown from three months before you leave to the return handover, with who holds each task.',
+    excerpt:
+      'A semester abroad is a fixed gap with a known return date. Here is the checklist for subletting your Ann Arbor place, from the lease check to the key handover.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 7,
+    sections: [
+      {
+        heading: 'Can you sublet your place while you are abroad?',
+        paragraphs: [
+          'Usually, yes, if your landlord and your roommates agree. A semester abroad is the easiest sublet to plan, because you know the day you leave and the day you come back. It is also the easiest to leave half done, because you will be on another continent when something goes wrong.',
+          "Most Ann Arbor leases allow subletting but require written landlord approval, and some charge a small re-let fee. A few prohibit it outright. If yours does, ask the landlord whether they will make an exception for a semester abroad, and get the answer in writing. The university's Dean of Students office gives the same advice for any sublease: make sure your landlord and roommates agree in writing.",
+          'Work backwards from your departure date. The checklist below puts the whole job on a calendar and shows who holds each task.',
+        ],
+      },
+      {
+        heading: 'What do you need to check before you list it?',
+        paragraphs: [
+          'Start three months before you leave. Winter semester sublets post mostly in November and early December, so a student heading out in January is already on the clock by fall.',
+          'Here is the countdown, with the person who holds each task:',
+        ],
+        table: {
+          caption: 'Countdown from three months before departure to the return handover, with who holds each task',
+          columns: [
+            'When',
+            'Task',
+            'Who holds it',
+          ],
+          rows: [
+            [
+              'Three months out',
+              'Read your lease for the subletting clause, re-let fee and notice terms',
+              'You',
+            ],
+            [
+              'Three months out',
+              'Ask your roommates if they are fine with a stranger in your room, and tell them your dates',
+              'You and roommates',
+            ],
+            [
+              'Three months out',
+              'Ask the landlord for their sublet process and form, and keep the reply',
+              'You and landlord',
+            ],
+            [
+              'Two months out',
+              'Write the listing with exact dates, rent, utilities and what stays in the room',
+              'You',
+            ],
+            [
+              'Two months out',
+              'Meet or video call every serious applicant, with a roommate on the call if you can',
+              'You and roommates',
+            ],
+            [
+              'One month out',
+              'Sign a written sublease, send a copy to the landlord, and agree how rent and deposit move',
+              'You and subletter',
+            ],
+            [
+              'One month out',
+              'Photograph the room and common areas, and agree on a list of what is left',
+              'You and subletter',
+            ],
+            [
+              'Two weeks out',
+              'Hand over keys and codes, and write down who to call for what',
+              'You, subletter and landlord',
+            ],
+            [
+              'While you are away',
+              'Answer messages, forward anything the landlord sends, and check that rent arrived',
+              'You',
+            ],
+            [
+              'While you are away',
+              'Report repairs to the landlord and keep the shared spaces in order',
+              'Subletter and roommates',
+            ],
+            [
+              'Two weeks before you return',
+              'Confirm the move-out date, the key return and a walkthrough',
+              'You and subletter',
+            ],
+            [
+              'Return day',
+              'Walk the room together against the photos, collect keys and settle the deposit',
+              'You and subletter',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'What should the lease and the sublease say?',
+        paragraphs: [
+          'Your lease is the document to read, not a summary of one. Leases commonly say whether subletting is allowed, whether the landlord must approve it in writing, and whether you stay on the hook for rent and damage while someone else lives there. Plenty of leases say you do, and the person on the lease is the one the landlord calls. If a clause is unclear, ask your landlord, or ask the city or a lawyer if the stakes are high. This guide describes what leases commonly say. It is not legal advice.',
+          "Put the money terms in writing too. The Dean of Students office says to put exactly how rent and utilities will be split in writing and to use the official sublease contract template on the university's off campus housing site.",
+        ],
+      },
+      {
+        heading: 'Who handles problems while you are away?',
+        paragraphs: [
+          'Decide this before you board the plane, because a leaking sink does not wait for your time zone. Four people each have a job:',
+        ],
+        bullets: [
+          'You: stay reachable. Pick a messaging app, tell your subletter when you are awake, and check it daily.',
+          'Roommates: they live there, so they see problems first. Ask them to tell the subletter and the landlord, and to message you if something is serious.',
+          'The landlord: repairs and notices go through them. Give your subletter the leasing office contact and ask the landlord to copy you on anything about the unit.',
+          'The subletter: pays on time, reports damage fast and follows the house rules your roommates already have.',
+        ],
+      },
+      {
+        heading: 'How should money move?',
+        paragraphs: [
+          'Write the plan down in one message that all four of you can see. If rent stops or a repair is ignored, that message is the first thing you will want. Money is where the plan breaks most often. Pick one payment method that leaves a record, agree on the due date, and set a reminder for that date.',
+          'Never take payment by wire transfer, gift card or cryptocurrency: the FTC says these work like cash and are usually very hard to get back. Payment apps are not much safer with someone you have not met, and the FTC explains how to act fast if something goes wrong.',
+        ],
+      },
+      {
+        heading: 'Should you sublet to someone you have not met?',
+        paragraphs: [
+          'Not yet. Meet the person, in person if they are in town and on a live video call if they are not. Ask for a reference you can actually call, and see if your roommates would be fine living with them. The same screening that works on a stranger works on a friend of a friend, so do it for both.',
+          "The university's Dean of Students office puts one rule bluntly: never send money before seeing the property in person. It is written for renters, and the flip side is just as true. Do not hand over keys to a person you have not met, and do not accept a deposit from someone who cannot show who they are.",
+          "If a stranger offers to pay the full semester up front by a cashier's check or a wire, stop. The FTC lists wire transfers, gift cards and cryptocurrency as major scam signals. On Wroomly, students who sign in with their umich Google account carry a blue check. That tells you a university Google login was used, and nothing more, so you still meet them and still put it in writing.",
+        ],
+      },
+      {
+        heading: 'What should you leave, lock up or take with you?',
+        paragraphs: [
+          'Decide what stays before you list, and put it in the listing. A furnished room rents faster, but anything you leave is something you are trusting a stranger with.',
+        ],
+        bullets: [
+          'Take with you: passport and documents, anything you would be upset to lose, and anything with sentimental value.',
+          "Lock up or store: valuables, a bike, and anything too bulky to carry. A locked closet, a roommate's offer to hold something, or a storage unit all work, as long as the subletter knows what is off limits.",
+          'Leave in the room: the bed, desk and basic furniture, and kitchen items you are fine sharing.',
+          'Photograph first: take timestamped photos of every wall, appliance and piece of furniture before the subletter arrives.',
+        ],
+      },
+      {
+        heading: 'What about the deposit and the shared stuff?',
+        paragraphs: [
+          'Check your renters insurance policy for what it covers when someone else lives in your room. Some policies treat a subletter differently, so ask your insurer, and ask whether the subletter should have their own policy.',
+          'Write a short list of the shared stuff: wifi password, trash and recycling days, how the heat works and who pays for what. It saves ten messages a week. Winter is the hard part, so tell the subletter whose job it is to clear the sidewalk and where to park overnight.',
+          'The security deposit is the piece people forget until the end. Your landlord holds the deposit on the lease, and that usually does not change because you sublet. Decide with your subletter whether they pay you a separate deposit, how big it is, and what it covers, and write it into the sublease. The photos you took before they arrived are what settle the question on return day.',
+        ],
+      },
+      {
+        heading: 'How do you hand the place back when you return?',
+        paragraphs: [
+          'Plan the handover as carefully as you planned the start. Two weeks before you land, confirm the move-out date with your subletter, and agree on where the keys go and when. If your flight is delayed, a roommate can take them.',
+          'On return day, walk the room together with the photos you took before you left. Check the walls, floors, appliances and furniture, note anything new, and settle the deposit while you are both standing there. Then tell the landlord the sublet is over and send them a short note so the record is clean.',
+          'If the subletter wants to stay on, that is a new conversation with the landlord, not a favor you can grant. Do not agree to extend until the landlord has said yes in writing.',
+        ],
+      },
+      {
+        heading: 'Where should you start today?',
+        paragraphs: [
+          "Open your lease, find the subletting clause, and email your landlord asking for their sublet process. Then message your roommates your dates. Once you have those two answers, list your place free or browse who else is looking right now, and use the table above to keep every task in someone's hands. Wroomly is independent and not affiliated with the University of Michigan.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Can I sublet my apartment while studying abroad?',
+        answer:
+          'Usually, if your lease and your landlord allow it. Most Ann Arbor leases allow subletting with written landlord approval, some charge a small re-let fee, and a few prohibit it outright. Read your lease, ask your landlord for their sublet process, and tell your roommates your dates before you list.',
+      },
+      {
+        question: 'Do I stay responsible for the lease while I am away?',
+        answer:
+          'Commonly, yes. Many leases keep the original tenant on the hook for rent and damage even when a subletter lives there, so the landlord still looks to you. Check what your lease says, ask your landlord to confirm in writing, and ask a lawyer if the stakes are high.',
+      },
+      {
+        question: 'Who should I leave in charge of my sublet while I am abroad?',
+        answer:
+          'Nobody takes charge alone. You stay reachable, roommates spot problems first, the landlord handles repairs and notices, and the subletter pays on time and reports damage promptly. Write the plan in one message all four can see, with the leasing office contact and your time zone in it.',
+      },
+      {
+        question: 'Should I sublet to someone I have not met?',
+        answer:
+          'Not before you meet them, in person or on a live video call. Ask for a reference you can call, check that your roommates are fine with them, and never take payment by wire, gift card or cryptocurrency. Put the dates, rent and deposit in a written sublease first.',
+      },
+    ],
+    links: [
+      { label: 'Winter semester sublets', href: '/guides/winter-semester-sublets-ann-arbor' },
+      { label: 'How to sublet at U-M', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Security deposits on sublets', href: '/guides/security-deposits-ann-arbor-sublets' },
+      { label: 'List your place free', href: '/list-place' },
+      { label: 'Browse current sublets', href: '/listings' },
+      { label: 'Dean of Students on finding housing and subleases', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/finding-housing-roommates/' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
+      { label: 'FTC advice on payment app scams', href: 'https://consumer.ftc.gov/articles/mobile-payment-apps-how-avoid-scam-when-you-use-one' },
+    ],
+  },
+  {
+    slug: 'do-you-need-a-car-umich-off-campus',
+    title: 'Do you need a car if you live off campus at UMich?',
+    seoTitle: 'Do You Need a Car Living Off Campus at UMich?',
+    description:
+      'Do you need a car living off campus at UMich? Five yes or no questions about your week land on no car, car share or own a car, plus what to ask about parking.',
+    excerpt:
+      'A UMich week runs on buses, feet and bikes more often than you would guess. Answer five questions about your own week to land on no car, an occasional car share, or owning one.',
+    published: '2026-11-03',
+    updated: '2026-11-03',
+    readingMinutes: 7,
+    sections: [
+      {
+        heading: 'Can you get through a UMich week without a car?',
+        paragraphs: [
+          'Often, yes. Whether you can depends on your week, not on the neighborhood name. Campus runs its own bus system, and a student with an active U-M yellow MCard rides TheRide city buses free through the MRide program. Between feet, a bike and buses, a lot of students never park anywhere.',
+          'A car earns its keep in a few places: groceries in bulk, a job or placement off the bus lines, and trips out of town. Sort your own week into those buckets before you decide, because the answer for a North Campus engineering student with a lab kit is not the answer for an LSA student a few blocks from the Diag.',
+          "Wroomly is independent and not run by the university, so use the university's transit pages for current routes and rules. The links at the bottom of this guide point to them.",
+        ],
+      },
+      {
+        heading: 'Which parts of the week are hardest without one?',
+        paragraphs: [
+          'Three things come up again and again: groceries, anything that runs on a schedule the buses do not, and leaving town.',
+          "Groceries are the big one. Students without cars shop at stores on city bus lines. A U-M student life guide to grocery shopping without a car lists Aldi off Route 31 from the Blake Transit Center, Trader Joe's off Routes 4 and 104 along Washtenaw Avenue, and Kroger in the North Campus area. The catch is carrying it all back: a full cart does not fit in one bus ride and one backpack, so plan smaller, more frequent trips.",
+          'Schedules matter next. Campus routes run on their own calendar. Bursley-Baits, the Diag-to-Diag Express, the Northwood Express and the Oxford Shuttle run only in the fall and winter terms, the two express routes run on class days only, and Northwood has weekend gaps in spring and summer. If your job, practice or placement starts early or ends late, look at the bus map for those exact hours before you count on it.',
+          'Leaving town is the third. Detroit Metro Airport sits outside Ann Arbor, so a flight home or a weekend away usually means a ride, a shuttle, a rental or a friend. TheRide lists an airport service page on its site; check it for what is running now.',
+        ],
+      },
+      {
+        heading: 'Five questions that decide it',
+        paragraphs: [
+          'Answer yes or no to each, about the semester you are actually signing a lease for. Count the yeses.',
+          'This is a rule of thumb for your own planning, not a rule about any area or any kind of person.',
+        ],
+        bullets: [
+          'Do you have a regular commitment that the buses do not reach or do not serve at that hour, such as an off campus job, a clinical or field placement, or an early or late shift?',
+          'Do you need to haul gear every week, such as an instrument, lab or studio equipment, or sports kit?',
+          'Would a weekly grocery trip by bus, carrying it all back, be a dealbreaker for you?',
+          'Do you leave Ann Arbor by road more than about once a month?',
+          'Does your front door sit well beyond a comfortable walk or bike ride from both a bus stop and a grocery store?',
+        ],
+        table: {
+          caption: 'What your count of yes answers points to, and what to ask the landlord for each outcome',
+          columns: [
+            'Yes answers',
+            'Where you land',
+            'What it looks like',
+            'Lease and parking question to ask',
+          ],
+          rows: [
+            [
+              '0',
+              'No car',
+              'Walk, bike and ride buses; groceries in small bus trips; rides or rentals for the occasional trip out',
+              'Ask whether bike storage is secure and covered, and whether you can opt out of a parking charge if one is bundled into rent',
+            ],
+            [
+              '1 or 2',
+              'Occasional car share',
+              'No car of your own; borrow or rent one for the big grocery run, a move or a trip home',
+              'Ask where visitors and rental cars can park, and whether there is a guest parking limit',
+            ],
+            [
+              '3 to 5',
+              'Own a car',
+              'A car parked at your place most days, used for work, gear or distance',
+              'Ask whether parking is assigned, what it costs per month, whether it is in the lease or a separate agreement, and what happens in snow removal',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'What changes in winter?',
+        paragraphs: [
+          "Everything takes longer. Walking to a bus stop in snow is slower, and so is waiting for a bus. Buses run on the university and city calendars, so check service alerts on TheRide's site and the campus bus tracker rather than trusting last year's memory.",
+          'Owning a car in winter has its own chores: clearing it after a storm, moving it for plows if your building asks, and finding a spot. If you do not have a car, the winter question is mostly about what you can carry and how far you walk to a stop. Look at your route in the dark and in the cold before you sign.',
+        ],
+      },
+      {
+        heading: 'What do you check about parking before you sign a lease?',
+        paragraphs: [
+          "Campus parking and apartment parking are two different systems. The university's parking permits cover university lots, and they are not the same thing as a space at your building. Check the university's parking pages for permits and the lease for your apartment.",
+          'Leases commonly handle parking in one of a few ways: a space included in rent, an assigned space for an extra monthly charge, a first come lot with no guarantee, or street parking with city rules. Which one you have is a question for the lease and the landlord, not something to assume from the listing photos. If you are not sure what a clause means, ask the landlord or the leasing office, and check with the city or a lawyer for anything beyond what the lease says.',
+        ],
+        bullets: [
+          'Is a parking space included in the rent, or is it an extra charge?',
+          'Is the space assigned, or first come?',
+          'Is parking written into the lease itself or into a separate agreement?',
+          'Is there a guest or visitor spot?',
+          'Who clears the lot in snow, and when do cars have to be moved?',
+          'If you will not have a car, can you skip a parking charge?',
+        ],
+      },
+      {
+        heading: 'When does a car share or an occasional rental beat owning?',
+        paragraphs: [
+          "If your count landed on one or two yeses, a car you do not own is often the cleaner answer. The university's car sharing page says Zipcar membership is open to members of the campus community and lists vehicles in lots across the Ann Arbor campus. It does not list prices, so check the current rates before you count on it.",
+          'The trade is simple. Owning means a car that is always there and a parking space that is always a cost, plus insurance and upkeep. Sharing or renting means planning ahead and paying per use, with nothing sitting unused in a lot. If you expect to need a car less than a handful of times a month, sharing usually wins on hassle. If you need one every week, owning does.',
+          "Browse places near the bus lines on Wroomly's listings, filter by dates, and check each listing's parking details with the poster or the landlord before you commit.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Do UMich students need a car off campus?',
+        answer:
+          'Many do not. Campus buses, city buses, walking and biking cover most daily needs near campus, and active U-M students can ride TheRide free with a yellow MCard. A car helps with bulk groceries, trips out of town, and jobs or placements off the bus lines. Count your own week before deciding.',
+      },
+      {
+        question: 'Can I get groceries in Ann Arbor without a car?',
+        answer:
+          "Yes, with planning. A U-M student life guide lists Aldi, Trader Joe's and Kroger reachable by city bus, so you can shop without a car. The trade is carrying everything back, so most students shop in smaller, more frequent trips instead of one big weekly run.",
+      },
+      {
+        question: 'Is parking included in Ann Arbor student apartments?',
+        answer:
+          'Sometimes. Leases commonly include a space in rent, charge extra for an assigned space, offer a first come lot, or leave you to street parking. It varies by building, so ask the landlord what the lease says about parking, what it costs, and whether you can decline it.',
+      },
+      {
+        question: 'How do I get to the airport without a car?',
+        answer:
+          "Detroit Metro Airport sits outside Ann Arbor, so plan a shuttle, a ride, a rental or a lift from a friend. TheRide's website lists an airport service page, so check it for what is currently running before you book a flight home.",
+      },
+    ],
+    links: [
+      { label: 'Best neighborhoods for UMich students', href: '/guides/best-neighborhoods-for-umich-students' },
+      { label: 'First apartment checklist', href: '/guides/first-apartment-checklist-ann-arbor' },
+      { label: 'Central Campus places', href: '/ann-arbor/central-campus' },
+      { label: 'Browse places near campus', href: '/listings' },
+      { label: 'U-M campus bus routes and schedules', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/' },
+      { label: 'U-M MRide free city bus rides', href: 'https://ltp.umich.edu/transportation-alternatives/mride/' },
+      { label: 'TheRide Ann Arbor bus system', href: 'https://www.theride.org/' },
+    ],
+  },
 ]
 
 export function getGuide(slug: string): Guide | undefined {
