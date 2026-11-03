@@ -1,14 +1,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { loadFollowupOverview, draftFollowups, saveFollowup, approveFollowups, withdrawFollowups, sendFollowup, sendApprovedFollowups, testFollowup } from '../../src/lib/universities/followup-runner.ts'
-import { draftAll, saveDraft, approve, approveAll, unapprove, unapproveMany, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, type MailSender } from '../../src/lib/universities/runner.ts'
+import { draftAll, saveDraft, approve, approveAll, unapprove, unapproveMany, sendOne, sendApproved, testSend, testTemplate, markOutcome, saveSettings, scheduleApproved, cancelScheduled, type MailSender } from '../../src/lib/universities/runner.ts'
 
 // A tiny in-memory stand-in for the three tables the runner touches. Only the
 // query shapes the runner actually uses are implemented. All data is INVENTED.
 
 type Row = Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]; messages?: Row[] }) {
+function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]; messages?: Row[]; /** Columns that do not exist yet, like production before a migration. */ missingColumns?: string[] }) {
   const tables: Record<string, Row[]> = {
     university_prospects: seed.prospects,
     outreach_suppressions: seed.suppressions ?? [],
@@ -25,9 +25,11 @@ function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]
       let order: { k: string; asc: boolean } | null = null
       let head = false
       let wantCount = false
+      const usedColumns: string[] = []
       const run = () => {
         // A table that does not exist answers with an error, as PostgREST does.
         if (!tables[name]) return { data: null, error: { code: 'PGRST205', message: `no table ${name}` }, count: null }
+        if (usedColumns.some(c => seed.missingColumns?.includes(c))) return { data: null, error: { code: '42703', message: 'column does not exist' }, count: null }
         let rows = tables[name].filter(r => filters.every(f => f(r)))
         if (order) rows = [...rows].sort((a, b) => (a[order!.k] < b[order!.k] ? -1 : 1) * (order!.asc ? 1 : -1))
         if (op === 'update') for (const r of rows) Object.assign(r, patch)
@@ -38,9 +40,10 @@ function fakeDb(seed: { prospects: Row[]; suppressions?: Row[]; settings?: Row[]
         eq: (k: string, v: unknown) => (filters.push(r => r[k] === v), api),
         not: (k: string, _o: string, v: unknown) => (filters.push(r => r[k] !== v), api),
         is: (k: string, v: unknown) => (filters.push(r => (v === null ? r[k] == null : r[k] === v)), api),
+        gt: (k: string, v: string) => (usedColumns.push(k), filters.push(r => r[k] != null && r[k] > v), api),
         gte: (k: string, v: string) => (filters.push(r => r[k] != null && r[k] >= v), api),
         order: (k: string, o?: { ascending?: boolean }) => ((order = { k, asc: o?.ascending !== false }), api),
-        update: (p: Row) => ((op = 'update'), (patch = p), api),
+        update: (p: Row) => ((op = 'update'), (patch = p), usedColumns.push(...Object.keys(p)), api),
         upsert: (row: Row | Row[], o?: { onConflict?: string }) => {
           for (const r of Array.isArray(row) ? row : [row]) {
             const key = o?.onConflict ?? 'id'
@@ -591,4 +594,102 @@ test('the latest hold wins, and a person\'s message or another university never 
   const o = await loadFollowupOverview(D(db), NOW)
   assert.equal(o.items[0].heldUntil, '2026-11-25T00:00:00Z')
   assert.equal(o.items[1].heldUntil, null)
+})
+
+// ── overnight scheduling ────────────────────────────────────────────────────
+
+const NOW_MS = Date.parse('2026-11-03T20:00:00Z') // 3:00 PM in Ann Arbor
+const fixedNow = () => NOW_MS
+const three = () => [
+  prospect({ id: 'p2', slug: 'b', name: 'B University', contact_email: 'b@example.edu' }),
+  prospect({ id: 'p3', slug: 'c', name: 'C University', contact_email: 'c@example.edu' }),
+]
+
+test('scheduling hands each message to the mail provider with its own time, three minutes apart', async () => {
+  const db = await approvedDb(three())
+  const { sent, send } = mailer()
+  const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
+  assert.equal(r.sent, 3)
+  // 2:30 AM EST on Nov 4 is 07:30 UTC.
+  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T07:30:00.000Z', '2026-11-04T07:33:00.000Z', '2026-11-04T07:36:00.000Z'])
+  assert.match(r.firstAt ?? '', /Nov 4 at 2:30 AM/)
+  assert.match(r.lastAt ?? '', /Nov 4 at 2:36 AM/)
+  for (const row of db.tables.university_prospects) {
+    assert.equal(row.status, 'sent', 'claimed at once, so it can neither be scheduled twice nor slip past the cap')
+    assert.equal(row.sent_at, row.scheduled_for, 'the sent time is when it will actually leave')
+    assert.ok(row.sent_message_id)
+  }
+})
+
+test('a message the gate refuses takes no slot, and nothing is scheduled when real sending is off', async () => {
+  const db = await approvedDb(three())
+  db.tables.outreach_suppressions.push({ email: 'b@example.edu', reason: 'unsubscribed' })
+  const { sent, send } = mailer()
+  const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
+  assert.equal(r.sent, 2)
+  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T07:30:00.000Z', '2026-11-04T07:33:00.000Z'], 'no gap where the refused one would have been')
+  const off = await approvedDb()
+  const m2 = mailer()
+  const r2 = await scheduleApproved(D(off), { send: m2.send, enabled: false, now: fixedNow, pauseMs: 0 })
+  assert.equal(r2.sent, 0)
+  assert.equal(m2.sent.length, 0)
+  assert.equal(off.tables.university_prospects[0].status, 'approved')
+})
+
+test('a second batch queues after the last scheduled message, never on the same minute', async () => {
+  const db = await approvedDb(three())
+  const first = mailer()
+  // Only one approved at first: withdraw the other two, schedule, approve again.
+  await unapproveMany(D(db), ['p2', 'p3'])
+  await scheduleApproved(D(db), { send: first.send, enabled: true, now: fixedNow, pauseMs: 0 })
+  for (const id of ['p2', 'p3']) await approve(D(db), id)
+  const second = mailer()
+  await scheduleApproved(D(db), { send: second.send, enabled: true, now: fixedNow, pauseMs: 0 })
+  assert.deepEqual(second.sent.map(m => m.scheduledAt), ['2026-11-04T07:33:00.000Z', '2026-11-04T07:36:00.000Z'])
+})
+
+test('a failed hand-off puts the message back to approved and frees its slot', async () => {
+  const db = await approvedDb(three())
+  let n = 0
+  const send: MailSender = async m => { if (++n === 1) throw new Error('provider down'); return { id: `m${n}`, ...(m ? {} : {}) } }
+  const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
+  assert.equal(r.sent, 2)
+  const failed = db.tables.university_prospects.find(p => p.status === 'approved')!
+  assert.equal(failed.scheduled_for, null)
+  assert.equal(failed.sent_at, null)
+})
+
+test('scheduling says so plainly when migration 049 is missing', async () => {
+  const db = fakeDb({ prospects: [prospect()], settings: [{ ...goodSettings }], missingColumns: ['scheduled_for'] })
+  await draftAll(D(db))
+  await approve(D(db), 'p1')
+  await assert.rejects(scheduleApproved(D(db), { send: mailer().send, enabled: true, now: fixedNow, pauseMs: 0 }), /needs migration 049/)
+  assert.equal(db.tables.university_prospects[0].status, 'approved', 'nothing was claimed')
+})
+
+test('cancelling returns waiting messages to approved, and leaves one it could not cancel as scheduled', async () => {
+  const db = await approvedDb(three())
+  const { send } = mailer()
+  await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
+  const cancelled: string[] = []
+  const cancel = async (id: string) => { if (id === 'msg_2') throw new Error('already sent'); cancelled.push(id) }
+  const r = await cancelScheduled(D(db), { cancel, now: new Date(NOW_MS) })
+  assert.equal(r.cancelled, 2)
+  assert.equal(r.failed.length, 1)
+  assert.match(r.failed[0].message, /already sent/)
+  const byStatus = (st: string) => db.tables.university_prospects.filter(p => p.status === st).length
+  assert.equal(byStatus('approved'), 2)
+  assert.equal(byStatus('sent'), 1, 'the one that could not be cancelled is still shown as going out')
+  const back = db.tables.university_prospects.find(p => p.status === 'approved')!
+  assert.equal(back.sent_message_id, null)
+  assert.equal(back.sent_snapshot, null)
+  assert.ok(back.approval_hash, 'approval kept, so it can be scheduled again without re-approving')
+})
+
+test('Send now is unchanged: no scheduled time, sent_at is now', async () => {
+  const db = await approvedDb()
+  const { sent, send } = mailer()
+  await sendOne(D(db), 'p1', { send, enabled: true })
+  assert.equal(sent[0].scheduledAt, undefined)
+  assert.equal(db.tables.university_prospects[0].scheduled_for, undefined)
 })

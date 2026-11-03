@@ -39,9 +39,15 @@ export default async function AdminUniversitiesPage() {
   // raw Postgres code. Accept both, or a missing migration looks like an
   // empty list.
   const missingTable = res.error?.code === 'PGRST205' || res.error?.code === '42P01'
-  const rows = (res.data ?? []) as TableRow[]
+  // Messages waiting at the mail provider for their overnight time. A separate
+  // query, so a missing migration 049 shows a notice instead of breaking the page.
+  const schedRes = await service.from('university_prospects').select('id, scheduled_for').gt('scheduled_for', new Date().toISOString())
+  const scheduleReady = !schedRes.error
+  const scheduledAt = new Map(((schedRes.data ?? []) as { id: string; scheduled_for: string }[]).map(r => [r.id, r.scheduled_for]))
+  const rows = ((res.data ?? []) as TableRow[]).map(r => ({ ...r, scheduled_for: scheduledAt.get(r.id) ?? null }))
+  const scheduledLast = [...scheduledAt.values()].sort().at(-1) ?? null
 
-  const count = (s: string) => rows.filter(r => r.status === s).length
+  const count = (s: string) => rows.filter(r => r.status === s && !r.scheduled_for).length
   const withEmail = rows.filter(r => r.contact_email).length
   const sentToday = await countSentLastDay(service)
 
@@ -109,6 +115,9 @@ export default async function AdminUniversitiesPage() {
             enabled={process.env.UNIVERSITY_OUTREACH_ENABLED === 'true'}
             dailyCap={settings.daily_cap}
             sentToday={sentToday}
+            scheduleReady={scheduleReady}
+            scheduledCount={scheduledAt.size}
+            scheduledLast={scheduledLast}
           />
           <section className="mt-8">
             <FollowupsPanel

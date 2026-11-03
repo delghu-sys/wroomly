@@ -186,3 +186,29 @@ Exchange students are nominated by their home university and then look for
 housing. Incoming-winter students are searching now (Oct–Dec); fall students are
 nominated Feb–April and search May–August. Write now for winter and again in
 February for fall.
+
+### Send now, or overnight
+
+The console has two send buttons. **Send N now** sends immediately, as before.
+**Send N at 2:30 AM** schedules the approved emails for the next 2:30 AM Ann Arbor
+time, three minutes apart. That is the start of the working day in most of
+Europe (five to six hours ahead), and the spacing keeps a batch from arriving as
+a blast.
+
+- **Nothing runs overnight on our side.** Each message is handed to Resend now
+  with its own send time. No cron job is needed and it does not matter if you
+  close the tab.
+- **The same gate applies.** Approval, unedited since, opt-outs, the daily cap
+  and the real-send switch are all checked when you click, exactly as for Send
+  now. The cap counts scheduled messages from the moment they are scheduled.
+- **They cannot be re-checked at 2:30.** That is why the console shows
+  "N scheduled, the last at …" with a **Cancel** button. Cancelling asks Resend to
+  drop the queued messages and returns them to approved, with their approval
+  kept. A message that already left cannot be cancelled and stays shown as sent.
+- **A second click queues after the first batch**, never on the same minute.
+- **Table and follow-ups.** A scheduled row shows as "scheduled", and its sent
+  time is the time it will leave, which is also when the follow-up clock starts.
+- A message that Resend refuses goes back to approved and does not take a slot.
+
+Needs **migration 049** (`scheduled_for`). Until it is applied the overnight button
+is disabled with a notice; Send now is unaffected. Follow-ups still send now only.
