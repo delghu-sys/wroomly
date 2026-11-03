@@ -1736,7 +1736,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'split-rent-with-roommates-different-bedrooms',
     title: 'How to split rent when the bedrooms are different sizes',
-    seoTitle: 'Split Rent With Different Size Bedrooms | Wroomly',
+    seoTitle: 'Split Rent With Different Size Bedrooms',
     description:
       'Split rent with roommates when bedrooms differ: a shared share for common space, a share by bedroom size, a worked three bedroom example, and a one line fairness test.',
     excerpt:
