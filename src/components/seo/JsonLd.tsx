@@ -227,7 +227,7 @@ export function siteJsonLd(): Record<string, unknown>[] {
         name: 'Ann Arbor',
         containedInPlace: { '@type': 'State', name: 'Michigan' },
       },
-      email: 'help@wroomly.app',
+      email: 'support@wroomly.app',
       ...(SOCIAL_PROFILES.length > 0 ? { sameAs: SOCIAL_PROFILES } : {}),
       founder: { '@type': 'Person', name: 'Hugo Delgado Verdu' },
       knowsAbout: [

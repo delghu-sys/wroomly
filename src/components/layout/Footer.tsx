@@ -66,7 +66,7 @@ export function Footer() {
               { href: '/safety', label: 'Trust & safety' },
               { href: '/terms', label: 'Terms' },
               { href: '/privacy', label: 'Privacy' },
-              { href: 'mailto:help@wroomly.app', label: 'Contact', external: true },
+              { href: 'mailto:support@wroomly.app', label: 'Contact', external: true },
             ]}
           />
         </div>

@@ -380,7 +380,7 @@ export default async function ExchangePage() {
                 </h2>
                 <p className="mt-6 text-lg text-white/70 leading-relaxed max-w-xl">
                   You are welcome to share or print this page for the students you nominate to Michigan. Questions are welcome at{' '}
-                  <a href="mailto:help@wroomly.app" className="text-maize-bright underline underline-offset-4">help@wroomly.app</a>.
+                  <a href="mailto:support@wroomly.app" className="text-maize-bright underline underline-offset-4">support@wroomly.app</a>.
                 </p>
                 <div className="mt-9 flex flex-wrap items-center gap-3">
                   <Link href="/listings"><MagneticButton showArrow>Browse sublets</MagneticButton></Link>
@@ -450,7 +450,7 @@ export default async function ExchangePage() {
           <div className="avoid-break mt-4 rounded-2xl border border-line p-3">
             <h2 className="font-display text-base tracking-tight text-ink">For exchange and international offices</h2>
             <p className="text-[12.5px] text-ink-soft leading-snug mt-1">
-              You are welcome to share or print this page for the students you nominate to Michigan. Questions are welcome at help@wroomly.app.
+              You are welcome to share or print this page for the students you nominate to Michigan. Questions are welcome at support@wroomly.app.
             </p>
           </div>
         </div>
