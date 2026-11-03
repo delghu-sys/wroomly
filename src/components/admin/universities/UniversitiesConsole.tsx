@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, FileText, Loader2, Send } from 'lucide-react'
+import { Check, FileText, Loader2, Moon, Send } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { TestTemplateButton } from './TestTemplateButton'
+import { SEND_HOUR, SEND_INTERVAL_MIN, SEND_MINUTE, formatSlot, planStart, slotAt } from '@/lib/universities/schedule'
 
 interface Props {
   researched: number
@@ -17,15 +18,20 @@ interface Props {
   enabled: boolean
   dailyCap: number
   sentToday: number
+  /** Migration 049 applied: overnight sending can be used. */
+  scheduleReady: boolean
+  /** Messages handed to the mail provider and waiting for their time. */
+  scheduledCount: number
+  scheduledLast: string | null
 }
 
 /** Two bulk steps. Drafting only writes text. Sending asks you to confirm the
  *  sender and count first, and still passes every message through the gate. */
-export function UniversitiesConsole({ researched, drafted, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday }: Props) {
+export function UniversitiesConsole({ researched, drafted, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday, scheduleReady, scheduledCount, scheduledLast }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
 
-  async function call(action: 'draft-all' | 'approve-all' | 'send-approved', extra: object = {}) {
+  async function call(action: 'draft-all' | 'approve-all' | 'send-approved' | 'schedule-approved' | 'cancel-scheduled', extra: object = {}) {
     setBusy(action)
     try {
       const res = await fetch('/api/admin/universities', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...extra }) })
@@ -33,7 +39,16 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
       if (!res.ok) return toast.error(data.error ?? 'Failed.')
       if (action === 'draft-all') toast.success(`Drafted ${data.drafted}. ${data.skippedNoEmail} skipped (no address).`)
       else if (action === 'approve-all') toast.success(`Approved ${data.approved}.${data.skipped ? ` ${data.skipped} skipped (no address or text).` : ''}`)
-      else {
+      else if (action === 'cancel-scheduled') {
+        toast.success(`Cancelled ${data.cancelled}. They are approved again.`)
+        if (data.failed?.[0]) toast.error(`${data.failed[0].name}: ${data.failed[0].message}`)
+      } else if (action === 'schedule-approved') {
+        const refused = (data.outcomes ?? []).filter((o: { sent: boolean; message?: string }) => !o.sent)
+        if (data.sent) toast.success(`Scheduled ${data.sent}: first ${data.firstAt}, last ${data.lastAt}.`)
+        else toast.error('Nothing was scheduled.')
+        if (refused[0]) toast.error(`${refused[0].name}: ${refused[0].message}`)
+        else if (data.remaining) toast.message('Click again to schedule the rest: they queue after the last one.')
+      } else {
         const refused = (data.outcomes ?? []).filter((o: { sent: boolean; message?: string }) => !o.sent)
         toast.success(`Sent ${data.sent}.${data.remaining ? ` ${data.remaining} approved ${data.remaining === 1 ? 'is' : 'are'} still waiting.` : ''}`)
         if (refused[0]) toast.error(`${refused[0].name}: ${refused[0].message}`)
@@ -68,6 +83,20 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
     if (ok) void call('send-approved', { confirm: true })
   }
 
+  function scheduleOvernight() {
+    const start = planStart(new Date(), scheduledLast ? new Date(scheduledLast) : null)
+    const n = Math.min(approved, Math.max(0, dailyCap - sentToday))
+    const ok = window.confirm(
+      `Schedule ${n} approved email${n === 1 ? '' : 's'} to go out overnight?\n\nFirst: ${formatSlot(start)}\nLast: ${formatSlot(slotAt(start, Math.max(0, n - 1)))}\nOne every ${SEND_INTERVAL_MIN} minutes (Ann Arbor time).\n\nFrom: ${fromDisplay}\nReplies go to: ${replyTo || '(not set)'}\nDaily cap: ${dailyCap} (${sentToday} already used in the last 24h)\n\nThey are checked now, exactly as for Send now. You can cancel any that are still waiting.`,
+    )
+    if (ok) void call('schedule-approved', { confirm: true })
+  }
+
+  function cancelAll() {
+    const ok = window.confirm(`Cancel ${scheduledCount} scheduled email${scheduledCount === 1 ? '' : 's'}?\n\nThey go back to approved and nothing is sent.`)
+    if (ok) void call('cancel-scheduled', { confirm: true })
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="bg-surface border border-line rounded-3xl p-6 shadow-1">
@@ -99,9 +128,24 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
             {busy === 'approve-all' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check data-icon="inline-start" />} Approve all {drafted}
           </Button>
           <Button size="sm" disabled={busy !== null || approved === 0} onClick={sendApproved}>
-            {busy === 'send-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Send ${approved} approved`}
+            {busy === 'send-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Send ${approved} now`}
+          </Button>
+          <Button size="sm" variant="outline" disabled={busy !== null || approved === 0 || !scheduleReady} onClick={scheduleOvernight} title={`Send ${approved} at ${SEND_HOUR}:${String(SEND_MINUTE).padStart(2, '0')} AM Ann Arbor time, ${SEND_INTERVAL_MIN} minutes apart (morning in Europe)`}>
+            {busy === 'schedule-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Moon data-icon="inline-start" />} Send {approved} at {SEND_HOUR}:{String(SEND_MINUTE).padStart(2, '0')} AM
           </Button>
         </div>
+        {!scheduleReady && <p className="text-[12.5px] text-red-600 mt-2">Overnight sending needs migration 049 (scheduled_for). Apply it to turn this button on.</p>}
+        {scheduledCount > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-line bg-navy-soft/40 px-4 py-3">
+            <p className="text-[13px] text-ink-soft">
+              <span className="font-medium text-ink">{scheduledCount} scheduled</span>
+              {scheduledLast ? `, the last at ${formatSlot(new Date(scheduledLast))}` : ''}. They send by themselves.
+            </p>
+            <Button size="sm" variant="outline" disabled={busy !== null} onClick={cancelAll}>
+              {busy === 'cancel-scheduled' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Cancel ${scheduledCount}`}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

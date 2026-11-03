@@ -29,6 +29,7 @@ const STATUS_TONES: Record<string, string> = {
   researched: 'text-ink-muted border-line bg-surface',
   drafted: 'text-[oklch(0.50_0.15_75)] border-[oklch(0.85_0.10_75)] bg-[oklch(0.97_0.04_75)]',
   approved: 'text-[oklch(0.40_0.13_250)] border-[oklch(0.85_0.08_250)] bg-[oklch(0.97_0.03_250)]',
+  scheduled: 'text-[oklch(0.40_0.13_250)] border-[oklch(0.85_0.08_250)] bg-[oklch(0.97_0.03_250)]',
   sent: 'text-[oklch(0.40_0.13_142)] border-[oklch(0.85_0.10_142)] bg-[oklch(0.97_0.04_142)]',
   replied: 'text-[oklch(0.40_0.13_142)] border-[oklch(0.80_0.12_142)] bg-[oklch(0.94_0.07_142)]',
   declined: 'text-red-700 border-red-200 bg-red-50',
@@ -181,7 +182,7 @@ export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
                   <input type="checkbox" aria-label={`Select ${r.name}`} className="accent-navy-deep" checked={selected.has(r.id) && isSelectable(r)} disabled={!isSelectable(r)} onChange={() => toggle(r.id)} />
                 </td>
                 <td className="px-3 py-2 border-b border-line/60">
-                  <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide ${STATUS_TONES[r.status]}`}>{r.status}</span>
+                  <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide ${STATUS_TONES[r.scheduled_for ? 'scheduled' : r.status]}`}>{r.scheduled_for ? 'scheduled' : r.status}</span>
                 </td>
                 <td className="px-3 py-2 border-b border-line/60 min-w-[14rem]">
                   <Link href={`/admin/universities/${r.id}`} className="text-navy underline underline-offset-2 hover:text-ink">{r.name}</Link>
@@ -205,7 +206,7 @@ export function UniversitiesTable({ rows }: { rows: TableRow[] }) {
                 <td className={`px-3 py-2 border-b border-line/60 whitespace-nowrap text-[12px] ${CONF_TONE[r.confidence]}`}>
                   {contactKindOf(r) === 'form' ? 'form only' : CONF_LABEL[r.confidence]}
                 </td>
-                <td className="px-3 py-2 border-b border-line/60 text-ink-muted tabular-nums whitespace-nowrap">{r.sent_at ? r.sent_at.slice(0, 10) : '—'}</td>
+                <td className="px-3 py-2 border-b border-line/60 text-ink-muted tabular-nums whitespace-nowrap">{r.scheduled_for ? `${r.scheduled_for.slice(0, 10)} (queued)` : r.sent_at ? r.sent_at.slice(0, 10) : '—'}</td>
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { normalizeEmail } from '../agents/outreach-policy.ts'
 import { DEFAULT_SETTINGS, renderEmail } from './template.ts'
+import { formatSlot, planStart, slotAt } from './schedule.ts'
 import {
   REFUSAL_TEXT,
   approvalHash,
@@ -81,6 +82,8 @@ export type MailSender = (m: {
   replyTo: string
   subject: string
   text: string
+  /** ISO time for Resend to send at. Omitted = send now. */
+  scheduledAt?: string
 }) => Promise<{ id?: string }>
 
 export async function loadSettings(db: Db): Promise<Settings> {
@@ -301,6 +304,8 @@ export async function sendOne(
   id: string,
   { send, enabled }: { send: MailSender; enabled: boolean },
   ctxIn?: Awaited<ReturnType<typeof sendContext>>,
+  /** Hand the message to the mail provider to send at this time instead of now. */
+  scheduledFor?: Date,
 ): Promise<SendOutcome> {
   const [p, s, ctx] = await Promise.all([getProspect(db, id), loadSettings(db), ctxIn ?? sendContext(db)])
   const envelope = envelopeFor(p, s)
@@ -323,15 +328,17 @@ export async function sendOne(
   // Claim the row BEFORE mailing so two overlapping requests cannot both send.
   const { data: claimed } = await db
     .from('university_prospects')
-    .update({ status: 'sent', sent_at: new Date().toISOString() })
+    .update({ status: 'sent', sent_at: new Date().toISOString(), ...(scheduledFor ? { scheduled_for: scheduledFor.toISOString() } : {}) })
     .eq('id', id)
     .eq('status', 'approved')
     .select('id')
   if (!claimed?.length) return { id, name: p.name, sent: false, reason: 'already-sent', message: REFUSAL_TEXT['already-sent'] }
 
   try {
-    const res = await send({ from: envelope.from, to: envelope.to, replyTo: envelope.replyTo, subject: envelope.subject, text: envelope.body })
-    const sentAt = new Date().toISOString()
+    const res = await send({ from: envelope.from, to: envelope.to, replyTo: envelope.replyTo, subject: envelope.subject, text: envelope.body, ...(scheduledFor ? { scheduledAt: scheduledFor.toISOString() } : {}) })
+    // A scheduled message records the time it will LEAVE, so the Sent column
+    // and the follow-up clock are right; it still counts against the daily cap.
+    const sentAt = (scheduledFor ?? new Date()).toISOString()
     await db
       .from('university_prospects')
       .update({ sent_at: sentAt, sent_message_id: res.id ?? null, sent_snapshot: { ...envelope, sentAt } })
@@ -343,7 +350,7 @@ export async function sendOne(
     // Not sent after all: put it back so it can be retried, and say why.
     await db
       .from('university_prospects')
-      .update({ status: 'approved', sent_at: null })
+      .update({ status: 'approved', sent_at: null, ...(scheduledFor ? { scheduled_for: null } : {}) })
       .eq('id', id)
     return { id, name: p.name, sent: false, message: err instanceof Error ? err.message : 'Send failed.' }
   }
@@ -388,6 +395,118 @@ export async function sendApproved(
     if (o.sent && pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs))
   }
   return { outcomes, sent: outcomes.filter(o => o.sent).length, remaining: ids.length - outcomes.length }
+}
+
+export interface ScheduleApprovedResult extends SendApprovedResult {
+  /** Local-time text for the first and last slot used, or null when none was. */
+  firstAt: string | null
+  lastAt: string | null
+}
+
+/** The latest time any message is already scheduled for, or null. Throws a
+ *  plain message when migration 049 has not been applied. */
+export async function latestScheduled(db: Db, now: Date): Promise<Date | null> {
+  const { data, error } = await db
+    .from('university_prospects')
+    .select('scheduled_for')
+    .gt('scheduled_for', now.toISOString())
+    .order('scheduled_for', { ascending: false })
+  if (error) {
+    if (error.code === '42703' || error.code === 'PGRST204' || /scheduled_for/.test(error.message)) {
+      throw new Error('Overnight sending needs migration 049 (scheduled_for). Apply it, then try again.')
+    }
+    throw new Error(error.message)
+  }
+  const top = ((data ?? []) as { scheduled_for: string }[])[0]?.scheduled_for
+  return top ? new Date(top) : null
+}
+
+/**
+ * Schedule approved messages for the next 2:30 AM, three minutes apart.
+ *
+ * Nothing waits around: each message is handed to Resend now with its own send
+ * time, so it needs no cron job and survives this request ending. Every message
+ * still passes the same gate as a send now (approval, unedited since, opt-outs,
+ * the daily cap, the real-send switch), and the cap counts scheduled messages
+ * from the moment they are scheduled. A message that cannot be scheduled does
+ * not take up a slot. Because the gate cannot run again at 2:30, cancelling is
+ * offered (see cancelScheduled).
+ */
+export async function scheduleApproved(
+  db: Db,
+  opts: { send: MailSender; enabled: boolean; pauseMs?: number; budgetMs?: number; now?: () => number },
+): Promise<ScheduleApprovedResult> {
+  const { pauseMs = 700, budgetMs = 45_000, now = Date.now } = opts
+  const startedAt = new Date(now())
+  const latest = await latestScheduled(db, startedAt)
+  const start = planStart(startedAt, latest)
+  const { data } = await db
+    .from('university_prospects')
+    .select('id')
+    .eq('status', 'approved')
+    .order('approved_at', { ascending: true })
+  const ids = ((data ?? []) as { id: string }[]).map(r => r.id)
+  const ctx = await sendContext(db)
+  const outcomes: SendOutcome[] = []
+  let slot = 0
+  let attempted = 0
+  const t0 = now()
+  for (const id of ids) {
+    if (now() - t0 > budgetMs) break
+    const o = await sendOne(db, id, opts, ctx, slotAt(start, slot))
+    attempted++
+    outcomes.push(o)
+    if (o.sent) slot++
+    if (o.reason === 'daily-cap-reached' || o.reason === 'sending-disabled' || o.reason === 'sender-misconfigured') break
+    if (o.sent && pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs))
+  }
+  return {
+    outcomes,
+    sent: slot,
+    remaining: ids.length - attempted,
+    firstAt: slot > 0 ? formatSlot(start) : null,
+    lastAt: slot > 0 ? formatSlot(slotAt(start, slot - 1)) : null,
+  }
+}
+
+export interface CancelScheduledResult {
+  cancelled: number
+  /** Messages that could not be cancelled, usually because they had just gone. */
+  failed: { name: string; message: string }[]
+}
+
+/** Cancel every message still waiting for its send time and return it to
+ *  "approved". `cancel` asks the mail provider to drop the queued message; the
+ *  row is only put back when that succeeds, so a message that already left is
+ *  never shown as unsent. */
+export async function cancelScheduled(
+  db: Db,
+  { cancel, now = new Date() }: { cancel: (messageId: string) => Promise<void>; now?: Date },
+): Promise<CancelScheduledResult> {
+  const { data, error } = await db
+    .from('university_prospects')
+    .select('id, name, sent_message_id')
+    .eq('status', 'sent')
+    .gt('scheduled_for', new Date(now.getTime() + 60_000).toISOString())
+  if (error) throw new Error(error.message)
+  const rows = (data ?? []) as { id: string; name: string; sent_message_id: string | null }[]
+  const result: CancelScheduledResult = { cancelled: 0, failed: [] }
+  for (const r of rows) {
+    if (!r.sent_message_id) { result.failed.push({ name: r.name, message: 'No message id on record, so it cannot be cancelled from here.' }); continue }
+    try {
+      await cancel(r.sent_message_id)
+    } catch (err) {
+      result.failed.push({ name: r.name, message: err instanceof Error ? err.message : 'Could not cancel.' })
+      continue
+    }
+    await db
+      .from('university_prospects')
+      .update({ status: 'approved', sent_at: null, sent_message_id: null, sent_snapshot: null, scheduled_for: null })
+      .eq('id', r.id)
+      .eq('status', 'sent')
+    result.cancelled++
+  }
+  return result
 }
 
 /** Mail the draft to the admin's own address. Changes nothing in the table. */

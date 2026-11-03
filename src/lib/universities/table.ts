@@ -13,6 +13,8 @@ export interface ProspectRowLite {
   confidence: 'verified' | 'likely' | 'not_found'
   status: ProspectStatus
   sent_at: string | null
+  /** Future send time of a message waiting at the mail provider (migration 049). */
+  scheduled_for?: string | null
 }
 
 export interface ProspectFilters {
