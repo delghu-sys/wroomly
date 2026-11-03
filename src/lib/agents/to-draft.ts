@@ -87,7 +87,8 @@ export function leadToExtractedDraft({
 }: {
   title: string | null
   sourceLabel: string
-  contactEmail: string
+  /** Null for a lead with no published email (a manual-channel lead). */
+  contactEmail: string | null
   extracted: AnyExtracted
 }): ExtractedListingDraft {
   const rentMonthly = parseMoney(extracted.price)

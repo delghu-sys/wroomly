@@ -9,6 +9,8 @@ import { LeadsTable } from '@/components/admin/LeadsTable'
 import { toLeadTableRow, type LeadDbRow } from '@/lib/agents/leads-table'
 import { EmailTemplateEditor } from '@/components/admin/EmailTemplateEditor'
 import { SOURCES, loadActiveSummary } from '@/lib/agents/runner'
+import { loadManualItems } from '@/lib/agents/manual-runner'
+import { ManualOutreachPanel } from '@/components/admin/ManualOutreachPanel'
 import { ActiveSubletsCard } from '@/components/admin/ActiveSubletsCard'
 import { DEFAULT_TEMPLATE, type OutreachTemplate } from '@/lib/agents/outreach-template'
 
@@ -36,7 +38,7 @@ export default async function AdminAgentsPage() {
   // Both tables are service-role only (RLS-on, zero policies) — this is the
   // one place they are read for a human.
   const service = createServiceClient()
-  const [leadsRes, supsRes, templateRes, activeSummary] = await Promise.all([
+  const [leadsRes, supsRes, templateRes, activeSummary, manualItems] = await Promise.all([
     service
       .from('sourced_leads')
       .select(
@@ -49,6 +51,8 @@ export default async function AdminAgentsPage() {
     // From stored data only (no network), so it is cheap on every page load.
     // A failure here must never take the whole console down with it.
     loadActiveSummary(service).catch(() => null),
+    // Never lets a problem here take the console down.
+    loadManualItems(service).catch(() => []),
   ])
 
   // Migration 042 not applied yet → the table doesn't exist. Say so instead
@@ -134,6 +138,12 @@ export default async function AdminAgentsPage() {
               <EmailTemplateEditor initial={template} />
             )}
           </section>
+
+          {manualItems.length > 0 && (
+            <section className="mt-10">
+              <ManualOutreachPanel items={manualItems} />
+            </section>
+          )}
 
           <section className="mt-10">
             <h2 className="font-display text-xl tracking-tight text-ink mb-1">Leads</h2>

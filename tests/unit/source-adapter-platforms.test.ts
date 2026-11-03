@@ -82,7 +82,8 @@ test('RotatingRoom listing: facts and a link, never a contact address', () => {
   assert.equal(lead.extracted?.contactHandle, 'Message on RotatingRoom')
   assert.equal(lead.extracted?.contactUrl, 'https://rotatingroom.com/need-a-room/1001')
   assert.equal(lead.extracted?.description, 'Furnished room. Close to campus.', 'whitespace collapsed')
-  assert.equal(lead.extracted?.beds, 3)
+  assert.equal(lead.extracted?.bedrooms, '3', 'the name and type the draft mapper reads')
+  assert.equal(lead.extracted?.bathrooms, '2')
 })
 
 test('RotatingRoom: a listing in another town is recorded as skipped, not imported', () => {
