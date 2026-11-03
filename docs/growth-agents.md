@@ -198,3 +198,30 @@ page loads its text with JavaScript and the SubLeaps terms page returned an erro
 Their robots.txt files allow ordinary crawlers (SubLeaps disallows named AI-training
 bots, which Wroomly's is not). Read both terms in a browser before enabling them,
 and again if either site changes.
+
+## Messaged by hand (manual outreach)
+
+Leads with no email (SubLeaps, RotatingRoom, Ohana, Reddit) can only be reached
+through the other site's own messenger. A person sends those messages; this
+tracks them, in the same spirit as the email pipeline.
+
+- **Recording.** `scripts/agents/manual.mjs sent` records the first message on a
+  lead (marks it contacted and keeps the conversation link); `reply`, `out` and
+  `state` log what came back, what was sent next, and the outcome. The thread
+  lives on the lead in `extracted.manual`, so there is no migration.
+- **Dashboard.** `/admin/agents` has a **Messaged by hand** panel above the leads
+  table. Each lead shows its conversation, a state (waiting, replied, listed, not
+  interested, closed), why it needs attention, and the next message, prepared.
+- **The rules.** One follow-up, three days after a first message with no reply.
+  Four days after that with still no reply, the lead is closed. A "no" closes it.
+  A reply is never answered automatically: the next message is prepared (a draft
+  link for someone interested, an answer for a question, a polite close for a no)
+  and a person pastes and sends it.
+- **Claim your draft.** **Add claim link** makes a draft listing from the post's
+  facts (rent, dates, bedrooms, description, never a guessed location or photos)
+  and a fresh 7-day claim link, the same flow as the email outreach. Only the
+  token's hash is stored, a newer link replaces an older one, and opening the
+  link claims nothing. The conversation log redacts any claim link, so the secret
+  is never kept.
+- **Checking for replies.** The other site does not tell us. Open its inbox and
+  log replies in the panel (or ask Claude to check the inbox and log them).

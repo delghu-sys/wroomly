@@ -341,7 +341,7 @@ export async function runDraft(
  * stops working. That is the intended behaviour: at most one live link per
  * draft, and it belongs to the most recent message.
  */
-async function mintClaimToken(db: Db, importRequestId: string): Promise<string> {
+export async function mintClaimToken(db: Db, importRequestId: string): Promise<string> {
   const token = generateClaimToken()
   const { error } = await db
     .from('listing_import_requests')

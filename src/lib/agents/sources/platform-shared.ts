@@ -113,14 +113,15 @@ export function platformExtracted(opts: {
     contactHandle: `Message on ${opts.platformName}`,
     contactChannel: opts.channel,
     contactUrl: opts.url,
-    posterType: `${opts.platformName} host`,
     leaseType: 'Sub Lease',
     price: opts.price ?? undefined,
     dates: opts.dates ?? undefined,
     postedAt: opts.postedAt ?? undefined,
     description: opts.description,
     boardStatus: opts.boardStatus,
-    beds: typeof opts.beds === 'number' ? opts.beds : undefined,
-    baths: typeof opts.baths === 'number' ? opts.baths : undefined,
+    // The names the draft mapper reads (strings), so a claimed draft arrives
+    // with them filled in.
+    bedrooms: typeof opts.beds === 'number' ? String(opts.beds) : undefined,
+    bathrooms: typeof opts.baths === 'number' ? String(opts.baths) : undefined,
   }
 }
