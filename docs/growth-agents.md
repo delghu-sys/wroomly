@@ -119,6 +119,12 @@ outreach email can honestly say "we saw your post".
 | `offcampus-universe-umich` | U-M **sublets only** from offcampus-universe.com, via its sitemap (131 U-M listings). Leads carry the poster's email, name, dates and bed/bath. |
 | `reddit-sublets` | Sublet **offers** on r/uofm and r/AnnArbor, via Reddit's public Atom search feeds (one request per subreddit per run). Nobody publishes an email there, so these leads carry a Reddit handle + post link for a **manual** message; the draft and outreach agents skip them. "Looking for a sublet" posts are recorded as skipped so the feed is not re-read for them. Expect about one real offer a month on r/uofm. Reddit rate-limits anonymous feeds (HTTP 429) — a run that hits it says so; wait a few minutes. |
 
+| `subleaps-a2` | Active subleases on SubLeaps' Ann Arbor and U-M pages (subleaps.com). One page carries every record, so there is no per-listing fetch: title, description, rent, start and end dates, bedrooms, town, status and the date posted. The "host" is an opaque id. Contact is through the site, so leads are link-only. About 6 active listings at the time of writing. Use the bare `subleaps.com`; the `www.` host was down. |
+| `rotatingroom-a2` | Furnished sublets on RotatingRoom's Ann Arbor page, from the schema.org data on each listing (rent, availability window, bedrooms, coordinates). No host name, email or phone. The "Ann Arbor" page also lists nearby towns, so each listing is checked against the service area and the rest are remembered as skipped. About 89 listings across five index pages; a run fetches up to 40 new ones, so the first sweep takes a few runs. |
+| `ohana-a2` | Ohana's "A2 Sublets" page (liveohana.ai): rent, availability window, bedrooms and town from each listing's schema.org data. No host name, email or phone. **Ohana's terms prohibit scraping** (see below); registered, but only runs when named in `AGENT_SOURCES` or ticked in the console. |
+
+All three are **link-only**: no email is published, so each lead carries `Message on <site>` plus the listing link, shows as a handle in the leads table, and is skipped by the draft and outreach agents. Nobody is emailed from these sources. An email that a host happens to type into a description is deliberately **not** taken: it was not published as an invitation to be emailed, and these sites route contact through their own messaging.
+
 ### Sources that were looked at and ruled out (2026-10-18)
 
 | Site | Why not |
@@ -126,7 +132,7 @@ outreach email can honestly say "we saw your post".
 | U-M Off-Campus Housing (offcampushousing.umich.edu) | The student **sublease board is behind U-M single sign-on**; the public part is landlord inventory, not sublets. |
 | Facebook groups (UMich Housing, Sublets & Roommates) | Login-only, and automated access is against Facebook's terms. The biggest source, and only reachable by posting there as a person. |
 | Craigslist (annarbor.craigslist.org/search/sub) | Its terms forbid scrapers and crawlers outright. Contacts are relay addresses anyway. |
-| SubLeaps, Uloop, CollegeRentals, Michigan Daily classifieds | 0–4 U-M sublets at the time of checking; contact only through the site's own form. |
+| Uloop, CollegeRentals, Michigan Daily classifieds | 0–4 U-M sublets at the time of checking; contact only through the site's own form. (SubLeaps was added later as `subleaps-a2`.) |
 | Other Ann Arbor managers' "sublet boards" (Varsity, CMI, Wilson White, Cabrio, Prime…) | None found — CMB is the only manager that publishes residents' own posts. |
 
 ### A standing note on `offcampus-universe-umich`
@@ -178,3 +184,17 @@ than a 40-page burst every click.
   webhook before volume grows.
 - **No per-lead actions in the console yet** (e.g. manually skip a lead). The
   queue is read-only; `/admin/import-review` covers the drafts themselves.
+
+### A standing note on `ohana-a2`
+
+Ohana's terms of use say that "scraping Ohana's websites is strictly prohibited"
+and list crawlers and automatic devices. The adapter reads only public pages, at
+one request a second, with a User-Agent that names Wroomly, and Ohana's
+robots.txt allows listing pages. That does not change what the terms say. It is
+the same kind of restriction that kept Craigslist off the list, so this source
+is registered but never runs unless someone names it on purpose. Neither of the
+other two sources' terms could be read when this was written: RotatingRoom's terms
+page loads its text with JavaScript and the SubLeaps terms page returned an error.
+Their robots.txt files allow ordinary crawlers (SubLeaps disallows named AI-training
+bots, which Wroomly's is not). Read both terms in a browser before enabling them,
+and again if either site changes.
