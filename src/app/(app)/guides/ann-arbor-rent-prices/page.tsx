@@ -5,7 +5,8 @@ import { computeAvailability } from '@/lib/seo/rent-stats'
 import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { JsonLd, breadcrumbJsonLd, faqJsonLd, articleJsonLd, rentDatasetJsonLd } from '@/components/seo/JsonLd'
-import { BookOpen, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import { AtmosphericBackground } from '@/components/brand/AtmosphericBackground'
 
 /**
  * Live-data guide: what sublets actually cost in Ann Arbor right now,
@@ -97,7 +98,7 @@ export default async function RentPricesPage() {
   ]
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div>
       <JsonLd
         data={[
           breadcrumbJsonLd([
@@ -121,42 +122,50 @@ export default async function RentPricesPage() {
         ]}
       />
 
-      <Breadcrumbs
-        crumbs={[
-          { name: 'Home', path: '/' },
-          { name: 'Guides', path: '/guides' },
-          { name: 'Ann Arbor rent prices' },
-        ]}
-      />
-
-      <header className="max-w-2xl">
-        <p className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] text-gold-deep font-bold mb-3">
-          <BookOpen className="w-3.5 h-3.5" /> Live data
-        </p>
-        <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
-          What Ann Arbor sublets{' '}
-          <span className="italic font-light text-navy">actually cost.</span>
-        </h1>
-        <p className="mt-4 text-lg text-ink-muted leading-relaxed">
-          Median asking rents computed live from the active student sublets on
-          Wroomly. Not estimates, not last year&rsquo;s survey.
-        </p>
-        <p className="mt-2 text-[12px] text-ink-muted">
-          Computed {today} from {priced.length} active listing
-          {priced.length === 1 ? '' : 's'}. Refreshes on every visit.
-        </p>
+      <header className="relative isolate overflow-hidden -mt-16 pt-16">
+        <AtmosphericBackground variant="hero" />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-14 sm:pt-16 sm:pb-20">
+          <Breadcrumbs
+            tone="dark"
+            crumbs={[
+              { name: 'Home', path: '/' },
+              { name: 'Guides', path: '/guides' },
+              { name: 'Ann Arbor rent prices' },
+            ]}
+          />
+          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-maize-bright font-medium mb-5">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-40" />
+              <span className="rounded-full h-1.5 w-1.5 bg-emerald-400" />
+            </span>
+            Live data
+          </p>
+          <h1 className="font-display text-[clamp(2.15rem,5vw,4rem)] leading-[1.0] tracking-tight text-white max-w-4xl text-balance">
+            What Ann Arbor sublets{' '}
+            <span className="italic font-light text-maize-bright">actually cost.</span>
+          </h1>
+          <p className="mt-6 text-lg text-white/70 leading-relaxed max-w-2xl">
+            Median asking rents computed live from the active student sublets on
+            Wroomly. Not estimates, not last year&rsquo;s survey.
+          </p>
+          <p className="mt-6 text-[13px] text-white/55">
+            Computed {today} from {priced.length} active listing
+            {priced.length === 1 ? '' : 's'}. Refreshes on every visit.
+          </p>
+        </div>
       </header>
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       {overall ? (
         <>
           <section className="mt-10">
-            <div className="rounded-3xl border border-line bg-surface p-6 sm:p-8 max-w-md">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-ink-muted font-semibold">
+            <div className="rounded-[2rem] bg-maize-bright p-6 sm:p-8 max-w-md">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-navy-deep/70 font-bold">
                 Median asking rent, all active sublets
               </p>
-              <p className="mt-2 font-display text-5xl tracking-tight text-ink">
+              <p className="mt-2 font-display text-5xl tracking-tight text-navy-deep">
                 {usd(overall)}
-                <span className="text-lg text-ink-muted font-sans"> /month</span>
+                <span className="text-lg text-navy-deep/70 font-sans"> /month</span>
               </p>
             </div>
           </section>
@@ -360,6 +369,7 @@ export default async function RentPricesPage() {
           Browse live sublets <ArrowRight className="w-4 h-4" />
         </Link>
       </section>
+      </div>
     </div>
   )
 }
