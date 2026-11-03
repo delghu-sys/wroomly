@@ -3,6 +3,20 @@ import { normalizeExtractedListing } from '../listing-import/normalize.ts'
 import { parseAvailability, parseStreetAddress, findContactDetails } from './prefill.ts'
 
 /**
+ * A preference about the sex of who may live there. Illegal in a housing ad
+ * (federal Fair Housing Act, 42 U.S.C. 3604(c); Michigan's Elliott-Larsen Act),
+ * so a draft never carries that wording over. Narrow on purpose: it matches
+ * the sex-based phrasings, not every word the broader fair-housing warning list
+ * flags, so ordinary descriptions are left alone.
+ */
+export const SEX_PREFERENCE =
+  /\b(?:(?:females?|males?|girls?|guys?|women|men)\s+only|no\s+(?:men|women|guys|girls)|must\s+be\s+(?:a\s+)?(?:female|male|girl|guy|woman|man)|(?:looking\s+for|prefer|want|wanted)\s+(?:a|an|someone|somebody)?\s*(?:girl|guy|woman|man|female|male)s?)\b/i
+
+export function hasSexPreference(text: string | null | undefined): boolean {
+  return !!text && SEX_PREFERENCE.test(text)
+}
+
+/**
  * Turn what a discovery adapter scraped into a real ExtractedListingDraft —
  * the exact type the claim page (`/claim-listing/[token]`) and its editor
  * (`ClaimReview`) already know how to render and let a person correct.
@@ -99,7 +113,11 @@ export function leadToExtractedDraft({
 
   // Their own words, verbatim. Length is capped once, by the shared
   // normalizeExtractedListing every draft passes through — not again here.
-  const description = extracted.description?.trim() || null
+  // A preference about who may live there is not copied: the host writes the
+  // description, and is told why below.
+  const postedDescription = extracted.description?.trim() || null
+  const droppedSexPreference = hasSexPreference(postedDescription) || hasSexPreference(title)
+  const description = droppedSexPreference ? null : postedDescription
   const contact = findContactDetails(description)
 
   // Read (never invent) the two fields that cost the most to retype.
@@ -181,6 +199,11 @@ export function leadToExtractedDraft({
   if (street) {
     uncertaintyNotes.push(
       'The address came from the original listing title. Pick it from the suggestions to place it on the map.',
+    )
+  }
+  if (droppedSexPreference) {
+    uncertaintyNotes.push(
+      'The original post said who it wanted as a tenant, which a listing cannot do, so that wording was not copied. Write a description of the place and its terms.',
     )
   }
   if (extracted.unitType) uncertaintyNotes.push(`Original listing said: "${extracted.unitType}".`)
