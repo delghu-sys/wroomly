@@ -6,8 +6,14 @@ import { Menu as MenuPrimitive } from "@base-ui/react/menu"
 import { cn } from "@/lib/utils"
 import { ChevronRightIcon, CheckIcon } from "lucide-react"
 
-function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
-  return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />
+/**
+ * Not modal by default. A modal menu locks page scrolling while it is open, and
+ * on this site that lock sent the page back to the top: scroll down, click the
+ * profile picture, and the page jumped to the top. A menu in the header has no
+ * reason to freeze the page; it still closes on an outside click and Escape.
+ */
+function DropdownMenu({ modal = false, ...props }: MenuPrimitive.Root.Props) {
+  return <MenuPrimitive.Root data-slot="dropdown-menu" modal={modal} {...props} />
 }
 
 function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
