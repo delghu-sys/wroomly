@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, FileText, Loader2, Moon, Send } from 'lucide-react'
+import { Check, FileText, Globe, Loader2, Send } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { TestTemplateButton } from './TestTemplateButton'
-import { SEND_HOUR, SEND_INTERVAL_MIN, SEND_MINUTE, formatSlot, planStart, slotAt } from '@/lib/universities/schedule'
+import { SEND_INTERVAL_MIN, formatClock, formatHere, formatSlot, groupByCountry, planSends } from '@/lib/universities/schedule'
 
 interface Props {
   researched: number
@@ -23,11 +23,15 @@ interface Props {
   /** Messages handed to the mail provider and waiting for their time. */
   scheduledCount: number
   scheduledLast: string | null
+  /** Send times (ISO) of messages already waiting, so a preview never reuses a minute. */
+  scheduledTimes: string[]
+  /** Country of each approved message, oldest approval first. */
+  approvedCountries: (string | null)[]
 }
 
 /** Two bulk steps. Drafting only writes text. Sending asks you to confirm the
  *  sender and count first, and still passes every message through the gate. */
-export function UniversitiesConsole({ researched, drafted, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday, scheduleReady, scheduledCount, scheduledLast }: Props) {
+export function UniversitiesConsole({ researched, drafted, approved, fromDisplay, replyTo, enabled, dailyCap, sentToday, scheduleReady, scheduledCount, scheduledLast, scheduledTimes, approvedCountries }: Props) {
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -44,7 +48,7 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
         if (data.failed?.[0]) toast.error(`${data.failed[0].name}: ${data.failed[0].message}`)
       } else if (action === 'schedule-approved') {
         const refused = (data.outcomes ?? []).filter((o: { sent: boolean; message?: string }) => !o.sent)
-        if (data.sent) toast.success(`Scheduled ${data.sent}: first ${data.firstAt}, last ${data.lastAt}.`)
+        if (data.sent) toast.success(`Scheduled ${data.sent} across ${(data.groups ?? []).length} ${(data.groups ?? []).length === 1 ? 'country' : 'countries'}, each for 9:00 AM their time.`)
         else toast.error('Nothing was scheduled.')
         if (refused[0]) toast.error(`${refused[0].name}: ${refused[0].message}`)
         else if (data.remaining) toast.message('Click again to schedule the rest: they queue after the last one.')
@@ -84,10 +88,17 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
   }
 
   function scheduleOvernight() {
-    const start = planStart(new Date(), scheduledLast ? new Date(scheduledLast) : null)
-    const n = Math.min(approved, Math.max(0, dailyCap - sentToday))
+    const cap = Math.max(0, dailyCap - sentToday)
+    const items = approvedCountries.slice(0, cap).map((country, i) => ({ id: String(i), country }))
+    const groups = groupByCountry(planSends(new Date(), items, scheduledTimes.map(t => new Date(t).getTime())))
+    const lines = groups.slice(0, 14).map(g => {
+      const range = g.count > 1 ? `${formatSlot(g.first, g.tz)} to ${formatClock(g.last, g.tz)}` : formatSlot(g.first, g.tz)
+      return `${g.country} (${g.count}): ${range}${g.fallback ? ' [time zone unknown, sent at 2:30 AM Ann Arbor]' : ''}`
+    })
+    if (groups.length > 14) lines.push(`and ${groups.length - 14} more countries`)
+    const first = groups[0]
     const ok = window.confirm(
-      `Schedule ${n} approved email${n === 1 ? '' : 's'} to go out overnight?\n\nFirst: ${formatSlot(start)}\nLast: ${formatSlot(slotAt(start, Math.max(0, n - 1)))}\nOne every ${SEND_INTERVAL_MIN} minutes (Ann Arbor time).\n\nFrom: ${fromDisplay}\nReplies go to: ${replyTo || '(not set)'}\nDaily cap: ${dailyCap} (${sentToday} already used in the last 24h)\n\nThey are checked now, exactly as for Send now. You can cancel any that are still waiting.`,
+      `Schedule ${items.length} approved email${items.length === 1 ? '' : 's'} to arrive at 9:00 AM, their time?\n\n${lines.join('\n')}\n\nOne every ${SEND_INTERVAL_MIN} minutes at least, Tuesday to Thursday only.${first ? `\nThe first leaves at ${formatHere(first.first)} your time.` : ''}\n\nFrom: ${fromDisplay}\nReplies go to: ${replyTo || '(not set)'}\nDaily cap: ${dailyCap} (${sentToday} already used in the last 24h)\n\nThey are checked now, exactly as for Send now. You can cancel any that are still waiting.`,
     )
     if (ok) void call('schedule-approved', { confirm: true })
   }
@@ -130,8 +141,8 @@ export function UniversitiesConsole({ researched, drafted, approved, fromDisplay
           <Button size="sm" disabled={busy !== null || approved === 0} onClick={sendApproved}>
             {busy === 'send-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : `Send ${approved} now`}
           </Button>
-          <Button size="sm" variant="outline" disabled={busy !== null || approved === 0 || !scheduleReady} onClick={scheduleOvernight} title={`Send ${approved} at ${SEND_HOUR}:${String(SEND_MINUTE).padStart(2, '0')} AM Ann Arbor time, ${SEND_INTERVAL_MIN} minutes apart (morning in Europe)`}>
-            {busy === 'schedule-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Moon data-icon="inline-start" />} Send {approved} at {SEND_HOUR}:{String(SEND_MINUTE).padStart(2, '0')} AM
+          <Button size="sm" variant="outline" disabled={busy !== null || approved === 0 || !scheduleReady} onClick={scheduleOvernight} title="Each email is scheduled to arrive at 9:00 AM in its own country, Tuesday to Thursday, three minutes apart">
+            {busy === 'schedule-approved' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Globe data-icon="inline-start" />} Send {approved} at 9 AM their time
           </Button>
         </div>
         {!scheduleReady && <p className="text-[12.5px] text-red-600 mt-2">Overnight sending needs migration 049 (scheduled_for). Apply it to turn this button on.</p>}
