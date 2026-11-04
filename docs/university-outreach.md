@@ -187,28 +187,37 @@ housing. Incoming-winter students are searching now (Oct–Dec); fall students a
 nominated Feb–April and search May–August. Write now for winter and again in
 February for fall.
 
-### Send now, or overnight
+### Send now, or at 9 AM their time
 
 The console has two send buttons. **Send N now** sends immediately, as before.
-**Send N at 2:30 AM** schedules the approved emails for the next 2:30 AM Ann Arbor
-time, three minutes apart. That is the start of the working day in most of
-Europe (five to six hours ahead), and the spacing keeps a batch from arriving as
-a blast.
+**Send N at 9 AM their time** schedules every approved email so it arrives at
+**9:00 in the recipient's own country**, on a **Tuesday, Wednesday or Thursday**
+(a working day everywhere we write to, and never the Monday backlog or the Friday
+wind-down). The country comes from the university's row, and each country maps to
+one time zone (`COUNTRY_TZ` in `src/lib/universities/schedule.ts`).
 
+- **Spacing.** No two messages go within three minutes of each other, in the same
+  country or across countries. A country with many messages fills 9:00 onwards;
+  anything that would run past noon waits for the next allowed day.
+- **Unknown country.** A country with no known time zone is sent at 2:30 AM Ann
+  Arbor time, and the confirmation says so. Add it to `COUNTRY_TZ` to fix.
+- **A second click** queues behind messages already scheduled, never on the same
+  minute.
 - **Nothing runs overnight on our side.** Each message is handed to Resend now
   with its own send time. No cron job is needed and it does not matter if you
   close the tab.
 - **The same gate applies.** Approval, unedited since, opt-outs, the daily cap
   and the real-send switch are all checked when you click, exactly as for Send
   now. The cap counts scheduled messages from the moment they are scheduled.
-- **They cannot be re-checked at 2:30.** That is why the console shows
+- **They cannot be re-checked at send time.** That is why the console shows
   "N scheduled, the last at …" with a **Cancel** button. Cancelling asks Resend to
   drop the queued messages and returns them to approved, with their approval
   kept. A message that already left cannot be cancelled and stays shown as sent.
-- **A second click queues after the first batch**, never on the same minute.
 - **Table and follow-ups.** A scheduled row shows as "scheduled", and its sent
   time is the time it will leave, which is also when the follow-up clock starts.
 - A message that Resend refuses goes back to approved and does not take a slot.
+- Public holidays are not known to the scheduler. Check the confirmation list
+  against local holidays (Japan, for example, has one on Nov 23).
 
 Needs **migration 049** (`scheduled_for`). Until it is applied the overnight button
 is disabled with a notice; Send now is unaffected. Follow-ups still send now only.

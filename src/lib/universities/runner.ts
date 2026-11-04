@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { normalizeEmail } from '../agents/outreach-policy.ts'
 import { DEFAULT_SETTINGS, renderEmail } from './template.ts'
-import { formatSlot, planStart, slotAt } from './schedule.ts'
+import { formatClock, formatSlot, pickSlot } from './schedule.ts'
 import {
   REFUSAL_TEXT,
   approvalHash,
@@ -397,40 +397,47 @@ export async function sendApproved(
   return { outcomes, sent: outcomes.filter(o => o.sent).length, remaining: ids.length - outcomes.length }
 }
 
-export interface ScheduleApprovedResult extends SendApprovedResult {
-  /** Local-time text for the first and last slot used, or null when none was. */
-  firstAt: string | null
-  lastAt: string | null
+export interface ScheduledGroup {
+  country: string
+  count: number
+  /** "Thu, Nov 5 at 9:00 AM GMT+9": in the recipients' own time. */
+  firstAt: string
+  /** Just the clock time of the last one, "9:18 AM". */
+  lastClock: string
 }
 
-/** The latest time any message is already scheduled for, or null. Throws a
+export interface ScheduleApprovedResult extends SendApprovedResult {
+  /** One entry per country that got at least one message. */
+  groups: ScheduledGroup[]
+}
+
+/** The times (ms) of every message already waiting for its send time. Throws a
  *  plain message when migration 049 has not been applied. */
-export async function latestScheduled(db: Db, now: Date): Promise<Date | null> {
+export async function futureScheduled(db: Db, now: Date): Promise<number[]> {
   const { data, error } = await db
     .from('university_prospects')
     .select('scheduled_for')
     .gt('scheduled_for', now.toISOString())
-    .order('scheduled_for', { ascending: false })
   if (error) {
     if (error.code === '42703' || error.code === 'PGRST204' || /scheduled_for/.test(error.message)) {
       throw new Error('Overnight sending needs migration 049 (scheduled_for). Apply it, then try again.')
     }
     throw new Error(error.message)
   }
-  const top = ((data ?? []) as { scheduled_for: string }[])[0]?.scheduled_for
-  return top ? new Date(top) : null
+  return ((data ?? []) as { scheduled_for: string }[]).map(r => new Date(r.scheduled_for).getTime())
 }
 
 /**
- * Schedule approved messages for the next 2:30 AM, three minutes apart.
+ * Schedule approved messages to arrive at 9:00 in each recipient's own country,
+ * on a Tuesday, Wednesday or Thursday, three minutes apart.
  *
  * Nothing waits around: each message is handed to Resend now with its own send
  * time, so it needs no cron job and survives this request ending. Every message
  * still passes the same gate as a send now (approval, unedited since, opt-outs,
  * the daily cap, the real-send switch), and the cap counts scheduled messages
  * from the moment they are scheduled. A message that cannot be scheduled does
- * not take up a slot. Because the gate cannot run again at 2:30, cancelling is
- * offered (see cancelScheduled).
+ * not take up a slot. Because the gate cannot run again at send time,
+ * cancelling is offered (see cancelScheduled).
  */
 export async function scheduleApproved(
   db: Db,
@@ -438,34 +445,47 @@ export async function scheduleApproved(
 ): Promise<ScheduleApprovedResult> {
   const { pauseMs = 700, budgetMs = 45_000, now = Date.now } = opts
   const startedAt = new Date(now())
-  const latest = await latestScheduled(db, startedAt)
-  const start = planStart(startedAt, latest)
+  const taken = await futureScheduled(db, startedAt)
   const { data } = await db
     .from('university_prospects')
-    .select('id')
+    .select('id, country')
     .eq('status', 'approved')
     .order('approved_at', { ascending: true })
-  const ids = ((data ?? []) as { id: string }[]).map(r => r.id)
+  const rows = (data ?? []) as { id: string; country: string | null }[]
   const ctx = await sendContext(db)
   const outcomes: SendOutcome[] = []
-  let slot = 0
+  const groups = new Map<string, { country: string; count: number; first: Date; last: Date; tz: string }>()
+  let scheduled = 0
   let attempted = 0
   const t0 = now()
-  for (const id of ids) {
+  for (const row of rows) {
     if (now() - t0 > budgetMs) break
-    const o = await sendOne(db, id, opts, ctx, slotAt(start, slot))
+    const slot = pickSlot(startedAt, row.country, taken)
+    const o = await sendOne(db, row.id, opts, ctx, slot.at)
     attempted++
     outcomes.push(o)
-    if (o.sent) slot++
+    if (o.sent) {
+      scheduled++
+      taken.push(slot.at.getTime())
+      const key = row.country ?? 'Unknown country'
+      const g = groups.get(key)
+      if (!g) groups.set(key, { country: key, count: 1, first: slot.at, last: slot.at, tz: slot.tz })
+      else {
+        g.count++
+        if (slot.at > g.last) g.last = slot.at
+        if (slot.at < g.first) g.first = slot.at
+      }
+    }
     if (o.reason === 'daily-cap-reached' || o.reason === 'sending-disabled' || o.reason === 'sender-misconfigured') break
     if (o.sent && pauseMs > 0) await new Promise(r => setTimeout(r, pauseMs))
   }
   return {
     outcomes,
-    sent: slot,
-    remaining: ids.length - attempted,
-    firstAt: slot > 0 ? formatSlot(start) : null,
-    lastAt: slot > 0 ? formatSlot(slotAt(start, slot - 1)) : null,
+    sent: scheduled,
+    remaining: rows.length - attempted,
+    groups: [...groups.values()]
+      .sort((x, y) => x.first.getTime() - y.first.getTime())
+      .map(g => ({ country: g.country, count: g.count, firstAt: formatSlot(g.first, g.tz), lastClock: formatClock(g.last, g.tz) })),
   }
 }
 

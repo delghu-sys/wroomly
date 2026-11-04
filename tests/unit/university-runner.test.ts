@@ -596,29 +596,49 @@ test('the latest hold wins, and a person\'s message or another university never 
   assert.equal(o.items[1].heldUntil, null)
 })
 
-// ── overnight scheduling ────────────────────────────────────────────────────
+// ── scheduling by recipient country ────────────────────────────────────────
 
-const NOW_MS = Date.parse('2026-11-03T20:00:00Z') // 3:00 PM in Ann Arbor
+const NOW_MS = Date.parse('2026-11-03T20:00:00Z') // Tuesday 3:00 PM in Ann Arbor
 const fixedNow = () => NOW_MS
 const three = () => [
   prospect({ id: 'p2', slug: 'b', name: 'B University', contact_email: 'b@example.edu' }),
   prospect({ id: 'p3', slug: 'c', name: 'C University', contact_email: 'c@example.edu' }),
 ]
 
-test('scheduling hands each message to the mail provider with its own time, three minutes apart', async () => {
+test('scheduling hands each message to the mail provider at 9:00 in its country, three minutes apart', async () => {
   const db = await approvedDb(three())
   const { sent, send } = mailer()
   const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
   assert.equal(r.sent, 3)
-  // 2:30 AM EST on Nov 4 is 07:30 UTC.
-  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T07:30:00.000Z', '2026-11-04T07:33:00.000Z', '2026-11-04T07:36:00.000Z'])
-  assert.match(r.firstAt ?? '', /Nov 4 at 2:30 AM/)
-  assert.match(r.lastAt ?? '', /Nov 4 at 2:36 AM/)
+  // The fixtures are Swedish: 9:00 CET on Wednesday is 08:00 UTC.
+  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T08:00:00.000Z', '2026-11-04T08:03:00.000Z', '2026-11-04T08:06:00.000Z'])
+  assert.equal(r.groups.length, 1)
+  assert.equal(r.groups[0].country, 'Sweden')
+  assert.equal(r.groups[0].count, 3)
+  assert.match(r.groups[0].firstAt, /Wed, Nov 4 at 9:00 AM/)
+  assert.equal(r.groups[0].lastClock, '9:06 AM')
   for (const row of db.tables.university_prospects) {
     assert.equal(row.status, 'sent', 'claimed at once, so it can neither be scheduled twice nor slip past the cap')
     assert.equal(row.sent_at, row.scheduled_for, 'the sent time is when it will actually leave')
     assert.ok(row.sent_message_id)
   }
+})
+
+test('every email goes out in its own country’s morning', async () => {
+  const db = await approvedDb([
+    prospect({ id: 'p2', slug: 'jp', name: 'Tokyo U', country: 'Japan', contact_email: 'jp@example.ac.jp' }),
+    prospect({ id: 'p3', slug: 'br', name: 'Sao Paulo U', country: 'Brazil', contact_email: 'br@example.br' }),
+    prospect({ id: 'p4', slug: 'zz', name: 'Nowhere U', country: 'Atlantis', contact_email: 'zz@example.org' }),
+  ])
+  const { sent, send } = mailer()
+  const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
+  assert.equal(r.sent, 4)
+  const at = (to: string) => sent.find(m => m.to === to)?.scheduledAt
+  assert.equal(at('jp@example.ac.jp'), '2026-11-04T00:00:00.000Z', '9:00 Wednesday in Tokyo')
+  assert.equal(at('exchange@example.edu'), '2026-11-04T08:00:00.000Z', '9:00 Wednesday in Stockholm')
+  assert.equal(at('br@example.br'), '2026-11-04T12:00:00.000Z', '9:00 Wednesday in Sao Paulo')
+  assert.equal(at('zz@example.org'), '2026-11-04T07:30:00.000Z', 'unknown country: 2:30 AM Ann Arbor time')
+  assert.deepEqual(r.groups.map(g => g.country), ['Japan', 'Atlantis', 'Sweden', 'Brazil'], 'listed earliest first')
 })
 
 test('a message the gate refuses takes no slot, and nothing is scheduled when real sending is off', async () => {
@@ -627,7 +647,7 @@ test('a message the gate refuses takes no slot, and nothing is scheduled when re
   const { sent, send } = mailer()
   const r = await scheduleApproved(D(db), { send, enabled: true, now: fixedNow, pauseMs: 0 })
   assert.equal(r.sent, 2)
-  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T07:30:00.000Z', '2026-11-04T07:33:00.000Z'], 'no gap where the refused one would have been')
+  assert.deepEqual(sent.map(m => m.scheduledAt), ['2026-11-04T08:00:00.000Z', '2026-11-04T08:03:00.000Z'], 'no gap where the refused one would have been')
   const off = await approvedDb()
   const m2 = mailer()
   const r2 = await scheduleApproved(D(off), { send: m2.send, enabled: false, now: fixedNow, pauseMs: 0 })
@@ -636,7 +656,7 @@ test('a message the gate refuses takes no slot, and nothing is scheduled when re
   assert.equal(off.tables.university_prospects[0].status, 'approved')
 })
 
-test('a second batch queues after the last scheduled message, never on the same minute', async () => {
+test('a second batch queues behind what is already scheduled, never on the same minute', async () => {
   const db = await approvedDb(three())
   const first = mailer()
   // Only one approved at first: withdraw the other two, schedule, approve again.
@@ -645,7 +665,7 @@ test('a second batch queues after the last scheduled message, never on the same 
   for (const id of ['p2', 'p3']) await approve(D(db), id)
   const second = mailer()
   await scheduleApproved(D(db), { send: second.send, enabled: true, now: fixedNow, pauseMs: 0 })
-  assert.deepEqual(second.sent.map(m => m.scheduledAt), ['2026-11-04T07:33:00.000Z', '2026-11-04T07:36:00.000Z'])
+  assert.deepEqual(second.sent.map(m => m.scheduledAt), ['2026-11-04T08:03:00.000Z', '2026-11-04T08:06:00.000Z'])
 })
 
 test('a failed hand-off puts the message back to approved and frees its slot', async () => {

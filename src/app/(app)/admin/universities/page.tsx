@@ -118,6 +118,8 @@ export default async function AdminUniversitiesPage() {
             scheduleReady={scheduleReady}
             scheduledCount={scheduledAt.size}
             scheduledLast={scheduledLast}
+            scheduledTimes={[...scheduledAt.values()]}
+            approvedCountries={rows.filter(r => r.status === 'approved' && !r.scheduled_for && r.contact_email).map(r => r.country)}
           />
           <section className="mt-8">
             <FollowupsPanel
