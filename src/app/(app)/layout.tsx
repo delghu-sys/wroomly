@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
+import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
 import { FooterGate } from '@/components/layout/FooterGate'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { SUPPLY_ONLY_MODE } from '@/lib/config'
@@ -114,7 +115,12 @@ export default async function AppLayout({
       >
         Skip to main content
       </a>
-      <Navbar user={profile} unreadCount={unreadCount} supplyOnly={SUPPLY_ONLY_MODE} />
+      <Navbar
+        user={profile}
+        unreadCount={unreadCount}
+        supplyOnly={SUPPLY_ONLY_MODE}
+        menuNeighborhoods={NEIGHBORHOOD_CONTENT.slice(0, 5).map(n => ({ slug: n.slug, name: n.name }))}
+      />
       {/* Clickwrap gate: prompts signed-in users whose latest acceptance
           predates the current policy versions (or who never clickwrapped). */}
       {profile ? <LegalReacceptance /> : null}

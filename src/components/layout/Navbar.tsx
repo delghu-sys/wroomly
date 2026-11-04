@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -18,17 +18,26 @@ import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Menu, X, House, Heart } from 'lucide-react'
 import { LogoMark } from '@/components/brand/Logo'
 import { PAYMENTS_ENABLED } from '@/lib/config'
+import { buildMenuSections, type MenuRole } from '@/lib/nav/site-menu'
+import { SiteMenu } from './SiteMenu'
 
 interface NavbarProps {
   user: User | null
   unreadCount?: number
   supplyOnly?: boolean
+  /** A few neighborhoods for the site menu ({slug, name} only: the full copy stays on the server). */
+  menuNeighborhoods?: { slug: string; name: string }[]
 }
 
-export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProps) {
+export function Navbar({ user, unreadCount = 0, supplyOnly = false, menuNeighborhoods = [] }: NavbarProps) {
   const router = useRouter()
   const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  // The menu remembers which page it was opened on, so any navigation (a link,
+  // the back button) closes it without an effect.
+  const [menuOpenedOn, setMenuOpenedOn] = useState<string | null>(null)
+  const menuOpen = menuOpenedOn === pathname
+  const closeMenu = useCallback(() => setMenuOpenedOn(null), [])
+  const toggleMenu = useCallback(() => setMenuOpenedOn(p => (p === pathname ? null : pathname)), [pathname])
   const [scrolled, setScrolled] = useState(false)
 
   // Pages whose top sections use the dark atmospheric hero. The navbar starts
@@ -47,13 +56,21 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const transparent = hasDarkHero && !scrolled
+  // Solid while the site menu is open, so the bar and the panel read as one surface.
+  const transparent = hasDarkHero && !scrolled && !menuOpen
 
   // Supply-only soft launch: hide the renter content links (Browse / How it
   // works) for anyone who isn't an exempt supplier/admin — they only lead to
   // /coming-soon, so they read as broken on supplier-flow pages.
   const hideRenterNav =
     supplyOnly && user?.user_type !== 'supplier' && user?.user_type !== 'admin'
+
+  const menuRole: MenuRole | null =
+    user?.user_type === 'admin' || user?.user_type === 'supplier' || user?.user_type === 'consumer' ? user.user_type : user ? 'consumer' : null
+  const menuSections = useMemo(
+    () => buildMenuSections({ role: menuRole, hideRenterNav, paymentsEnabled: PAYMENTS_ENABLED, unreadCount, neighborhoods: menuNeighborhoods }),
+    [menuRole, hideRenterNav, unreadCount, menuNeighborhoods],
+  )
 
   async function signOut() {
     const supabase = createClient()
@@ -64,7 +81,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
 
   function nav(href: string) {
     return () => {
-      setMobileOpen(false)
+      closeMenu()
       router.push(href)
     }
   }
@@ -81,7 +98,9 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
       className={`sticky top-0 z-50 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         transparent
           ? 'bg-transparent border-b border-transparent'
-          : 'mobile-frost bg-background/90 sm:bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-1 sm:supports-[backdrop-filter]:bg-background/60'
+          : menuOpen
+            ? 'bg-background border-b border-line'
+            : 'mobile-frost bg-background/90 sm:bg-background/80 backdrop-blur-xl border-b border-line/80 shadow-1 sm:supports-[backdrop-filter]:bg-background/60'
       }`}
     >
       <nav aria-label="Main" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
@@ -198,6 +217,22 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                 </div>
               )}
 
+              {/* Site menu — desktop. Everything on the site, next to the
+                  account menu (which keeps the account pages). */}
+              <button
+                type="button"
+                onClick={() => toggleMenu()}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                className={`hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-sm font-medium border ease-smooth transition-colors ${
+                  transparent
+                    ? 'text-white border-white/20 hover:bg-white/10'
+                    : 'text-ink border-line hover:bg-navy-soft'
+                }`}
+              >
+                {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />} Menu
+              </button>
+
               {/* Avatar dropdown — desktop */}
               <div className="hidden md:block">
                 <DropdownMenu>
@@ -259,7 +294,7 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => {
-                        setMobileOpen(false)
+                        closeMenu()
                         signOut()
                       }}
                       className="rounded-lg text-destructive focus:text-destructive"
@@ -272,19 +307,37 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
 
               {/* Hamburger — mobile */}
               <button
-                onClick={() => setMobileOpen(o => !o)}
+                onClick={() => toggleMenu()}
                 className={`md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                   transparent
                     ? 'text-white hover:bg-white/10'
                     : 'hover:bg-navy-soft'
                 }`}
                 aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
               >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </>
           ) : (
             <>
+              {/* Site menu — desktop. Everything on the site, next to the
+                  account menu (which keeps the account pages). */}
+              <button
+                type="button"
+                onClick={() => toggleMenu()}
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
+                className={`hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-sm font-medium border ease-smooth transition-colors ${
+                  transparent
+                    ? 'text-white border-white/20 hover:bg-white/10'
+                    : 'text-ink border-line hover:bg-navy-soft'
+                }`}
+              >
+                {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />} Menu
+              </button>
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -309,137 +362,24 @@ export function Navbar({ user, unreadCount = 0, supplyOnly = false }: NavbarProp
                 Get started
               </Button>
               <button
-                onClick={() => setMobileOpen(o => !o)}
+                onClick={() => toggleMenu()}
                 className={`md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                   transparent
                     ? 'text-white hover:bg-white/10'
                     : 'hover:bg-navy-soft'
                 }`}
                 aria-label="Toggle menu"
+                aria-expanded={menuOpen}
+                aria-controls="site-menu"
               >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
             </>
           )}
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-line bg-background/95 mobile-frost backdrop-blur-xl animate-fade-up">
-          <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-            {!hideRenterNav && (
-              <>
-                <MobileLink href="/listings" onClick={() => setMobileOpen(false)}>
-                  Browse
-                </MobileLink>
-                <MobileLink href="/match" onClick={() => setMobileOpen(false)}>
-                  Get matched
-                </MobileLink>
-                <MobileLink href="/list-place" onClick={() => setMobileOpen(false)}>
-                  List your place
-                </MobileLink>
-              </>
-            )}
-
-            {user && (
-              <>
-                <div className="h-px bg-line my-2" />
-                <MobileLink href="/dashboard" onClick={() => setMobileOpen(false)}>
-                  Dashboard
-                </MobileLink>
-                <MobileLink href="/messages" onClick={() => setMobileOpen(false)}>
-                  Messages{' '}
-                  {unreadCount > 0 && (
-                    <span className="ml-1.5 text-xs bg-maize text-navy px-1.5 py-0.5 rounded-full font-semibold">
-                      {unreadCount}
-                    </span>
-                  )}
-                </MobileLink>
-
-                {(user.user_type === 'supplier' || user.user_type === 'admin') && (
-                  <>
-                    <MobileLink href="/my-listings" onClick={() => setMobileOpen(false)}>
-                      My listings
-                    </MobileLink>
-                    <MobileLink href="/inquiries" onClick={() => setMobileOpen(false)}>
-                      Inquiries
-                    </MobileLink>
-                    <MobileLink href="/listings/new" onClick={() => setMobileOpen(false)}>
-                      + List a place
-                    </MobileLink>
-                  </>
-                )}
-                {/* Saved listings for everyone — any user can favorite. */}
-                <MobileLink href="/favorites" onClick={() => setMobileOpen(false)}>
-                  Saved listings
-                </MobileLink>
-                {user.user_type === 'consumer' && (
-                  <>
-                    <MobileLink href="/saved-searches" onClick={() => setMobileOpen(false)}>
-                      Saved searches
-                    </MobileLink>
-                    <MobileLink href="/applications" onClick={() => setMobileOpen(false)}>
-                      Applications
-                    </MobileLink>
-                  </>
-                )}
-                {user.user_type === 'admin' && (
-                  <MobileLink href="/admin" onClick={() => setMobileOpen(false)}>
-                    Admin
-                  </MobileLink>
-                )}
-
-                <div className="h-px bg-line my-2" />
-                <MobileLink href="/profile" onClick={() => setMobileOpen(false)}>
-                  Profile settings
-                </MobileLink>
-                <button
-                  onClick={() => {
-                    setMobileOpen(false)
-                    signOut()
-                  }}
-                  className="w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors"
-                >
-                  Sign out
-                </button>
-              </>
-            )}
-
-            {!user && (
-              <>
-                <div className="h-px bg-line my-2" />
-                <MobileLink href="/sign-in" onClick={() => setMobileOpen(false)}>
-                  Sign in
-                </MobileLink>
-                <MobileLink href="/sign-up" onClick={() => setMobileOpen(false)}>
-                  Create account
-                </MobileLink>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <SiteMenu open={menuOpen} sections={menuSections} onClose={closeMenu} onSignOut={user ? signOut : undefined} />
     </header>
-  )
-}
-
-function MobileLink({
-  href,
-  onClick,
-  children,
-}: {
-  href: string
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="block px-3 py-2.5 text-sm font-medium text-ink rounded-xl hover:bg-navy-soft transition-colors"
-    >
-      {children}
-    </Link>
   )
 }
