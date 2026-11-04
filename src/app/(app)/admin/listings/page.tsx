@@ -99,10 +99,14 @@ export default async function AdminListingsPage({
                 <div className="flex items-start justify-between gap-4 mb-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-ink">{listing.title}</h3>
-                      <Link href={`/listings/${listing.id}`} target="_blank">
-                        <ExternalLink className="w-3.5 h-3.5 text-ink-muted hover:text-[#2F6BFF]" />
-                      </Link>
+                      <h3 className="font-semibold text-ink">
+                        <Link href={`/admin/listings/${listing.id}`} className="hover:underline underline-offset-4">{listing.title}</Link>
+                      </h3>
+                      {listing.status === 'active' && (
+                        <Link href={`/listings/${listing.id}`} target="_blank" aria-label="View the live listing" title="View the live listing">
+                          <ExternalLink className="w-3.5 h-3.5 text-ink-muted hover:text-[#2F6BFF]" />
+                        </Link>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 text-sm text-ink-muted">
                       <span className="capitalize">{listing.type}</span>
@@ -180,9 +184,15 @@ export default async function AdminListingsPage({
                   </div>
                 )}
 
-                {listing.status === 'pending_review' && (
-                  <AdminListingActions listingId={listing.id} />
-                )}
+                <div className="space-y-3">
+                  <Link
+                    href={`/admin/listings/${listing.id}`}
+                    className="inline-flex items-center h-9 px-4 rounded-full bg-navy-deep text-maize-bright text-[13px] font-semibold hover:opacity-90 transition"
+                  >
+                    {listing.status === 'pending_review' ? 'Review everything they submitted' : 'See all details'}
+                  </Link>
+                  {listing.status === 'pending_review' && <AdminListingActions listingId={listing.id} />}
+                </div>
               </div>
             )
           })}
