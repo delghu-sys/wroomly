@@ -1,10 +1,15 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { ArrowRight, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
 import type { ListingWithDetails } from '@/types/database'
 import { HomeHero } from '@/components/home/HomeHero'
 import { BrandListingCard } from '@/components/listings/BrandListingCard'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

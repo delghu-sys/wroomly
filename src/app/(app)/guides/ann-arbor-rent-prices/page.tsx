@@ -21,7 +21,7 @@ const MIN_SAMPLE = 3
 export const metadata: Metadata = {
   title: 'Ann Arbor Rent Prices for Students: Live Sublet Data',
   description:
-    'What University of Michigan sublets actually cost right now: live median asking rents by bedroom count and neighborhood, computed from active student listings on Wroomly.',
+    'What University of Michigan sublets cost right now: live median asking rents by bedroom count and neighborhood, from active student listings on Wroomly.',
   alternates: { canonical: '/guides/ann-arbor-rent-prices' },
   openGraph: {
     title: 'Ann Arbor Rent Prices for Students: Live Sublet Data | Wroomly',

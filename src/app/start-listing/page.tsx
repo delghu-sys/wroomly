@@ -5,9 +5,10 @@ import { LogoMark } from '@/components/brand/Logo'
 import { Camera, PencilLine, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'List your place | Wroomly',
+  title: 'List Your Ann Arbor Sublet for Free',
   description:
-    'List your Ann Arbor sublet. Import it from an existing post in seconds, or create it yourself.',
+    'List your Ann Arbor sublet on Wroomly for free. Import it from an existing post in seconds, or create it yourself and reach U-M students.',
+  alternates: { canonical: '/start-listing' },
 }
 
 const NOISE_SVG =

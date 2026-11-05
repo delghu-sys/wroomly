@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { clampMeta, clampTitle } from '@/lib/seo/meta'
 import type { Metadata } from 'next'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { PUBLIC_LISTING_COLUMNS } from '@/lib/listings/columns'
@@ -85,7 +86,7 @@ export async function generateMetadata({
         })}`
       : 'flexible dates'
 
-  const description = `${bedroomLabel} ${typeLabel} in ${where}, available ${dateRange}. On Wroomly, where verified University of Michigan students carry a blue check so you can see who is a real student.`
+  const description = clampMeta(`${bedroomLabel} ${typeLabel} in ${where}, available ${dateRange}. On Wroomly, where verified University of Michigan students carry a blue check.`)
 
   return {
     title: seoTitle,

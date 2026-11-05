@@ -89,32 +89,4 @@ export const PROPERTY_TYPES = [
 
 export type PropertyTypeValue = (typeof PROPERTY_TYPES)[number]['value']
 
-// Curated list of named student residences / apartment complexes in Ann Arbor.
-// Used both for listing creation (when property_type === 'residence') and as a
-// browse filter on /listings.
-export const ANN_ARBOR_RESIDENCES = [
-  '411 Lofts',
-  'Ann Arbor City Apartments',
-  'Arbor Blu',
-  'Courtyards',
-  'Forest Plaza',
-  'Foundry Lofts',
-  'HERE Ann Arbor',
-  'Hub on Campus',
-  'Landmark',
-  'Lookout',
-  'Saga',
-  'Six11',
-  'Sterling 411 Lofts',
-  'The Bell Tower',
-  'The Heritage',
-  'The Legacy',
-  'The Standard',
-  'The Varsity',
-  'The Yard',
-  'Tower Plaza',
-  'Verve',
-  'Vic Village North',
-  'Vic Village South',
-  'Z Place',
-] as const
+export { ANN_ARBOR_RESIDENCES } from './residences'

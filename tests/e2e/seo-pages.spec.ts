@@ -64,3 +64,38 @@ test('new guides render with Article + FAQPage schema', async ({ request }) => {
   expect(types).toContain('Article')
   expect(types).toContain('FAQPage')
 })
+
+// ── technical SEO: real 404s, canonicals, indexability ──────────────────────
+
+test('a guide, neighborhood or building that does not exist is a real 404', async ({ request }) => {
+  for (const path of ['/guides/this-does-not-exist', '/ann-arbor/not-a-place', '/buildings/not-a-building']) {
+    const res = await request.get(path)
+    expect(res.status(), `${path} should be HTTP 404, not a 200 "not found" page`).toBe(404)
+  }
+})
+
+test('pages that exist still answer 200', async ({ request }) => {
+  for (const path of ['/guides/ann-arbor-rent-prices', '/guides/how-to-pay-for-a-sublet-safely', '/ann-arbor/central-campus', '/buildings']) {
+    expect((await request.get(path)).status(), path).toBe(200)
+  }
+})
+
+test('each page names itself as the canonical, not the homepage', async ({ request }) => {
+  for (const path of ['/about', '/start-listing', '/safety', '/exchange', '/guides']) {
+    const html = await (await request.get(path)).text()
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1]
+    expect(canonical, path).toBe(`https://wroomly.app${path}`)
+  }
+})
+
+test('sign-in and sign-up are not indexed', async ({ request }) => {
+  for (const path of ['/sign-in', '/sign-up']) {
+    const html = await (await request.get(path)).text()
+    expect(html, path).toMatch(/<meta name="robots" content="noindex/)
+  }
+})
+
+test('the exchange page has exactly one h1', async ({ request }) => {
+  const html = await (await request.get('/exchange')).text()
+  expect(html.match(/<h1[ >]/g)?.length).toBe(1)
+})

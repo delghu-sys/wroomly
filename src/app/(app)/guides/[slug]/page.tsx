@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { GUIDES, getGuide } from '@/lib/seo/guides'
+import { clampMeta } from '@/lib/seo/meta'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import {
   JsonLd,
@@ -27,13 +28,16 @@ export async function generateMetadata({
   const { slug } = await params
   const g = getGuide(slug)
   if (!g) return { title: 'Guide not found' }
+  // The full description is the on-page lede; the search-result snippet is
+  // clamped so it is not cut off mid-sentence.
+  const snippet = clampMeta(g.description)
   return {
     title: g.seoTitle ?? g.title,
-    description: g.description,
+    description: snippet,
     alternates: { canonical: `/guides/${g.slug}` },
     openGraph: {
       title: `${g.seoTitle ?? g.title} | Wroomly`,
-      description: g.description,
+      description: snippet,
       type: 'article',
       images: ['/og-default.png'],
     },

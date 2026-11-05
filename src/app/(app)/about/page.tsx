@@ -10,9 +10,10 @@ import { StackedSteps } from '@/components/about/StackedSteps'
 import { TrustBento } from '@/components/about/TrustBento'
 
 export const metadata: Metadata = {
-  title: 'How It Works',
+  title: 'How Wroomly Works for U-M Sublets',
   description:
     'See how Wroomly handles verification, reviewed listings, and in-app messaging for U of M student housing.',
+  alternates: { canonical: '/about' },
   openGraph: {
     title: 'How It Works | Wroomly',
     description:

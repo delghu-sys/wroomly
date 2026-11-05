@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { clampMeta, clampTitle } from '@/lib/seo/meta'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BUILDINGS, getBuilding, buildingIntro, buildingFaqs } from '@/lib/seo/buildings'
@@ -22,10 +23,10 @@ export async function generateMetadata({
   const b = getBuilding(building)
   if (!b) return { title: 'Building not found' }
 
-  const title = `Sublets at ${b.name}: University of Michigan Housing, Ann Arbor`
-  const description = b.address
+  const title = clampTitle(`Sublets at ${b.name} in Ann Arbor`)
+  const description = clampMeta(b.address
     ? `Sublet at ${b.name} (${b.address.split(',')[0]}) in Ann Arbor. University of Michigan student sublets, plus floor plans, amenities, and location facts. Verified UMich students carry a blue check.`
-    : `Looking to sublet at ${b.name} in Ann Arbor? Find University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`
+    : `Looking to sublet at ${b.name} in Ann Arbor? Find University of Michigan student sublets at ${b.name} on Wroomly. Verified UMich students carry a blue check.`)
   return {
     title,
     description,
