@@ -194,3 +194,12 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
 export function getNeighborhood(slug: string): NeighborhoodContent | undefined {
   return NEIGHBORHOOD_CONTENT.find(n => n.slug === slug)
 }
+
+/**
+ * Meta description for a neighborhood page: the tagline plus a call to browse.
+ * Composed from whole fields only, so it never cuts a sentence mid word.
+ * Kept to 155 characters or fewer (enforced by tests/unit/neighborhoods.test.ts).
+ */
+export function neighborhoodDescription(n: NeighborhoodContent): string {
+  return `${n.tagline} Browse UMich student sublets in ${n.name}, Ann Arbor, on Wroomly.`
+}

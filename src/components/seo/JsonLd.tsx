@@ -54,6 +54,7 @@ export function articleJsonLd(opts: {
     description: opts.description,
     datePublished: opts.datePublished,
     dateModified: opts.dateModified ?? opts.datePublished,
+    image: `${ORIGIN}/og-default.png`,
     mainEntityOfPage: `${ORIGIN}/guides/${opts.slug}`,
     // Named human author (E-E-A-T): AI engines cite content with a real,
     // identifiable person behind it markedly more than anonymous org bylines.

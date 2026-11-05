@@ -1,5 +1,6 @@
 import { computeRentStats, usd } from '@/lib/seo/rent-stats'
 import { NEIGHBORHOOD_CONTENT } from '@/lib/seo/neighborhoods'
+import { GUIDES } from '@/lib/seo/guides'
 
 /**
  * /llms.txt — the file AI assistants fetch to understand a site
@@ -67,6 +68,11 @@ export async function GET() {
     }),
   ].join('\n')
 
+  // Generated from GUIDES so a new guide appears here without a second edit.
+  const guides = GUIDES.map(
+    g => `- [${g.title}](https://wroomly.app/guides/${g.slug}): ${g.description}`,
+  ).join('\n')
+
   const body = `# Wroomly
 
 > Wroomly is a sublet and student-housing marketplace for the University of Michigan community in Ann Arbor. University of Michigan students verify through their @umich.edu Google login and carry a blue check next to their name, so renters can see which listings come from a real, verified U-M student. Anyone can browse, inquire, and list; the blue check is a visible trust signal, not a gate. Wroomly focuses on summer and term-time sublets near campus, with building-by-building landing pages, live rent-price data computed from active listings, and guides on subletting safely, avoiding scams, and Michigan deposit law.
@@ -90,19 +96,7 @@ ${liveData}
 
 ## Guides
 
-- [How to sublet your apartment at the University of Michigan](https://wroomly.app/guides/how-to-sublet-your-apartment-at-university-of-michigan): Step-by-step on pricing, landlord approval, and finding a subletter as a U-M student.
-- [Summer sublets in Ann Arbor: a student's guide](https://wroomly.app/guides/summer-sublets-in-ann-arbor-student-guide): How the Ann Arbor summer sublet market works, timing, and typical rents near campus.
-- [How to avoid sublet scams in Ann Arbor](https://wroomly.app/guides/how-to-avoid-sublet-scams-ann-arbor): Red flags, safe payment practices, and how to verify a listing is real.
-- [Security deposits for Ann Arbor sublets](https://wroomly.app/guides/security-deposits-ann-arbor-sublets): Michigan deposit law, the 30-day return rule, and documenting move-in/move-out.
-- [The best Ann Arbor neighborhoods for UMich students](https://wroomly.app/guides/best-neighborhoods-for-umich-students): All eleven neighborhoods compared by walk time, vibe, and value.
-- [The UMich off-campus housing timeline](https://wroomly.app/guides/umich-off-campus-housing-timeline): Ann Arbor's early leasing calendar month by month, and where sublets fit.
-- [Sublet vs. relet vs. lease takeover](https://wroomly.app/guides/sublet-vs-relet-lease-takeover): Who stays on the lease, who holds the risk, and which arrangement fits.
-- [Housing at UMich as an international student](https://wroomly.app/guides/international-student-housing-guide-umich): Renting from abroad safely — timing, documents, and sight-unseen precautions.
-- [Grad student housing in Ann Arbor](https://wroomly.app/guides/grad-student-housing-ann-arbor): The quieter neighborhoods, medical-campus logistics, and sublet timing for grad life.
-- [Winter semester sublets in Ann Arbor](https://wroomly.app/guides/winter-semester-sublets-ann-arbor): The January move-in market — who leaves mid-year and how to price a spring semester.
-- [How to price your Ann Arbor sublet](https://wroomly.app/guides/how-to-price-your-sublet): Anchoring on live comparables and the empty-room math.
-- [Your first Ann Arbor apartment: the move-in checklist](https://wroomly.app/guides/first-apartment-checklist-ann-arbor): Condition photos, utilities, renters insurance, and Ann Arbor-specific details.
-- [How to verify an Ann Arbor landlord](https://wroomly.app/guides/how-to-verify-an-ann-arbor-landlord): Look up a rental's city Certificate of Compliance to confirm a listing is a real, licensed rental — a scam check almost no student uses.
+${guides}
 
 ## Buildings
 

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { NEIGHBORHOOD_CONTENT, getNeighborhood } from '@/lib/seo/neighborhoods'
+import { NEIGHBORHOOD_CONTENT, getNeighborhood, neighborhoodDescription } from '@/lib/seo/neighborhoods'
 import { BUILDINGS } from '@/lib/seo/buildings'
 import { fetchActiveListings, fetchRentSample } from '@/lib/seo/fetch-listings'
 import { neighborhoodRent, usd } from '@/lib/seo/rent-stats'
@@ -25,7 +25,7 @@ export async function generateMetadata({
   if (!n) return { title: 'Neighborhood not found' }
 
   const title = `${n.name} Sublets in Ann Arbor: UMich Housing`
-  const description = `${n.tagline} Find UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0].slice(0, 90)}…`
+  const description = neighborhoodDescription(n)
   return {
     title,
     description,
