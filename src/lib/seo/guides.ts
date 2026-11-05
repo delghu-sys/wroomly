@@ -2250,6 +2250,611 @@ export const GUIDES: Guide[] = [
       { label: 'TheRide Ann Arbor bus system', href: 'https://www.theride.org/' },
     ],
   },
+  {
+    slug: 'off-campus-housing-near-north-campus-umich',
+    title: 'Living near North Campus, and how to choose where to rent',
+    seoTitle: 'Off Campus Housing Near North Campus',
+    description:
+      'Choosing off campus housing near North Campus? Pick by commute mode first: walk, campus bus or car. A decision table, bus facts, parking checks and when to look.',
+    excerpt:
+      'Pick North Campus housing by how you will get to class or lab first, then by lease length. A decision table, the campus bus facts and what to check before you sign.',
+    published: '2026-11-04',
+    updated: '2026-11-04',
+    readingMinutes: 7,
+    sections: [
+      {
+        heading: 'Who is better off living near North Campus than Central?',
+        paragraphs: [
+          'Start with where your classes or lab are, not with the listing photos. North Campus is where Engineering, Music, Theatre & Dance, and Art & Design have their buildings, so a schedule built around those buildings is the clearest reason to look up there instead of near Central.',
+          'If your week splits between both campuses, the choice gets less obvious. Living near one means a bus or a long bike ride to the other, every day you have class there. Write down which days you are on North and which on Central before you compare a single apartment.',
+          "Wroomly's North Campus page covers the area's basics and the sublets posted there right now. This guide is the decision layer: how to pick a spot by how you will get to class, what to check before you sign, and when to look.",
+        ],
+      },
+      {
+        heading: 'How do walking, the bus and driving change where you should look?',
+        paragraphs: [
+          'Pick your commute mode first, then let it set your search area. The three modes below lead to different places, different checks and different questions for the landlord.',
+          'This is a rule of thumb for your own planning, not a statement about any area or any kind of person.',
+        ],
+        table: {
+          caption:
+            'Decision rule: commute mode, where to look, what to check, and what to ask the landlord',
+          columns: [
+            'Commute mode',
+            'Where to look',
+            'What to check',
+            'Ask the landlord',
+          ],
+          rows: [
+            [
+              'Walk or bike',
+              "Close enough to your building that you would do it in rain and snow. Measure the route on a map, not the listing's description.",
+              'The actual route in the dark and after snow. Where you can lock a bike. Whether the walk crosses a road with no crosswalk.',
+              'Is bike storage covered and secure? Is the path plowed or salted, and by whom?',
+            ],
+            [
+              'Campus bus',
+              'Near a stop on the route that reaches your building, with the stop a short walk from the door. Compare Bursley-Baits, Northwood and Commuter North, which serve different parts of North Campus.',
+              'Which terms and hours the route runs, how far you walk to the stop, and the last bus time for your latest class or lab.',
+              'Is there a stop at the complex or a short walk away? Does any bus route change in summer?',
+            ],
+            [
+              'Drive',
+              'A place with parking that is part of the deal, not an afterthought. Then check the campus lot you would use.',
+              'Campus permits and apartment parking are separate. Which permit type you are eligible for, and where it is valid.',
+              'Is parking included, assigned, or first come? Is it in the lease or a separate agreement? Who clears the lot in snow?',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'What do the buses actually do for a North Campus renter?',
+        paragraphs: [
+          "The university runs its own buses between North and Central Campus, and its rider guide says they are open and free to the general public with no ID required. Routes, hours and terms change, so read the route page for the semester you are signing for rather than trusting last year's memory.",
+          "Here is what the university's route pages show for the routes that serve North Campus. Bursley-Baits links the Central Campus Transit Center with Bursley Hall and Vera Baits Houses. It runs every day in the fall and winter terms only, and on weekdays it starts in the early morning and runs until the small hours, with buses more frequent in the daytime than late at night. Northwood serves the Northwood housing areas and runs every day all year except university holidays, with weekend gaps in spring and summer. In fall and winter on weekdays, the route page lists a first bus before 7 am and the most frequent service through the daytime and evening.",
+          'Commuter North runs from Crisler Center to Glazier Way, connecting South, Central and Medical Campus with North Campus. The route page lists a first weekday departure early in the morning, the most frequent service through the day, and less frequent service in the evening and overnight. Northwood Express runs weekdays only, on class days in fall and winter, with a limited schedule.',
+          'Two practical limits are worth knowing. Bicycles are not allowed on any university bus, so a bike commute cannot be switched to a bus ride halfway through. And the bus tracking app, Magic Bus, shows real-time arrivals, though the Bursley-Baits page says that route cannot currently be tracked there.',
+          'The city system, TheRide, is separate from the campus buses and has its own fares and trip planner. Check its site for the route you would use.',
+        ],
+      },
+      {
+        heading: 'What does housing near North Campus cost right now?',
+        paragraphs: [
+          "Compare per listing, not per neighborhood. Wroomly's live rent page did not have a North Campus row in its median rent by neighborhood table on 2026-11-04, so there is no North Campus median to quote, and this guide does not make one up.",
+          'For a reference point, the same table shows Central Campus at a median asking rent of $1,600/mo across 23 active listings, per the live rent page at /guides/ann-arbor-rent-prices, read on 2026-11-04. That is a comparison anchor, not a North Campus price. Open the live rent page for current figures and the neighborhoods that are listed.',
+          "On housing type, Wroomly's neighborhood page describes North Campus housing as mostly apartment complexes and newer builds, anchored by the Northwood and Bursley areas. When you compare two places, compare what rent includes: parking, utilities, furniture and lease length move the monthly number more than the zip code does.",
+        ],
+      },
+      {
+        heading: 'What should you check about parking, buses and winter?',
+        paragraphs: [
+          "Parking comes in two systems. University permits cover university lots, and your apartment's parking is a separate matter handled in the lease. The university's permit page lists student permit types: Student Orange is for juniors, seniors and graduate students and is valid in the North Campus lots, and Student Yellow is valid in Orange or Yellow lots on North, Central and other campuses with some exceptions. Student Storage is open to all students on a first come, first served basis. Permits are bought online and linked to a license plate. The page does not list prices, so check the university's annual costs page before you count on one.",
+          "Winter changes the math. During fall and winter terms, many campus and residence hall routes run until 2 or 3 am, according to the university's rider guide, and SafeRide runs from 8 pm to 2 am on class days with a valid MCard. That helps late nights. It does not shorten the walk from your door to the stop, so walk the exact route before you sign, in the dark if you can.",
+        ],
+        bullets: [
+          'How far is the nearest bus stop from the front door, and which route stops there?',
+          'What time does the last bus run on the days you have class or lab?',
+          'Is a parking space included in rent, and if not, what does it cost per month?',
+          'Which campus permit type would you be eligible for, and is it valid in the lot you would use?',
+          'Who plows and salts the walkways, and how soon after a storm?',
+          'Where does the bike go, and is it covered?',
+        ],
+      },
+      {
+        heading: 'When should you look, and is a sublet a good way to try North Campus?',
+        paragraphs: [
+          "Ann Arbor leases for the following fall start signing in the fall, so the time to look for next year is now. Wroomly's housing timeline guide walks through the calendar month by month. If you are not sure the area suits your commute, a shorter stay lets you find out for one term before you commit to twelve months.",
+          "A sublet is the cleanest trial. You ride the actual bus at your actual class times, check the real winter walk, and learn whether you miss the density of Central Campus. Winter semester and summer sublets post as people leave for internships, co-ops and study abroad. Read the sublet's terms, ask the landlord whether approval is needed, and send any question about what a lease clause means to the landlord, the city or a lawyer.",
+        ],
+      },
+      {
+        heading: 'What are the common trade-offs?',
+        paragraphs: [
+          'No option wins on everything. These are the trade-offs that come up most often when a renter weighs a place near North Campus against one near Central.',
+        ],
+        bullets: [
+          'A short walk to class versus a bus ride to Central for anything outside North Campus.',
+          'Parking that comes with the place versus a place without parking that you will not need if you ride the bus.',
+          'A longer lease that locks in a spot versus a short term sublet that lets you test the commute.',
+          'A lower rent that comes with a longer commute versus a higher rent for a place that is closer.',
+          'Bus schedules that stop in the summer versus a year-round route.',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Is it better to live near North Campus or Central Campus?',
+        answer:
+          'It depends on where your classes or lab are. North Campus holds Engineering, Music, Theatre & Dance, and Art & Design, so living near it cuts that commute. If your week splits between campuses, compare the bus times for both before you choose, and consider a short sublet first.',
+      },
+      {
+        question: 'Can you get between North Campus and Central Campus without a car?',
+        answer:
+          'Yes. The university runs buses between the two campuses, including Bursley-Baits, Northwood and Commuter North. Its rider guide says they are open and free with no ID required. Routes, terms and hours change by semester, so check the route page for the term you are signing for.',
+      },
+      {
+        question: 'Is housing cheaper near North Campus?',
+        answer:
+          'Its table had no North Campus median, so there is no North Campus figure to quote. The live rent page at /guides/ann-arbor-rent-prices, read on 2026-11-04, showed Central Campus at a $1,600 median asking rent across 23 listings. Compare individual listings, including parking, utilities and lease length, rather than assuming either area is cheaper.',
+      },
+      {
+        question: 'Are there summer sublets near North Campus?',
+        answer:
+          "Sometimes. Summer sublets post as people leave for internships, co-ops and study abroad, usually from late winter into spring. Wroomly's North Campus page shows what is listed now. Note that Bursley-Baits runs only in fall and winter, and Northwood has weekend gaps in summer.",
+      },
+    ],
+    links: [
+      { label: 'North Campus sublets and housing on Wroomly', href: '/ann-arbor/north-campus' },
+      { label: 'Do you need a car if you live off campus at UMich?', href: '/guides/do-you-need-a-car-umich-off-campus' },
+      { label: 'UMich off-campus housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
+      { label: 'Live Ann Arbor rent prices', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'Best neighborhoods for UMich students', href: '/guides/best-neighborhoods-for-umich-students' },
+      { label: 'Grad student housing in Ann Arbor', href: '/guides/grad-student-housing-ann-arbor' },
+      { label: 'Browse places near campus', href: '/listings' },
+      { label: 'U-M campus bus routes and schedules', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/' },
+      { label: 'U-M student permit parking', href: 'https://ltp.umich.edu/parking/permit-parking/' },
+      { label: 'TheRide Ann Arbor bus fares', href: 'https://www.theride.org/fares-passes/fares' },
+    ],
+  },
+  {
+    slug: 'sublet-your-room-with-roommates-staying',
+    title: 'How to sublet your room when your roommates are staying',
+    seoTitle: 'How to Sublet Your Room With Roommates',
+    description:
+      'Subletting your room while roommates stay is a household decision. Check your lease, agree on money and house rules, then list. Includes a roommate agreement checklist.',
+    excerpt:
+      'Your roommates will live with whoever takes your room. Here is the order that works: lease and landlord first, roommates second, a fair pick, and a written checklist before move in.',
+    published: '2026-11-04',
+    updated: '2026-11-04',
+    readingMinutes: 6,
+    sections: [
+      {
+        heading: 'What do your lease and your landlord say about subletting a room?',
+        paragraphs: [
+          'Start with the paper, not the roommates. Pull up your lease and look for the subletting or assignment clause, then ask your landlord or the leasing office how they handle a sublet of one room in a shared unit. Some leases need written approval, some charge a re-let fee, and a few prohibit subletting outright.',
+          'Roommates are a separate question from the landlord. Whether your roommates have a formal say depends on how the lease is written, so read it and ask. If you are not sure what a clause means, ask the landlord, and talk to a lawyer for anything beyond that. Wroomly does not give legal advice, and nothing in this guide tells you what your lease means.',
+          'Michigan has a state law on rental agreements, the Truth in Renting Act. It is linked at the bottom as a reference. Read it yourself or ask someone qualified, because a summary here would not be safe to lean on.',
+          'Whatever the answers are, get them in writing before you list. An email from the landlord is better than a memory of a hallway chat.',
+        ],
+      },
+      {
+        heading: 'How do you bring your roommates in before you list?',
+        paragraphs: [
+          'Treat it as a household decision, because it is one. Your roommates will share a kitchen, a bathroom and a thermostat with whoever takes your room. Tell them first, before the listing goes up and before anyone has toured.',
+          "The U-M Dean of Students page on finding housing and roommates tells students to get the landlord and roommates to agree to a sublease in writing, and to never rely on a handshake. It also points to a sublease contract template on the university's off campus housing site. Wroomly is independent and not run by the university, so use that page for the current template.",
+          'In that first conversation, cover four things: your dates, what you plan to charge, how you want to pick someone, and what is a dealbreaker for them. Ask what they want. Do not announce what you decided.',
+        ],
+      },
+      {
+        heading: 'How do you split rent, utilities and the deposit with a subletter?',
+        paragraphs: [
+          'Decide the split before you meet anyone, so there are no surprises later. Your rent is a number you know. What the subletter pays is a separate number, and the how to price your sublet guide walks through setting it. Rent figures change week to week, so check the live Ann Arbor rent page rather than a number from a blog.',
+          "Utilities are where roommate sublets go sideways. List every shared bill: electric, gas, water, internet, trash. For each one, decide whether it is split evenly, included in the subletter's rent, or billed by actual use, and who is the name on the account. Tell prospective subletters which bills are on top of rent so they can budget.",
+          'The deposit has two layers. Your landlord may hold a deposit in your name already, and you may want a separate deposit from your subletter to cover damage or a missed payment. Write down the amount, who holds it and when it goes back. Put payments through a trackable method and never send money before seeing the room, as the how to pay for a sublet safely guide explains.',
+          'Remember that you commonly stay on the lease. If the subletter stops paying, your name is still the one the landlord knows, so ask your landlord what their process is and put your plan for that in writing too.',
+        ],
+      },
+      {
+        heading: 'How do you choose a subletter fairly with your roommates?',
+        paragraphs: [
+          'Pick by the things that affect the household: dates, rent, references and house rules. Agree on that short list with your roommates before you read a single message, and use the same list for every candidate.',
+          'Keep it fair: never choose, screen or turn someone down based on race, religion, sex, family status, disability, national origin or any other protected class. Do not word a listing that way either. If a question is not about dates, money, references or house rules, leave it out.',
+          'A good process is simple. Ask each candidate for their dates and a reference, hold a short video call or meet in public, and then let your roommates meet the top choice before you commit. Your roommates can say they are comfortable or not, and they can raise house rule concerns. Ask your landlord whether they run their own approval on top of yours.',
+          'Verified UMich students on Wroomly carry a blue check, which shows a student verified with their university email. It is a trust signal and not a guarantee, so still check references and see the place in person.',
+        ],
+      },
+      {
+        heading: 'What goes in writing before move in?',
+        paragraphs: [
+          'Write it down while everyone is still friendly. A one page roommate agreement with the subletter, signed by you and your roommates, beats a group chat nobody can find in March. Use the checklist below as a starting point and adjust it to your house.',
+          "This checklist is a planning aid and not a legal form. For the sublease itself, use the landlord's form or the university's template, and read your own lease.",
+          'List your room free on Wroomly once your roommates and landlord are on board.',
+        ],
+        table: {
+          caption:
+            'Roommate agreement checklist for a room sublet',
+          columns: [
+            'Topic',
+            'What to decide',
+            'Write down',
+          ],
+          rows: [
+            [
+              'Shared cost split',
+              'Which bills are shared, who holds each account, how the subletter pays their part',
+              'Each bill, the split, the due date and the payment method',
+            ],
+            [
+              'House rules',
+              'Guests, quiet hours, cleaning, kitchen use, smoking, pets, parking',
+              'The rules your household already follows, in plain words',
+            ],
+            [
+              'Keys',
+              'How many keys or fobs, who hands them over, what happens if one is lost',
+              'Number of keys and who is responsible for each',
+            ],
+            [
+              'Who the subletter contacts',
+              'Who they message about rent, repairs, the landlord and house issues',
+              "One named person for money, one for the house, and the landlord's contact",
+            ],
+            [
+              'Move out walkthrough',
+              'Condition of the room at move in and move out, who walks through, when',
+              'Dated photos at both ends and the day of the walkthrough',
+            ],
+          ],
+        },
+      },
+    ],
+    faqs: [
+      {
+        question: 'Do my roommates have to agree to my sublet?',
+        answer:
+          'It depends on your lease and your landlord, so read the lease and ask the landlord. Even where roommates have no formal say, they share the home with your subletter, so tell them first. The U-M Dean of Students page suggests getting landlord and roommate agreement in writing.',
+      },
+      {
+        question: 'Who pays utilities when I sublet my room?',
+        answer:
+          'Decide it with your roommates before you list. For each shared bill, choose whether the subletter pays an even share, a flat amount included in rent, or actual use, and who holds the account. Tell candidates which bills come on top of rent so they can budget.',
+      },
+      {
+        question: 'Can my roommates help pick my subletter?',
+        answer:
+          'Yes, and it usually goes better when they do. Agree on a short list first: dates, rent, references and house rules. Use it for every candidate, then let your roommates meet the top choice. Never choose anyone based on a protected class such as race, religion, sex or disability.',
+      },
+      {
+        question: 'What if my subletter stops paying?',
+        answer:
+          'You commonly remain the tenant the landlord knows, so ask your landlord what their process is before it happens. Keep a written agreement with the subletter, track every payment, and hold a deposit if you agreed to one. For anything about your rights, ask a lawyer.',
+      },
+    ],
+    links: [
+      { label: 'How to sublet your apartment at UMich', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
+      { label: 'How to price your sublet', href: '/guides/how-to-price-your-sublet' },
+      { label: 'Sublet vs relet vs lease takeover', href: '/guides/sublet-vs-relet-lease-takeover' },
+      { label: 'Roommate agreement checklist', href: '/guides/roommate-agreement-checklist-off-campus' },
+      { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'List your room free', href: '/list-place' },
+      { label: 'U-M Dean of Students: finding housing and roommates', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/finding-housing-roommates/' },
+      { label: 'Michigan Truth in Renting Act (reference)', href: 'https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-Act-454-of-1978' },
+    ],
+  },
+  {
+    slug: 'cost-of-living-ann-arbor-student',
+    title: 'What it costs to live in Ann Arbor as a UMich student, line by line',
+    seoTitle: 'Cost of Living in Ann Arbor as a Student',
+    description:
+      'What does it cost to live in Ann Arbor as a student? Build a monthly budget from live median asking rents, then fill in every other line yourself with a source beside it.',
+    excerpt:
+      'Rent is the one line you can price today. Start from live median asking rents, then fill in utilities, food, transport and the costs students forget, each with a source.',
+    published: '2026-11-04',
+    updated: '2026-11-04',
+    readingMinutes: 5,
+    sections: [
+      {
+        heading: 'What does rent cost right now?',
+        paragraphs: [
+          "Rent is the biggest line and the only one with a live number behind it. Wroomly publishes median asking rents for active sublets, and they move, so read them on the day you budget. These were read on 2026-11-04 from Wroomly's own rent page, which covered 152 active listings that day.",
+          'A median asking rent is the price on the listing for the whole place, not your share of it. If the place has three bedrooms and three people, you will divide it yourself.',
+        ],
+        bullets: [
+          'Studio: $1,450 median asking rent, 9 active listings (Wroomly rent page, read 2026-11-04).',
+          '1 bedroom: $1,500 median asking rent, 55 active listings (Wroomly rent page, read 2026-11-04).',
+          '2 bedrooms: $2,000 median asking rent, 31 active listings (Wroomly rent page, read 2026-11-04).',
+          '3 bedrooms: $3,000 median asking rent, 24 active listings (Wroomly rent page, read 2026-11-04).',
+          '4+ bedrooms: $4,250 median asking rent, 30 active listings (Wroomly rent page, read 2026-11-04).',
+          'Furnished: $1,900 median asking rent, 82 active listings (Wroomly rent page, read 2026-11-04).',
+          'Unfurnished: $1,817 median asking rent, 70 active listings (Wroomly rent page, read 2026-11-04).',
+        ],
+      },
+      {
+        heading: 'What else belongs in a monthly student budget?',
+        paragraphs: [
+          'Rent is the start, not the total. The university describes cost of attendance as a set of estimated student budgets: tuition and fees, living expenses for housing and food, books and course materials, transportation, and miscellaneous personal expenses such as phone bills and student insurance. Use those same categories as the skeleton of your own sheet.',
+          "Every category below is one you fill in yourself, because the right number depends on your lease, your kitchen and your week. This guide prints no figure for them. Open the university's cost of attendance page to compare your totals against its categories, and treat its estimates as a yardstick, not as your bill.",
+        ],
+        bullets: [
+          'Utilities: electric, heat, water and trash, if the lease does not cover them.',
+          'Internet and phone.',
+          'Groceries and eating out.',
+          'Transportation: buses, a bike, a car share, or a car.',
+          'Books, supplies and course materials.',
+          'Renters insurance.',
+        ],
+      },
+      {
+        heading: 'How does a sublet or a shared room change the total?',
+        paragraphs: [
+          'Three things change: the divisor, the length, and what is included.',
+          'The divisor first. Take the median for your bedroom count and divide it by the people on the lease, then check the listing to see if rooms are priced separately. The listing, not the median, is what you will actually pay.',
+          'Length next. A sublet runs for the months the poster is away, often shorter than a twelve month lease, so multiply by the months you hold the place, not by twelve. A furnished sublet also saves the one time cost of buying a desk and a bed.',
+          "Then what is included. Some sublets bundle utilities or internet into rent, others do not. Ask, and write the answer in your sheet beside the line it replaces. Wroomly's guide on how to price a sublet covers how posters decide what to include.",
+        ],
+      },
+      {
+        heading: 'Which costs do students forget?',
+        paragraphs: [
+          'The ones that do not arrive monthly. Put them in the sheet anyway and divide by the months you will live there.',
+        ],
+        bullets: [
+          'The security deposit and any move in fees, which come before the first month feels like a month.',
+          'Furniture and kitchen basics for an unfurnished place.',
+          'Winter heat, if it is not in the rent. Ask the landlord for a typical winter bill.',
+          'Renters insurance, which some landlords ask for.',
+          'Parking, if you bring a car, and whether it is in the lease or a separate agreement.',
+          'Trips home, and the move out at the end of the lease.',
+        ],
+      },
+      {
+        heading: 'How do you build your own budget?',
+        paragraphs: [
+          'Copy the table below into a spreadsheet. The housing lines already carry a figure and a source. Every other line is blank on purpose: type your number, and type where it came from in the last column. A line with no source is a guess, so either find one or mark it as a guess.',
+          "Then do the sum in three passes. First, rent for the place you are actually looking at, divided by the people on the lease. Second, the monthly lines you filled in. Third, the one time costs, spread across the months you will stay. Compare the result with the university's cost of attendance categories, and adjust the lines that look off.",
+        ],
+        table: {
+          caption:
+            'A worked monthly budget with a source on every line. Housing lines are read from the live rent page, every other line is yours to fill in.',
+          columns: [
+            'Line',
+            'Amount',
+            'Source and date',
+          ],
+          rows: [
+            [
+              'Studio rent',
+              '$1,450 median asking rent (9 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              '1 bedroom rent',
+              '$1,500 median asking rent (55 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              '2 bedroom rent',
+              '$2,000 median asking rent (31 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              '3 bedroom rent',
+              '$3,000 median asking rent (24 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              '4+ bedroom rent',
+              '$4,250 median asking rent (30 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              'Furnished place',
+              '$1,900 median asking rent (82 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              'Unfurnished place',
+              '$1,817 median asking rent (70 active listings)',
+              'Wroomly rent page, read 2026-11-04, 152 active listings overall',
+            ],
+            [
+              'Your share of rent',
+              'Fill in: the median for your bedroom count, divided by the people on the lease',
+              'Your own division, plus what the listing says',
+            ],
+            [
+              'Utilities (electric, heat, water, trash)',
+              'Fill in',
+              'Ask the landlord what the lease includes and for a typical winter bill',
+            ],
+            [
+              'Internet',
+              'Fill in',
+              "The provider's current price for your address",
+            ],
+            [
+              'Groceries and eating out',
+              'Fill in',
+              'Your own receipts for a few weeks',
+            ],
+            [
+              'Transportation',
+              'Fill in',
+              'TheRide fares page or the MRide page if you hold a yellow MCard',
+            ],
+            [
+              'Books, supplies and course materials',
+              'Fill in',
+              "Your syllabi and the university's cost of attendance page",
+            ],
+            [
+              'Phone and personal costs',
+              'Fill in',
+              'Your own bills',
+            ],
+            [
+              'Renters insurance',
+              'Fill in',
+              'A quote from the insurer you pick',
+            ],
+            [
+              'One time costs (deposit, move in, furniture)',
+              'Fill in',
+              'Your lease and the listing',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'Where do you compare places once the budget is set?',
+        paragraphs: [
+          "Once you have a ceiling per month, filter by it. Browse current sublets on Wroomly's listings, check each one against your sheet, and look at neighborhood pages for walk time and transit before you decide that a cheaper place is cheaper overall. Verified UMich students carry a blue check on Wroomly, which shows a verified student and nothing more, so check every listing as you would any other.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'How much does it cost to live in Ann Arbor as a student each month?',
+        answer:
+          "It depends on your share of rent and what the lease includes. Read the current median asking rent for your bedroom count from Wroomly's live rent page, divide it by the people on your lease, then add utilities, food, transport and personal costs from your own bills.",
+      },
+      {
+        question: 'Is Ann Arbor expensive for students?',
+        answer:
+          "Rent is the line that decides it, and it moves with bedroom count and furnishing. Check Wroomly's live rent page on the day you budget, compare a shared room with a whole place, and then price the non rent lines yourself so the total is built from your own week.",
+      },
+      {
+        question: 'Are utilities included in Ann Arbor rent?',
+        answer:
+          'Sometimes. Some leases and sublets bundle utilities or internet into rent and others do not. The lease and the listing say which, so ask the landlord or poster, and ask for a typical winter bill if heat is not included.',
+      },
+      {
+        question: 'How can you lower your living costs near UMich?',
+        answer:
+          "Share a place and split rent, compare a furnished sublet with buying furniture, and check the bus options before paying for a car. Active U-M students with a yellow MCard ride TheRide city buses free through MRide, according to the university's transportation page.",
+      },
+    ],
+    links: [
+      { label: 'Ann Arbor rent prices, live data', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'How to price your sublet', href: '/guides/how-to-price-your-sublet' },
+      { label: 'Best neighborhoods for UMich students', href: '/guides/best-neighborhoods-for-umich-students' },
+      { label: 'Browse places near campus', href: '/listings' },
+      { label: 'U-M Office of Financial Aid cost of attendance', href: 'https://finaid.umich.edu/cost-of-attendance/' },
+      { label: 'U-M MRide free city bus rides', href: 'https://ltp.umich.edu/transportation-alternatives/mride/' },
+      { label: 'TheRide Ann Arbor fares', href: 'https://www.theride.org/fares-passes/fares' },
+    ],
+  },
+  {
+    slug: 'fall-semester-sublet-ann-arbor',
+    title: 'Can you sublet for just the fall semester at UMich?',
+    seoTitle: 'Fall Semester Sublet in Ann Arbor at UMich',
+    description:
+      'Fall only sublets in Ann Arbor exist but are scarce. Who lists September to December places, when they post, what to try if none fits, and how to stay safe.',
+    excerpt:
+      'A fall only sublet in Ann Arbor is possible but rare. Here is who lists a September to December place, when it appears, and the fallbacks if none fits.',
+    published: '2026-11-04',
+    updated: '2026-11-04',
+    readingMinutes: 5,
+    sections: [
+      {
+        heading: 'Can you get a fall only sublet in Ann Arbor?',
+        paragraphs: [
+          "Yes, but they are scarce. Fall only places exist, and they come from a handful of students, not a flood of listings. Ann Arbor's market is built around August move-ins and year long leases, so a place that opens for just September to December is the exception. Plan for patience, more than one channel and a backup.",
+          "The numbers on Wroomly show the shape of it. Among the 151 current listings with usable dates, 114 open in August, 17 in July, 3 in October, 2 in September, 2 in November and 1 in December, and the median advertised term is 12 months, per Wroomly's live rent data guide (/guides/ann-arbor-rent-prices) at the time of writing. Those are move in months, not term lengths, so not every September start ends in December. Still, the start of fall is thin.",
+        ],
+      },
+      {
+        heading: 'Who lists a place for just September to December?',
+        paragraphs: [
+          'Fall only places open up when someone with a lease is away for the semester. That is a short list of people, and knowing who they are tells you where to ask.',
+          'Here is who lists a fall only place, when they usually post, and where to look for each:',
+        ],
+        table: {
+          caption:
+            'Who lists a fall only sublet in Ann Arbor, when they usually post, and where to look',
+          columns: [
+            'Who lists',
+            'Why the place opens up',
+            'When they usually post',
+            'Where to look',
+          ],
+          rows: [
+            [
+              'Students on a fall study abroad term',
+              'They hold a lease but are away until winter',
+              'Late spring or summer, once the program is confirmed',
+              'Program and department lists, classmates, a saved search on Wroomly',
+            ],
+            [
+              'Students on a fall co-op or internship',
+              'The placement is somewhere else for the semester',
+              'Summer, once the placement is locked in',
+              'Co-op and internship groups, word of mouth, a saved search',
+            ],
+            [
+              'Landlords and property managers with a gap',
+              'A unit sits empty between longer leases',
+              'Whenever the gap appears, so ask early',
+              'The leasing office, asked directly',
+            ],
+            [
+              'Anyone whose plans changed after signing',
+              'A plan fell through or a job started',
+              'Any time, often close to move in',
+              'A saved search and the Facebook housing groups',
+            ],
+          ],
+        },
+      },
+      {
+        heading: 'When do fall only sublets appear?',
+        paragraphs: [
+          'Later than you want. Fall only places tend to show up once summer starts, when co-op and study abroad plans are confirmed, and the stragglers come right up to move in. Winter sublets are a different wave: they post mostly in November and early December.',
+          'That timing is why a saved search beats refreshing. Set one on Wroomly with a September start and check it weekly from spring. Ask your program office and your friends at the same time, because the best fall only places often never get posted publicly. The university also holds housing fairs in the fall and winter semesters, which are worth a look for leads, according to the Dean of Students office.',
+        ],
+      },
+      {
+        heading: 'What are the fallbacks if none fits?',
+        paragraphs: [
+          'If nothing lines up with your dates, you still have moves. Work down this list:',
+        ],
+        bullets: [
+          'Ask landlords directly for a four month term. Many listings ask for eight or twelve months, but some landlords will agree to a shorter stay if you ask',
+          'Take a place that starts a bit earlier or ends a bit later, and keep the extra weeks short. Ask the landlord in writing what happens to the unused time',
+          "Widen the map. Sublet asking rents run lower in some neighborhoods: among current Wroomly listings the median is $1,600 in Central Campus and $1,505 in South University, per Wroomly's live rent data guide (/guides/ann-arbor-rent-prices). Check the neighborhood pages for distance and transit",
+          "Bridge with a short stay, such as a friend's couch or a short term rental, then move into a winter sublet in January",
+          'Read your own lease before you hand off a longer place. Many Ann Arbor leases require written landlord approval to sublet, so ask before you list or take one',
+        ],
+      },
+      {
+        heading: 'How do you keep a fall sublet safe and in writing?',
+        paragraphs: [
+          'Scarcity makes people rush, and rushing is what rental scams rely on. Slow down. Scammers copy photos and descriptions from real listings, swap in their own contact details and repost them, and the Federal Trade Commission says wire transfers, gift cards and cryptocurrency work like sending cash, so the money is usually gone for good. The Dean of Students office gives the same basic rule: never send money before seeing the property in person.',
+          'A blue check on Wroomly shows that a person signed in with a umich Google account at some point, and nothing more. It does not confirm the person holds the lease or that the place is as described, and Wroomly never handles payments. Keep the conversation on the platform until you trust the person, so there is a record.',
+          'Before you pay anything, get these in writing:',
+        ],
+        bullets: [
+          'The exact start and end dates, with the move out date after the last day of your term',
+          'The monthly rent, the deposit and who holds it, and which utilities are included',
+          "The landlord's approval of the sublet, in writing, and the approval of any roommates in the place",
+          "A sublease contract, not a handshake. The university's off campus housing site offers a sublease template",
+          'A payment method that leaves a record tied to the person you are paying',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'Are fall only sublets common at UMich?',
+        answer:
+          "No, they are scarce. Ann Arbor's market runs on August move-ins and year long leases, and at the time of writing only 2 of 151 current Wroomly listings with usable dates open in September, per the live rent data guide. The few that appear usually come from students away for a fall study abroad term, co-op or internship.",
+      },
+      {
+        question: 'When should you start looking for a fall sublet?',
+        answer:
+          'Start in spring and keep checking through summer. Fall only places tend to post once study abroad and co-op plans are confirmed, and some appear close to move in. Set a saved search with a September start date so a new post reaches you the day it appears, and ask your program office too.',
+      },
+      {
+        question: 'Can you find a lease shorter than a year in Ann Arbor?',
+        answer:
+          'Sometimes. Many listings ask for an eight or twelve month lease, but some landlords will agree to about four months if you ask them directly. Ask before you assume, get the dates and rent in writing, and read the lease terms yourself or ask the landlord what they allow.',
+      },
+      {
+        question: 'Are fall sublets priced differently from summer sublets?',
+        answer:
+          "Expect less room to negotiate. Wroomly's live rent data guide notes that summer sublets often price below what the same unit costs on a year long lease, because supply floods a quiet town. Fall has far fewer places, so compare the monthly rent with similar current listings and do not pay extra just because time is short.",
+      },
+    ],
+    links: [
+      { label: 'Winter semester sublets', href: '/guides/winter-semester-sublets-ann-arbor' },
+      { label: 'UMich off campus housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
+      { label: 'Summer sublet guide', href: '/guides/summer-sublets-in-ann-arbor-student-guide' },
+      { label: 'Live rent data', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
+      { label: 'Browse fall dates', href: '/listings' },
+      { label: 'Dean of Students guide to finding housing and roommates', href: 'https://deanofstudents.umich.edu/student-programs/beyond-the-diag/finding-housing-roommates/' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
+    ],
+  },
 ]
 
 export function getGuide(slug: string): Guide | undefined {

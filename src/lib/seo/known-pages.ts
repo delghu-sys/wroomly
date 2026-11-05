@@ -45,6 +45,10 @@ export const GUIDE_SLUGS: readonly string[] = [
   'split-rent-with-roommates-different-bedrooms',
   'sublet-apartment-while-studying-abroad',
   'do-you-need-a-car-umich-off-campus',
+  'off-campus-housing-near-north-campus-umich',
+  'sublet-your-room-with-roommates-staying',
+  'cost-of-living-ann-arbor-student',
+  'fall-semester-sublet-ann-arbor',
 ]
 
 /** The live rent data page is its own route, not part of the GUIDES data. */
