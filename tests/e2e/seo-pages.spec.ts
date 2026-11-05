@@ -99,3 +99,20 @@ test('the exchange page has exactly one h1', async ({ request }) => {
   const html = await (await request.get('/exchange')).text()
   expect(html.match(/<h1[ >]/g)?.length).toBe(1)
 })
+
+test('homepage leads with the brand and defines it in plain language', async ({ request }) => {
+  const html = await (await request.get('/')).text()
+  expect(html).toMatch(/<title>Wroomly: University of Michigan Sublets in Ann Arbor<\/title>/)
+  expect(html.match(/<h1[ >]/g)?.length).toBe(1)
+  expect(html).toContain('spelled with a W')
+  expect(html).toContain('<link rel="canonical" href="https://wroomly.app"/>')
+
+  const org = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .flatMap(([, raw]) => { const d = JSON.parse(raw); return Array.isArray(d) ? d : [d] })
+    .find(n => n['@type'] === 'Organization')
+  expect(org.name).toBe('Wroomly')
+  expect(org.alternateName).toContain('Wroomly.app')
+  expect(JSON.stringify(org)).not.toMatch(/vroomly/i)
+  expect(org.disambiguatingDescription).toContain('wroomly.app')
+  expect(org.sameAs.length).toBeGreaterThan(0)
+})

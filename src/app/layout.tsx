@@ -17,15 +17,15 @@ const display = Syne({
 // Set the canonical origin for all metadata URLs (og:image, twitter:image,
 // canonical, etc.). Allows per-page metadata to use relative paths like
 // `/og-default.png` and have them resolved correctly in social cards.
-// SEO: titles + descriptions lead with real user-intent keywords
-// (UMich sublet / Ann Arbor sublet / student housing) rather than the
-// bare brand "Wroomly", which collides with the established "Vroomly".
-// The template appends " | Wroomly — UMich Student Sublets" so even
-// deep pages carry the intent keywords into the SERP title.
+// SEO: the homepage title leads with the brand ("Wroomly: ...") because
+// Google's spelling correction maps the bare query "wroomly" to the
+// established "Vroomly"; a title that opens with the exact brand word is the
+// strongest on-page signal that the query is intentional. Deep pages keep the
+// intent keywords first and carry the brand in the " | Wroomly" template.
 export const metadata: Metadata = {
   metadataBase: new URL('https://wroomly.app'),
   title: {
-    default: 'University of Michigan Sublets in Ann Arbor | Wroomly',
+    default: 'Wroomly: University of Michigan Sublets in Ann Arbor',
     template: '%s | Wroomly',
   },
   description:

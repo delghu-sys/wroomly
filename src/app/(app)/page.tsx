@@ -154,6 +154,20 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* ── What Wroomly is — a plain-language definition for people and for
+          search engines. The brand is routinely auto-corrected to a similarly
+          spelled one, so this says outright what it is and how it is spelled. ── */}
+      <section aria-label="About Wroomly" className="bg-background px-6 pb-20 sm:pb-24">
+        <p className="max-w-[40rem] mx-auto text-center text-[0.9rem] leading-[1.7] text-ink-muted text-pretty">
+          <strong className="font-semibold text-ink">Wroomly</strong> (spelled with a W, at wroomly.app) is a
+          sublet marketplace for University of Michigan students in Ann Arbor. Students list summer and
+          semester sublets, and students who verify with their UMich account carry a blue check.{' '}
+          <Link href="/about" className="font-semibold text-navy underline underline-offset-4 decoration-navy/30 hover:decoration-navy">
+            About Wroomly
+          </Link>
+        </p>
+      </section>
     </div>
   )
 }
