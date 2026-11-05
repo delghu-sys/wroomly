@@ -2,6 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { splitAccent, topicOf, sectionIds, formatUpdated, TOPICS } from '../../src/lib/guides/present.ts'
 import { GUIDES } from '../../src/lib/seo/guides.ts'
+import { readFileSync } from 'node:fs'
 
 test('the headline accent is the last word or two, never a bare connector', () => {
   assert.deepEqual(splitAccent('How to pay for a sublet without getting burned'), { lead: 'How to pay for a sublet without', accent: 'getting burned' })
@@ -39,4 +40,11 @@ test('every guide has unique anchors for its own sections', () => {
 
 test('the updated date reads the same in every time zone', () => {
   assert.equal(formatUpdated('2026-11-03'), 'November 3, 2026')
+})
+
+test('Article JSON-LD carries an absolute image so rich results are eligible', () => {
+  // JsonLd.tsx is TSX, which node --test cannot import, so assert on the source.
+  const src = readFileSync(new URL('../../src/components/seo/JsonLd.tsx', import.meta.url), 'utf8')
+  const article = src.slice(src.indexOf('export function articleJsonLd'), src.indexOf('export function rentDatasetJsonLd'))
+  assert.match(article, /image: `\$\{ORIGIN\}\/og-default\.png`/)
 })
