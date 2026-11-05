@@ -213,6 +213,9 @@ export function siteJsonLd(): Record<string, unknown>[] {
       '@type': 'Organization',
       '@id': `${ORIGIN}/#organization`,
       name: 'Wroomly',
+      // Names people actually type. Not "Vroomly": that is a different,
+      // unrelated company, and listing it here would claim its identity.
+      alternateName: ['Wroomly.app', 'Wroomly Ann Arbor'],
       url: ORIGIN,
       // The brand logo (square) — Google reads this for the org logo.
       // (og-default.png exists now, but the org logo should stay the square
@@ -228,6 +231,10 @@ export function siteJsonLd(): Record<string, unknown>[] {
         name: 'Ann Arbor',
         containedInPlace: { '@type': 'State', name: 'Michigan' },
       },
+      // Spelled out for entity matching: "Wroomly" is routinely auto-corrected
+      // to a similarly spelled brand, so state plainly what this one is.
+      disambiguatingDescription:
+        'Wroomly (spelled with a W, at wroomly.app) is an Ann Arbor sublet marketplace for University of Michigan students.',
       email: 'support@wroomly.app',
       ...(SOCIAL_PROFILES.length > 0 ? { sameAs: SOCIAL_PROFILES } : {}),
       founder: { '@type': 'Person', name: 'Hugo Delgado Verdu' },
