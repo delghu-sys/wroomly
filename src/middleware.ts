@@ -130,6 +130,16 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
+  // Vercel Cron (vercel.json). Cron calls carry no session, only
+  // `Authorization: Bearer $CRON_SECRET`, which each route verifies itself and
+  // fails closed on. Without this the auth gate below answers every cron call
+  // with a 307 to /sign-in and the handler never runs. Above the supply-only
+  // gate for the same reason: the alerts must keep working while renters are
+  // gated to /coming-soon.
+  if (pathname.startsWith('/api/cron/')) {
+    return supabaseResponse
+  }
+
   // ── Supply-only soft-launch gate ────────────────────────────────────────────
   // No-op unless SUPPLY_ONLY_MODE === 'true'. When on, non-exempt visitors
   // (renters / anon) are redirected to /coming-soon; admins, suppliers, and

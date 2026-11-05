@@ -13,7 +13,7 @@ export const maxDuration = 60 // seconds — cron can be slow
 /**
  * GET /api/cron/saved-search-alerts
  *
- * Scheduled hourly by Vercel Cron (see vercel.json). For each
+ * Scheduled daily by Vercel Cron (see vercel.json). For each
  * saved_search where email_alerts = true:
  *   1. Find listings created after last_alerted_at that match the
  *      stored filters.
@@ -99,7 +99,10 @@ export async function GET(request: Request) {
       })
 
       const { ok } = await sendEmail({ to: u.email, subject, html })
-      if (ok) emailed++
+      // A failed send must not advance last_alerted_at: the matches would be
+      // skipped for good. Leave it so tomorrow's run retries.
+      if (!ok) continue
+      emailed++
 
       await service
         .from('saved_searches')
