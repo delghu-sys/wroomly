@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { LegalPage, loadLegalDoc } from '@/components/legal/LegalPage'
 
 export const metadata: Metadata = {
-  title: 'Trust & Safety',
+  title: 'Trust & Safety: How Wroomly Protects Renters',
   description:
-    'How Wroomly keeps the platform safe, the community rules, and how to protect yourself.',
+    'How Wroomly keeps the platform safe: verified U-M students, reviewed listings, on-platform messaging, the community rules, and how to protect yourself.',
   alternates: { canonical: '/safety' },
 }
 

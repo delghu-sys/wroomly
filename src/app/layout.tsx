@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: '%s | Wroomly',
   },
   description:
-    'University of Michigan student sublets in Ann Arbor. Verified UMich students carry a blue check, so you can see who is a real student. Find a summer sublet near campus or list your place free.',
+    'University of Michigan student sublets in Ann Arbor. Verified UMich students carry a blue check. Find a sublet near campus or list your place free.',
   keywords: [
     'University of Michigan sublet',
     'UMich sublet',
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
     'University of Michigan student housing',
     'Ann Arbor student housing',
   ],
-  alternates: {
-    canonical: '/',
-  },
+  // No default canonical here on purpose: a site-wide `canonical: '/'` is
+  // inherited by every page that does not set its own, and tells Google those
+  // pages are copies of the homepage. Each indexable page sets its own.
   // Google Search Console domain/URL-prefix verification. Renders as
   // <meta name="google-site-verification" content="…"> in <head>.
   verification: {

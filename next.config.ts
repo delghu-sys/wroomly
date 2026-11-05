@@ -38,7 +38,18 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }]
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // Only wroomly.app (and www, which redirects to it) belongs in search.
+      // The same code is served from other hostnames: a second Vercel project
+      // and every preview URL. Without this, those are full duplicates of the
+      // site that search engines can index.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(?!(www\\.)?wroomly\\.app$)(?!localhost)(.*)' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ]
   },
   compiler: {
     // Sentry's bundleSizeOptimizations only take effect under webpack — this

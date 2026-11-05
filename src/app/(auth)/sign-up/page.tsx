@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: {
     absolute: 'Join Wroomly: Find or List Student Housing',
   },
+  robots: { index: false, follow: true },
   description:
     'Sign up to sublet your U of M apartment, or find student housing in Ann Arbor.',
   openGraph: {

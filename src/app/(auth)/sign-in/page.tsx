@@ -3,6 +3,7 @@ import SignInClient from './SignInClient'
 
 export const metadata: Metadata = {
   title: 'Sign In',
+  robots: { index: false, follow: true },
   description: 'Sign in to your Wroomly account.',
   openGraph: {
     title: 'Sign In | Wroomly',

@@ -8,6 +8,7 @@ import {
   BYPASS_COOKIE,
 } from '@/lib/supplyOnly'
 import { withAttribution } from '@/lib/attribution'
+import { isUnknownSeoPage } from '@/lib/seo/known-pages'
 
 // /list-place is public: it's the "List your place" CTA target and does its own
 // auth routing (anon → the public /start-listing chooser; supplier → /listings/new).
@@ -51,6 +52,13 @@ const PUBLIC_PREFIXES = [
 ]
 
 export async function middleware(request: NextRequest) {
+  // A guide, neighborhood or building that does not exist is a real 404, not a
+  // 200 page that says "not found" (see lib/seo/known-pages). Answered first,
+  // before any session work.
+  if (request.method === 'GET' && isUnknownSeoPage(request.nextUrl.pathname)) {
+    return NextResponse.rewrite(new URL('/not-found', request.url), { status: 404 })
+  }
+
   const { supabaseResponse, user, supabase: sessionClient } = await updateSession(request)
   const pathname = request.nextUrl.pathname
 

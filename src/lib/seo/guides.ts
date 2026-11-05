@@ -39,9 +39,9 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-to-sublet-your-apartment-at-university-of-michigan',
     title: 'How to sublet your apartment at the University of Michigan',
-    seoTitle: 'How to Sublet Your U-M Apartment in Ann Arbor',
+    seoTitle: 'How to Sublet an Apartment in Ann Arbor (UMich)',
     description:
-      'A step-by-step guide for UMich students subletting their Ann Arbor apartment: checking your lease, setting a price, finding a verified subletter, and getting paid safely.',
+      'How to sublet your apartment in Ann Arbor: check your lease first, price the room, find a verified UMich subletter, and get paid safely.',
     excerpt:
       "Leaving for the summer, a co-op, or study abroad? Here's how to sublet your Ann Arbor place without losing money or breaking your lease.",
     published: '2026-07-03',
@@ -88,6 +88,10 @@ export const GUIDES: Guide[] = [
           'Even a simple written sublease agreement (dates, rent, deposit terms, who pays utilities, condition of the place) saves enormous headaches. It protects both of you if something goes sideways, and most landlords want a copy anyway. Take timestamped move-in photos so the deposit return is a non-issue at the end.',
         ],
       },
+    ],
+    links: [
+      { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'Sublet while you study abroad', href: '/guides/sublet-apartment-while-studying-abroad' },
     ],
     faqs: [
       {
@@ -156,6 +160,10 @@ export const GUIDES: Guide[] = [
           'Summer is peak scam season for student housing. Fake listings, "landlords" who need a deposit wired before you can see the place, prices too good to be true. Stick to platforms that verify identity. On Wroomly, students who verify with their UMich Google login carry a blue check, so you can see who is a real U of M student. And never pay anyone by wire, gift card, or crypto, no matter where you found the listing.',
         ],
       },
+    ],
+    links: [
+      { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'Sublet while you study abroad', href: '/guides/sublet-apartment-while-studying-abroad' },
     ],
     faqs: [
       {
@@ -227,6 +235,10 @@ export const GUIDES: Guide[] = [
         ],
       },
     ],
+    links: [
+      { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'Find a roommate at UMich', href: '/guides/find-a-roommate-umich-off-campus' },
+    ],
     faqs: [
       {
         question: 'What are the red flags of a sublet scam?',
@@ -288,6 +300,10 @@ export const GUIDES: Guide[] = [
           'Listings on Wroomly state the deposit up front, and a blue check marks listers who\'ve verified as UMich students, so you can see who is holding your money. Pay the deposit by a traceable method and keep the written terms. That paper trail is half the battle when it\'s time to get your deposit back.',
         ],
       },
+    ],
+    links: [
+      { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'Individual vs joint lease', href: '/guides/individual-lease-vs-joint-lease-ann-arbor' },
     ],
     faqs: [
       {
@@ -396,9 +412,9 @@ export const GUIDES: Guide[] = [
   {
     slug: 'umich-off-campus-housing-timeline',
     title: 'The UMich off-campus housing timeline: when to look, sign, and sublet',
-    seoTitle: 'UMich Off-Campus Housing Timeline: When to Sign',
+    seoTitle: 'UMich Off-Campus Housing Timeline, Month by Month',
     description:
-      "Ann Arbor's leasing calendar is famously early. Here's the month-by-month timeline for finding UMich off-campus housing, and where sublets fit when you missed the wave.",
+      'When to look and sign for UMich off-campus housing in Ann Arbor, month by month, and what to do if you already missed the early wave.',
     excerpt:
       "Ann Arbor leases sign absurdly early. The month-by-month calendar, and what to do if you've already missed the wave.",
     published: '2026-07-07',
@@ -443,6 +459,7 @@ export const GUIDES: Guide[] = [
       { label: 'Summer sublet guide', href: '/guides/summer-sublets-in-ann-arbor-student-guide' },
       { label: 'Live rent data', href: '/guides/ann-arbor-rent-prices' },
       { label: 'Browse buildings', href: '/buildings' },
+      { label: 'Individual vs joint lease', href: '/guides/individual-lease-vs-joint-lease-ann-arbor' },
     ],
     faqs: [
       {
@@ -465,9 +482,9 @@ export const GUIDES: Guide[] = [
   {
     slug: 'sublet-vs-relet-lease-takeover',
     title: 'Sublet vs. relet vs. lease takeover: which one do you actually want?',
-    seoTitle: 'Sublet vs. Relet vs. Lease Takeover, Explained',
+    seoTitle: 'Sublet vs. Relet vs. Lease Takeover: Which to Pick',
     description:
-      'Sublet, sublease, relet, lease takeover, assignment: what each term means, who stays on the lease, who holds the risk, and which one fits your Ann Arbor situation.',
+      'Sublet, relet or lease takeover in Ann Arbor? See who stays on the lease, who holds the risk, and which one fits a summer stay.',
     excerpt:
       "Sublet, sublease, relet, lease takeover, assignment. People use them interchangeably; they mean legally different things. Here is who's on the lease, who holds the risk, and which to pick.",
     published: '2026-07-07',
@@ -532,6 +549,7 @@ export const GUIDES: Guide[] = [
       { label: 'How to sublet your apartment', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
       { label: 'Security deposits', href: '/guides/security-deposits-ann-arbor-sublets' },
       { label: 'Housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
+      { label: 'Individual vs joint lease', href: '/guides/individual-lease-vs-joint-lease-ann-arbor' },
     ],
     faqs: [
       {
@@ -762,6 +780,7 @@ export const GUIDES: Guide[] = [
       { label: 'Summer sublet guide', href: '/guides/summer-sublets-in-ann-arbor-student-guide' },
       { label: 'Housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
       { label: 'Live rent data', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'Sublet while you study abroad', href: '/guides/sublet-apartment-while-studying-abroad' },
     ],
     faqs: [
       {
@@ -829,6 +848,7 @@ export const GUIDES: Guide[] = [
       { label: 'Live rent data', href: '/guides/ann-arbor-rent-prices' },
       { label: 'How to sublet your apartment', href: '/guides/how-to-sublet-your-apartment-at-university-of-michigan' },
       { label: 'Summer sublet guide', href: '/guides/summer-sublets-in-ann-arbor-student-guide' },
+      { label: 'Split rent across different bedrooms', href: '/guides/split-rent-with-roommates-different-bedrooms' },
     ],
     faqs: [
       {
@@ -907,6 +927,7 @@ export const GUIDES: Guide[] = [
       { label: 'Security deposits', href: '/guides/security-deposits-ann-arbor-sublets' },
       { label: 'Sublet vs. relet', href: '/guides/sublet-vs-relet-lease-takeover' },
       { label: 'Neighborhood comparison', href: '/guides/best-neighborhoods-for-umich-students' },
+      { label: 'Individual vs joint lease', href: '/guides/individual-lease-vs-joint-lease-ann-arbor' },
     ],
     faqs: [
       {
