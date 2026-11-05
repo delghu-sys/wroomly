@@ -16,7 +16,7 @@ import { PrintButton } from '@/components/exchange/PrintButton'
 
 const TITLE = 'Housing in Ann Arbor for exchange students at Michigan'
 const DESCRIPTION =
-  'A one-page overview for exchange offices and students: how to find a furnished room or apartment in Ann Arbor for just the semester you are at the University of Michigan.'
+  'A one-page overview for exchange offices and students: how to find a furnished room or apartment in Ann Arbor for just your semester at Michigan.'
 
 export const metadata: Metadata = {
   title: 'Housing for exchange students at Michigan',
@@ -407,9 +407,9 @@ export default async function ExchangePage() {
         {/* ── The printed sheet: one plain A4 page ── */}
         <div className="hidden print:block" style={{ zoom: 0.98 }}>
           <p className="text-[11px] uppercase tracking-[0.22em] text-ink-muted font-semibold">For exchange offices and students</p>
-          <h1 className="font-display text-[2.4rem] leading-[1.02] tracking-tight text-ink mt-2">
+          <p role="presentation" className="font-display text-[2.4rem] leading-[1.02] tracking-tight text-ink mt-2">
             Housing in Ann Arbor for <span className="italic font-light text-gold-deep">exchange students</span> at Michigan
-          </h1>
+          </p>
           <p className="mt-2 text-base text-ink-soft leading-relaxed">
             Wroomly is a housing marketplace built around the University of Michigan. It helps students find a room or apartment in Ann Arbor for just the months they are here.
           </p>

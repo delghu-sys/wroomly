@@ -16,6 +16,7 @@
 //    subletting".
 
 import { ANN_ARBOR_RESIDENCES } from '@/lib/constants'
+import { slugifyName } from './known-pages'
 
 export interface BuildingContent {
   slug: string
@@ -33,14 +34,6 @@ export interface BuildingContent {
   /** Building-specific FAQs (FAQPage JSON-LD). */
   faqs?: { question: string; answer: string }[]
   note?: string // legacy optional hand-verified fact slot
-}
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
 }
 
 /** The one sublet-policy answer we're willing to make — generic and honest. */
@@ -629,7 +622,7 @@ const DETAILS: Record<string, Omit<BuildingContent, 'slug' | 'name'>> = {
 // so a building added to the picker automatically gets a landing page.
 // Researched details are merged in when we have them.
 export const BUILDINGS: BuildingContent[] = ANN_ARBOR_RESIDENCES.map(name => ({
-  slug: slugify(name),
+  slug: slugifyName(name),
   name,
   ...(DETAILS[name] ?? {}),
 }))

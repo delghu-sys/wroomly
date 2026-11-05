@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { clampMeta, clampTitle } from '@/lib/seo/meta'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { NEIGHBORHOOD_CONTENT, getNeighborhood } from '@/lib/seo/neighborhoods'
@@ -24,8 +25,8 @@ export async function generateMetadata({
   const n = getNeighborhood(neighborhood)
   if (!n) return { title: 'Neighborhood not found' }
 
-  const title = `${n.name} Sublets in Ann Arbor: UMich Housing`
-  const description = `${n.tagline} Find UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0].slice(0, 90)}…`
+  const title = clampTitle(`${n.name} Sublets in Ann Arbor: UMich Housing`)
+  const description = clampMeta(`${n.tagline} Find UMich student sublets in ${n.name}, Ann Arbor on Wroomly. ${n.intro[0]}`)
   return {
     title,
     description,
