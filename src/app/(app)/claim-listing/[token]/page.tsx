@@ -5,6 +5,7 @@ import { hashClaimToken, isClaimTokenExpired } from '@/lib/listing-import/claim-
 import { signImportUrls } from '@/lib/listing-import/uploads'
 import { isPublishablePhotoPath } from '@/lib/listing-import/schema'
 import { ClaimReview } from '@/components/import/ClaimReview'
+import { RefreshClaimLink } from '@/components/import/RefreshClaimLink'
 import type { ExtractedListingDraft } from '@/types/listing-import'
 import { ArrowRight, AlertCircle, Sparkles } from 'lucide-react'
 
@@ -74,8 +75,8 @@ export default async function ClaimListingPage({
     return (
       <ErrorState
         title="This link has expired"
-        body="Claim links are valid for 7 days. Import your post again to get a fresh link."
-        cta={<Link href="/import-listing" className="text-navy hover:text-ink inline-flex items-center gap-1">Import again <ArrowRight className="w-4 h-4" /></Link>}
+        body="Claim links are valid for 7 days, but your draft is still saved. We'll email a fresh link to the address you imported it with."
+        cta={<RefreshClaimLink token={token} />}
       />
     )
   }
