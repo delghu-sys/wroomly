@@ -12,6 +12,7 @@ import { fetchConnectStatus } from '@/lib/stripe'
 import { PayoutSetupBanner } from '@/components/payments/PayoutSetupBanner'
 import { PAYMENTS_ENABLED } from '@/lib/config'
 import { EmptyState } from '@/components/brand/EmptyState'
+import { WaitingDrafts } from '@/components/import/WaitingDrafts'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
 
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <WaitingDrafts user={{ id: user.id, email: user.email }} />
         <div className="animate-fade-up mb-10 flex items-end justify-between flex-wrap gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-ink-muted font-medium mb-2">
@@ -252,6 +254,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <WaitingDrafts user={{ id: user.id, email: user.email }} />
       <div className="animate-fade-up mb-10">
         <p className="text-xs uppercase tracking-[0.18em] text-ink-muted font-medium mb-2">
           Your dashboard
