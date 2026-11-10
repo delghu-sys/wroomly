@@ -39,6 +39,7 @@ export function Footer() {
             title="Browse"
             links={[
               { href: '/listings', label: 'All listings' },
+              { href: '/umich-sublets', label: 'UMich sublets' },
               { href: '/listings?type=sublet', label: 'Sublets' },
               { href: '/buildings', label: 'By building' },
               { href: '/guides', label: 'Guides & FAQ' },

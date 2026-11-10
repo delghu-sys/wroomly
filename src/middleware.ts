@@ -16,7 +16,7 @@ import { isUnknownSeoPage } from '@/lib/seo/known-pages'
 // /exchange is the one-page overview we send to universities' exchange offices
 // (it is the link in our outreach emails). Its readers have no Wroomly account
 // and never will, so it must NOT sit behind sign-in or the coming-soon gate.
-const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/safety', '/guides', '/buildings', '/coming-soon', '/start-listing', '/list-place', '/exchange']
+const PUBLIC_ROUTES = ['/', '/listings', '/about', '/terms', '/privacy', '/safety', '/guides', '/buildings', '/coming-soon', '/start-listing', '/list-place', '/exchange', '/umich-sublets']
 // /callback handles the OAuth + email-confirm code exchange — it MUST be
 // reachable while logged-out, because it's the request that creates the
 // session. Gating it behind auth bounces the user to /sign-in?next=/callback

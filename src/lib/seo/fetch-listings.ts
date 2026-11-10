@@ -40,6 +40,21 @@ export async function fetchActiveListings(
   return (data ?? []) as unknown as ListingWithDetails[]
 }
 
+/**
+ * The newest active listings across all of Ann Arbor, for the /umich-sublets
+ * landing page (the other helper needs a neighborhood or building filter).
+ */
+export async function fetchLatestActiveListings(limit = 12): Promise<ListingWithDetails[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('listings')
+    .select(LISTING_SELECT)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  return (data ?? []) as unknown as ListingWithDetails[]
+}
+
 export interface RentSampleRow {
   price_per_month: number | null // cents
   bedrooms: number | null

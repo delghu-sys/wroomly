@@ -41,6 +41,7 @@ export function buildSitemap({ listings, neighborhoods, buildings, guides }: Sit
   return [
     page('/', 'weekly', 1, latestListing),
     page('/listings', 'hourly', 0.9, latestListing),
+    page('/umich-sublets', 'daily', 0.8, latestListing),
     page('/about', 'monthly', 0.7),
     page('/exchange', 'monthly', 0.6),
     // Public, no account needed: the renter alert signup and the host importer.
