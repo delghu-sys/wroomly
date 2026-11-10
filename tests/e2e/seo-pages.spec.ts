@@ -116,3 +116,15 @@ test('homepage leads with the brand and defines it in plain language', async ({ 
   expect(org.disambiguatingDescription).toContain('wroomly.app')
   expect(org.sameAs.length).toBeGreaterThan(0)
 })
+
+test('UMich sublets landing page is public, has one h1 and parseable FAQPage schema', async ({ request }) => {
+  const res = await request.get('/umich-sublets')
+  expect(res.status()).toBe(200)
+  const html = await res.text()
+  expect(html.match(/<h1[\s>]/g)?.length).toBe(1)
+  expect(html).toMatch(/<h1[^>]*>[^<]*UMich sublets/)
+  expect(html).toContain('<link rel="canonical" href="https://wroomly.app/umich-sublets"')
+  const types = await jsonLdTypes(html)
+  expect(types).toContain('FAQPage')
+  expect(types).toContain('BreadcrumbList')
+})

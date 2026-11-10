@@ -163,6 +163,10 @@ export default async function HomePage() {
           <strong className="font-semibold text-ink">Wroomly</strong> (spelled with a W, at wroomly.app) is a
           sublet marketplace for University of Michigan students in Ann Arbor. Students list summer and
           semester sublets, and students who verify with their UMich account carry a blue check.{' '}
+          <Link href="/umich-sublets" className="font-semibold text-navy underline underline-offset-4 decoration-navy/30 hover:decoration-navy">
+            Browse UMich sublets
+          </Link>
+          {' · '}
           <Link href="/about" className="font-semibold text-navy underline underline-offset-4 decoration-navy/30 hover:decoration-navy">
             About Wroomly
           </Link>

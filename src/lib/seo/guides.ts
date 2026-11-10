@@ -90,6 +90,7 @@ export const GUIDES: Guide[] = [
       },
     ],
     links: [
+      { label: 'Browse UMich sublets', href: '/umich-sublets' },
       { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
       { label: 'Sublet while you study abroad', href: '/guides/sublet-apartment-while-studying-abroad' },
     ],

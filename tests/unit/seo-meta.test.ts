@@ -35,7 +35,7 @@ const entries = buildSitemap(input)
 const byPath = (p: string) => entries.find(e => e.url === `https://wroomly.app${p}`)
 
 test('sitemap: public acquisition pages in, sign-in and sign-up out', () => {
-  for (const p of ['/', '/listings', '/about', '/exchange', '/match', '/import-listing', '/safety', '/guides', '/buildings', '/guides/ann-arbor-rent-prices']) {
+  for (const p of ['/', '/listings', '/umich-sublets', '/about', '/exchange', '/match', '/import-listing', '/safety', '/guides', '/buildings', '/guides/ann-arbor-rent-prices']) {
     assert.ok(byPath(p), `${p} missing`)
   }
   assert.ok(!byPath('/sign-in') && !byPath('/sign-up'))
