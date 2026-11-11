@@ -8,6 +8,7 @@ import { SaveSearchButton } from '@/components/listings/SaveSearchButton'
 import { ListingsMap, type MapListing } from '@/components/listings/ListingsMap'
 import { ListingsQuickFilters } from '@/components/listings/ListingsQuickFilters'
 import { MobileFilterSheet } from '@/components/listings/MobileFilterSheet'
+import Link from 'next/link'
 import { BrowseHero } from '@/components/listings/BrowseHero'
 import { ListingsGrid } from '@/components/listings/ListingsGrid'
 import { JustListedStrip } from '@/components/listings/JustListedStrip'
@@ -350,6 +351,12 @@ export default async function ListingsPage({
               </>
             )}
           </PendingResults>
+          <p className="mt-10 text-center text-[13px] text-ink-muted">
+            New here?{' '}
+            <Link href="/umich-sublets" className="text-navy underline underline-offset-2 hover:text-gold-deep">
+              UMich sublets: how it works and common questions
+            </Link>
+          </p>
         </div>
       </div>
       </FilterTransitionProvider>

@@ -48,7 +48,7 @@ export function HomeHero() {
           className="animate-fade-up text-[1.0625rem] leading-[1.65] text-white/50 text-pretty mb-10"
           style={{ animationDelay: '0.22s' }}
         >
-          Every student sublease and rental, in one place. Free.
+          UMich sublets and Ann Arbor student rentals, in one place. Free.
         </p>
 
         {/* Search bar + quick chips (wired to /listings) */}
