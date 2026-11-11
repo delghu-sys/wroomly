@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { clampMeta, clampTitle } from '../../src/lib/seo/meta.ts'
+import { UMICH_TITLE, UMICH_DESCRIPTION, UMICH_FAQS } from '../../src/lib/seo/umich-sublets.ts'
 import { buildSitemap } from '../../src/lib/seo/sitemap-entries.ts'
 import { GUIDES } from '../../src/lib/seo/guides.ts'
 import { NEIGHBORHOOD_CONTENT } from '../../src/lib/seo/neighborhoods.ts'
@@ -77,5 +78,16 @@ test('guide titles and descriptions fit a results page', () => {
     // The page clamps this to 155 for the search snippet; the full text is the on-page lede.
     assert.ok(g.description.length >= 70 && g.description.length <= 210, `${g.slug} description is ${g.description.length}`)
     assert.ok(clampMeta(g.description).length <= 155, g.slug)
+  }
+})
+
+test('/umich-sublets: title and description fit a results page, FAQ answers are quotable', () => {
+  assert.ok(`${UMICH_TITLE} | Wroomly`.length <= 65, UMICH_TITLE)
+  assert.ok(!UMICH_TITLE.endsWith('…') && !UMICH_DESCRIPTION.endsWith('…'), 'not cut off by the clamp')
+  assert.ok(UMICH_DESCRIPTION.length >= 70 && UMICH_DESCRIPTION.length <= 155, String(UMICH_DESCRIPTION.length))
+  assert.ok(/umich/i.test(UMICH_TITLE) && /university of michigan/i.test(UMICH_DESCRIPTION))
+  for (const f of UMICH_FAQS) {
+    const words = f.answer.split(/\s+/).length
+    assert.ok(words >= 25 && words <= 70, `${f.question}: ${words} words`)
   }
 })
