@@ -351,13 +351,15 @@ export default async function ListingsPage({
               </>
             )}
           </PendingResults>
-          <p className="mt-10 text-center text-[13px] text-ink-muted">
-            New here?{' '}
-            <Link href="/umich-sublets" className="text-navy underline underline-offset-2 hover:text-gold-deep">
-              UMich sublets: how it works and common questions
-            </Link>
-          </p>
         </div>
+        {/* Below the flex row (sidebar + results), not inside it: as a third
+            child it became a column beside the results and squeezed them. */}
+        <p className="mt-10 text-center text-[13px] text-ink-muted">
+          New here?{' '}
+          <Link href="/umich-sublets" className="text-navy underline underline-offset-2 hover:text-gold-deep">
+            UMich sublets: how it works and common questions
+          </Link>
+        </p>
       </div>
       </FilterTransitionProvider>
     </div>
