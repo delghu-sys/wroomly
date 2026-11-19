@@ -10,6 +10,23 @@ export interface NeighborhoodContent {
   intro: string[] // paragraphs
   highlights: string[]
   bestFor: string
+  // Optional search-focused fields. A neighborhood without them renders exactly
+  // as before. Plain ASCII punctuation only (no em or en dashes).
+  /** Title lead before the " | Wroomly" suffix. Keep at most 50 characters. */
+  searchTitle?: string
+  /** H1 split into a plain part and an italic tail. */
+  h1?: { plain: string; italic: string }
+  /** First sentence(s) of the meta description; see neighborhoodDescription(). */
+  descriptionLead?: string
+  /** Extra sections rendered under the live listings. */
+  sections?: { heading: string; paragraphs: string[]; bullets?: string[] }[]
+  /** Visible FAQ, mirrored in FAQPage JSON-LD. Answers: 40 to 60 words. */
+  faqs?: { question: string; answer: string }[]
+  /** Internal links (path starting with /) shown as "Keep planning". */
+  links?: { label: string; href: string }[]
+  /** External primary sources, shown with the date they were read. */
+  sources?: { label: string; href: string }[]
+  sourcesReadOn?: string
 }
 
 export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
@@ -33,6 +50,10 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     slug: 'north-campus',
     name: 'North Campus',
     tagline: 'Quieter and greener. Home base for engineering, music, and art.',
+    searchTitle: 'North Campus Apartments and Sublets near UMich',
+    h1: { plain: 'North Campus apartments and sublets near the ', italic: 'University of Michigan.' },
+    descriptionLead:
+      'North Campus apartments and housing: how the buses reach Central Campus, what to ask a landlord and when to look.',
     intro: [
       "North Campus is its own world. If you're in Engineering, Music, Theatre & Dance, or Art & Design, your classes are up here, and living nearby saves you the bus commute across town. It's calmer and more spread out than Central. More trees, more parking, fewer crowds.",
       "Housing skews toward apartment complexes and newer builds. The Northwood and Bursley areas anchor it. Sublets open up here for the same reasons as everywhere else: co-ops, internships, graduation. And because it's a bit removed, you can sometimes find better value than the Central Campus crush.",
@@ -40,10 +61,110 @@ export const NEIGHBORHOOD_CONTENT: NeighborhoodContent[] = [
     highlights: [
       'Home to Engineering, Music, and Art & Design',
       'Quieter and greener than Central Campus',
-      'Served by the UMich bus (Bursley–Baits, Northwood routes)',
+      'Served by the university buses (Bursley-Baits, Northwood and more)',
       'More apartment complexes, often better value',
     ],
     bestFor: 'engineering, music, and art students who want to skip the commute',
+    sections: [
+      {
+        heading: 'What kinds of apartments are near North Campus?',
+        paragraphs: [
+          "Housing here skews toward apartment complexes and newer builds, so expect a unit in a larger community more often than a room in an old house. Layout, furnishing and lease terms differ by building and by listing, so read each listing's details and ask what the rent includes.",
+          "One building on Wroomly's own building pages sits in this area: The Courtyards on Broadway Street. Wroomly's page for it describes one to four bedroom furnished apartments on individual leases.",
+          "Wroomly is independent and is not run by or affiliated with the University of Michigan. For university owned housing, use the university's own housing pages.",
+        ],
+      },
+      {
+        heading: 'How do you get from North Campus to Central Campus?',
+        paragraphs: [
+          "The university runs its own bus system, and its rider guide says its 12 routes are open and free to the general public, with no ID and no fare. Four of them serve North Campus. Terms and days differ by route, so read the route page for the term you will be here.",
+        ],
+        bullets: [
+          'Bursley-Baits links the Central Campus Transit Center with Bursley Hall and the Vera Baits Houses. It runs seven days a week in the fall and winter terms only.',
+          'Northwood links Central Campus with Northwood Housing. It runs every day all year except University holidays, but the timetable differs between fall and winter and spring and summer, and spring and summer weekends have gaps.',
+          'Commuter North runs every day from Crisler Center to Glazier Way through South, Central and Medical Campus. Its routing changes early in the morning and in the evening, so check the route page.',
+          'Northwood Express runs Monday to Friday on class days in the fall and winter terms only, on a limited schedule.',
+        ],
+      },
+      {
+        heading: 'What should you know about riding the bus from North Campus?',
+        paragraphs: [
+          'Bicycles are not allowed on university buses; the rider guide makes an exception for foldable bikes and scooters. The Northwood route can be followed live on the Magic Bus map, while the Bursley-Baits route page says that route cannot currently be tracked there.',
+          "TheRide, Ann Arbor's city bus system, is separate from the campus buses. The university's MRide page says active U-M students with a yellow MCard ride TheRide fixed routes free. Without one, TheRide's fare page lists a single ride at $1.50 for an adult.",
+        ],
+      },
+      {
+        heading: 'How far is it to class, a bus stop and groceries?',
+        paragraphs: [
+          "North Campus is spread out, so distance varies a lot from one building to the next. Measure the walk from the front door to your class building, to the stop for your route and to a grocery store, instead of trusting a listing's description. Wroomly's page for The Courtyards states about a six minute walk to North Campus, which is a useful example of the kind of figure to ask any landlord for.",
+          'Then walk the route once in the dark and once after snow if you can. A stop that is close on a map can be slower in winter.',
+        ],
+      },
+      {
+        heading: 'When should you look for North Campus housing?',
+        paragraphs: [
+          "Wroomly's housing timeline guide says leasing for the following fall starts in the autumn, with the most wanted places going first from September through November. If you only need one term, sublets are the shorter route: winter semester sublets post from November and December as people leave, and summer sublets surge from February to April.",
+          'A short sublet is also a low risk way to test the commute before you sign a twelve month lease.',
+        ],
+      },
+      {
+        heading: 'What should you ask a landlord about a North Campus place?',
+        paragraphs: [
+          'Use this as a checklist for your own planning, not as legal advice. If a lease clause is unclear, ask the landlord or leasing office and keep the answer in writing.',
+        ],
+        bullets: [
+          'How far is the nearest bus stop, and which route stops there?',
+          'Is parking included in the rent, assigned, or an extra monthly charge, and is it in the lease or a separate agreement?',
+          'Who clears snow from the walkways and the lot, and how soon after a storm?',
+          'Is bike storage covered and secure?',
+          'What does the rent include: utilities, internet, furniture?',
+          'Does a sublet or lease takeover need the landlord\'s approval?',
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: 'How do you get from North Campus to Central Campus without a car?',
+        answer:
+          "The university runs free campus buses between the two, including Bursley-Baits, Northwood and Commuter North. Its rider guide says they are open to the public with no ID or fare. Some routes run only in the fall and winter terms, so check each route page for the term you will be here.",
+      },
+      {
+        question: 'What kinds of housing are near North Campus?',
+        answer:
+          "Housing near North Campus skews toward apartment complexes and newer buildings. Wroomly's page for The Courtyards describes one to four bedroom furnished apartments on individual leases. Layout, furnishing and lease terms differ by building, so compare each listing's details and ask what the rent includes before you commit.",
+      },
+      {
+        question: 'When should you start looking for North Campus housing?',
+        answer:
+          "Wroomly's timeline guide says leasing for the following fall starts in the autumn, from about September through November. If you only need one term, winter and summer sublets post as people leave for internships and co-ops. Start early and compare places by commute, lease length and what rent includes.",
+      },
+      {
+        question: 'What should you ask a landlord about a place near North Campus?',
+        answer:
+          "Ask how far the nearest bus stop is and which route stops there, whether parking is included or costs extra, who clears snow from walkways and the lot, where bikes can be stored, and what the rent includes. Get the answers in writing before you sign, and ask about anything unclear.",
+      },
+    ],
+    links: [
+      { label: 'Off campus housing near North Campus: how to choose', href: '/guides/off-campus-housing-near-north-campus-umich' },
+      { label: 'Do you need a car if you live off campus at UMich?', href: '/guides/do-you-need-a-car-umich-off-campus' },
+      { label: 'The Courtyards on Broadway Street', href: '/buildings/courtyards' },
+      { label: 'UMich off campus housing timeline', href: '/guides/umich-off-campus-housing-timeline' },
+      { label: 'Winter semester sublets in Ann Arbor', href: '/guides/winter-semester-sublets-ann-arbor' },
+      { label: 'Live Ann Arbor rent prices', href: '/guides/ann-arbor-rent-prices' },
+      { label: 'Central Campus places', href: '/ann-arbor/central-campus' },
+      { label: 'Browse all Ann Arbor listings', href: '/listings' },
+    ],
+    sourcesReadOn: 'November 19, 2026',
+    sources: [
+      { label: 'U-M campus bus rider guide', href: 'https://ltp.umich.edu/campus-transit/rider-guide/' },
+      { label: 'U-M bus routes and schedules', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/' },
+      { label: 'Bursley-Baits route', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/bursley-baits/' },
+      { label: 'Northwood route', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/northwood/' },
+      { label: 'Commuter North route', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/commuter-north/' },
+      { label: 'Northwood Express route', href: 'https://ltp.umich.edu/campus-transit/routes-and-schedules/northwood-express/' },
+      { label: 'U-M MRide free TheRide rides', href: 'https://ltp.umich.edu/transportation-alternatives/mride/' },
+      { label: 'TheRide fares', href: 'https://www.theride.org/fares-passes/fares' },
+    ],
   },
   {
     slug: 'south-university',
@@ -201,5 +322,11 @@ export function getNeighborhood(slug: string): NeighborhoodContent | undefined {
  * Kept to 155 characters or fewer (enforced by tests/unit/neighborhoods.test.ts).
  */
 export function neighborhoodDescription(n: NeighborhoodContent): string {
+  if (n.descriptionLead) return `${n.descriptionLead} Browse live sublets on Wroomly.`
   return `${n.tagline} Browse UMich student sublets in ${n.name}, Ann Arbor, on Wroomly.`
+}
+
+/** Page title before the " | Wroomly" suffix. */
+export function neighborhoodTitle(n: NeighborhoodContent): string {
+  return n.searchTitle ?? `${n.name} Sublets in Ann Arbor: UMich Housing`
 }

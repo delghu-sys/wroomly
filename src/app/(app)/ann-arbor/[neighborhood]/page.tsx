@@ -2,13 +2,13 @@ import { notFound } from 'next/navigation'
 import { clampTitle } from '@/lib/seo/meta'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { NEIGHBORHOOD_CONTENT, getNeighborhood, neighborhoodDescription } from '@/lib/seo/neighborhoods'
+import { NEIGHBORHOOD_CONTENT, getNeighborhood, neighborhoodDescription, neighborhoodTitle } from '@/lib/seo/neighborhoods'
 import { BUILDINGS } from '@/lib/seo/buildings'
 import { fetchActiveListings, fetchRentSample } from '@/lib/seo/fetch-listings'
 import { neighborhoodRent, usd } from '@/lib/seo/rent-stats'
 import { BrandListingCard } from '@/components/listings/BrandListingCard'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
-import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
+import { JsonLd, breadcrumbJsonLd, faqJsonLd } from '@/components/seo/JsonLd'
 import { MapPin, ArrowRight, Check } from 'lucide-react'
 
 // Pre-render all neighborhood pages at build time.
@@ -25,7 +25,7 @@ export async function generateMetadata({
   const n = getNeighborhood(neighborhood)
   if (!n) return { title: 'Neighborhood not found' }
 
-  const title = clampTitle(`${n.name} Sublets in Ann Arbor: UMich Housing`)
+  const title = clampTitle(neighborhoodTitle(n))
   const description = neighborhoodDescription(n)
   return {
     title,
@@ -66,6 +66,8 @@ export default async function NeighborhoodPage({
           { name: n.name, path: `/ann-arbor/${n.slug}` },
         ])}
       />
+      {/* FAQPage markup only when the visible FAQ section below is rendered. */}
+      {n.faqs && n.faqs.length > 0 && <JsonLd data={faqJsonLd(n.faqs)} />}
 
       <Breadcrumbs
         crumbs={[
@@ -81,8 +83,10 @@ export default async function NeighborhoodPage({
           <MapPin className="w-3.5 h-3.5" /> Ann Arbor · Neighborhood
         </p>
         <h1 className="font-display text-4xl sm:text-5xl tracking-tight text-ink leading-[1.05] text-balance">
-          {n.name} sublets near the{' '}
-          <span className="italic font-light text-navy">University of Michigan.</span>
+          {n.h1 ? n.h1.plain : <>{n.name} sublets near the </>}
+          <span className="italic font-light text-navy">
+            {n.h1 ? n.h1.italic : 'University of Michigan.'}
+          </span>
         </h1>
         <p className="mt-4 text-lg text-ink-muted leading-relaxed">{n.tagline}</p>
 
@@ -172,6 +176,87 @@ export default async function NeighborhoodPage({
           </div>
         )}
       </section>
+
+
+      {/* Optional extra content (sections, FAQ, links, sources). Only rendered
+          for neighborhoods whose data entry provides it. */}
+      {n.sections && n.sections.length > 0 && (
+        <div className="mt-14 pt-8 border-t border-line max-w-3xl space-y-10">
+          {n.sections.map(sec => (
+            <section key={sec.heading}>
+              <h2 className="font-display text-2xl tracking-tight text-ink">{sec.heading}</h2>
+              <div className="mt-3 space-y-3">
+                {sec.paragraphs.map((p, i) => (
+                  <p key={i} className="text-[15px] text-ink-soft leading-relaxed">{p}</p>
+                ))}
+              </div>
+              {sec.bullets && (
+                <ul className="mt-3 space-y-2">
+                  {sec.bullets.map((b, i) => (
+                    <li key={i} className="flex items-start gap-2 text-[15px] text-ink-soft leading-relaxed">
+                      <Check className="w-4 h-4 text-gold-deep shrink-0 mt-1" strokeWidth={2.5} />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      )}
+
+      {n.faqs && n.faqs.length > 0 && (
+        <section className="mt-14 pt-8 border-t border-line max-w-3xl">
+          <h2 className="font-display text-2xl tracking-tight text-ink mb-4">
+            Questions about {n.name} housing
+          </h2>
+          <div className="divide-y divide-line border-y border-line">
+            {n.faqs.map(f => (
+              <div key={f.question} className="py-5">
+                <h3 className="font-display text-lg text-ink tracking-tight leading-snug">{f.question}</h3>
+                <p className="mt-2 text-[15px] text-ink-soft leading-relaxed">{f.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {((n.links && n.links.length > 0) || (n.sources && n.sources.length > 0)) && (
+        <section className="mt-14 pt-8 border-t border-line">
+          {n.links && n.links.length > 0 && (
+            <>
+              <p className="text-[11px] uppercase tracking-[0.16em] text-ink-muted font-semibold mb-4">
+                Keep planning
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {n.links.map(l => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className="inline-flex items-center px-3.5 h-9 rounded-full text-[13px] font-medium bg-white/85 border border-line text-ink-soft hover:border-maize-bright/45 hover:text-ink transition"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+          {n.sources && n.sources.length > 0 && (
+            <p className="mt-6 text-[13px] text-ink-muted leading-relaxed">
+              Sources{n.sourcesReadOn ? `, read ${n.sourcesReadOn}` : ''}:{' '}
+              {n.sources.map((l, i) => (
+                <span key={l.href}>
+                  {i > 0 && ', '}
+                  <a href={l.href} rel="noopener" className="underline underline-offset-2 hover:text-ink">
+                    {l.label}
+                  </a>
+                </span>
+              ))}
+              . Routes and hours change by term, so check the route page before you plan around a schedule.
+            </p>
+          )}
+        </section>
+      )}
 
       {/* Buildings located in this neighborhood — cross-links the two
           landing-page families so link equity flows both ways. */}
