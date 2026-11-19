@@ -142,8 +142,9 @@ export function CardGallery({
             </button>
           )}
 
-          {/* Dots */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
+          {/* Dots: the very bottom edge, with the card's chip row lifted above
+              them (BrandListingCard), so Furnished/Pets never sit on the dots. */}
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 pointer-events-none">
             {images.map((_, i) => (
               <span
                 key={i}
