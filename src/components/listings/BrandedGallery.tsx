@@ -17,6 +17,52 @@ interface BrandedGalleryProps {
 
 const spring = { type: 'spring' as const, stiffness: 100, damping: 20 }
 
+// Only qualities listed in next.config.ts `images.qualities` are used, so each
+// photo is requested at a size/quality the CDN is likely to have cached.
+const MAIN_SIZES = '(max-width: 1024px) 100vw, 66vw'
+const LIGHTBOX_SIZES = '(min-width: 1024px) 1024px, 100vw'
+
+/**
+ * Fetches the photos on either side of the one being shown, using exactly the
+ * props of the real <Image> (same sizes, quality, dimensions) so the browser
+ * requests the same URL and the next click finds it already in cache. Each
+ * photo is a Supabase on-the-fly resize, so without this every click paid for
+ * a cold resize + download before anything appeared.
+ */
+function Preload({
+  images,
+  current,
+  sizes,
+  quality,
+  dims,
+}: {
+  images: ListingImage[]
+  current: number
+  sizes: string
+  quality: number
+  dims?: { width: number; height: number }
+}) {
+  if (images.length < 2) return null
+  const n = images.length
+  const idx = [...new Set([(current + 1) % n, (current - 1 + n) % n, (current + 2) % n])].filter(i => i !== current)
+  return (
+    <div aria-hidden className="absolute w-px h-px overflow-hidden opacity-0 pointer-events-none">
+      {idx.map(i => (
+        <Image
+          key={images[i].id}
+          src={getListingImageUrl(images[i].storage_path)}
+          alt=""
+          {...(dims ?? { fill: true })}
+          quality={quality}
+          sizes={sizes}
+          loading="eager"
+          fetchPriority="low"
+        />
+      ))}
+    </div>
+  )
+}
+
 export function BrandedGallery({ images, title }: BrandedGalleryProps) {
   const [current, setCurrent] = useState(0)
   const [direction, setDirection] = useState(0)
@@ -77,20 +123,22 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
               initial={{ opacity: 0, x: direction > 0 ? 60 : -60, scale: 1.02 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: direction > 0 ? -60 : 60, scale: 1.02 }}
-              transition={{ ...spring, stiffness: 80 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0"
             >
               <Image
                 src={getListingImageUrl(images[current].storage_path)}
                 alt={`${title}, photo ${current + 1}`}
                 fill
-                quality={92}
+                quality={90}
                 className="object-cover"
                 priority={current === 0}
-                sizes="(max-width: 1024px) 100vw, 66vw"
+                sizes={MAIN_SIZES}
               />
             </motion.div>
           </AnimatePresence>
+
+          <Preload images={images} current={current} sizes={MAIN_SIZES} quality={90} />
 
           {/* Bottom scrim for legibility */}
           <div
@@ -221,12 +269,12 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[100] bg-navy-deep/97 flex items-center justify-center backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-navy-deep flex items-center justify-center"
             onClick={() => setLightboxOpen(false)}
           >
           <button
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/[0.08] hover:bg-white/[0.15] backdrop-blur flex items-center justify-center transition-colors"
+            className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/[0.10] hover:bg-white/[0.18] flex items-center justify-center transition-colors"
             aria-label="Close lightbox"
           >
             <X className="w-5 h-5 text-white" />
@@ -243,7 +291,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
                   e.stopPropagation()
                   prev()
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/[0.08] hover:bg-white/[0.15] backdrop-blur flex items-center justify-center transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/[0.10] hover:bg-white/[0.18] flex items-center justify-center transition-colors"
                 aria-label="Previous photo"
               >
                 <ChevronLeft className="w-6 h-6 text-white" />
@@ -253,7 +301,7 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
                   e.stopPropagation()
                   next()
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/[0.08] hover:bg-white/[0.15] backdrop-blur flex items-center justify-center transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 rounded-full bg-white/[0.10] hover:bg-white/[0.18] flex items-center justify-center transition-colors"
                 aria-label="Next photo"
               >
                 <ChevronRight className="w-6 h-6 text-white" />
@@ -274,9 +322,17 @@ export function BrandedGallery({ images, title }: BrandedGalleryProps) {
               alt={`${title}, photo ${current + 1}`}
               width={1920}
               height={1080}
-              quality={95}
+              quality={75}
               className="object-contain w-full h-full max-h-[85vh] rounded-2xl"
-              sizes="100vw"
+              sizes={LIGHTBOX_SIZES}
+              priority
+            />
+            <Preload
+              images={images}
+              current={current}
+              sizes={LIGHTBOX_SIZES}
+              quality={75}
+              dims={{ width: 1920, height: 1080 }}
             />
           </motion.div>
         </motion.div>
