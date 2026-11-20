@@ -41,25 +41,33 @@ export const GUIDES: Guide[] = [
     title: 'How to sublet your apartment at the University of Michigan',
     seoTitle: 'How to Sublet an Apartment in Ann Arbor (UMich)',
     description:
-      'How to sublet your apartment in Ann Arbor: check your lease first, price the room, find a verified UMich subletter, and get paid safely.',
+      'How to sublet your apartment in Ann Arbor: get written landlord and roommate approval, price the room, vet a UMich subletter, cap the deposit and sign a sublease.',
     excerpt:
-      "Leaving for the summer, a co-op, or study abroad? Here's how to sublet your Ann Arbor place without losing money or breaking your lease.",
+      "Leaving for the summer, a co-op, or study abroad? Here's how to sublet your Ann Arbor place step by step without losing money or breaking your lease.",
     published: '2026-07-03',
-    updated: '2026-08-30',
-    readingMinutes: 6,
+    updated: '2026-11-20',
+    readingMinutes: 7,
     sections: [
       {
         heading: 'First: check whether your lease even allows it',
         paragraphs: [
-          "Before anything else, read your lease. Most Ann Arbor leases allow subletting but require written landlord approval, and some charge a small re-let fee. A few prohibit it outright. If you sublet against your lease and your landlord finds out, you can be on the hook. Get approval in writing first.",
-          "If your building is managed by one of the big campus property companies, there's usually a form. Email your leasing office, ask for the sublet policy, and keep the reply. That paper trail protects you later.",
+          'To sublet your apartment at UMich, get written approval from your landlord, and from your roommates if you share a lease, then price the room, vet a subletter, collect the deposit and first month before handing over keys, and sign a written sublease that ends on or before your own lease. You stay responsible to your landlord the whole time.',
+          'Before anything else, read your lease. Most Ann Arbor leases allow subletting but require written landlord approval, and some charge a small re-let fee. A few prohibit it outright. If you sublet against your lease and your landlord finds out, you can be on the hook. Get approval in writing first.',
+          "If your building is managed by one of the big campus property companies, there's usually a form. Email your leasing office, ask for the sublet policy, and keep the reply. That paper trail protects you later. Some landlords also want to screen your subletter the same way they screened you, so ask about that up front.",
+        ],
+      },
+      {
+        heading: 'Do your roommates have to agree?',
+        paragraphs: [
+          "Often, yes. U-M Student Legal Services notes that your lease may require your roommates' consent as well as your landlord's. Even where it doesn't, ask anyway: on a joint lease, everyone signed for the whole rent, so a subletter who stops paying is a problem for the whole apartment, not just you.",
+          'On an individual lease you rent your own bedroom, and the sublet mostly concerns you and the landlord. Your roommates still share a kitchen and a bathroom with whoever moves in, so introduce the subletter before you commit. Not sure which kind you signed? The lease says, and the guide on individual and joint leases explains the difference.',
         ],
       },
       {
         heading: 'Set a price that actually fills the room',
         paragraphs: [
-          "Summer sublets in Ann Arbor almost always go for less than the academic-year rate. Students are competing for a smaller pool of renters, and most people only need May through August. Pricing at or slightly below what you pay is normal. Holding out for full rent usually means an empty room and you paying for it anyway.",
-          'Look at comparable live listings near you to anchor your number. A furnished room a short walk from the Diag commands more than an unfurnished room out in Pittsfield. Location and furniture are the two biggest levers.',
+          'Summer sublets in Ann Arbor almost always go for less than the academic-year rate. Students are competing for a smaller pool of renters, and most people only need May through August. Pricing at or slightly below what you pay is normal. Holding out for full rent usually means an empty room and you paying for it anyway.',
+          'Look at comparable live listings near you to anchor your number. A furnished room a short walk from the Diag commands more than an unfurnished room out in Pittsfield. Location and furniture are the two biggest levers. Say plainly whether utilities and internet are included, because that changes what the number really means.',
         ],
       },
       {
@@ -72,27 +80,70 @@ export const GUIDES: Guide[] = [
           'Exact dates available (and whether they flex)',
           'Rent, deposit, and what utilities are included',
           'How many roommates, and a sentence about them',
-          'Distance to campus / which bus line',
+          'Distance to campus and which bus line',
         ],
       },
       {
         heading: 'Vet your subletter, then get paid safely',
         paragraphs: [
-          "The riskiest part of subletting is handing your place to (and collecting money from) someone you've never met. This is exactly why Wroomly verifies students through their UMich Google login: where you see a blue check, the person messaging you is a real U of M student with a name attached, not an anonymous account. Meet them, or at least do a video call, before anything is signed.",
-          "When money moves, keep it traceable. Collect rent and any deposit by a method with a paper trail, and never take payment by gift card, crypto, or a wire from an account you can't verify. Those are the classic scam patterns. A real subletter will happily pay in a way that protects them too.",
+          "The riskiest part of subletting is handing your place to (and collecting money from) someone you've never met. This is exactly why Wroomly verifies students through their UMich Google login: where you see a blue check, the person messaging you signed in with a UMich account, not an anonymous one. Meet them, or at least do a video call, before anything is signed. Ask for references and a permanent address.",
+          "Student Legal Services says to collect the deposit and the first rent payment before your subletter moves in or gets keys. Keep it traceable: never take payment by gift card, crypto, or a wire from an account you can't verify. Be wary of anyone who wants to rent sight unseen: the Ann Arbor Police Department has confirmed email scams aimed at students and landlords.",
+        ],
+      },
+      {
+        heading: 'How much deposit can you ask a subletter for?',
+        paragraphs: [
+          "Michigan law caps a security deposit at one and a half months' rent, and Student Legal Services applies the same limit to a subletter: no more than one and a half times their monthly rent. Ask your landlord or a lawyer how that applies to your setup rather than guessing.",
+          'Write down who holds the subletter\'s deposit, what it covers, and when it comes back. Your own deposit with the landlord is a separate thing, and it stays on the line for any damage your subletter causes.',
         ],
       },
       {
         heading: 'Put it in writing',
         paragraphs: [
-          'Even a simple written sublease agreement (dates, rent, deposit terms, who pays utilities, condition of the place) saves enormous headaches. It protects both of you if something goes sideways, and most landlords want a copy anyway. Take timestamped move-in photos so the deposit return is a non-issue at the end.',
+          'A written sublease saves enormous headaches. It protects both of you if something goes sideways, and most landlords want a copy anyway. Give your subletter a copy of your own lease too: its rules apply to them while they live there. Take timestamped move-in photos so the deposit return is a non-issue at the end.',
         ],
+        bullets: [
+          'Start and end dates, with the end on or before your own lease ends',
+          "Total rent, the monthly amount, and how and when it's paid",
+          'Deposit amount, who holds it, and when it comes back',
+          'Who pays which utilities and internet, and whose name the accounts stay in',
+          "The landlord's written approval, attached",
+          'What happens if either of you needs to end it early',
+        ],
+      },
+      {
+        heading: "What's the timeline, step by step?",
+        paragraphs: [
+          "Here's the whole process in order. Start as soon as you know you're leaving: listings for summer pile up fast once winter semester winds down.",
+        ],
+        table: {
+          caption: 'Step by step timeline for subletting your Ann Arbor apartment',
+          columns: ['When', 'What to do', 'Done when'],
+          rows: [
+            ["As soon as you know you're leaving", 'Read your lease and ask the leasing office for its sublet policy', 'You have the policy, or approval, in writing'],
+            ['Same week', 'Talk to your roommates', 'Everyone on the lease is on board, in writing if the lease asks for it'],
+            ['Before you list', 'Set the price, take daylight photos, write the listing', 'The listing shows dates, rent, deposit and utilities'],
+            ['While you screen', 'Video call or meet, ask for references and a permanent address', 'You know who you\'re renting to'],
+            ['Before keys', 'Sign the sublease, collect deposit and first month traceably', 'Signed copies for both of you and your landlord'],
+            ['Move out day', 'Take timestamped photos, hand over keys, set up utilities', 'Photos saved, accounts sorted'],
+            ['When the sublet ends', 'Walk through together, return the subletter\'s deposit as agreed', 'Deposit settled, place ready for you or your landlord'],
+          ],
+        },
       },
     ],
     links: [
-      { label: 'Browse UMich sublets', href: '/umich-sublets' },
+      { label: 'How to price your sublet', href: '/guides/how-to-price-your-sublet' },
+      { label: 'Individual vs joint leases', href: '/guides/individual-lease-vs-joint-lease-ann-arbor' },
+      { label: 'Sublet your room while roommates stay', href: '/guides/sublet-your-room-with-roommates-staying' },
+      { label: 'Avoiding sublet scams', href: '/guides/how-to-avoid-sublet-scams-ann-arbor' },
       { label: 'How to pay for a sublet safely', href: '/guides/how-to-pay-for-a-sublet-safely' },
+      { label: 'Security deposits for sublets', href: '/guides/security-deposits-ann-arbor-sublets' },
       { label: 'Sublet while you study abroad', href: '/guides/sublet-apartment-while-studying-abroad' },
+      { label: 'Wroomly safety page', href: '/safety' },
+      { label: 'Browse current sublets', href: '/listings' },
+      { label: 'U-M Student Legal Services tips on subletting', href: 'https://studentlegalservices.umich.edu/article/tips-subletting' },
+      { label: 'Michigan security deposit limit, MCL 554.602', href: 'https://www.legislature.mi.gov/Laws/MCL?objectName=mcl-554-602' },
+      { label: 'FTC guide to rental listing scams', href: 'https://consumer.ftc.gov/articles/rental-listing-scams' },
     ],
     faqs: [
       {
@@ -101,19 +152,29 @@ export const GUIDES: Guide[] = [
           'Usually, yes. Most Ann Arbor leases allow subletting but require written landlord approval, and some charge a small re-let fee. A few prohibit it outright. Read your lease, email your leasing office for the sublet policy, and keep the written approval before you list your place.',
       },
       {
+        question: "Am I still responsible for rent if my subletter doesn't pay?",
+        answer:
+          'Yes. Subletting does not release you from your lease. U-M Student Legal Services says you stay liable to the landlord for your subtenant\'s acts, including unpaid rent and damage. On a joint lease your roommates are exposed too, which is why choosing your subletter carefully matters so much.',
+      },
+      {
+        question: 'Do my roommates have to agree to my sublet?',
+        answer:
+          "Often, yes. Your lease may require your roommates' consent as well as the landlord's, and on a joint lease everyone shares responsibility for the whole rent. Even on an individual lease, introduce the subletter first: your roommates will share a kitchen and bathroom with them all summer.",
+      },
+      {
         question: 'How much should I charge for a summer sublet at UMich?',
         answer:
           'Price at or slightly below what you pay in rent. Summer sublets in Ann Arbor go for less than the academic-year rate because supply outstrips demand from May through August. Furnished rooms close to Central Campus hold their value best; holding out for full rent usually means an empty room.',
       },
       {
-        question: 'How do I find a subletter I can trust?',
+        question: 'How much of a deposit can I ask a subletter for?',
         answer:
-          'Use a platform that verifies identity. On Wroomly, students who sign in with their UMich Google account carry a blue check, so you can tell a real U of M student from an anonymous one. Meet or video-call before signing, put the agreement in writing, and only accept payment by a traceable method, never wire, gift card, or crypto.',
+          "Michigan law caps a security deposit at one and a half months' rent, and U-M Student Legal Services applies the same cap to a subletter's monthly rent. Collect it with the first month's rent before handing over keys, and write down who holds it and when it comes back.",
       },
       {
         question: 'Do I need a written sublease agreement?',
         answer:
-          'Yes. Even a simple one-page agreement covering dates, rent, deposit terms, utilities, and the condition of the place protects both sides, and most landlords want a copy. Pair it with timestamped move-in photos so the deposit return is straightforward at the end.',
+          "Yes. A written sublease covering dates, rent, deposit terms, utilities, and the landlord's approval protects both sides, and most landlords want a copy. Its end date should fall on or before your own lease's. Pair it with timestamped move-in photos so the deposit return is straightforward.",
       },
     ],
   },
